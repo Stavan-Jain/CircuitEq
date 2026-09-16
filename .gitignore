@@ -3,3 +3,4 @@
 
 # Claude Code local state (the project-scoped MCP config .mcp.json is tracked)
 .claude/*
+__pycache__/

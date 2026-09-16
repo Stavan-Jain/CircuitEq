@@ -138,34 +138,62 @@ numbers.
 
 | Circuit | Pipeline | Qubits | Gates | T-count | Matched | Aligned | Windows | Widest window | Lean time | Notes |
 |---|---|---:|---:|---:|---:|---|---:|---|---:|---|
-| tof_3 | teleport | 5 | 45 → 50 | 21 → 19 | 42/45 | yes | 4 | 3w / 10g | 7 s | kernel-checked |
-| tof_3 | full_reduce | 5 | 45 → 51 | 21 → 15 | 15/45 | no | 9 | 5w / 20g | — | no alignment: windows are not equivalences |
-| tof_4 | teleport | 7 | 75 → 83 | 35 → 31 | 68/75 | timeout | 6 | 5w / 42g | 500 s | 5-wire, 42-gate decide timed out (killed at 8 min, 2.1 GB resident) |
-| tof_4 | full_reduce | 7 | 75 → 100 | 35 → 23 | 14/75 | no | 10 | 7w / 52g | — | no alignment: windows are not equivalences |
-| tof_5 | teleport | 9 | 105 → 116 | 49 → 43 | 95/105 | no | 10 | 7w / 74g | — | no alignment within 8 wires |
-| tof_5 | full_reduce | 9 | 105 → 124 | 49 → 31 | 18/105 | no | 11 | 8w / 54g | — | no alignment: windows are not equivalences |
-| barenco_tof_3 | teleport | 5 | 60 → 62 | 28 → 24 | 54/60 | yes | 6 | 1w / 3g | 2 s | kernel-checked |
-| barenco_tof_3 | full_reduce | 5 | 60 → 75 | 28 → 16 | 9/60 | no | 7 | 5w / 47g | — | no alignment: windows are not equivalences |
-| mod5_4 | teleport | 5 | 63 → 66 | 28 → 22 | 53/63 | unchecked (whole register) | 3 | 5w / 108g | — | found; 5-wire window not sent to Lean |
-| mod5_4 | full_reduce | 5 | 63 → 27 | 28 → 8 | 3/63 | unchecked (whole register) | 1 | 5w / 90g | — | found; 5-wire window not sent to Lean |
-| cuccaro_2 | teleport | 6 | 69 → 77 | 28 → 24 | 59/69 | unchecked | 4 | 5w / 31g | — | found; 5-wire window not sent to Lean |
-| cuccaro_2 | full_reduce | 6 | 69 → 78 | 28 → 16 | 6/69 | unchecked (whole register) | 1 | 6w / 147g | — | found; 6-wire window not sent to Lean |
-| cuccaro_3 | teleport | 8 | 103 → 116 | 42 → 36 | 86/103 | unchecked | 6 | 5w / 33g | — | found; 5-wire window not sent to Lean |
-| cuccaro_3 | full_reduce | 8 | 103 → 129 | 42 → 24 | 21/103 | no | 15 | 8w / 34g | — | no alignment: windows are not equivalences |
-| cuccaro_4 | teleport | 10 | 137 → 155 | 56 → 48 | 113/137 | unchecked | 8 | 5w / 33g | — | found; 5-wire window not sent to Lean |
-| cuccaro_4 | full_reduce | 10 | 137 → 190 | 56 → 32 | 5/137 | no | 3 | 10w / 182g | — | no alignment within 8 wires |
-| random_4q_d30_s1 | teleport | 4 | 30 → 30 | 8 → 4 | 17/30 | yes (whole register) | 3 | 4w / 24g | 64 s | kernel-checked |
-| random_4q_d30_s1 | full_reduce | 4 | 30 → 29 | 8 → 2 | 5/30 | timeout (whole register) | 1 | 4w / 59g | 601 s | 4-wire, 59-gate decide timed out |
-| random_5q_d45_s2 | teleport | 5 | 45 → 46 | 12 → 6 | 18/45 | no | 8 | 5w / 31g | — | equivalent only up to a global phase |
-| random_5q_d45_s2 | full_reduce | 5 | 45 → 54 | 12 → 6 | 8/45 | no | 8 | 5w / 33g | — | equivalent only up to a global phase |
-| random_6q_d60_s3 | teleport | 6 | 60 → 58 | 24 → 12 | 17/60 | no | 8 | 6w / 43g | — | no alignment: windows are not equivalences |
-| random_6q_d60_s3 | full_reduce | 6 | 60 → 66 | 24 → 12 | 13/60 | no | 9 | 6w / 48g | — | equivalent only up to a global phase |
+| tof_3 | teleport | 5 | 45 → 50 | 21 → 19 | 42/45 | yes | 4 | 3w / 10g | 7 s |  |
+| tof_5 | teleport | 9 | 105 → 116 | 49 → 43 | 95/105 | no | 10 | 7w / 74g | — |  |
+| barenco_tof_3 | teleport | 5 | 60 → 62 | 28 → 24 | 54/60 | yes | 6 | 1w / 3g | 2 s |  |
+| random_5q_d45_s2 | teleport | 5 | 45 → 46 | 12 → 6 | 18/45 | no | 8 | 5w / 31g | — |  |
+| random_6q_d60_s3 | teleport | 6 | 60 → 58 | 24 → 12 | 17/60 | no | 8 | 6w / 43g | — |  |
+| tof_4 | teleport | 7 | 75 → 83 | 35 → 31 | 68/75 | yes | 6 | 5w / 42g | 6 s |  |
+| cuccaro_2 | teleport | 6 | 69 → 77 | 28 → 24 | 59/69 | yes | 4 | 5w / 31g | 5 s |  |
+| cuccaro_3 | teleport | 8 | 103 → 116 | 42 → 36 | 86/103 | yes | 6 | 5w / 33g | 9 s |  |
+| cuccaro_4 | teleport | 10 | 137 → 155 | 56 → 48 | 113/137 | no | 8 | 5w / 33g | 12 s |  |
+| mod5_4 | teleport | 5 | 63 → 66 | 28 → 22 | 53/63 | yes (whole register) | 3 | 5w / 108g | 10 s |  |
+| tof_3 | full_reduce | 5 | 45 → 51 | 21 → 15 | 15/45 | no | 9 | 5w / 20g | — |  |
+| tof_5 | full_reduce | 9 | 105 → 124 | 49 → 31 | 18/105 | no | 11 | 8w / 54g | — |  |
+| barenco_tof_3 | full_reduce | 5 | 60 → 75 | 28 → 16 | 9/60 | no | 7 | 5w / 47g | — |  |
+| random_5q_d45_s2 | full_reduce | 5 | 45 → 54 | 12 → 6 | 8/45 | no | 8 | 5w / 33g | — |  |
+| random_6q_d60_s3 | full_reduce | 6 | 60 → 66 | 24 → 12 | 13/60 | no | 9 | 6w / 48g | — |  |
+| tof_4 | full_reduce | 7 | 75 → 100 | 35 → 23 | 14/75 | no | 10 | 7w / 52g | — |  |
+| cuccaro_2 | full_reduce | 6 | 69 → 78 | 28 → 16 | 6/69 | unchecked (whole register) | 1 | 6w / 147g | — |  |
+| cuccaro_3 | full_reduce | 8 | 103 → 129 | 42 → 24 | 21/103 | no | 15 | 8w / 34g | — |  |
+| cuccaro_4 | full_reduce | 10 | 137 → 190 | 56 → 32 | 5/137 | no | 3 | 10w / 182g | — |  |
+| mod5_4 | full_reduce | 5 | 63 → 27 | 28 → 8 | 3/63 | unchecked (whole register) | 1 | 5w / 90g | — |  |
+| random_4q_d30_s1 | teleport | 4 | 30 → 30 | 8 → 4 | 17/30 | yes (whole register) | 3 | 4w / 24g | 2 s |  |
+| random_4q_d30_s1 | full_reduce | 4 | 30 → 29 | 8 → 2 | 5/30 | yes (whole register) | 1 | 4w / 59g | 3 s |  |
 
 Whole-register means every window found spans all `n` wires: the
 alignment is then a brute-force basis decide of the whole pair and says
 nothing about locality. The search only produced such windows for
 `n ≤ 6`, and only the 4-qubit ones were within the Lean bound; one of
 those two was checked (64 s) and the other timed out.
+
+## Rerun on `main` with the dyadic evaluator
+
+The survey above was run on the branch's base, whose basis evaluator worked
+in `ℚ(ζ₈)` with rational normalisation. After the merge, `main` decides
+windows with the gcd-free `Dyadic8` closure evaluator (`CircuitEq/Dyadic.lean`),
+and the width-blocked pairs were rerun on it with `--lean-max-wires 5` and a
+300 s cap; the table has been updated with these rows.
+
+| Pair | Before (base evaluator) | On `main` |
+|---|---|---|
+| `tof_4` / teleport (6 windows, widest 5 wires, 42 gates) | killed at 8 min, 2.1 GB | **yes**, 5.9 s |
+| `cuccaro_2` / teleport (4 windows, widest 5w / 31g) | not sent (5 wires) | **yes**, 5.0 s |
+| `cuccaro_3` / teleport (6 windows, widest 5w / 33g) | not sent (5 wires) | **yes**, 8.8 s |
+| `cuccaro_4` / teleport (8 windows, widest 5w / 33g) | not sent (5 wires) | memory: the Lean process was killed at 4.6 GB resident by a watchdog after 12 s |
+| `mod5_4` / teleport (whole register, 5w / 108g) | not sent | yes, 9.6 s (a brute-force decide) |
+| `random_4q` / teleport (whole register, 4w / 24g) | 64 s | yes, 2.1 s |
+| `random_4q` / `full_reduce` (whole register, 4w / 59g) | timeout at 600 s, 3.4 GB | yes, 2.9 s |
+
+So the width limit that section 5 below describes has moved from four wires
+to about five, and time is no longer the constraint at these sizes: memory
+is. `cuccaro_4` is the first pair to fail on memory alone, and the culprit
+is not the window (the same 5-wire windows pass on `cuccaro_3`) but the
+replay of a 155-gate certificate, whose intermediate terms the kernel's
+`whnf` cache retains for the whole declaration. A compact encoding of the
+instruction list and chunked replay are the levers (`QUEUE.md`). The
+`full_reduce` rows and the global-phase rows are unchanged by the
+evaluator: their failures are structural, not a matter of cost.
 
 ## Reading the results
 
@@ -318,6 +346,9 @@ section "Where the phase-polynomial checker applies" says which windows it
 would take.
 
 ### 5. The decide cost of a 5-wire window
+
+*Partly superseded by the rerun above: on `main` the 5-wire windows of
+`tof_4` and the adders decide in seconds; memory, not time, is now the limit.*
 
 Measured with `lake env lean` on the same machine during the same hours
 (a 10-core laptop with 16 GB, shared with four other agents' Lean builds

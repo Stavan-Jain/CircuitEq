@@ -111,6 +111,23 @@ proof is one line, `(tableauChecker 15).sound _ _ (by decide +kernel)`,
 about 0.3 s of kernel time, and states `≡ₛ`, equality up to a unit scalar,
 which is all a tableau can see.
 
+[`benchmarks/barenco_tof_3/`](benchmarks/barenco_tof_3/README.md) is the
+first pair whose alignment a script found rather than a person: Barenco's
+three-controlled Toffoli, T-count 28 to 24 under phase teleportation, six
+one-wire windows emitted by the survey's diff-based search and checked by
+`circuit_windows` with no refinement.
+
+[`benchmarks/survey/`](benchmarks/survey/README.md) is the evidence run for
+the roadmap's working hypothesis: eleven T-heavy circuits (Toffoli chains,
+Barenco's Toffoli, `mod5_4`, Cuccaro adders, seeded random circuits) against
+both PyZX pipelines, aligned by script. Phase-teleportation output aligns
+by windows on the structured circuits (seven pairs kernel-checked in 2 to
+10 s each on the dyadic evaluator, one memory-bound), re-synthesised output
+never does except as a whole-register decide, three random pairs are equal
+only up to a global phase, and every wide window is CNOT-plus-diagonal
+segments around one Hadamard, which is where the phase-polynomial checker
+applies next.
+
 ## Design
 
 - **Coefficients are the computable field ℚ(ζ₈), not ℂ.** Mathlib's `ℂ` is

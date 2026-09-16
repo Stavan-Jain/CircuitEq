@@ -12,21 +12,19 @@ Sizes: S is a session, M a few sessions, L a milestone.
 
 ## In flight (16 September 2026)
 
-- **T-count survey.** `scripts/tcount_survey.py`, `benchmarks/survey/`:
-  Toffoli chains, adders and seeded random circuits against both PyZX
-  pipelines, diff-based alignments checked by `circuit_windows`, and a
-  written account of what does not align. M. Early records: teleport
-  alignments tend to a single whole-register window (a brute-force decide,
-  not a window proof), and `full_reduce` pairs have no alignment.
+Nothing. All five parallel branches are merged (see "Done").
 
 ## Next
 
-1. **Integrate the survey.** Merge its branch, fold its table and failure
-   modes into ROADMAP Rung 3 and this file, and turn its findings into
-   items below. S. Depends on the survey branch. (The other four branches
-   are merged; `phasePolyChecker` is registered at index 0 of
-   `defaultCheckers` with `evalChecker` as fallback. `tableauChecker`
-   cannot join that table: it certifies `≡ₛ`; see item 11.)
+1. **Replay memory.** `cuccaro_4`'s certificate (155 gates, 8 windows)
+   is killed at 4.6 GB while the same windows pass on `cuccaro_3`, and a
+   128-gate move-only replay peaks at 1.9 GB: the kernel's `whnf` cache
+   retains every intermediate instruction list for the whole declaration.
+   Levers, in order: a compact `Nat` (or `String`) encoding of the
+   instruction list decoded by the kernel; chunked replay (one theorem per
+   segment, composed by `Equivalent.trans`); cursor-based steps (item 4).
+   Acceptance: `cuccaro_4` / teleport checks under 2 GB. M. Depends on
+   nothing.
 
 2. **Phase polynomials with Hadamard variables (path-sum form).** Extend
    `PhasePoly` so that an `H` on a wire introduces a fresh variable (bit
@@ -67,8 +65,14 @@ Sizes: S is a session, M a few sessions, L a milestone.
    largest contiguous `H`-free regions (pulled together by commutations)
    checked by the phase-polynomial checker, keep the basis decide for the
    residue near Hadamards, add the `tzap` pipeline, rerun, and record
-   which pairs still need the residual pattern. S. Depends on items 1
-   and 3.
+   which pairs still need the residual pattern. The survey's own analysis
+   says where this lands: every wide window of the structured teleport
+   pairs is one or two CNOT-plus-diagonal segments around one interior
+   Hadamard, so `tof_3`, `tof_4`, `tof_5`, the adders and `mod5_4` become
+   proofs with no basis decide wider than one wire, and the recurring
+   library gap (`[CX 4 3, CZ 3 4] ≡ᵤ [Sdg 3, CX 4 3, S 4, S 3]`, a `CZ`
+   through a control-only block) is a phase-polynomial identity. S.
+   Depends on item 3 for `tzap`; nothing else.
 
 6. **Phase-polynomial follow-ups.** Completeness (equal unitaries in the
    fragment give equal forms, so `false` is a refutation); the affine `X`
@@ -103,8 +107,9 @@ Sizes: S is a session, M a few sessions, L a milestone.
 11. **The scalar replay.** A `ScalarCheckerTable`, a window step whose
     soundness uses `EquivalentUpToScalar.append` and a rename lemma for
     `≡ₛ`, and `replayₛ_sound : … → c ≡ₛ c'`, so that `tableauChecker` can
-    justify windows and, later, residuals. Until then the tableau is used
-    whole-circuit only. S to M. Depends on nothing.
+    justify windows and, later, residuals, and so that pairs equal only up
+    to a global phase (three of the survey's random pairs) can be stated
+    at all by the window pattern. S to M. Depends on nothing.
 
 12. **A block-theorem step.** A step kind that applies a registered lemma
     such as `layer_cnotNetwork_hLayer` at a position, so the Steane proof
@@ -135,6 +140,10 @@ Sizes: S is a session, M a few sessions, L a milestone.
 
 ## Done
 
+- `7641f8e` (merged `90ca69c`) T-count survey: eleven circuits, two
+  pipelines, scripted alignment, `barenco_tof_3` promoted; rerun of the
+  width-blocked pairs on the dyadic evaluator (`tof_4`, `cuccaro_2`,
+  `cuccaro_3` now check in 5 to 9 s).
 - `d134d7e` `phasePolyChecker` registered at index 0 of the certificate
   table, with `evalChecker` as fallback.
 - `a163ea5` (merged `fde3773`) Certificate language: `Step`, `replay`,

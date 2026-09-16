@@ -312,6 +312,27 @@ analytic proofs about `Complex.exp`, not `decide`.
 
 ### Rung 3 — Compositional proofs of fixed-size pairs
 
+**Status (16 September 2026).** The hypothesis has its first test,
+`benchmarks/survey/`: eleven T-heavy circuits against PyZX phase
+teleportation and `full_reduce`, aligned by a diff-based script and checked
+by `circuit_windows`. Teleportation output aligns by windows on the
+structured circuits: `tof_3`, `tof_4`, `barenco_tof_3`, `cuccaro_2` and
+`cuccaro_3` are kernel-checked in 2 to 10 s each on the dyadic evaluator
+(`barenco_tof_3` is promoted as a benchmark, six one-wire windows the
+script found unaided), `cuccaro_4` is memory-bound in the replay of a
+155-gate certificate, and `tof_5` finds no alignment within eight wires
+because a `CZ` commuted through control-only blocks is not a gate-by-gate
+move. Re-synthesised output never aligns except as a whole-register decide
+(`mod5_4`, `random_4q`), which proves the pair but says nothing about
+locality. Three random pairs are equal only up to a global phase, which
+`circuit_windows` cannot state. The decisive observation for what comes
+next: every wide window of the structured pairs is one or two
+CNOT-plus-diagonal segments around a single interior Hadamard, each an
+equivalence on its own, so with the phase-polynomial checker as the leaf and
+windows cut at common Hadamard layers, the structured teleportation pairs
+become proofs with no basis decide wider than one wire (`QUEUE.md`,
+item 5). The residual pattern is still what `full_reduce` output needs.
+
 **Goal.** The direct route to S on real compiled circuits, and the empirical
 test of the working hypothesis above. Everything here is stated with `≡ᵤ` and
 `≡ₚ`.
