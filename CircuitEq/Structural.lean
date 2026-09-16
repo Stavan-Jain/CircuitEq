@@ -160,4 +160,79 @@ def hLayer (n : ℕ) : Circuit n := layer .H (List.finRange n)
 theorem hLayer_hLayer (n : ℕ) : hLayer n ++ hLayer n ≡ᵤ [] :=
   layer_layer_cancel Gate1.H_mul_H _ (List.nodup_finRange n)
 
+/-! ### Inverse circuits
+
+`inverse c` runs the inverse gates in reverse order. It undoes `c` whenever
+every CNOT in `c` has distinct control and target (`applyCNOT c c` is a
+projection, not an involution), which is the only proviso in
+`denote_inverse_denote` and `denote_denote_inverse`. -/
+
+namespace Instr
+
+/-- The inverse instruction: the inverse gate on the same wire; a CNOT is
+its own inverse. -/
+def inverse : Instr n → Instr n
+  | one g i => one g.inverse i
+  | cnot c t => cnot c t
+
+@[simp] lemma inverse_one (g : Gate1) (i : Fin n) : (one g i).inverse = one g.inverse i := rfl
+
+@[simp] lemma inverse_cnot (c t : Fin n) : (cnot c t).inverse = cnot c t := rfl
+
+/-- Inverting twice is the identity. -/
+@[simp] lemma inverse_inverse (g : Instr n) : g.inverse.inverse = g := by
+  cases g with
+  | one g i => cases g <;> rfl
+  | cnot c t => rfl
+
+/-- The inverse instruction undoes the instruction; a CNOT needs distinct
+wires. -/
+lemma inverse_apply_apply (g : Instr n) (h : ∀ c t, g = cnot c t → c ≠ t) (ψ : Vec n) :
+    g.inverse.apply (g.apply ψ) = ψ := by
+  cases g with
+  | one A i => simp [applyOne_applyOne_same, Gate1.inverse_mul, applyOne_one]
+  | cnot c t => exact applyCNOT_applyCNOT_self (h c t rfl) ψ
+
+end Instr
+
+/-- The inverse circuit: the inverse instructions in reverse order. -/
+def inverse (c : Circuit n) : Circuit n := (c.map Instr.inverse).reverse
+
+@[simp] lemma inverse_nil : inverse ([] : Circuit n) = [] := rfl
+
+@[simp] lemma inverse_cons (g : Instr n) (c : Circuit n) :
+    inverse (g :: c) = inverse c ++ [g.inverse] := by
+  simp [inverse]
+
+/-- Inverting twice is the identity. -/
+@[simp] lemma inverse_inverse (c : Circuit n) : inverse (inverse c) = c := by
+  simp [inverse, List.map_reverse, List.map_map, Function.comp_def]
+
+/-- A CNOT of the inverse circuit is a CNOT of the circuit. -/
+lemma cnot_mem_of_mem_inverse {c : Circuit n} {a b : Fin n} (h : Instr.cnot a b ∈ inverse c) :
+    Instr.cnot a b ∈ c := by
+  simp only [inverse, List.mem_reverse, List.mem_map] at h
+  obtain ⟨g, hg, hga⟩ := h
+  cases g with
+  | one _ _ => exact absurd hga (by simp)
+  | cnot _ _ => exact hga ▸ hg
+
+/-- The inverse circuit undoes the circuit, provided every CNOT has distinct
+control and target. -/
+theorem denote_inverse_denote (c : Circuit n) (h : ∀ a b, Instr.cnot a b ∈ c → a ≠ b)
+    (ψ : Vec n) : denote (inverse c) (denote c ψ) = ψ := by
+  induction c generalizing ψ with
+  | nil => rfl
+  | cons g c ih =>
+    have hc : ∀ a b, Instr.cnot a b ∈ c → a ≠ b :=
+      fun a b hm => h a b (List.mem_cons_of_mem _ hm)
+    rw [inverse_cons, denote_cons, denote_append, ih hc, denote_cons, denote_nil]
+    exact g.inverse_apply_apply (fun a b hg => h a b (hg ▸ List.mem_cons_self ..)) ψ
+
+/-- The circuit undoes its inverse, under the same proviso. -/
+theorem denote_denote_inverse (c : Circuit n) (h : ∀ a b, Instr.cnot a b ∈ c → a ≠ b)
+    (ψ : Vec n) : denote c (denote (inverse c) ψ) = ψ := by
+  have := denote_inverse_denote (inverse c) (fun a b hm => h a b (cnot_mem_of_mem_inverse hm)) ψ
+  rwa [inverse_inverse] at this
+
 end Quantum.Circuit

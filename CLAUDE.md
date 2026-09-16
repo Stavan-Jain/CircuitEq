@@ -69,6 +69,17 @@ Rules that follow, for anyone adding to the library:
   `not_touches_of_disjoint`; `Rewriting.lean` adds
   `Instr.CanCommute.of_disjoint` and `gate_block_comm_of_disjoint`. Do not
   invent a second encoding of wire sets.
+- `CircuitEq/Tableau.lean` — the Clifford tableau checker: `Pauli` strings
+  (x-mask, z-mask, phase in `Fin 4`, denoting `i^p · Z^z · X^x`), the
+  gate update rules with pointwise soundness (`conjH_sound`, …,
+  `conjCX_sound`), `conj` / `tableau` (images of the `2n` generators,
+  `none` outside the fragment or for `CX c c`), `tableauCheck`,
+  `tableau_sound` (equal tableaux give `≡ₛ`, the normal-form shape) and
+  the export `tableauChecker n : ScalarChecker n`; `witness` names the
+  first disagreeing generator. Structure-independent, `O(n)` bit
+  operations per gate, no `Zeta8` arithmetic in the kernel: the 15-qubit
+  Reed–Muller pair decides in about 0.3 s. Extend `Gate1.conj` (with a
+  `sound` case) if the Clifford alphabet grows.
 - `CircuitEq/Structural.lean` — the parametric toolkit: fusion,
   commutation, `denote_applyOne_comm_of_not_touches`, `layer`, `hLayer`.
 - `CircuitEq/Rewriting.lean` — rewriting on instruction lists:

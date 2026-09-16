@@ -5,6 +5,7 @@ import CircuitEq.Semantics
 import CircuitEq.Checker
 import CircuitEq.Structural
 import CircuitEq.Support
+import CircuitEq.Tableau
 import CircuitEq.Rewriting
 import CircuitEq.Layers
 import CircuitEq.Tactic
@@ -13,6 +14,7 @@ import CircuitEq.Examples
 import CircuitEq.Benchmarks.Rep3PhaseFlip
 import CircuitEq.Benchmarks.SteanePlus
 import CircuitEq.Benchmarks.Tof3
+import CircuitEq.Benchmarks.RM15Zero
 
 /-!
 # CircuitEq
