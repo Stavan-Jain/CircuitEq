@@ -28,7 +28,10 @@ Rules that follow, for anyone adding to the library:
   pattern.
 - Verify answers, not algorithms. A new optimiser is supported by a
   certified normal form or checker for the fragment it works in, never by
-  formalising its source. External tools are untrusted oracles.
+  formalising its source. External tools are untrusted oracles: TZAP
+  (linear-time phase folding, probabilistically sound, no certificate; its
+  output keeps the gate skeleton, so its pairs align by construction),
+  PyZX, Feynman, Qiskit.
 - New proof techniques land as *step kinds in a certificate language* with
   a certified replay interpreter behind them, so the agent emits data and
   the kernel's cost is linear in the trace. The tactic-built proof terms in
@@ -79,7 +82,10 @@ Rules that follow, for anyone adding to the library:
   gate count and never `2 ^ n` (a 100-gate pair on ten wires is 0.2 s of
   kernel time); it decides T-count windows on many wires. A proof is
   `(phasePolyChecker n).sound _ _ (by decide +kernel)`; bare `decide` times
-  out at about a hundred gates.
+  out at about a hundred gates. It is the deterministic counterpart of
+  TZAP's randomised parity analysis; the extension with Hadamard
+  variables that certifies TZAP output across `H` gates is `QUEUE.md`
+  item 2.
 - `CircuitEq/Structural.lean` — the parametric toolkit: fusion,
   commutation, `denote_applyOne_comm_of_not_touches`, `layer`, `hLayer`.
 - `CircuitEq/Rewriting.lean` — rewriting on instruction lists:
@@ -115,7 +121,9 @@ Rules that follow, for anyone adding to the library:
   repo. The script knows two pipelines, `full_reduce` (re-synthesis) and
   `teleport` (phase teleportation, skeleton-preserving, the one that gives
   alignable T-count pairs), and translates `cz` to `H; CX; H` and
-  `rz(k·π/4)` to the diagonal Clifford+T gate with that matrix.
+  `rz(k·π/4)` to the diagonal Clifford+T gate with that matrix. A `tzap`
+  pipeline (https://github.com/qqq-wisc/tzap) is queued; TZAP reads and
+  writes the same `rz` convention as PyZX.
 - `scripts/AxiomCheck.lean` — CI axiom policy; not in any `lean_lib`.
 
 Namespaces: `Quantum.Zeta8` for the field, `Quantum.Circuit` for everything

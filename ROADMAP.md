@@ -176,8 +176,8 @@ tools' results instead of competing with them.
    is a wire relabelling; ancilla subspaces are a side condition on
    congruence. Cost functions (T-count, depth, gate count) are computed in
    Lean, so "this circuit has T-count 19" is a checked claim.
-6. **The agent.** External tools (PyZX, Feynman, quizx, Qiskit) are untrusted
-   oracles it uses to see where the structure is. It never sees a million
+6. **The agent.** External tools (TZAP, PyZX, Feynman, quizx, Qiskit) are
+   untrusted oracles it uses to see where the structure is. It never sees a million
    gates; it works at the level of blocks and delegates below that to
    checkers. Its output is a certificate; Lean's error messages are its
    feedback.
@@ -187,6 +187,24 @@ ship the trace. *Oracle-guided*: run an external optimiser, take its output
 as the target, certify it with the checker, and fall back to constructive
 mode steered by the target if certification fails. The hybrid is the aim:
 external optimisations verified when possible, the agent's own otherwise.
+
+**TZAP is the model oracle.** TZAP (Albarghouthi, arXiv 2605.13929) does
+phase folding in linear time by replacing the exact parity analysis of
+Feynman and VOQC with random 128-bit fingerprints per wire: CNOT XORs
+them, `H` draws a fresh one, and rotations whose wires carry equal
+fingerprints merge. It matches the T-count of PyZX, VOQC, QuiZX and
+Feynman within a few percent, runs orders of magnitude faster (148 million
+gates in under a minute), is sound only with probability `1 − m²·2⁻¹²⁸`,
+and validates its output by matrix comparison up to six qubits and by
+Feynman's path-sum verifier on some larger circuits: no certificate. Its
+symbolic variant is exactly the analysis `CircuitEq/PhasePoly.lean`
+certifies, and its output keeps the CX/H/X skeleton (it only deletes
+rotations, edits angles and cancels `XX`/`HH` pairs), so a TZAP pair is
+alignable by construction. The optimiser's oracle-guided mode is therefore
+concrete: run TZAP in milliseconds, certify in the kernel with the
+phase-polynomial checker extended by Hadamard variables (`QUEUE.md`,
+item 2), and never rely on the `2⁻¹²⁸`. The Feynman and Cobble suites it
+is evaluated on are the T-heavy benchmark family Rung 3 asks for.
 
 **Parametric proofs are not displaced.** A theorem for all `n` is an
 ordinary Lean statement about a circuit family, proved by induction with
@@ -324,10 +342,14 @@ test of the working hypothesis above. Everything here is stated with `≡ᵤ` an
   first; Clifford once Rung 4 lands), proved preserved step by step.
 - **The optimiser-output benchmark.** For each of the 19 QECUnitaryCircuits
   origins, and for adders and QFTs at `n = 8` to `64`: the output of PyZX
-  `full_reduce` plus extraction, of a T-count optimiser (quizx, or Feynman's
-  optimiser), and of Qiskit at optimisation level 3. These pairs are
-  structurally different and T-heavy, which is where decision-diagram tools
-  degrade.
+  `full_reduce` plus extraction, of a T-count optimiser (TZAP first, whose
+  phase-folding output keeps the gate skeleton and is alignable by
+  construction, then quizx or Feynman), and of Qiskit at optimisation
+  level 3. These pairs are structurally different and T-heavy, which is
+  where decision-diagram tools degrade. TZAP's own benchmark inputs, the
+  Feynman suite (`gf2^k_mult`, `mod_adder`, `barenco_tof`, `hwb`, …) and
+  the Cobble suite, are the natural T-heavy sources at the sizes the kernel
+  reaches.
 - **Agent in the loop.** The alignment or invariant is proposed by an agent
   (or, as a baseline, by a heuristic script); Lean checks it. Record success
   rate, time and tokens, and the pairs where no decomposition was found.
@@ -442,7 +464,10 @@ with exponents in `ZMod (2^m)`; a certified normaliser for the CNOT + diagonal
 fragment, where equivalence is exactly equality of a linear reversible map plus
 a phase polynomial, so that fragment gets a *complete* procedure and Rung 3's
 latent-algebra mechanism gets its tool; the Fourier lemma that the QFT
-diagonalises addition.
+diagonalises addition. The `Fin 8` version of the normaliser exists for the
+Hadamard-free fragment (`CircuitEq/PhasePoly.lean`, September 2026); the
+Hadamard-variable (path-sum) extension and the `ZMod (2 ^ m)` phases are
+queued.
 
 **Acceptance.** `∀ n, qft n ≡ᵤ qftSpec n` (recursive circuit against the DFT
 matrix); `∀ n, qft n ++ qftInv n ≡ᵤ []`; `∀ n, draperAdder n ≡ cuccaroAdder n`,
@@ -535,9 +560,10 @@ Two benchmark families.
   `n = 4, 8, 16, 32, 64, 128`. Our result covers all `n` by one proof; report
   the smallest `n` at which each tool fails as the crossover.
 - **Optimiser output.** For each origin circuit: the pair (origin, optimised)
-  from PyZX `full_reduce` plus extraction, from a T-count optimiser, and from
-  Qiskit at optimisation level 3. These are the structurally different,
-  T-heavy pairs. This family is the S benchmark proper.
+  from PyZX `full_reduce` plus extraction, from a T-count optimiser (TZAP,
+  then quizx or Feynman), and from Qiskit at optimisation level 3. These
+  are the structurally different, T-heavy pairs. This family is the S
+  benchmark proper.
 
 Tools: QCEC (`mqt.qcec`), PyZX (`full_reduce` on `U†V`, and `compare_tensors`
 where feasible), Feynman (`feynver`), and any newer checker such as the one
