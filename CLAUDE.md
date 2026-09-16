@@ -3,7 +3,9 @@
 CircuitEq is a Lean 4 / mathlib library for stating and proving unitary
 equivalence of Clifford+T quantum circuits. Read `README.md` first for the
 pitch and the design; this file is the working conventions. Build with
-`lake build`.
+`lake build`. The next pieces of work, in priority order with context and
+acceptance tests, are in `QUEUE.md`; take the top unblocked item and move
+it to "Done" when it lands.
 
 ## What we are optimising for
 

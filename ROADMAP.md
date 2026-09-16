@@ -587,6 +587,8 @@ and it strengthens 3. Rung 5 before 6 and 10. Rung 6 before 8, and 8 before
 
 ## Suggested order for the next quarter
 
+The concrete, current version of this list is `QUEUE.md`.
+
 The certificate language and replay interpreter with bitmask supports
 (Rung 3), since they replace the quadratic tactic and every later technique
 is a step kind in them; the gcd-free coefficient ring (Rung 1), which speeds
