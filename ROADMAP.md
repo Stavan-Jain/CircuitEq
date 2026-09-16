@@ -188,6 +188,19 @@ as the target, certify it with the checker, and fall back to constructive
 mode steered by the target if certification fails. The hybrid is the aim:
 external optimisations verified when possible, the agent's own otherwise.
 
+**Parametric proofs are not displaced.** A theorem for all `n` is an
+ordinary Lean statement about a circuit family, proved by induction with
+the structural toolkit, and it meets certificates in two ways: around one,
+as in the Steane proof, where a `calc` applies the parametric block theorem
+and a certificate closes the concrete remainder; and inside one, as the
+template step, which applies a registered theorem proved for all `n` at a
+concrete `n` with no evaluation at all. The one constraint is that a
+certificate step can only name a *registered* lemma, because `replay` is
+fixed code driven by data, so a new parametric identity is used by
+registering it or by composing around the certificate. The P method stays
+the way to reach large `n`; certificates are how its instances and the
+concrete leftovers get checked.
+
 Where this stands (September 2026): `circuit_windows` in
 `CircuitEq/Tactic.lean` is the first form of the certificate idea, alignment
 as input and checking as output, but it builds a proof term step by step

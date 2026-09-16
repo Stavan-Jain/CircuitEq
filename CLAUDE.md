@@ -53,7 +53,22 @@ Rules that follow, for anyone adding to the library:
   `Vec n`, `applyOne`, `applyCNOT`, linearity, fusion, commutation.
 - `CircuitEq/Semantics.lean` — `Instr`, `Circuit n := List (Instr n)`,
   `denote`, `denoteₗ`, `Equivalent` (`≡ᵤ`), `EquivalentUpToPhase` (`≡ₚ`),
-  basis reduction, `Decidable` instances, `Trans` instance for `calc`.
+  `EquivalentUpToScalar` (`≡ₛ`, up to a unit of `Zeta8`; what a tableau
+  certifies), basis reduction, `evalList`, `Decidable` instances, `Trans`
+  instance for `calc`.
+- `CircuitEq/Checker.lean` — the checker contract: `Checker n` is
+  `check : Circuit n → Circuit n → Bool` plus `sound : check a b = true →
+  a ≡ᵤ b` (`PhaseChecker`, `ScalarChecker` for `≡ₚ`, `≡ₛ`); `NormalForm n`
+  with `toChecker`; `Checker.orElse`; `syntacticChecker`; `evalChecker`
+  (the basis decide as a checker). A checker module imports only
+  `Semantics`, `Structural`, `Support` and `Checker`, writes `check` as
+  kernel-friendly `Bool` code, and exports exactly one checker.
+- `CircuitEq/Support.lean` — wire sets as `Nat` bitmasks, the one encoding
+  every checker and the certificate language use: `Instr.support`,
+  `support`, `masksDisjoint`, `support_testBit`,
+  `not_touches_of_disjoint`; `Rewriting.lean` adds
+  `Instr.CanCommute.of_disjoint` and `gate_block_comm_of_disjoint`. Do not
+  invent a second encoding of wire sets.
 - `CircuitEq/Structural.lean` — the parametric toolkit: fusion,
   commutation, `denote_applyOne_comm_of_not_touches`, `layer`, `hLayer`.
 - `CircuitEq/Rewriting.lean` — rewriting on instruction lists:

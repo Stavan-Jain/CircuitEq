@@ -153,6 +153,19 @@ def EquivalentUpToPhase (c₁ c₂ : Circuit n) : Prop :=
 
 @[inherit_doc] scoped infix:50 " ≡ₚ " => EquivalentUpToPhase
 
+/-- Equivalence up to a global scalar that is a unit of the coefficient
+ring. For unitaries the scalar has modulus one, and for Clifford+T it is a
+power of `ω`, but that is a theorem about the ring rather than part of the
+definition; this is the relation a Clifford tableau certifies. -/
+def EquivalentUpToScalar (c₁ c₂ : Circuit n) : Prop :=
+  ∃ a : Zeta8, IsUnit a ∧ ∀ ψ : Vec n, denote c₁ ψ = a • denote c₂ ψ
+
+@[inherit_doc] scoped infix:50 " ≡ₛ " => EquivalentUpToScalar
+
+/-- `ω` is a unit: `ω · ω⁷ = 1`. -/
+lemma isUnit_ω : IsUnit Zeta8.ω :=
+  ⟨⟨Zeta8.ω, Zeta8.ω ^ 7, by decide +kernel, by decide +kernel⟩, rfl⟩
+
 namespace Equivalent
 
 @[refl] protected lemma refl (c : Circuit n) : c ≡ᵤ c := fun _ => rfl
@@ -178,7 +191,42 @@ protected lemma cons (g : Instr n) {c c' : Circuit n} (h : c ≡ᵤ c') : g :: c
 lemma toUpToPhase {c₁ c₂ : Circuit n} (h : c₁ ≡ᵤ c₂) : c₁ ≡ₚ c₂ :=
   ⟨0, fun ψ => by simp [h ψ]⟩
 
+/-- Exact equivalence is equivalence with trivial scalar. -/
+lemma toUpToScalar {c₁ c₂ : Circuit n} (h : c₁ ≡ᵤ c₂) : c₁ ≡ₛ c₂ :=
+  ⟨1, isUnit_one, fun ψ => by simp [h ψ]⟩
+
 end Equivalent
+
+/-- A phase is a unit scalar. -/
+lemma EquivalentUpToPhase.toUpToScalar {c₁ c₂ : Circuit n} (h : c₁ ≡ₚ c₂) : c₁ ≡ₛ c₂ := by
+  obtain ⟨k, hk⟩ := h
+  exact ⟨Zeta8.ω ^ (k : ℕ), isUnit_ω.pow _, hk⟩
+
+namespace EquivalentUpToScalar
+
+@[refl] protected lemma refl (c : Circuit n) : c ≡ₛ c :=
+  ⟨1, isUnit_one, fun _ => (one_smul _ _).symm⟩
+
+@[symm] protected lemma symm {c₁ c₂ : Circuit n} (h : c₁ ≡ₛ c₂) : c₂ ≡ₛ c₁ := by
+  obtain ⟨a, ha, h⟩ := h
+  refine ⟨↑ha.unit⁻¹, (ha.unit⁻¹).isUnit, fun ψ => ?_⟩
+  rw [h ψ, smul_smul, Units.inv_mul_of_eq ha.unit_spec, one_smul]
+
+@[trans] protected lemma trans {c₁ c₂ c₃ : Circuit n} (h₁ : c₁ ≡ₛ c₂) (h₂ : c₂ ≡ₛ c₃) :
+    c₁ ≡ₛ c₃ := by
+  obtain ⟨a, ha, h₁⟩ := h₁
+  obtain ⟨b, hb, h₂⟩ := h₂
+  exact ⟨a * b, ha.mul hb, fun ψ => by rw [h₁ ψ, h₂ ψ, smul_smul]⟩
+
+/-- Equivalence up to scalar is a congruence for sequential composition. -/
+protected lemma append {c₁ c₁' c₂ c₂' : Circuit n} (h₁ : c₁ ≡ₛ c₁') (h₂ : c₂ ≡ₛ c₂') :
+    c₁ ++ c₂ ≡ₛ c₁' ++ c₂' := by
+  obtain ⟨a, ha, h₁⟩ := h₁
+  obtain ⟨b, hb, h₂⟩ := h₂
+  refine ⟨a * b, ha.mul hb, fun ψ => ?_⟩
+  rw [denote_append, denote_append, h₁ ψ, denote_smul, h₂, smul_smul]
+
+end EquivalentUpToScalar
 
 /-- `calc` support: chaining `≡ᵤ` with `≡ᵤ` (chaining with `=` is built in). -/
 instance : @Trans (Circuit n) (Circuit n) (Circuit n) Equivalent Equivalent Equivalent :=

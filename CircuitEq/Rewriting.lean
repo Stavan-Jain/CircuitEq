@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stavan Jain
 -/
 import CircuitEq.Structural
+import CircuitEq.Support
 import Mathlib.Data.List.Perm.Basic
 
 /-! # Rewriting circuits and commuting blocks
@@ -90,6 +91,31 @@ theorem Instr.CanCommute.sound {a b : Instr n} (h : a.CanCommute b) :
       | one A i => exact (one_cnot_comm_of_check h).symm
       | cnot d u => exact cnot_cnot_comm h.1 h.2
 
+/-- Instructions that share no wire pass the commutation check. -/
+lemma Instr.CanCommute.of_no_shared_wire {a b : Instr n}
+    (h : ∀ i, ¬ (a.touches i ∧ b.touches i)) : a.CanCommute b := by
+  refine Or.inr ?_
+  cases a with
+  | one g i =>
+    cases b with
+    | one g' j => exact Or.inl fun e => h i ⟨rfl, e.symm⟩
+    | cnot c t =>
+      exact Or.inl ⟨fun e => h i ⟨rfl, Or.inl e.symm⟩,
+        fun e => h i ⟨rfl, Or.inr e.symm⟩⟩
+  | cnot c t =>
+    cases b with
+    | one g i =>
+      exact Or.inl ⟨fun e => h i ⟨Or.inl e.symm, rfl⟩,
+        fun e => h i ⟨Or.inr e.symm, rfl⟩⟩
+    | cnot d u =>
+      exact ⟨fun e => h c ⟨Or.inl rfl, Or.inr e.symm⟩,
+        fun e => h t ⟨Or.inr rfl, Or.inl e⟩⟩
+
+/-- Instructions with disjoint supports commute. -/
+lemma Instr.CanCommute.of_disjoint {a b : Instr n} (h : a.support &&& b.support = 0) :
+    a.CanCommute b :=
+  Instr.CanCommute.of_no_shared_wire (Instr.not_touches_both_of_disjoint h)
+
 /-- `g` passes the syntactic commutation check against every instruction
 of `c`: the side condition the tactics discharge by `decide`. -/
 def Instr.CanCommuteAll (g : Instr n) (c : Circuit n) : Prop := ∀ a ∈ c, g.CanCommute a
@@ -106,6 +132,20 @@ theorem gate_block_comm (g : Instr n) (c : Circuit n)
     have ha := h a (by simp)
     have hc := ih (fun b hb => h b (by simp [hb]))
     exact (ha.in_context [] c).trans (hc.cons a)
+
+/-- A gate whose support is disjoint from a block's commutes past the
+block; the mask form of `gate_block_comm`. -/
+theorem gate_block_comm_of_disjoint (g : Instr n) (c : Circuit n)
+    (h : g.support &&& support c = 0) : [g] ++ c ≡ᵤ c ++ [g] := by
+  apply gate_block_comm
+  intro a ha
+  apply Instr.CanCommute.sound
+  apply Instr.CanCommute.of_no_shared_wire
+  rintro i ⟨hg, ha'⟩
+  have hi : g.support.testBit i.val = true := by
+    rw [Instr.support_testBit]
+    simpa using hg
+  exact not_touches_of_disjoint h hi a ha ha'
 
 /-- Move two blocks past each other using pairwise gate commutation. -/
 theorem blocks_comm (a b : Circuit n)

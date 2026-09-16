@@ -2,7 +2,9 @@ import CircuitEq.Zeta8
 import CircuitEq.Bits
 import CircuitEq.Gates
 import CircuitEq.Semantics
+import CircuitEq.Checker
 import CircuitEq.Structural
+import CircuitEq.Support
 import CircuitEq.Rewriting
 import CircuitEq.Layers
 import CircuitEq.Tactic
