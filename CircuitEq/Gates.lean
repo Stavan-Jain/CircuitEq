@@ -79,6 +79,21 @@ lemma H_mul_X_mul_H : H.mat * X.mat * H.mat = Z.mat := by decide +kernel
 lemma H_mul_Z_mul_H : H.mat * Z.mat * H.mat = X.mat := by decide +kernel
 lemma X_mul_Z : X.mat * Z.mat = -(Z.mat * X.mat) := by decide +kernel
 
+/-- Whether a gate's matrix is diagonal: `Z`, `S`, `S†`, `T`, `T†`. -/
+def isDiag : Gate1 → Bool
+  | Z | S | Sdg | T | Tdg => true
+  | H | X | Y => false
+
+/-- A diagonal gate has zero off-diagonal entries. -/
+lemma mat_off_diag_of_isDiag {g : Gate1} (h : g.isDiag = true) : ∀ b, g.mat b (!b) = 0 := by
+  cases g <;> first | exact absurd h (by decide) | decide +kernel
+
+/-- Diagonal gates commute as matrices. -/
+lemma mat_comm_of_isDiag {g g' : Gate1} (h : g.isDiag = true) (h' : g'.isDiag = true) :
+    g.mat * g'.mat = g'.mat * g.mat := by
+  cases g <;> cases g' <;>
+    first | exact absurd h (by decide) | exact absurd h' (by decide) | decide +kernel
+
 end Gate1
 
 /-- Amplitude vectors of an `n`-qubit register over `ℚ(ζ₈)`. -/
@@ -164,5 +179,31 @@ lemma applyCNOT_applyCNOT_self {c t : Fin n} (h : c ≠ t) (ψ : Vec n) :
   funext x
   simp only [applyCNOT, bit_flipBit_of_ne h, flipBit_flipBit_self]
   split_ifs <;> rfl
+
+/-- CNOTs commute when neither control is the other gate's target.
+They may share a control or share a target. -/
+lemma applyCNOT_comm {a b c d : Fin n} (had : a ≠ d) (hcb : c ≠ b) (ψ : Vec n) :
+    applyCNOT a b (applyCNOT c d ψ) = applyCNOT c d (applyCNOT a b ψ) := by
+  funext x
+  simp only [applyCNOT, bit_flipBit_of_ne had, bit_flipBit_of_ne hcb]
+  split_ifs <;> first | rfl | rw [flipBit_comm b d]
+
+/-- `X` on the target commutes with a CNOT: both flip the target, and flips
+commute. -/
+lemma applyCNOT_applyOne_X_target_comm {c t : Fin n} (hct : c ≠ t) (ψ : Vec n) :
+    applyCNOT c t (applyOne Gate1.X.mat t ψ) = applyOne Gate1.X.mat t (applyCNOT c t ψ) := by
+  funext x
+  simp only [applyOne, applyCNOT, Gate1.mat, Matrix.of_apply, bit_flipBit_of_ne hct,
+    flipBit_flipBit_self]
+  cases bit c x <;> cases bit t x <;> simp
+
+/-- Moving Hadamards on both wires across a CNOT reverses its direction. -/
+lemma applyHadamards_applyCNOT {c t : Fin n} (h : c ≠ t) (ψ : Vec n) :
+    applyOne Gate1.H.mat t (applyOne Gate1.H.mat c (applyCNOT c t ψ)) =
+      applyCNOT t c (applyOne Gate1.H.mat t (applyOne Gate1.H.mat c ψ)) := by
+  funext x
+  simp only [applyOne, applyCNOT, bit_flipBit_self, bit_flipBit_of_ne h,
+    bit_flipBit_of_ne h.symm, flipBit_flipBit_self, flipBit_comm t c]
+  cases bit c x <;> cases bit t x <;> simp [Gate1.mat] <;> ring
 
 end Quantum.Circuit

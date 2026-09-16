@@ -16,8 +16,9 @@ of the design is to make that agent's job mechanical where it can be
 (`decide` is the oracle for leaves) and expressive where it must be
 (structural lemmas that hold for every `n` are the connectives).
 
-**Status: prototype.** Clifford+T only, one and two-qubit gates, twenty
-worked identities. See "Roadmap" for what is missing.
+**Status: prototype.** Clifford+T only, one and two-qubit gates, some
+twenty worked identities, three original-versus-PyZX benchmark pairs. See
+"Roadmap" for what is missing.
 
 ## What you can state and prove today
 
@@ -43,6 +44,23 @@ theorem H_T_H_eq_T {n} {i j : Fin n} (h : i ≠ j) : [H i, T j, H i] ≡ᵤ ([T 
 
 -- a layer of Hadamards on every qubit is self-inverse, for every n
 theorem hLayer_cancel (n : ℕ) : hLayer n ++ hLayer n ≡ᵤ [] := hLayer_hLayer n
+
+-- placed: a two-qubit identity the kernel decided, on any two wires of any register
+theorem hh_cnot_hh' {n} {i j : Fin n} (h : i ≠ j) :
+    [H i, H j, CX i j, H i, H j] ≡ᵤ ([CX j i] : Circuit n) := by
+  simpa [wires₂] using hh_cnot_hh.rename (wires₂ h)
+
+-- benchmark: PyZX's 13-gate Steane |+_L⟩ encoder equals the 19-gate original
+theorem original_equiv_optimized : original ≡ᵤ optimized :=
+  calc original
+      = layer .H [0, 1, 3] ++ cnotNetwork edges ++ hLayer 7 := rfl
+    _ ≡ᵤ _ := layer_cnotNetwork_hLayer [0, 1, 3] (by decide) edges (by decide)
+    _ ≡ᵤ optimized := by circuit_simp
+
+-- the window pattern: an optimiser's local rewrites, each decided on its own wires
+theorem two_windows :
+    ([T 0, CX 1 2, T 0, H 5, X 3, H 5] : Circuit 6) ≡ᵤ [CX 1 2, S 0, X 3] := by
+  circuit_windows [([T 0, T 0], [S 0]), ([H 5, H 5], [])]
 ```
 
 Circuits are lists in time order, so `[g₁, g₂]` is the operator `U₂ · U₁`.
@@ -54,6 +72,27 @@ with `: Circuit n`. Use `decide +kernel`, not bare `decide` (see "Design").
 three-qubit CNOT ladder), refutations (`HT ≠ TH`, `T` on a CNOT target does
 not commute), and structural results for every `n` (`H²` cancels on any qubit,
 `T` commutes through a CNOT on its control, Hadamard layers cancel).
+
+[`benchmarks/rep3_phaseflip/`](benchmarks/rep3_phaseflip/README.md) adds an
+original-versus-PyZX pair from QECUnitaryCircuits: the three-qubit
+phase-flip repetition encoder, whose five gates PyZX only reorders. The pair
+closes by `circuit_simp` in one line; `reorder` is the same fact for any
+three distinct wires of any register.
+
+[`benchmarks/steane_plus/`](benchmarks/steane_plus/README.md) proves a larger
+pair: PyZX reduces the seven-qubit Steane logical plus-state encoder from
+19 gates to 13, reversing all nine CNOTs. The proof is the five-line `calc`
+above: one application of the parametric theorem that moves a Hadamard layer
+through a CNOT network, then `circuit_simp` for the commuting remainder. No
+step enumerates the seven-qubit basis.
+
+[`benchmarks/tof_3/`](benchmarks/tof_3/README.md) is the first T-heavy pair:
+the standard `tof_3` circuit (three Toffolis, T-count 21) against PyZX's
+phase-teleportation output (T-count 19, gate skeleton preserved). One
+`circuit_windows` call with four windows on at most three wires proves
+exact equivalence; every other change is a phase gate moving through a CNOT
+control. Full re-synthesis (T-count 15) is a structurally unrelated circuit
+and out of the window pattern's reach.
 
 ## Design
 
@@ -73,7 +112,10 @@ not commute), and structural results for every `n` (`H²` cancels on any qubit,
 - **Equivalence reduces to the basis.** `c₁ ≡ᵤ c₂` is `∀ ψ, denote c₁ ψ =
   denote c₂ ψ`. Every instruction is linear, so `LinearMap.pi_ext` reduces
   this to the `2 ^ n` basis vectors, which gives a `Decidable` instance.
-  `≡ₚ` additionally ranges over the eight powers of `ω`.
+  `≡ₚ` additionally ranges over the eight powers of `ω`. The instance
+  evaluates with `evalList`, a materialised list-backed evaluator proved
+  equal to `denote`, so a decide costs linear in circuit depth, not
+  `2 ^ depth`.
 - **Kernel-only.** `decide +kernel` is required because `Rat.add` and
   `Rat.mul` are `@[irreducible]`, which stalls elaborator-level `decide`; the
   kernel ignores reducibility and evaluates `Nat.gcd` with GMP. No
@@ -83,6 +125,39 @@ not commute), and structural results for every `n` (`H²` cancels on any qubit,
   `denote_applyOne_comm_of_not_touches` (move a gate past any circuit that
   ignores its qubit), `layer_layer_cancel`. Each is stated on `≡ᵤ` for
   arbitrary `n` with `2 × 2` matrix leaves decided by the kernel.
+- **Rewriting happens on instruction lists, not state vectors.**
+  `Equivalent.in_context` replaces an equivalent window inside any prefix and
+  suffix; `Instr.CanCommute` and `Instr.CanCancel` are decidable syntactic
+  checks whose `sound` lemmas produce the semantic swap or cancellation
+  (`CanCommute` knows disjoint wires, diagonal gates on one wire, a
+  diagonal gate on a CNOT control, `X` on a CNOT target, and CNOTs whose
+  controls avoid each other's targets);
+  `gate_block_comm`, `blocks_comm`, `perm_equivalent`, `pull_cons` and
+  `cancel_window` move gates and blocks. A benchmark proof never mentions
+  `denote` or an amplitude vector.
+- **Layers and networks are first-class.** `layer_cnotNetwork_hLayer` moves
+  a Hadamard layer through a whole CNOT network in one step, reversing every
+  CNOT and cancelling against the seed layer, for every `n`; `hOn_symmDiff`
+  is the algebra of partial Hadamard layers (`hOn S ++ hOn T ≡ᵤ hOn (S ∆ T)`);
+  `cnotNetwork_perm` reorders a network with disjoint controls and targets.
+- **`circuit_simp` does the routine.** Given `c₁ ≡ᵤ c₂` on concrete lists, it
+  cancels checked inverse pairs through the gates they commute with, then
+  aligns the two lists by pulling each gate of `c₂` through a checked prefix
+  of `c₁`. It assembles ordinary proof terms from `cancel_window` and
+  `pull_cons`; block identities remain explicit steps in the calling proof.
+- **`circuit_windows` is the window pattern.** The alignment is input: a
+  list of windows `(aᵢ, bᵢ)`, each a pair of gate lists on the full register
+  touching a few wires, in the order they occur. The tactic decides each
+  window on its own wires by `decide +kernel` (cost `2 ^ k`, never `2 ^ n`),
+  places it back with the locality theorem (`Equivalent.of_rename`), and
+  checks every other move as a commutation. It never searches: a move the
+  checks do not license, or a false window, is an error naming the gate or
+  the window.
+- **The locality theorem.** `rename f c` places an `m`-qubit circuit on the
+  wires `f : Fin m ↪ Fin n`; `rename_equivalent_iff` says
+  `rename f a ≡ᵤ rename f b ↔ a ≡ᵤ b`. So a `decide +kernel` on `m` qubits,
+  at cost `2 ^ m`, yields the identity on any `m` distinct wires of any
+  register, and a window that touches `m` wires costs `2 ^ m`, never `2 ^ n`.
 
 ## Layout
 
@@ -93,9 +168,16 @@ CircuitEq/
 ├── Bits.lean               bit / flipBit on Fin (2 ^ n), commutation lemmas
 ├── Gates.lean              Gate1 alphabet, 2×2 matrices, applyOne / applyCNOT
 ├── Semantics.lean          Instr, Circuit, denote, ≡ᵤ, ≡ₚ, decidability
-├── Structural.lean         the parametric toolkit
-└── Examples.lean           worked identities: decided, refuted, structural
+├── Structural.lean         the parametric toolkit: fusion, commutation, layers
+├── Rewriting.lean          rewriting in context, checked swaps and cancellations
+├── Layers.lean             Hadamard-layer algebra, CNOT-network conjugation
+├── Tactic.lean             circuit_simp, circuit_windows
+├── Embedding.lean          the locality theorem: circuits on selected wires
+├── Examples.lean           worked identities: decided, refuted, structural, placed
+└── Benchmarks/             original-versus-PyZX proofs
+benchmarks/                 QASM fixtures and provenance for each benchmark
 scripts/AxiomCheck.lean     CI: standard three axioms only
+scripts/check_pyzx_benchmarks.py   reproduce the PyZX fixtures (pyzx==0.9.0)
 ```
 
 ## Building

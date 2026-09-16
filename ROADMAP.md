@@ -1,11 +1,14 @@
 # Roadmap — a ladder from toy identities to circuits no checker can reach
 
 The target is proving equivalence of *useful, real-world* quantum circuits
-that current automated equivalence checkers cannot handle. This document
-breaks that into rungs of increasing difficulty. Each rung has a concrete
-acceptance test, so progress is measurable, and each leaves reusable library
-behind, so the rungs above it get cheaper. They are ordered by difficulty and
-dependency; they need not be finished strictly in sequence.
+that current automated equivalence checkers cannot handle, first as an
+AI + Lean equivalence checker and, in the longer run, as an AI + Lean
+optimiser that finds an optimisation and proves it (see "Two products, one
+architecture"). This document breaks that into rungs of increasing
+difficulty. Each rung has a concrete acceptance test, so progress is
+measurable, and each leaves reusable library behind, so the rungs above it
+get cheaper. They are ordered by difficulty and dependency; they need not be
+finished strictly in sequence.
 
 ## Where the bar is
 
@@ -117,6 +120,82 @@ Three mechanisms, and the proof shapes they become in this library:
   can reason in that form across the Hadamard boundaries, case by case, where
   a fixed reduction system stalls. The normaliser of Rung 8 is the tool.
 
+## Two products, one architecture
+
+The project has two goals, and it pays to keep them distinct because the
+agent searches for different things in each.
+
+- **The equivalence checker.** Input: two circuits. Output: a kernel-checked
+  proof of `≡ᵤ` or `≡ₚ`, a kernel-checked refutation, or "no certificate
+  found", recorded. The agent's search is for a *derivation between two
+  fixed endpoints* that nobody handed it: an optimiser produced the second
+  circuit and discarded the path. This is the S benchmark of the ladder.
+- **The optimiser.** Input: one circuit. Output: a cheaper circuit and a
+  kernel-checked proof that it is equivalent. The agent's search is for a
+  *cheaper endpoint*, and since it chooses every step, the derivation is
+  known and the proof is free. Correctness is guaranteed by construction
+  whatever strategy chose the steps, so the strategy can be anything: model
+  judgment, heuristics, search. Only quality is at stake, never soundness.
+
+The checker is a subroutine of the optimiser, and every optimiser step is a
+checker move: a derivation from `c₁` to `c₂` by certified steps is a proof
+of their equivalence, and the checker's hard case is exactly reconstructing
+a derivation an external tool discarded. The optimiser avoids that case by
+construction, which makes it the more tractable product in the long run. The
+checker is built first because it is what lets the optimiser absorb external
+tools' results instead of competing with them.
+
+### The architecture both share
+
+1. **A trusted core.** `denote` over state vectors and the definition of
+   `≡ᵤ`, reviewed by hand, pinned by identity lemmas, never evaluated at
+   scale, never redefined.
+2. **A certificate language.** A Lean data type of rewrite steps: swap two
+   adjacent commuting gates; cancel a pair; replace a window by an
+   equivalent window on `k` wires; normalise a Clifford or CNOT-plus-diagonal
+   block; substitute a template instance by an equivalent one proved for all
+   `n`. Every new proof technique lands as a step kind.
+3. **A replay interpreter with a soundness theorem.** `replay steps c` is a
+   circuit and `c ≡ᵤ replay steps c` for every well-formed trace. The kernel
+   runs the interpreter; the proof term is one application of the theorem;
+   cost is linear in the trace. The agent emits *data*, never proof terms,
+   so the same steps can run fast outside Lean during search, with Lean as
+   the judge.
+4. **Certified checkers behind the steps.** Tableaux for Clifford blocks,
+   phase polynomials for CNOT-plus-diagonal blocks, Boolean functions for
+   classical reversible blocks, the small-window evaluator on at most a
+   dozen qubits. Each verifies a tool's *answer*, never its algorithm, so a
+   new optimiser costs nothing to support and nobody reads its source. ZX
+   rewriting itself resists this, since a ZX derivation lives on diagrams;
+   its output is caught by the fragment checkers and residuals instead.
+5. **Representations built for the checkers.** Gates and blocks carry their
+   wire sets as `Nat` bitmasks, so a commutation test is one `land`.
+   Circuits are hierarchical, named blocks and templates parametric in `n`
+   with congruence lemmas, and the flat list exists only for `denote`.
+   Large concrete circuits enter as compact data the kernel decodes. Routing
+   is a wire relabelling; ancilla subspaces are a side condition on
+   congruence. Cost functions (T-count, depth, gate count) are computed in
+   Lean, so "this circuit has T-count 19" is a checked claim.
+6. **The agent.** External tools (PyZX, Feynman, quizx, Qiskit) are untrusted
+   oracles it uses to see where the structure is. It never sees a million
+   gates; it works at the level of blocks and delegates below that to
+   checkers. Its output is a certificate; Lean's error messages are its
+   feedback.
+
+The optimiser runs in two modes. *Constructive*: apply certified steps and
+ship the trace. *Oracle-guided*: run an external optimiser, take its output
+as the target, certify it with the checker, and fall back to constructive
+mode steered by the target if certification fails. The hybrid is the aim:
+external optimisations verified when possible, the agent's own otherwise.
+
+Where this stands (September 2026): `circuit_windows` in
+`CircuitEq/Tactic.lean` is the first form of the certificate idea, alignment
+as input and checking as output, but it builds a proof term step by step
+with quadratic kernel work. The next move is to make windows and
+commutations the first version of the certificate language with a certified
+replay interpreter. Everything after that is adding step kinds and the
+checkers behind them.
+
 ## The ladder
 
 ### Rung 0 — Prototype ✅ (September 2026)
@@ -130,6 +209,15 @@ checks cost `2^depth`; there is no link to ℂ; no locality theorem, so every
 `decide` pays for all `n` qubits.
 
 ### Rung 1 — Concrete circuits at benchmark scale
+
+**Status (September 2026).** The materialised evaluator is in:
+`evalList` in `CircuitEq/Semantics.lean`, proved equal to `denote`
+(`evalList_toList`), and the `Decidable` instances for `≡ᵤ` and `≡ₚ` go
+through it, so a decide is linear in depth. Measured cost is now the
+`Zeta8` arithmetic itself (`Rat` gcd normalisation): about 3 s in the
+kernel for a three-qubit six-gate window. The compact coefficient
+representation below is the next step; the benchmark-scale runs have not
+been attempted.
 
 **Goal.** Decide `≡ᵤ` and `≡ₚ` for concrete Clifford+T circuits of the size
 real benchmarks have: 10–12 qubits, depth in the hundreds to low thousands.
@@ -193,17 +281,32 @@ test of the working hypothesis above. Everything here is stated with `≡ᵤ` an
 
 **Work.**
 
-- **The locality theorem.** If two sub-circuits touch only a set of `k`
+- **The locality theorem.** ✅ (September 2026, `CircuitEq/Embedding.lean`:
+  `rename_equivalent_iff`.) If two sub-circuits touch only a set of `k`
   qubits, their equivalence on `n` qubits is equivalent to the equivalence of
-  their restrictions on `k` qubits. This needs generic gate placement and a
-  restriction map, and it is what makes a window cost `2^k` instead of `2^n`.
-  It is the single most valuable lemma not yet in the library and should be
-  the first thing built at this rung.
+  their restrictions on `k` qubits. Gate placement is `rename f` for an
+  embedding `f : Fin k ↪ Fin n`; this is what makes a window cost `2^k`
+  instead of `2^n`.
 - **The window pattern.** Given an alignment — a matching of windows between
   the two circuits, plus the commutations needed to make them adjacent — a
   tactic or macro discharges the whole equivalence by congruence, moving
   lemmas, and one small `decide` per window. The alignment is *input*; the
-  tactic only checks it.
+  tactic only checks it. ✅ (September 2026.) `circuit_windows` in
+  `CircuitEq/Tactic.lean` takes the alignment as a list of windows, decides
+  each on its own wires (`Equivalent.of_rename`, cost `2^k`), and checks
+  every move (`pull_cons`); `circuit_simp` is the same engine without
+  windows. The block theorems of `CircuitEq/Layers.lean` closed the first
+  two QECUnitaryCircuits-versus-PyZX pairs, and `circuit_windows` closed
+  `tof_3` against PyZX phase teleportation (T-count 21 → 19) with four
+  windows on at most three wires (`CircuitEq/Benchmarks/`). Re-synthesised
+  output (`full_reduce`, T-count 15 on the same input) has no alignment;
+  that is the residual pattern's job.
+- **The certificate language and replay interpreter.** The step data type,
+  `replay`, and `replay_sound`, with windows and commutations as the first
+  step kinds and bitmask supports so a move costs one `land`. Replaces the
+  proof-term construction in `circuit_windows`; kernel cost becomes linear
+  in the trace. See "Two products, one architecture". This is the next
+  piece of work at this rung.
 - **The residual pattern.** Cut points with a compact residual (diagonal
   first; Clifford once Rung 4 lands), proved preserved step by step.
 - **The optimiser-output benchmark.** For each of the 19 QECUnitaryCircuits
@@ -308,7 +411,9 @@ removed; a held-out set of optimiser-output pairs from Rung 3.
 unaided from statements; at least half of the held-out optimiser pairs proved
 compositionally with an agent-found alignment; at least one new parametric
 identity found and proved that no human wrote; a written account of every
-failure mode observed.
+failure mode observed. And the optimiser's first outing: a held-out set of
+circuits optimised in constructive mode by certified steps, reporting the
+certified T-count against PyZX's uncertified T-count on the same inputs.
 
 **Delivers.** The evidence for the project's central bet. **Harder because**
 success is, for the first time, not under our control.
@@ -432,6 +537,10 @@ checking at every `n`; the advantage there is T, not S.
 
 - **Performance.** Reflection, packed `Nat`, no `Finset.sum` in anything the
   kernel evaluates; measured on every rung.
+- **Certificates.** Every proof technique lands as a step kind in the
+  certificate language with a checker behind it, plus a Python mirror of the
+  step so search can run outside Lean. The tactic-built proof terms of
+  `CircuitEq/Tactic.lean` are the interim form.
 - **Trust, proportionate.** Semantics reviewed by hand and pinned by identity
   lemmas; the evaluator proved, not tested; the generator conformance-checked
   against Qiskit in CI; the axiom policy in CI. Nothing uses `native_decide`.
@@ -465,8 +574,14 @@ and it strengthens 3. Rung 5 before 6 and 10. Rung 6 before 8, and 8 before
 
 ## Suggested order for the next quarter
 
-Rung 1, then 2, then 3 starting with the locality theorem. Take Rung 4 as soon
-as a Rung 3 residual proof needs a Clifford invariant. Then Rung 6, defining
-only the parts of Rung 5 that the adders and multi-controlled gates actually
-need, then Rung 7. The first S result from Rung 3 is the first thing worth
-writing up.
+The certificate language and replay interpreter with bitmask supports
+(Rung 3), since they replace the quadratic tactic and every later technique
+is a step kind in them; the gcd-free coefficient ring (Rung 1), which speeds
+up every leaf; then the Rung 3 benchmark run over the 19 origins with a
+diff-based alignment script as the baseline, recording the pairs with no
+alignment, with Rung 2's conformance check riding along because the
+translation script is now where a convention error would live. Take Rung 4
+as soon as a residual proof needs a Clifford invariant. Then Rung 6,
+defining only the parts of Rung 5 that the adders and multi-controlled gates
+actually need, then Rung 7 in both checker and optimiser modes. The first S
+result from Rung 3 is the first thing worth writing up.

@@ -4,11 +4,13 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stavan Jain
 -/
 import CircuitEq.Structural
+import CircuitEq.Embedding
+import CircuitEq.Tactic
 
 /-!
 # Worked equivalences
 
-Concrete circuit identities, established three ways:
+Concrete circuit identities, established four ways:
 
 1. **decided** — the kernel checks the `2 ^ n` computational-basis vectors
    (`decide +kernel`, via `decidableEquivalent`);
@@ -16,11 +18,13 @@ Concrete circuit identities, established three ways:
    and separates "equal" from "equal up to a global phase";
 3. **structural** — parametric in the qubit count `n` and the qubit indices,
    assembled from the toolkit in `CircuitEq.Structural` with `2 × 2`
-   matrix leaves.
+   matrix leaves;
+4. **placed** — a decided identity on `k` qubits, lifted to any `k` distinct
+   wires of any register by `Equivalent.rename` (`CircuitEq.Embedding`).
 
-The structural proofs are the point of the prototype: they hold for every `n`
-and every choice of qubits, which no fixed-size equivalence checker can even
-state.
+The structural and placed proofs are the point of the prototype: they hold
+for every `n` and every choice of qubits, which no fixed-size equivalence
+checker can even state.
 -/
 
 namespace Quantum.Circuit.Examples
@@ -121,5 +125,35 @@ theorem H_T_H_eq_T {i j : Fin n} (h : i ≠ j) : [H i, T j, H i] ≡ᵤ ([T j] :
 
 /-- A layer of Hadamards on every qubit is self-inverse, for every `n`. -/
 theorem hLayer_cancel (n : ℕ) : hLayer n ++ hLayer n ≡ᵤ [] := hLayer_hLayer n
+
+/-! ### Decided on `k` qubits, placed on any `k` wires
+
+The kernel pays `2 ^ k` for the small identity; `Equivalent.rename` moves it
+to any distinct wires of an `n`-qubit register at no further cost. -/
+
+/-- `H ⊗ H` conjugation reverses a CNOT on any two distinct wires: the
+two-qubit fact `hh_cnot_hh`, placed on `i, j`. -/
+theorem hh_cnot_hh' {i j : Fin n} (h : i ≠ j) :
+    [H i, H j, CX i j, H i, H j] ≡ᵤ ([CX j i] : Circuit n) := by
+  simpa [wires₂] using hh_cnot_hh.rename (wires₂ h)
+
+/-- The CNOT ladder implements a long-range CNOT over any middle wire: the
+three-qubit fact `cx_ladder`, placed on `a, b, c`. -/
+theorem cx_ladder' {a b c : Fin n} (hab : a ≠ b) (hac : a ≠ c) (hbc : b ≠ c) :
+    [CX a b, CX b c, CX a b, CX b c] ≡ᵤ ([CX a c] : Circuit n) := by
+  simpa [wires₃] using cx_ladder.rename (wires₃ hab hac hbc)
+
+/-! ### The window pattern
+
+An optimiser changed a circuit in two places: it fused `T · T` into `S` on
+qubit 0 and deleted a Hadamard pair on qubit 5, leaving the other gates
+where they were. The alignment names the two windows; `circuit_windows`
+decides each on its own wires (one and one qubit here, never six), places
+it back, and checks that every other gate can be moved into position. -/
+
+/-- Two local rewrites with context gates in between. -/
+theorem two_windows :
+    ([T 0, CX 1 2, T 0, H 5, X 3, H 5] : Circuit 6) ≡ᵤ [CX 1 2, S 0, X 3] := by
+  circuit_windows [([T 0, T 0], [S 0]), ([H 5, H 5], [])]
 
 end Quantum.Circuit.Examples

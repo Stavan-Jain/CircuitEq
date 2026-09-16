@@ -25,6 +25,10 @@ concrete equivalences and non-equivalences close by `decide +kernel`.
 `c₁ ≡ₚ c₂` (`EquivalentUpToPhase`) allows a global phase, which for
 Clifford+T is one of the eight powers of `ω`, so it is decidable the same way.
 
+The instances evaluate through `evalList`, a materialised list-backed
+evaluator proved equal to `denote` (`evalList_toList`), so the kernel's
+cost is linear in depth; `denote` itself is nested closures.
+
 ## Why state vectors, not matrices
 
 `denote` is defined on vectors, not as a `2 ^ n × 2 ^ n` matrix, because
@@ -214,13 +218,70 @@ theorem equivalentUpToPhase_iff_basis (c₁ c₂ : Circuit n) :
     rw [_root_.LinearMap.smul_apply, denoteₗ_apply, denoteₗ_apply, hk y]
   simpa using LinearMap.congr_fun this ψ
 
-/-- Equivalence of concrete circuits is decidable: check the basis vectors. -/
+/-! ### A materialised evaluator for the kernel
+
+`denote` builds nested closures, so reading one amplitude of a depth-`d`
+circuit re-reads the input up to `2 ^ d` times. For the decision procedure
+the state is instead kept as a list of `2 ^ n` amplitudes and each
+instruction reads the previous list once per output entry, `O(d · 4 ^ n)`
+list steps in all. `evalList_toList` is the correspondence with `denote`,
+and the `Decidable` instances go through it. -/
+
+/-- A state as its list of amplitudes: entry `x` is `ψ x`. -/
+def Vec.toList (ψ : Vec n) : List Zeta8 := List.ofFn ψ
+
+/-- A list of amplitudes as a state (`0` past the end, which does not happen
+for lists of length `2 ^ n`). -/
+def Vec.ofList (l : List Zeta8) : Vec n := fun x => l.getD x.val 0
+
+lemma Vec.ofList_toList (ψ : Vec n) : Vec.ofList (Vec.toList ψ) = ψ := by
+  funext x
+  simp [Vec.ofList, Vec.toList, List.getD_eq_getElem?_getD, x.isLt]
+
+lemma Vec.toList_inj {ψ φ : Vec n} : Vec.toList ψ = Vec.toList φ ↔ ψ = φ := List.ofFn_inj
+
+lemma Vec.map_mul_toList (a : Zeta8) (ψ : Vec n) :
+    (Vec.toList ψ).map (a * ·) = Vec.toList (a • ψ) := by
+  simp only [Vec.toList, List.map_ofFn, List.ofFn_inj]
+  funext x
+  simp
+
+/-- Apply a circuit to a materialised state, one list per instruction. -/
+def evalList (c : Circuit n) (l : List Zeta8) : List Zeta8 :=
+  match c with
+  | [] => l
+  | g :: c => evalList c (Vec.toList (g.apply (Vec.ofList l)))
+
+/-- The materialised evaluator agrees with `denote`. -/
+lemma evalList_toList (c : Circuit n) (ψ : Vec n) :
+    evalList c (Vec.toList ψ) = Vec.toList (denote c ψ) := by
+  induction c generalizing ψ with
+  | nil => rfl
+  | cons g c ih => simp [evalList, Vec.ofList_toList, ih]
+
+/-- Equivalence, as the materialised evaluator agreeing on the basis. -/
+theorem equivalent_iff_evalList (c₁ c₂ : Circuit n) :
+    c₁ ≡ᵤ c₂ ↔ ∀ y : Fin (2 ^ n),
+      evalList c₁ (Vec.toList (basis y)) = evalList c₂ (Vec.toList (basis y)) := by
+  rw [equivalent_iff_basis]
+  simp only [evalList_toList, Vec.toList_inj]
+
+/-- Equivalence up to phase, as the materialised evaluator agreeing on the
+basis up to one of the eight phases. -/
+theorem equivalentUpToPhase_iff_evalList (c₁ c₂ : Circuit n) :
+    c₁ ≡ₚ c₂ ↔ ∃ k : Fin 8, ∀ y : Fin (2 ^ n), evalList c₁ (Vec.toList (basis y)) =
+      (evalList c₂ (Vec.toList (basis y))).map (Zeta8.ω ^ (k : ℕ) * ·) := by
+  rw [equivalentUpToPhase_iff_basis]
+  simp only [evalList_toList, Vec.map_mul_toList, Vec.toList_inj]
+
+/-- Equivalence of concrete circuits is decidable: run the materialised
+evaluator on the `2 ^ n` basis vectors. -/
 instance decidableEquivalent (c₁ c₂ : Circuit n) : Decidable (c₁ ≡ᵤ c₂) :=
-  decidable_of_iff _ (equivalent_iff_basis c₁ c₂).symm
+  decidable_of_iff _ (equivalent_iff_evalList c₁ c₂).symm
 
 /-- Decidable: eight candidate phases, `2 ^ n` basis vectors each. -/
 instance decidableEquivalentUpToPhase (c₁ c₂ : Circuit n) : Decidable (c₁ ≡ₚ c₂) :=
-  decidable_of_iff _ (equivalentUpToPhase_iff_basis c₁ c₂).symm
+  decidable_of_iff _ (equivalentUpToPhase_iff_evalList c₁ c₂).symm
 
 end Circuit
 

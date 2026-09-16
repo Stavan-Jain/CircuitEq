@@ -7,13 +7,38 @@ pitch and the design; this file is the working conventions. Build with
 
 ## What we are optimising for
 
-The long-run goal is **agent-found structural proofs**: equivalences that
-hold for every qubit count `n`, assembled from the toolkit in
-`CircuitEq/Structural.lean` with `2 × 2` matrix facts as leaves. `decide
-+kernel` on the computational basis is the oracle for concrete leaves and
-small instances; it is not the plan for large circuits. When adding to the
-library, prefer a lemma stated on `≡ᵤ` for arbitrary `n` over a bigger
-`decide`.
+Two products, one architecture (`ROADMAP.md`, "Two products, one
+architecture"):
+
+1. **An AI + Lean equivalence checker.** Given two circuits, an agent finds
+   the structure (an alignment of windows, cut points with residuals, a
+   template instance) and Lean checks it. The agent searches for a
+   derivation between fixed endpoints that an optimiser discarded.
+2. **An AI + Lean optimiser**, longer term. Given one circuit, the agent
+   finds a cheaper one by certified rewrite steps and the proof is the
+   trace. Soundness is by construction; only quality depends on the agent.
+
+Rules that follow, for anyone adding to the library:
+
+- `denote` and `≡ᵤ` are the trusted core. Never redefine them. Every
+  scalable representation is a separate computable structure with a proven
+  correspondence, used by reflection; `evalList` and `rename` are the
+  pattern.
+- Verify answers, not algorithms. A new optimiser is supported by a
+  certified normal form or checker for the fragment it works in, never by
+  formalising its source. External tools are untrusted oracles.
+- New proof techniques land as *step kinds in a certificate language* with
+  a certified replay interpreter behind them, so the agent emits data and
+  the kernel's cost is linear in the trace. The tactic-built proof terms in
+  `CircuitEq/Tactic.lean` are the interim form of this; do not add more
+  tactics that assemble proof terms gate by gate.
+- Representations are chosen for the checkers: `Nat` bitmasks for wire
+  supports, hierarchical circuits with congruence for blocks, templates
+  parametric in `n`, cost functions computed in Lean. Nothing of size
+  `2 ^ n` is ever built for `n` beyond a window.
+- Prefer a lemma stated on `≡ᵤ` for arbitrary `n` over a bigger `decide`.
+  `decide +kernel` is the leaf oracle for windows of a few qubits, never
+  the plan for large circuits.
 
 ## Layout
 
@@ -29,9 +54,42 @@ library, prefer a lemma stated on `≡ᵤ` for arbitrary `n` over a bigger
 - `CircuitEq/Semantics.lean` — `Instr`, `Circuit n := List (Instr n)`,
   `denote`, `denoteₗ`, `Equivalent` (`≡ᵤ`), `EquivalentUpToPhase` (`≡ₚ`),
   basis reduction, `Decidable` instances, `Trans` instance for `calc`.
-- `CircuitEq/Structural.lean` — the parametric toolkit.
+- `CircuitEq/Structural.lean` — the parametric toolkit: fusion,
+  commutation, `denote_applyOne_comm_of_not_touches`, `layer`, `hLayer`.
+- `CircuitEq/Rewriting.lean` — rewriting on instruction lists:
+  `Equivalent.in_context`, the decidable checks `Instr.CanCommute` /
+  `Instr.CanCancel` with their `sound` lemmas, `gate_block_comm`,
+  `blocks_comm`, `perm_equivalent`, `pull_cons`, `cancel_window`.
+  `CanCommute` licenses: equal gates, disjoint wires, two diagonal gates on
+  one wire, a diagonal gate on a CNOT control, `X` on a CNOT target, CNOTs
+  whose controls avoid each other's targets. Extend it there (with a
+  `sound` case) when a benchmark needs a new local commutation; the
+  tactics pick it up automatically.
+- `CircuitEq/Layers.lean` — `cnotNetwork`, `swapEndpoints`, `hOn` (a layer
+  indexed by a `Finset`), `hOn_symmDiff`, `cnotNetwork_layer`, and the
+  benchmark-facing `layer_cnotNetwork_hLayer`.
+- `CircuitEq/Tactic.lean` — `circuit_simp` (cancel checked inverse pairs
+  through commuting gates, then align two concrete lists by `pull_cons`)
+  and `circuit_windows [(a₁, b₁), …]` (the window pattern: each window is
+  decided on its own wires and placed back by `Equivalent.of_rename`, every
+  other move is a checked commutation, windows are consumed in the listed
+  order). Both read lists by `whnf`, so `layer`, `cnotNetwork`, `hLayer`
+  and named circuit `def`s are fine as inputs. Neither searches.
+- `CircuitEq/Embedding.lean` — the locality theorem: `rename f c` places a
+  circuit on the wires `f : Fin m ↪ Fin n`, `rename_equivalent_iff`,
+  `Equivalent.rename`, `wires₂` / `wires₃` for concrete embeddings.
 - `CircuitEq/Examples.lean` — worked identities; add new showcase results
-  here, new general lemmas to `Structural.lean`.
+  here, new general lemmas to `Structural.lean`, `Rewriting.lean` or
+  `Layers.lean`.
+- `CircuitEq/Benchmarks/*.lean` — one module per original-versus-PyZX pair,
+  with QASM fixtures and provenance under `benchmarks/<name>/`. Keep each to
+  the two circuit `def`s (which `scripts/check_pyzx_benchmarks.py` parses
+  and compares with the QASM) and the equivalence theorem; development
+  sanity checks (duplicate `decide` proofs, mutants) do not belong in the
+  repo. The script knows two pipelines, `full_reduce` (re-synthesis) and
+  `teleport` (phase teleportation, skeleton-preserving, the one that gives
+  alignable T-count pairs), and translates `cz` to `H; CX; H` and
+  `rz(k·π/4)` to the diagonal Clifford+T gate with that matrix.
 - `scripts/AxiomCheck.lean` — CI axiom policy; not in any `lean_lib`.
 
 Namespaces: `Quantum.Zeta8` for the field, `Quantum.Circuit` for everything
@@ -68,6 +126,17 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
 - **Circuits are lists in time order.** `denote [g₁, g₂] ψ = U₂ (U₁ ψ)`;
   fusion lemmas therefore have the *later* gate as the left matrix factor
   (`fuse : B.mat * A.mat = C.mat → [one A i, one B i] ≡ᵤ [one C i]`).
+- **Benchmark proofs are `calc` chains on lists.** Name the block
+  decomposition (`layer`, `cnotNetwork`, `hLayer`, a `def edges`), equate
+  the circuit to it by `rfl`, apply the block theorem, and finish with
+  `circuit_simp`. Do not unfold `denote` and rewrite with `applyOne_comm`
+  gate by gate; that is what `CircuitEq/Rewriting.lean` exists to avoid.
+  `perm_equivalent` needs *every* pair in the block to commute; when only
+  the moved gates need to, use `circuit_simp` or `pull_cons`. When the
+  optimiser rewrote a few local regions, hand them to `circuit_windows` as
+  `(before, after)` pairs rather than writing `in_context`, `rename` and
+  `decide +kernel` by hand; a window's decide costs `2 ^ k` for its `k`
+  wires, not `2 ^ n`.
 
 ## Build and verification
 
@@ -112,12 +181,19 @@ Do not run `lake build` between diagnostics edits; one build at the end.
 
 ## Kernel-cost notes
 
-`denote` on nested closures re-reads `ψ` at each flipped index, so a
-depth-`d` concrete circuit costs up to `2^d` amplitude reads per output
-entry (fine to depth ≈ 10 at `n ≤ 3`; the whole `Examples.lean` elaborates in
-under ten seconds). The fix is roadmap item 1 in the README: a materialised
-`List`-backed evaluator with a proven correspondence to `denote`. Until then,
-do not add deep concrete `decide` examples; add structural lemmas instead.
+The `Decidable` instances for `≡ᵤ` and `≡ₚ` run `evalList`
+(`Semantics.lean`), a materialised `List`-backed evaluator proved equal to
+`denote` (`evalList_toList`), so a depth-`d` decide on `k` qubits costs
+`O(d · 4^k)` list steps plus `d · 2^k` `Zeta8` multiplications; `denote`
+itself is nested closures and would re-read the input `2^d` times, so never
+`decide` through `denote` directly. The arithmetic dominates: a `Zeta8`
+product is 16 `Rat` products with gcd normalisation, and the kernel manages
+on the order of 10⁴–10⁵ `Rat` operations per second. Measured with cached
+imports: a two-qubit four-gate window ≈ 0.3 s, a three-qubit six-gate
+window ≈ 3 s, `Tof3.lean` (four windows) ≈ 5 s. Keep `decide` windows to
+three or four qubits and a handful of gates; anything larger wants a
+structural lemma. The next lever is a gcd-free coefficient representation
+(roadmap Rung 1).
 
 `Finset.sum` unfolding in the kernel is slow. `Gate1.mat` products are over
 `Bool` (a two-term sum) and are fine; do not introduce `Matrix (Fin (2 ^ n))`
