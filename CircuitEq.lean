@@ -18,6 +18,7 @@ import CircuitEq.Benchmarks.Rep3PhaseFlip
 import CircuitEq.Benchmarks.SteanePlus
 import CircuitEq.Benchmarks.Tof3
 import CircuitEq.Benchmarks.RM15Zero
+import CircuitEq.Benchmarks.BarencoTof3
 
 /-!
 # CircuitEq
