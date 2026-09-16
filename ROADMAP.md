@@ -249,11 +249,12 @@ ring are both in: the `Decidable` instances run a closure evaluator over
 `Dyadic8` (`CircuitEq/Dyadic.lean`, the ring `ℤ[ω, 1/√2]`, no gcd), proved
 equal to `denote`, with the list evaluator `evalList` kept as the reference
 form. A three-qubit six-gate window went from 3 s to 0.09 s and depth is
-linear. The seven-qubit `SteanePlus` basis decide is still unmeasured: it
-is memory-bound on a 16 GB machine (the kernel's `whnf` cache retains
-everything evaluated in one declaration), so the 10–12-qubit acceptance
-below is not reached by evaluation, and for the Clifford benchmark family
-the route is the tableau of Rung 4 instead. `swapNetwork`, mutants and the
+linear. The seven-qubit `SteanePlus` basis decide is memory-bound: on an
+idle 16 GB machine a 6 GB watchdog killed it after 20 s at 6.9 GB resident
+and still growing (the kernel's `whnf` cache retains everything evaluated
+in one declaration), so the 10–12-qubit acceptance below is not reached
+by evaluation until evaluation is chunked, and for the Clifford benchmark
+family the route is the tableau of Rung 4 instead. `swapNetwork`, mutants and the
 Qiskit-routed pairs have not been attempted.
 
 **Goal.** Decide `≡ᵤ` and `≡ₚ` for concrete Clifford+T circuits of the size

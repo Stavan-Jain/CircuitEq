@@ -20,11 +20,14 @@ Nothing. All five parallel branches are merged (see "Done").
    is killed at 4.6 GB while the same windows pass on `cuccaro_3`, and a
    128-gate move-only replay peaks at 1.9 GB: the kernel's `whnf` cache
    retains every intermediate instruction list for the whole declaration.
-   Levers, in order: a compact `Nat` (or `String`) encoding of the
-   instruction list decoded by the kernel; chunked replay (one theorem per
-   segment, composed by `Equivalent.trans`); cursor-based steps (item 4).
-   Acceptance: `cuccaro_4` / teleport checks under 2 GB. M. Depends on
-   nothing.
+   The same retention kills the seven-qubit `SteanePlus` basis decide at
+   6.9 GB after 20 s of a machine otherwise idle. Levers, in order: a
+   compact `Nat` (or `String`) encoding of the instruction list decoded by
+   the kernel; chunked replay and chunked evaluation (one theorem per
+   segment or per basis vector, composed by `Equivalent.trans` or
+   `equivalent_iff_basis`); cursor-based steps (item 4). Acceptance:
+   `cuccaro_4` / teleport checks under 2 GB, and the seven-qubit decide
+   finishes. M. Depends on nothing.
 
 2. **Phase polynomials with Hadamard variables (path-sum form).** Extend
    `PhasePoly` so that an `H` on a wire introduces a fresh variable (bit
@@ -117,12 +120,9 @@ Nothing. All five parallel branches are merged (see "Done").
     this is the first form of the template step of item 4. S. Depends on
     nothing.
 
-13. **Measure the seven-qubit decide on an idle machine.** `original ≡ᵤ
-    optimized` from `SteanePlus.lean` by `decide +kernel` under the dyadic
-    evaluator, with the machine otherwise idle and a memory cap; the
-    estimate is tens of seconds and a few GB. If memory is the limit, the
-    kernel's `whnf` cache is the reason and chunked evaluation is the
-    lever. S. Depends on nothing but a quiet machine.
+13. *(done, folded into item 1)* The seven-qubit decide was measured on
+    an idle machine: killed by a 6 GB watchdog after 20 s at 6.9 GB and
+    growing, so memory is the limit and chunked evaluation is the lever.
 
 ## Later
 

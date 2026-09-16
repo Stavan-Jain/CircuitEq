@@ -279,8 +279,13 @@ operations each, hours of kernel time). With the closure evaluator,
 attempts of 9 and 3 minutes were stopped swap-starved (the 9-minute one
 before reads were forced: 2:22 of CPU, 9.9 GB resident; see `Dyadic.lean`
 on forcing). The expected cost is 5 × 10⁵ memoised gate steps and a cache
-of the order of 10⁷ terms, tens of seconds and a few GB; measure it on an
-idle machine before relying on the number.
+of the order of 10⁷ terms, tens of seconds and a few GB. Measured on an
+idle machine (16 September 2026): a 6 GB watchdog killed the kernel after
+20 s at 6.9 GB resident and still growing, 19 s of CPU. The cache, not the
+arithmetic, is the wall; chunked evaluation (one lemma per basis vector or
+per gate block, composed by `equivalent_iff_basis` or `Equivalent.trans`)
+is the lever, and the same retention limits certificate replay
+(`QUEUE.md`, item 1).
 
 Two intermediate designs were measured on the way: the same dyadic
 arithmetic through the materialised list evaluator (`evalListD`, kept as
