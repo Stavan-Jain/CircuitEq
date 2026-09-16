@@ -7,6 +7,7 @@ import CircuitEq.Rewriting
 import CircuitEq.Embedding
 import CircuitEq.Checker
 import CircuitEq.Support
+import CircuitEq.PhasePoly
 
 /-!
 # The certificate language and its replay interpreter
@@ -45,8 +46,9 @@ Positions are indices into the instruction list, in time order.
   depends on `wires.length`, never on `n`.
 
 A checker table `Cs : CheckerTable` gives, for each register size, the
-checkers a window may name by index. `defaultCheckers` has the basis
-evaluator `evalChecker` at index `0` and `syntacticChecker` at index `1`;
+checkers a window may name by index. `defaultCheckers` has, at index `0`, the
+phase-polynomial checker with the basis evaluator `evalChecker` as its
+fallback, and `syntacticChecker` at index `1`;
 every certified checker written against `CircuitEq.Checker` can be added to
 a table, and `replay_sound` holds for every table because each checker
 carries its own proof.
@@ -307,7 +309,8 @@ def crossRight (d : ℕ) : Circuit n → Option (Circuit n)
     | none => none
   | [] => none
 
-lemma crossRight_sound {d : ℕ} {c c' : Circuit n} (h : crossRight d c = some c') : c ≡ᵤ c' := by
+lemma crossRight_sound {d : ℕ} {c c' : Circuit n} (h : crossRight d c = some c') :
+    c ≡ᵤ c' := by
   unfold crossRight at h
   split at h
   · next g rest =>
@@ -417,9 +420,15 @@ theorem replay_sound (Cs : CheckerTable) (steps : List (Step n)) {c c' : Circuit
 
 /-! ### The default table and the closing form -/
 
-/-- The default checker table: index `0` is the basis evaluator (cost
-`2 ^ k` for a window on `k` wires), index `1` is syntactic equality. -/
-def defaultCheckers : CheckerTable := fun k => [evalChecker k, syntacticChecker k]
+/-- The default checker table. Index `0` tries the phase-polynomial
+checker first (linear in the window's gates, for CNOT-plus-diagonal
+windows of any width) and falls back to the basis evaluator (cost `2 ^ k`
+for a window on `k` wires); `||` is lazy in the kernel, so the evaluator
+runs only when the symbolic check declines. Index `1` is syntactic
+equality. The tableau checker certifies `≡ₛ`, not `≡ᵤ`, and needs a
+scalar variant of `replay` before it can join a table. -/
+def defaultCheckers : CheckerTable := fun k =>
+  [(phasePolyChecker k).orElse (evalChecker k), syntacticChecker k]
 
 /-- Close a goal `c₁ ≡ᵤ c₂` by replaying a certificate:
 `circuit_replay Cs steps` is `replay_sound Cs steps (by decide +kernel)`,

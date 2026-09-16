@@ -128,7 +128,9 @@ Rules that follow, for anyone adding to the library:
   kernel-friendly interpreter that checks each step (`Instr.CanCommute`,
   `masksDisjoint` on supports, `Instr.CanCancel`, or checker `k` of the
   table `Cs : CheckerTable` on the window's own wires); `replay_sound`;
-  `defaultCheckers` (`evalChecker` at index 0, `syntacticChecker` at 1);
+  `defaultCheckers` (index 0: `phasePolyChecker` with `evalChecker` as
+  fallback, so a CNOT-plus-diagonal window is decided symbolically and
+  only otherwise by the basis; index 1: `syntacticChecker`);
   the closing form `replay_sound Cs steps (by decide +kernel)` and the
   macro `circuit_replay Cs steps`. Never imported by a checker module. A
   new proof technique is a new step kind here with its case in
