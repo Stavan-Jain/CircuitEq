@@ -23,6 +23,7 @@ BENCHMARKS = {
     "rep3_phaseflip": ("Rep3PhaseFlip", "full_reduce"),
     "steane_plus": ("SteanePlus", "full_reduce"),
     "tof_3": ("Tof3", "teleport"),
+    "barenco_tof_3": ("BarencoTof3", "teleport"),
 }
 
 PHASES = {
