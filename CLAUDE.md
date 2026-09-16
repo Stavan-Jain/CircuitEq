@@ -69,6 +69,15 @@ Rules that follow, for anyone adding to the library:
   `not_touches_of_disjoint`; `Rewriting.lean` adds
   `Instr.CanCommute.of_disjoint` and `gate_block_comm_of_disjoint`. Do not
   invent a second encoding of wire sets.
+- `CircuitEq/PhasePoly.lean` — the phase-polynomial normal form for the
+  CNOT-plus-diagonal fragment (`CX` and `Z, S, Sdg, T, Tdg`): `PhasePoly`
+  (one row bitmask per wire for the 𝔽₂-linear part, a sorted `(mask, phase)`
+  list with `phase : Fin 8` for the phases), `PhasePoly.nf`,
+  `phasePolyNormalForm n` and `phasePolyChecker n`. Cost is linear in the
+  gate count and never `2 ^ n` (a 100-gate pair on ten wires is 0.2 s of
+  kernel time); it decides T-count windows on many wires. A proof is
+  `(phasePolyChecker n).sound _ _ (by decide +kernel)`; bare `decide` times
+  out at about a hundred gates.
 - `CircuitEq/Structural.lean` — the parametric toolkit: fusion,
   commutation, `denote_applyOne_comm_of_not_touches`, `layer`, `hLayer`.
 - `CircuitEq/Rewriting.lean` — rewriting on instruction lists:
