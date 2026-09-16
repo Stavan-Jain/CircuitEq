@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Fetches the mathlib olean cache and runs `lake build`.
+      - uses: leanprover/lean-action@v1
+      # Every declaration must depend on exactly [propext, Classical.choice,
+      # Quot.sound]: no `native_decide`, no `sorry`, no bespoke axioms. Runs
+      # against the build lean-action just produced.
+      - name: Axiom policy (standard three axioms only)
+        run: lake env lean scripts/AxiomCheck.lean

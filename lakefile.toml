@@ -1,0 +1,20 @@
+name = "CircuitEq"
+version = "0.1.0"
+keywords = ["math", "quantum", "verification"]
+defaultTargets = ["CircuitEq"]
+
+[leanOptions]
+pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+autoImplicit = false
+relaxedAutoImplicit = false
+weak.linter.mathlibStandardSet = true
+maxSynthPendingDepth = 3
+
+# Pinned by lake-manifest.json to the same mathlib commit as QECLean, so the
+# two projects can share one prebuilt `.lake/packages` (see README § Building).
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+
+[[lean_lib]]
+name = "CircuitEq"
