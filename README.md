@@ -120,30 +120,14 @@ with QECLean's when bumping mathlib, or drop the symlink and use the cache.
 
 ## Roadmap
 
-In rough order of value:
-
-1. **Materialised evaluator.** `denote` on nested closures re-reads `ψ` at each
-   flipped index, so a depth-`d` circuit costs up to `2^d` amplitude reads per
-   output entry. A `List`-backed evaluator with a proven correspondence makes
-   it `O(d · 2^n)` and lets concrete checks scale to real circuit depths.
-2. **Embedding into ℂ.** `Zeta8 →+* ℂ` with `ω ↦ exp(iπ/4)`, then unitarity of
-   every `Gate1.mat`, then agreement with the matrices in QECLean's
-   `QEC/Foundations/`.
-3. **Equivalence notions real compilers need.** Ancilla-aware (`|0⟩` in, `|0⟩`
-   out, on a subspace) and up-to-qubit-permutation.
-4. **Generic `k`-qubit gates** (`applyGate G qs`), subsuming the two primitives.
-5. **A complete Clifford decision procedure** via stabilizer tableaux: a unitary
-   is fixed up to phase by its conjugation action on the Pauli generators, so
-   two Clifford circuits are equivalent iff their symplectic matrices and sign
-   vectors agree — polynomial, kernel-checkable, and a `no` yields a Pauli
-   witness. QECLean's binary-symplectic layer already has the representation.
-6. **Certificate replay** from external rewriters (PyZX, Feynman), each step
-   justified by a lemma here, so the untrusted tool searches and Lean checks.
-7. **OpenQASM ingestion** via a generator, starting with the benchmark set in
-   [QECUnitaryCircuits](https://github.com/Stavan-Jain/QECUnitaryCircuits).
-8. **The agent harness** and a benchmark that shows the gap honestly: fixed-size
-   pairs where decision-diagram tools win on speed, structurally distant pairs,
-   and parametric families that no other checker can state.
+[`ROADMAP.md`](ROADMAP.md) is the full ladder: eleven rungs from the prototype
+to modular arithmetic for Shor for all `n`, each with an acceptance test and a
+statement of what it delivers beyond current checkers (parametric, scale, or
+trust). Near term: a materialised evaluator so concrete checks scale with
+depth; OpenQASM ingestion and a differential test of the semantics; the
+equivalence notions compilers need (permutation, ancilla, subspace); then the
+first useful parametric theorems, ripple-carry adders and multi-controlled
+gates for every `n`.
 
 ## Trust
 
