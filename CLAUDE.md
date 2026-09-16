@@ -34,9 +34,9 @@ Rules that follow, for anyone adding to the library:
   PyZX, Feynman, Qiskit.
 - New proof techniques land as *step kinds in a certificate language* with
   a certified replay interpreter behind them, so the agent emits data and
-  the kernel's cost is linear in the trace. The tactic-built proof terms in
-  `CircuitEq/Tactic.lean` are the interim form of this; do not add more
-  tactics that assemble proof terms gate by gate.
+  the kernel's cost is linear in the trace. `CircuitEq/Certificate.lean` is
+  that language; the tactics in `CircuitEq/Tactic.lean` emit its steps. Do
+  not add tactics that assemble proof terms gate by gate.
 - Representations are chosen for the checkers: `Nat` bitmasks for wire
   supports, hierarchical circuits with congruence for blocks, templates
   parametric in `n`, cost functions computed in Lean. Nothing of size
@@ -122,13 +122,27 @@ Rules that follow, for anyone adding to the library:
 - `CircuitEq/Layers.lean` — `cnotNetwork`, `swapEndpoints`, `hOn` (a layer
   indexed by a `Finset`), `hOn_symmDiff`, `cnotNetwork_layer`, and the
   benchmark-facing `layer_cnotNetwork_hLayer`.
+- `CircuitEq/Certificate.lean` — the certificate language: `Step n`
+  (`swap`, `moveLeft`, `moveRight`, `cancel`, `insert`, `window`), plain
+  data with positions as `ℕ`; `replay Cs steps c : Option (Circuit n)`, a
+  kernel-friendly interpreter that checks each step (`Instr.CanCommute`,
+  `masksDisjoint` on supports, `Instr.CanCancel`, or checker `k` of the
+  table `Cs : CheckerTable` on the window's own wires); `replay_sound`;
+  `defaultCheckers` (`evalChecker` at index 0, `syntacticChecker` at 1);
+  the closing form `replay_sound Cs steps (by decide +kernel)` and the
+  macro `circuit_replay Cs steps`. Never imported by a checker module. A
+  new proof technique is a new step kind here with its case in
+  `replayStep_sound`; the kernel evaluates `replay` once per proof.
 - `CircuitEq/Tactic.lean` — `circuit_simp` (cancel checked inverse pairs
-  through commuting gates, then align two concrete lists by `pull_cons`)
-  and `circuit_windows [(a₁, b₁), …]` (the window pattern: each window is
-  decided on its own wires and placed back by `Equivalent.of_rename`, every
-  other move is a checked commutation, windows are consumed in the listed
-  order). Both read lists by `whnf`, so `layer`, `cnotNetwork`, `hLayer`
-  and named circuit `def`s are fine as inputs. Neither searches.
+  through commuting gates, then align two concrete lists gate by gate) and
+  `circuit_windows [(a₁, b₁), …]` (the window pattern: each window is
+  decided on its own wires by the checker table, every other move is a
+  checked commutation, windows are consumed in the listed order). Both
+  search in meta code and emit a `List (Step n)` closed by `replay_sound`,
+  so the kernel evaluates `replay` once; moves found on the right-hand
+  circuit are inverted into the same trace. Both read lists by `whnf`, so
+  `layer`, `cnotNetwork`, `hLayer` and named circuit `def`s are fine as
+  inputs. Neither searches for an alignment.
 - `CircuitEq/Embedding.lean` — the locality theorem: `rename f c` places a
   circuit on the wires `f : Fin m ↪ Fin n`, `rename_equivalent_iff`,
   `Equivalent.rename`, `wires₂` / `wires₃` for concrete embeddings.

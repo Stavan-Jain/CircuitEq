@@ -20,7 +20,9 @@ Concrete circuit identities, established four ways:
    assembled from the toolkit in `CircuitEq.Structural` with `2 × 2`
    matrix leaves;
 4. **placed** — a decided identity on `k` qubits, lifted to any `k` distinct
-   wires of any register by `Equivalent.rename` (`CircuitEq.Embedding`).
+   wires of any register by `Equivalent.rename` (`CircuitEq.Embedding`);
+5. **certified** — a list of rewrite steps, found by a tactic or written by
+   hand, replayed and checked by the kernel once (`CircuitEq.Certificate`).
 
 The structural and placed proofs are the point of the prototype: they hold
 for every `n` and every choice of qubits, which no fixed-size equivalence
@@ -155,5 +157,22 @@ it back, and checks that every other gate can be moved into position. -/
 theorem two_windows :
     ([T 0, CX 1 2, T 0, H 5, X 3, H 5] : Circuit 6) ≡ᵤ [CX 1 2, S 0, X 3] := by
   circuit_windows [([T 0, T 0], [S 0]), ([H 5, H 5], [])]
+
+/-! ### The certificate
+
+What `circuit_windows` finds is data: a list of `Step`s that `replay`
+turns into the right-hand circuit. The same proof written out as that
+data, closed by `circuit_replay`; each move names its position, the
+windows name their wires, and the kernel checks the trace once. This is
+the form an external search emits. -/
+
+/-- `two_windows` as an explicit certificate: move the second `T 0` left
+past the CNOT, fuse on wire `0`, move the CNOT back to the front, bring
+the Hadamards together past `X 3`, and delete them on wire `5`. -/
+theorem two_windows_certificate :
+    ([T 0, CX 1 2, T 0, H 5, X 3, H 5] : Circuit 6) ≡ᵤ [CX 1 2, S 0, X 3] := by
+  circuit_replay defaultCheckers
+    [.moveLeft 2 1, .window 0 [0] ([T 0, T 0] : Circuit 1) [S 0] 0, .moveLeft 1 1,
+      .moveLeft 4 1, .window 2 [5] ([H 0, H 0] : Circuit 1) [] 0]
 
 end Quantum.Circuit.Examples
