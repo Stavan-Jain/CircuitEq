@@ -12,33 +12,21 @@ Sizes: S is a session, M a few sessions, L a milestone.
 
 ## In flight (16 September 2026)
 
-One agent each, on branches off `321e631`, to be merged by the integrator.
-
-- **Certificate language and replay interpreter.** `CircuitEq/Certificate.lean`:
-  `Step`, `replay`, `replay_sound`; `Tactic.lean` re-targeted so
-  `circuit_windows` and `circuit_simp` emit a trace closed by one
-  `replay_sound`. M.
-- **Clifford tableau checker.** `CircuitEq/Tableau.lean`: Pauli strings as
-  bitmasks, gate update rules, soundness to `≡ₛ` by the commutant argument;
-  exports a `ScalarChecker`. L.
-- **Gcd-free dyadic coefficient ring.** `CircuitEq/Dyadic.lean` plus the
-  decision instances in `Semantics.lean` rerouted through a dyadic
-  evaluator. M.
 - **T-count survey.** `scripts/tcount_survey.py`, `benchmarks/survey/`:
   Toffoli chains, adders and seeded random circuits against both PyZX
   pipelines, diff-based alignments checked by `circuit_windows`, and a
-  written account of what does not align. M.
-- Landed: **phase-polynomial checker**, `CircuitEq/PhasePoly.lean`
-  (`2768c71`).
+  written account of what does not align. M. Early records: teleport
+  alignments tend to a single whole-register window (a brute-force decide,
+  not a window proof), and `full_reduce` pairs have no alignment.
 
 ## Next
 
-1. **Integrate the in-flight branches.** Merge each branch into `main`;
-   resolve the expected conflicts in `CircuitEq.lean` and CLAUDE.md;
-   register `phasePolyChecker` and `tableauChecker` in the certificate's
-   checker table ahead of `evalChecker`, so a window is tried symbolically
-   before the basis decide; rebuild, run the axiom check, update README
-   and ROADMAP. S. Depends on the four branches.
+1. **Integrate the survey.** Merge its branch, fold its table and failure
+   modes into ROADMAP Rung 3 and this file, and turn its findings into
+   items below. S. Depends on the survey branch. (The other four branches
+   are merged; `phasePolyChecker` is registered at index 0 of
+   `defaultCheckers` with `evalChecker` as fallback. `tableauChecker`
+   cannot join that table: it certifies `≡ₛ`; see item 11.)
 
 2. **Phase polynomials with Hadamard variables (path-sum form).** Extend
    `PhasePoly` so that an `H` on a wire introduces a fresh variable (bit
@@ -112,6 +100,25 @@ One agent each, on branches off `321e631`, to be merged by the integrator.
     circuits (the `rz` global-phase trap), run in CI. S. Depends on
     nothing.
 
+11. **The scalar replay.** A `ScalarCheckerTable`, a window step whose
+    soundness uses `EquivalentUpToScalar.append` and a rename lemma for
+    `≡ₛ`, and `replayₛ_sound : … → c ≡ₛ c'`, so that `tableauChecker` can
+    justify windows and, later, residuals. Until then the tableau is used
+    whole-circuit only. S to M. Depends on nothing.
+
+12. **A block-theorem step.** A step kind that applies a registered lemma
+    such as `layer_cnotNetwork_hLayer` at a position, so the Steane proof
+    and the Python mirror no longer need a `calc` around the certificate;
+    this is the first form of the template step of item 4. S. Depends on
+    nothing.
+
+13. **Measure the seven-qubit decide on an idle machine.** `original ≡ᵤ
+    optimized` from `SteanePlus.lean` by `decide +kernel` under the dyadic
+    evaluator, with the machine otherwise idle and a memory cap; the
+    estimate is tens of seconds and a few GB. If memory is the limit, the
+    kernel's `whnf` cache is the reason and chunked evaluation is the
+    lever. S. Depends on nothing but a quiet machine.
+
 ## Later
 
 - Hierarchical circuits (named blocks, congruence) and compact encodings
@@ -128,6 +135,14 @@ One agent each, on branches off `321e631`, to be merged by the integrator.
 
 ## Done
 
+- `d134d7e` `phasePolyChecker` registered at index 0 of the certificate
+  table, with `evalChecker` as fallback.
+- `a163ea5` (merged `fde3773`) Certificate language: `Step`, `replay`,
+  `replay_sound`, tactics emitting traces, `scripts/certificate.py`.
+- `f29e999` (merged `ffa5522`) Gcd-free `Dyadic8` closure evaluator behind
+  the decision instances; three-qubit window 2.66 s to 0.09 s.
+- `b90aac9` (merged `fa378fd`) Clifford tableau checker with soundness to
+  `≡ₛ`, witness, the 15-qubit Reed–Muller benchmark.
 - `2768c71` Phase-polynomial normal form and checker (CNOT plus diagonal).
 - `321e631` Checker interface, bitmask wire supports, `≡ₛ`.
 - `bc811d0` Rewriting toolkit, `circuit_windows`, locality theorem,

@@ -177,9 +177,9 @@ tools' results instead of competing with them.
    congruence. Cost functions (T-count, depth, gate count) are computed in
    Lean, so "this circuit has T-count 19" is a checked claim.
 6. **The agent.** External tools (TZAP, PyZX, Feynman, quizx, Qiskit) are
-   untrusted oracles it uses to see where the structure is. It never sees a million
-   gates; it works at the level of blocks and delegates below that to
-   checkers. Its output is a certificate; Lean's error messages are its
+   untrusted oracles it uses to see where the structure is. It never sees a
+   million gates; it works at the level of blocks and delegates below that
+   to checkers. Its output is a certificate; Lean's error messages are its
    feedback.
 
 The optimiser runs in two modes. *Constructive*: apply certified steps and
@@ -219,13 +219,16 @@ registering it or by composing around the certificate. The P method stays
 the way to reach large `n`; certificates are how its instances and the
 concrete leftovers get checked.
 
-Where this stands (September 2026): `circuit_windows` in
-`CircuitEq/Tactic.lean` is the first form of the certificate idea, alignment
-as input and checking as output, but it builds a proof term step by step
-with quadratic kernel work. The next move is to make windows and
-commutations the first version of the certificate language with a certified
-replay interpreter. Everything after that is adding step kinds and the
-checkers behind them.
+Where this stands (16 September 2026): the certificate language exists
+(`CircuitEq/Certificate.lean`: `Step`, `replay`, `replay_sound`, a checker
+table), and `circuit_windows` and `circuit_simp` emit its traces and close
+goals with one `replay_sound`. Two fragment checkers are behind it, the
+phase polynomial (`PhasePoly.lean`, `≡ᵤ`) and the Clifford tableau
+(`Tableau.lean`, `≡ₛ`), the basis evaluator runs on the gcd-free ring
+(`Dyadic.lean`), and a Python mirror of the language exists. What is
+missing is in `QUEUE.md`: the scalar variant of replay so tableau windows
+and residuals compose, Hadamard variables in the phase polynomial, and the
+template step for registered parametric lemmas.
 
 ## The ladder
 
@@ -241,14 +244,17 @@ checks cost `2^depth`; there is no link to ℂ; no locality theorem, so every
 
 ### Rung 1 — Concrete circuits at benchmark scale
 
-**Status (September 2026).** The materialised evaluator is in:
-`evalList` in `CircuitEq/Semantics.lean`, proved equal to `denote`
-(`evalList_toList`), and the `Decidable` instances for `≡ᵤ` and `≡ₚ` go
-through it, so a decide is linear in depth. Measured cost is now the
-`Zeta8` arithmetic itself (`Rat` gcd normalisation): about 3 s in the
-kernel for a three-qubit six-gate window. The compact coefficient
-representation below is the next step; the benchmark-scale runs have not
-been attempted.
+**Status (16 September 2026).** The evaluator and the compact coefficient
+ring are both in: the `Decidable` instances run a closure evaluator over
+`Dyadic8` (`CircuitEq/Dyadic.lean`, the ring `ℤ[ω, 1/√2]`, no gcd), proved
+equal to `denote`, with the list evaluator `evalList` kept as the reference
+form. A three-qubit six-gate window went from 3 s to 0.09 s and depth is
+linear. The seven-qubit `SteanePlus` basis decide is still unmeasured: it
+is memory-bound on a 16 GB machine (the kernel's `whnf` cache retains
+everything evaluated in one declaration), so the 10–12-qubit acceptance
+below is not reached by evaluation, and for the Clifford benchmark family
+the route is the tableau of Rung 4 instead. `swapNetwork`, mutants and the
+Qiskit-routed pairs have not been attempted.
 
 **Goal.** Decide `≡ᵤ` and `≡ₚ` for concrete Clifford+T circuits of the size
 real benchmarks have: 10–12 qubits, depth in the hundreds to low thousands.
@@ -332,12 +338,14 @@ test of the working hypothesis above. Everything here is stated with `≡ᵤ` an
   windows on at most three wires (`CircuitEq/Benchmarks/`). Re-synthesised
   output (`full_reduce`, T-count 15 on the same input) has no alignment;
   that is the residual pattern's job.
-- **The certificate language and replay interpreter.** The step data type,
-  `replay`, and `replay_sound`, with windows and commutations as the first
-  step kinds and bitmask supports so a move costs one `land`. Replaces the
-  proof-term construction in `circuit_windows`; kernel cost becomes linear
-  in the trace. See "Two products, one architecture". This is the next
-  piece of work at this rung.
+- **The certificate language and replay interpreter.** ✅ (16 September
+  2026, `CircuitEq/Certificate.lean`.) `Step` (`swap`, `moveLeft`,
+  `moveRight` across a block with disjoint bitmask support, `cancel`,
+  `insert`, `window` on named wires justified by a checker from a table),
+  `replay`, `replay_sound` for every table; the tactics emit traces and
+  close with one `replay_sound`; `scripts/certificate.py` mirrors it.
+  Missing: cursor-based traces (replay still walks to each position), the
+  template step, and the `≡ₛ` variant that lets tableau windows compose.
 - **The residual pattern.** Cut points with a compact residual (diagonal
   first; Clifford once Rung 4 lands), proved preserved step by step.
 - **The optimiser-output benchmark.** For each of the 19 QECUnitaryCircuits
@@ -366,6 +374,17 @@ control; whether an agent finds the alignment on real optimiser output is the
 most interesting open question in the project.
 
 ### Rung 4 — A complete, certified Clifford decision procedure
+
+**Status (16 September 2026).** The tableau is in: `CircuitEq/Tableau.lean`
+conjugates the `2n` Pauli generators (x-mask, z-mask, phase in `ZMod 4`)
+through `H, X, Y, Z, S, S†, CX` with `O(n)` bit operations per gate, and
+`tableau_sound` proves equal tableaux give `≡ₛ` by the commutant argument
+on state vectors, with a `witness` function naming the first disagreeing
+generator. The 15-qubit Reed–Muller encoder against its PyZX
+re-synthesis decides in about 0.3 s of kernel time
+(`CircuitEq/Benchmarks/RM15Zero.lean`). Open: completeness, the `≡ₚ`
+strengthening (the scalar is a power of `ω`; number theory in `ℤ[ω]`), the
+19-origin run, and the residual use in Rung 3 (`QUEUE.md`).
 
 **Goal.** Decide equivalence of Clifford circuits at hundreds to thousands of
 qubits, with a witness on failure, and represent Clifford residuals for Rung 3.

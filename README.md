@@ -17,8 +17,9 @@ of the design is to make that agent's job mechanical where it can be
 (structural lemmas that hold for every `n` are the connectives).
 
 **Status: prototype.** Clifford+T only, one and two-qubit gates, some
-twenty worked identities, three original-versus-PyZX benchmark pairs. See
-"Roadmap" for what is missing.
+twenty worked identities, four original-versus-PyZX benchmark pairs, and
+certified checkers for the Clifford and the CNOT-plus-diagonal fragments.
+See "Roadmap" for what is missing and `QUEUE.md` for what is next.
 
 ## What you can state and prove today
 
@@ -57,10 +58,18 @@ theorem original_equiv_optimized : original ≡ᵤ optimized :=
     _ ≡ᵤ _ := layer_cnotNetwork_hLayer [0, 1, 3] (by decide) edges (by decide)
     _ ≡ᵤ optimized := by circuit_simp
 
--- the window pattern: an optimiser's local rewrites, each decided on its own wires
+-- the window pattern: an optimiser's local rewrites, each decided on its own wires;
+-- the tactic emits a certificate and the kernel replays it once
 theorem two_windows :
     ([T 0, CX 1 2, T 0, H 5, X 3, H 5] : Circuit 6) ≡ᵤ [CX 1 2, S 0, X 3] := by
   circuit_windows [([T 0, T 0], [S 0]), ([H 5, H 5], [])]
+
+-- fragment checkers: symbolic, linear in the gate count, never 2^n
+theorem gadgets_merge :
+    ([CX 0 1, T 1, CX 0 1, CX 0 1, T 1, CX 0 1] : Circuit 2) ≡ᵤ [CX 0 1, S 1, CX 0 1] :=
+  (phasePolyChecker 2).sound _ _ (by decide +kernel)
+theorem rm15 : original ≡ₛ optimized :=   -- 15 qubits, re-synthesised CNOT network, ~0.3 s
+  (tableauChecker 15).sound _ _ (by decide +kernel)
 ```
 
 Circuits are lists in time order, so `[g₁, g₂]` is the operator `U₂ · U₁`.
@@ -94,6 +103,14 @@ exact equivalence; every other change is a phase gate moving through a CNOT
 control. Full re-synthesis (T-count 15) is a structurally unrelated circuit
 and out of the window pattern's reach.
 
+[`benchmarks/rm15_zero/`](benchmarks/rm15_zero/README.md) is the first pair
+decided by the Clifford tableau: the 15-qubit `[[15,1,3]]` Reed–Muller
+logical-zero encoder against PyZX's re-synthesised CNOT network (32 to 28
+gates, with CNOTs the original never has, so no alignment exists). The
+proof is one line, `(tableauChecker 15).sound _ _ (by decide +kernel)`,
+about 0.3 s of kernel time, and states `≡ₛ`, equality up to a unit scalar,
+which is all a tableau can see.
+
 ## Design
 
 - **Coefficients are the computable field ℚ(ζ₈), not ℂ.** Mathlib's `ℂ` is
@@ -113,9 +130,10 @@ and out of the window pattern's reach.
   denote c₂ ψ`. Every instruction is linear, so `LinearMap.pi_ext` reduces
   this to the `2 ^ n` basis vectors, which gives a `Decidable` instance.
   `≡ₚ` additionally ranges over the eight powers of `ω`. The instance
-  evaluates with `evalList`, a materialised list-backed evaluator proved
-  equal to `denote`, so a decide costs linear in circuit depth, not
-  `2 ^ depth`.
+  evaluates with a closure evaluator over `Dyadic8` (`Dyadic.lean`), the
+  gcd-free ring `ℤ[ω, 1/√2]`, proved equal to `denote`, so the kernel never
+  sees a rational and a decide is linear in depth: a three-qubit six-gate
+  window is 0.09 s where the rational list evaluator took 3 s.
 - **Kernel-only.** `decide +kernel` is required because `Rat.add` and
   `Rat.mul` are `@[irreducible]`, which stalls elaborator-level `decide`; the
   kernel ignores reducibility and evaluates `Nat.gcd` with GMP. No
@@ -140,19 +158,31 @@ and out of the window pattern's reach.
   CNOT and cancelling against the seed layer, for every `n`; `hOn_symmDiff`
   is the algebra of partial Hadamard layers (`hOn S ++ hOn T ≡ᵤ hOn (S ∆ T)`);
   `cnotNetwork_perm` reorders a network with disjoint controls and targets.
-- **`circuit_simp` does the routine.** Given `c₁ ≡ᵤ c₂` on concrete lists, it
-  cancels checked inverse pairs through the gates they commute with, then
-  aligns the two lists by pulling each gate of `c₂` through a checked prefix
-  of `c₁`. It assembles ordinary proof terms from `cancel_window` and
-  `pull_cons`; block identities remain explicit steps in the calling proof.
-- **`circuit_windows` is the window pattern.** The alignment is input: a
-  list of windows `(aᵢ, bᵢ)`, each a pair of gate lists on the full register
-  touching a few wires, in the order they occur. The tactic decides each
-  window on its own wires by `decide +kernel` (cost `2 ^ k`, never `2 ^ n`),
-  places it back with the locality theorem (`Equivalent.of_rename`), and
-  checks every other move as a commutation. It never searches: a move the
-  checks do not license, or a false window, is an error naming the gate or
-  the window.
+- **Certificates, not proof terms.** `Certificate.lean` is a data type of
+  rewrite steps (`swap`, `moveLeft`/`moveRight` across a block with a
+  disjoint bitmask support, `cancel`/`insert`, `window` on named wires
+  justified by a checker from a table) with a kernel-friendly interpreter
+  `replay` and one theorem `replay_sound`. A proof is
+  `replay_sound Cs steps (by decide +kernel)`: the kernel evaluates
+  `replay` once, cost linear in the trace. `scripts/certificate.py` mirrors
+  the language in Python so external tools can emit traces.
+- **The tactics emit certificates.** `circuit_simp` cancels checked inverse
+  pairs and aligns two concrete lists; `circuit_windows` takes an alignment
+  as input, a list of windows `(aᵢ, bᵢ)` on the full register in the order
+  they occur, and checks every other move as a commutation. Both search in
+  meta, emit a `List Step`, and close the goal with a single `replay_sound`.
+  Neither searches for alignments: a move the checks do not license, or a
+  false window, is an error naming the gate or the window.
+- **Fragment checkers decide windows symbolically.** `PhasePoly.lean` is a
+  certified normal form for CNOT-plus-diagonal circuits (an `𝔽₂`-linear
+  part as row bitmasks, a phase polynomial in units of `π/4`): linear in
+  gates, independent of `2 ^ n`, and the deterministic counterpart of what
+  T-count optimisers such as TZAP compute. `Tableau.lean` conjugates the
+  `2n` Pauli generators through a Clifford circuit with `O(n)` bit
+  operations per gate and certifies `≡ₛ`, equality up to a unit scalar,
+  by the commutant argument on state vectors. Both export the `Checker`
+  contract of `Checker.lean`, and the default certificate table tries the
+  phase polynomial before the basis evaluator.
 - **The locality theorem.** `rename f c` places an `m`-qubit circuit on the
   wires `f : Fin m ↪ Fin n`; `rename_equivalent_iff` says
   `rename f a ≡ᵤ rename f b ↔ a ≡ᵤ b`. So a `decide +kernel` on `m` qubits,
@@ -167,17 +197,25 @@ CircuitEq/
 ├── Zeta8.lean              ℚ(ζ₈): the computable coefficient field
 ├── Bits.lean               bit / flipBit on Fin (2 ^ n), commutation lemmas
 ├── Gates.lean              Gate1 alphabet, 2×2 matrices, applyOne / applyCNOT
-├── Semantics.lean          Instr, Circuit, denote, ≡ᵤ, ≡ₚ, decidability
+├── Dyadic.lean             ℤ[ω, 1/√2]: the gcd-free ring the kernel computes in
+├── Semantics.lean          Instr, Circuit, denote, ≡ᵤ, ≡ₚ, ≡ₛ, decidability
+├── Checker.lean            the checker contract: check + sound, normal forms
 ├── Structural.lean         the parametric toolkit: fusion, commutation, layers
+├── Support.lean            wire sets as Nat bitmasks
+├── PhasePoly.lean          phase-polynomial normal form, CNOT + diagonal
+├── Tableau.lean            Clifford tableau checker, soundness to ≡ₛ
 ├── Rewriting.lean          rewriting in context, checked swaps and cancellations
 ├── Layers.lean             Hadamard-layer algebra, CNOT-network conjugation
-├── Tactic.lean             circuit_simp, circuit_windows
+├── Certificate.lean        Step, replay, replay_sound, the checker table
+├── Tactic.lean             circuit_simp, circuit_windows (emit certificates)
 ├── Embedding.lean          the locality theorem: circuits on selected wires
 ├── Examples.lean           worked identities: decided, refuted, structural, placed
 └── Benchmarks/             original-versus-PyZX proofs
 benchmarks/                 QASM fixtures and provenance for each benchmark
 scripts/AxiomCheck.lean     CI: standard three axioms only
 scripts/check_pyzx_benchmarks.py   reproduce the PyZX fixtures (pyzx==0.9.0)
+scripts/certificate.py      Python mirror of the certificate language
+QUEUE.md                    the ordered list of next work
 ```
 
 ## Building

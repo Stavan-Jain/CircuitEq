@@ -24,8 +24,8 @@ Rules that follow, for anyone adding to the library:
 
 - `denote` and `≡ᵤ` are the trusted core. Never redefine them. Every
   scalable representation is a separate computable structure with a proven
-  correspondence, used by reflection; `evalList` and `rename` are the
-  pattern.
+  correspondence, used by reflection: the dyadic evaluator, `rename`,
+  `PhasePoly.nf`, `tableau` and `replay` are the pattern.
 - Verify answers, not algorithms. A new optimiser is supported by a
   certified normal form or checker for the fragment it works in, never by
   formalising its source. External tools are untrusted oracles: TZAP
