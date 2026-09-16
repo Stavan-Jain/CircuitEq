@@ -53,9 +53,35 @@ equally important, and every rung below says which it delivers.
   matters in certification settings and because a proved lemma composes into
   larger proofs, which a tool's "yes" cannot, but it is not a goal in itself.
 
+### Which equivalence relation
+
+Basic equivalence carries most of the project. `≡ᵤ` (equal unitaries) and
+`≡ₚ` (equal up to a global phase) already exist and are decidable, and they
+are all the S-critical path needs:
+
+- optimisers preserve the whole unitary up to a global phase, so
+  optimiser-output pairs are `≡ₚ` statements;
+- routing appends a permutation of the qubits, and a permutation is a SWAP
+  network, which is a circuit: a routed circuit is verified as
+  `compiled ≡ₚ source ++ swapNetwork π` with `π` read from the transpiler's
+  metadata. No new relation is needed.
+
+Refined relations — equivalence on the subspace where ancilla qubits are `|0⟩`,
+equivalence up to a relative phase on a subspace, equivalence modulo a
+stabilizer group — are needed only to compare *different constructions* that
+use ancillas (two multi-controlled-`X` decompositions, two adders with
+different ancilla counts, a relative-phase Toffoli inside a gadget) and for
+statements on a code subspace. The decidable part of each is easy: the same
+basis check over fewer basis vectors. The algebra is where care is needed,
+because equivalence on a subspace is a congruence for sequencing only when the
+surrounding circuit preserves that subspace, so every congruence lemma carries
+a side condition. They are therefore introduced at Rung 5, immediately before
+the constructions that need them, and only in the form those constructions
+need.
+
 ### What "structure" means for compiled circuits
 
-This is the project's working hypothesis. Rung 4 is its test.
+This is the project's working hypothesis. Rung 3 is its test.
 
 Exact equivalence is coNP-hard, so in the worst case every method fails at
 about the same size, ours included. But circuits that come out of compilers
@@ -78,14 +104,14 @@ Three mechanisms, and the proof shapes they become in this library:
   unitary on the few qubits it touches. The proof is many tiny `decide`s glued
   by `Equivalent.append`, with the moving lemmas inserting the commutations
   that let a gate cross a window boundary. Cost is linear in circuit size and
-  independent of `n`, given the locality theorem of Rung 4. Finding the
+  independent of `n`, given the locality theorem of Rung 3. Finding the
   alignment is the creative step; QCEC's alternating scheme does it by a fixed
   heuristic, and that is exactly the freedom an agent adds.
 - **Residual invariants.** At agent-chosen cut points, assert that one
   circuit's prefix times the inverse of the other's is something compact — a
   Clifford, a diagonal — and prove each step preserves it. This is a loop
   invariant; tools cannot invent them, agents and humans do routinely. The
-  tableau layer of Rung 5 is what represents a Clifford residual compactly.
+  tableau layer of Rung 4 is what represents a Clifford residual compactly.
 - **Latent algebra.** Between Hadamard layers every Clifford+T circuit is a
   CNOT-plus-diagonal fragment with a canonical phase-polynomial form. An agent
   can reason in that form across the Hadamard boundaries, case by case, where
@@ -100,13 +126,13 @@ concrete circuits; a structural toolkit; twenty identities, several parametric
 in `n` (`hLayer_hLayer`, `T_cnot_comm`, `H_T_H_eq_T`).
 
 Limits: the gate alphabet is single-qubit Clifford+T plus CNOT; concrete
-checks cost `2^depth`; there is no link to ℂ; no ancilla-aware equivalence; no
-locality theorem, so every `decide` pays for all `n` qubits.
+checks cost `2^depth`; there is no link to ℂ; no locality theorem, so every
+`decide` pays for all `n` qubits.
 
 ### Rung 1 — Concrete circuits at benchmark scale
 
-**Goal.** Decide `≡ᵤ` for concrete Clifford+T circuits of the size real
-benchmarks have: 10–12 qubits, depth in the hundreds to low thousands.
+**Goal.** Decide `≡ᵤ` and `≡ₚ` for concrete Clifford+T circuits of the size
+real benchmarks have: 10–12 qubits, depth in the hundreds to low thousands.
 
 **Work.** A materialised evaluator over `List`/`Array`, gate by gate, so cost
 is `O(depth · 2^n)` instead of `O(2^depth)`; a *proof* that it agrees with
@@ -114,11 +140,15 @@ is `O(depth · 2^n)` instead of `O(2^depth)`; a *proof* that it agrees with
 routed through it. If ℚ's gcd normalisation dominates, re-represent `Zeta8` as
 ℤ numerators over a shared power of √2 (the exact-synthesis ring `D[ω]`).
 Packed `Nat` bit-vectors where lists are too slow for the kernel — the
-technique that de-nativised QECLean's gross-code proof.
+technique that de-nativised QECLean's gross-code proof. A `swapNetwork π`
+circuit and the derived statement for routed circuits.
 
 **Acceptance.** Verify all 19 origin circuits of QECUnitaryCircuits against
 their PyZX-optimised twins, and refute their gate-deleted mutants, each in
-under one minute of kernel time. Publish the scaling table (n, depth, seconds).
+under one minute of kernel time. Verify Qiskit-transpiled versions of the same
+circuits, with routing SWAPs and layout changes, against their sources via
+`≡ₚ … ++ swapNetwork π`, at the sizes the evaluator reaches. Publish the
+scaling table (n, depth, seconds).
 
 **Delivers.** The brute-force baseline for S, and T. **Harder because** the
 evaluator correspondence is the library's first reflection proof, and kernel
@@ -155,30 +185,11 @@ proved unitary; the bridge lemmas to QECLean compile.
 **Delivers.** T. **Harder because** the ℂ side is noncomputable, so those are
 analytic proofs about `Complex.exp`, not `decide`.
 
-### Rung 3 — Equivalence notions compilers actually need
-
-**Goal.** State the equivalences that arise from compilation and from
-ancilla-using constructions.
-
-**Work.** Equivalence up to a qubit permutation (routing, SWAP insertion);
-equivalence on the ancilla subspace (the last `a` qubits enter and leave in
-`|0⟩`); equivalence up to a relative phase on a subspace (Margolus-style
-relative-phase Toffolis). Congruence lemmas for each under sequencing, and
-decidability wherever the quantifier is finite.
-
-**Acceptance.** Qiskit-transpiled versions of the 19 benchmark circuits, with
-SWAPs and layout changes, verified against their sources; the 4-T
-relative-phase Toffoli verified against Toffoli under the right relation.
-
-**Delivers.** T, plus the prerequisites for Rungs 4 and 6. **Harder because**
-the definitions are subtle — which side a permutation acts on, what "restored
-ancilla" means on superposed inputs — and a wrong one silently weakens
-everything built on it.
-
-### Rung 4 — Compositional proofs of fixed-size pairs
+### Rung 3 — Compositional proofs of fixed-size pairs
 
 **Goal.** The direct route to S on real compiled circuits, and the empirical
-test of the working hypothesis above.
+test of the working hypothesis above. Everything here is stated with `≡ᵤ` and
+`≡ₚ`.
 
 **Work.**
 
@@ -194,7 +205,7 @@ test of the working hypothesis above.
   lemmas, and one small `decide` per window. The alignment is *input*; the
   tactic only checks it.
 - **The residual pattern.** Cut points with a compact residual (diagonal
-  first; Clifford once Rung 5 lands), proved preserved step by step.
+  first; Clifford once Rung 4 lands), proved preserved step by step.
 - **The optimiser-output benchmark.** For each of the 19 QECUnitaryCircuits
   origins, and for adders and QFTs at `n = 8` to `64`: the output of PyZX
   `full_reduce` plus extraction, of a T-count optimiser (quizx, or Feynman's
@@ -216,10 +227,10 @@ falsify the hypothesis for that optimiser.
 control; whether an agent finds the alignment on real optimiser output is the
 most interesting open question in the project.
 
-### Rung 5 — A complete, certified Clifford decision procedure
+### Rung 4 — A complete, certified Clifford decision procedure
 
 **Goal.** Decide equivalence of Clifford circuits at hundreds to thousands of
-qubits, with a witness on failure, and represent Clifford residuals for Rung 4.
+qubits, with a witness on failure, and represent Clifford residuals for Rung 3.
 
 **Work.** Tableau semantics: a Clifford circuit maps to a symplectic matrix over
 `𝔽₂` plus a sign vector. The theorem that the tableau determines the unitary up
@@ -230,11 +241,34 @@ completeness (equal tableaux imply `≡ₚ`); a Pauli witness `P` with
 
 **Acceptance.** GHZ/cat-state ladders and stabilizer-state preparation
 circuits for QECLean's codes at `n ≥ 100` verified in seconds; a wrong pair
-yields a concrete Pauli; a Rung 4 residual proof uses a Clifford invariant.
+yields a concrete Pauli; a Rung 3 residual proof uses a Clifford invariant.
 
 **Delivers.** S for Clifford-heavy circuits against non-tableau checkers, and
 T. **Harder because** the soundness theorem is real linear algebra over ℚ(ζ₈),
 and the procedure has to be fast in the kernel, not merely correct.
+
+### Rung 5 — Refined equivalence, only as constructions need it
+
+**Goal.** The relations required to compare different ancilla-using
+constructions, introduced in the minimal form the next rungs need.
+
+**Work.** Equivalence on the ancilla subspace (the last `a` qubits enter in
+`|0⟩`; a variant also requires them to leave in `|0⟩`); equivalence up to a
+relative phase on a subspace, for Margolus-style relative-phase Toffolis. For
+each: the decidable basis-check form, and congruence lemmas *with their side
+conditions* (the surrounding circuit must preserve the subspace). Nothing is
+defined until a Rung 6 or Rung 10 statement needs it, and permutation stays a
+derived notion via `swapNetwork`.
+
+**Acceptance.** A Toffoli-with-ancilla decomposition verified against its
+specification on the `|0⟩`-ancilla subspace; the 4-T relative-phase Toffoli
+verified against Toffoli under the relative-phase relation; the congruence
+lemmas proved with explicit side conditions.
+
+**Delivers.** The prerequisites for Rungs 6 and 10; nothing on the S-critical
+path depends on it. **Harder because** the definitions are subtle — what
+"restored ancilla" means on superposed inputs, when sequencing is a congruence
+— and a wrong one silently weakens everything built on it.
 
 ### Rung 6 — The classical reversible layer: adders and multi-controlled gates for all `n`
 
@@ -246,14 +280,15 @@ macro for its 15-gate Clifford+T decomposition verified once at `n = 3` and
 lifted by the locality theorem; the theorem that such a circuit permutes basis
 states by a Boolean function built compositionally; `≡ᵤ` on classical circuits
 reduced to equality of Boolean functions; induction principles for ripple
-structures.
+structures. Layout differences are handled by `swapNetwork`; ancilla-count
+differences by the Rung 5 subspace relation.
 
 **Acceptance.**
 `∀ n, cuccaroAdder n ≡ vbeAdder n` (Cuccaro 2004 against Vedral–Barenco–Ekert
-1996, up to layout permutation); `∀ n, barencoCnX n ≡ᵃ cnX n` (multi-controlled
-`X` via Toffolis with ancilla against its specification, ancilla-aware);
-`∀ n, cnotLadder n ≡ᵤ [CX 0 n]`. Fixed-`n` instances run through the benchmark
-protocol for the crossover table.
+1996, on the ancilla subspace after layout alignment);
+`∀ n, barencoCnX n ≡ᵃ cnX n` (multi-controlled `X` via Toffolis with ancilla
+against its specification); `∀ n, cnotLadder n ≡ᵤ [CX 0 n]`. Fixed-`n`
+instances run through the benchmark protocol for the crossover table.
 
 **Delivers.** P, and S at the crossover `n` (probably 32–64, where the T-count
 reaches the hundreds). **Harder because** the proofs are inductions with
@@ -267,7 +302,7 @@ than evaluation.
 **Work.** A harness that gives an agent (Claude, Aristotle, or similar) a
 statement, the library and the lean-lsp tools, and records outcome, time and
 tokens; a held-out set of the existing parametric theorems with proofs
-removed; a held-out set of optimiser-output pairs from Rung 4.
+removed; a held-out set of optimiser-output pairs from Rung 3.
 
 **Acceptance.** At least 80 % of the Rung 0–6 parametric theorems re-proved
 unaided from statements; at least half of the held-out optimiser pairs proved
@@ -287,7 +322,7 @@ success is, for the first time, not under our control.
 coefficients either in a tower `ℚ(ζ_{2^m})` or, better, as phase polynomials
 with exponents in `ZMod (2^m)`; a certified normaliser for the CNOT + diagonal
 fragment, where equivalence is exactly equality of a linear reversible map plus
-a phase polynomial, so that fragment gets a *complete* procedure and Rung 4's
+a phase polynomial, so that fragment gets a *complete* procedure and Rung 3's
 latent-algebra mechanism gets its tool; the Fourier lemma that the QFT
 diagonalises addition.
 
@@ -322,10 +357,10 @@ normal forms for trigonometric identities need care to stay decidable.
 extraction as unitary equivalences on a code space.
 
 **Work.** Import stabilizer codes from QECLean; define "implements the logical
-gate" and "equivalent modulo the stabilizer group" as circuit-level relations;
-apply the classical layer from Rung 6 to CNOT syndrome-extraction schedules;
-use QECLean's parametric toric and rotated-surface families for statements in
-the lattice size `L`.
+gate" and "equivalent modulo the stabilizer group" as circuit-level relations,
+the one place a relation beyond Rung 5's is needed; apply the classical layer
+from Rung 6 to CNOT syndrome-extraction schedules; use QECLean's parametric
+toric and rotated-surface families for statements in the lattice size `L`.
 
 **Acceptance.** Every transversal-gate circuit in QECUnitaryCircuits proved as
 a logical-gate theorem: Steane `H`, `S`, `CNOT`, and `[[15,1,3]]` transversal
@@ -337,7 +372,7 @@ states carrying the syndromes.
 **Delivers.** P and T in a domain where no checker has the vocabulary, and S
 on the fault-tolerant instances, which are large and Clifford-heavy. **Harder
 because** the relations are subspace-relative and the codes are parametric;
-Rungs 3, 5 and 6 are all load-bearing.
+Rungs 4, 5 and 6 are all load-bearing.
 
 ### Rung 11 — Agent milestone B, and the benchmark
 
@@ -369,10 +404,10 @@ approach it.
 
 ## The S-critical path
 
-Rungs 1 → 3 → 4 → 5 are the direct route to the first real-world result, with
-the locality theorem as the first concrete deliverable of Rung 4. Rungs 6 and
-8 feed templates and the phase-polynomial normaliser back into Rung 4's
-mechanisms. Everything else strengthens P or T.
+Rungs 1 → 3 → 4, entirely in `≡ᵤ` and `≡ₚ`, with the locality theorem as the
+first concrete deliverable of Rung 3. Rungs 6 and 8 feed templates and the
+phase-polynomial normaliser back into Rung 3's mechanisms. Rung 5, the refined
+relations, is deliberately off this path. Everything else strengthens P or T.
 
 ## Benchmark protocol (how S is measured)
 
@@ -407,9 +442,9 @@ checking at every `n`; the advantage there is T, not S.
 
 ## Dependencies
 
-Rung 1 before 4 and 5. Rung 2 alongside 1. Rung 3 before 4, 6 and 10. Rung 4
-before 7. Rung 5 before 10, and it strengthens 4. Rung 6 before 8, and 8
-before 12. Rung 9 before 12. Rung 8 strengthens 4. Rung 11 after 8 or 10.
+Rung 1 before 3 and 4. Rung 2 alongside 1. Rung 3 before 7. Rung 4 before 10,
+and it strengthens 3. Rung 5 before 6 and 10. Rung 6 before 8, and 8 before
+12. Rung 9 before 12. Rung 8 strengthens 3. Rung 11 after 8 or 10.
 
 ## Risks and fallbacks
 
@@ -430,6 +465,8 @@ before 12. Rung 9 before 12. Rung 8 strengthens 4. Rung 11 after 8 or 10.
 
 ## Suggested order for the next quarter
 
-Rung 1, then 2, then 3, then 4 starting with the locality theorem, then 6 and
-7. Take Rung 5 as soon as a Rung 4 residual proof needs a Clifford invariant.
-The first S result from Rung 4 is the first thing worth writing up.
+Rung 1, then 2, then 3 starting with the locality theorem. Take Rung 4 as soon
+as a Rung 3 residual proof needs a Clifford invariant. Then Rung 6, defining
+only the parts of Rung 5 that the adders and multi-controlled gates actually
+need, then Rung 7. The first S result from Rung 3 is the first thing worth
+writing up.

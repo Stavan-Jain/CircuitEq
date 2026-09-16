@@ -124,12 +124,14 @@ with QECLean's when bumping mathlib, or drop the symlink and use the cache.
 to modular arithmetic for Shor for all `n`, each with an acceptance test.
 Scale on real compiled circuits that today's checkers cannot handle is the
 goal; parametric theorems about circuit templates are the method; kernel-level
-trust is the byproduct. Near term: a materialised evaluator so concrete checks
-scale with depth; a conformance-checked OpenQASM generator and the bridge to
-ℂ; the equivalence notions compilers need (permutation, ancilla, subspace); a
-locality theorem and compositional proofs of fixed-size optimiser-output
-pairs; then the first parametric templates, ripple-carry adders and
-multi-controlled gates for every `n`.
+trust is the byproduct. Basic equivalence, exact or up to a global phase,
+carries the whole S-critical path; refined relations on ancilla subspaces are
+introduced only when constructions that use ancillas need them. Near term: a
+materialised evaluator so concrete checks scale with depth; a
+conformance-checked OpenQASM generator and the bridge to ℂ; a locality theorem
+and compositional proofs of fixed-size optimiser-output pairs; then the first
+parametric templates, ripple-carry adders and multi-controlled gates for every
+`n`.
 
 ## Trust
 
