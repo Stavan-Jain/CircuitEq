@@ -94,6 +94,15 @@ lemma mat_comm_of_isDiag {g g' : Gate1} (h : g.isDiag = true) (h' : g'.isDiag = 
   cases g <;> cases g' <;>
     first | exact absurd h (by decide) | exact absurd h' (by decide) | decide +kernel
 
+/-- The inverse single-qubit gate in the supported alphabet. -/
+def inverse : Gate1 → Gate1
+  | .H => .H | .X => .X | .Y => .Y | .Z => .Z
+  | .S => .Sdg | .Sdg => .S | .T => .Tdg | .Tdg => .T
+
+/-- Each alphabet inverse cancels its gate as a two-by-two matrix. -/
+theorem inverse_mul (g : Gate1) : g.inverse.mat * g.mat = 1 := by
+  cases g <;> decide +kernel
+
 end Gate1
 
 /-- Amplitude vectors of an `n`-qubit register over `ℚ(ζ₈)`. -/

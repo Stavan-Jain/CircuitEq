@@ -193,15 +193,6 @@ theorem layer_perm (g : Gate1) {a b : List (Fin n)} (h : a.Perm b) :
   · subst j; exact Equivalent.refl _
   · exact one_one_comm hij g g
 
-/-- The inverse single-qubit gate in the supported alphabet. -/
-def Gate1.inverse : Gate1 → Gate1
-  | .H => .H | .X => .X | .Y => .Y | .Z => .Z
-  | .S => .Sdg | .Sdg => .S | .T => .Tdg | .Tdg => .T
-
-/-- Each alphabet inverse cancels its gate as a two-by-two matrix. -/
-theorem Gate1.inverse_mul (g : Gate1) : g.inverse.mat * g.mat = 1 := by
-  cases g <;> decide +kernel
-
 /-- A decidable sufficient condition for cancelling two instructions. -/
 def Instr.CanCancel (a b : Instr n) : Prop :=
   match a, b with
