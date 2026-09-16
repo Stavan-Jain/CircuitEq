@@ -1,6 +1,7 @@
 import CircuitEq.Zeta8
 import CircuitEq.Bits
 import CircuitEq.Gates
+import CircuitEq.Dyadic
 import CircuitEq.Semantics
 import CircuitEq.Checker
 import CircuitEq.Structural

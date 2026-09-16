@@ -56,11 +56,22 @@ Rules that follow, for anyone adding to the library:
   `flipBit_comm` are what every commutation proof rewrites with.
 - `CircuitEq/Gates.lean` — `Gate1`, `Gate1.mat : Matrix Bool Bool Zeta8`,
   `Vec n`, `applyOne`, `applyCNOT`, linearity, fusion, commutation.
+- `CircuitEq/Dyadic.lean` — `Quantum.Dyadic8`, the gcd-free ring
+  `ℤ[ω, 1/√2]` the decision procedure computes in: four `ℤ` coordinates and
+  a `√2` exponent, `add` / `mul` / `eqv` by exponent alignment, `toZeta8`
+  with a `toZeta8_*` lemma per operation and `eqv_iff`. The per-gate
+  actions `Gate1.applyD` (on `Fin`, proved against `applyOne g.mat`) and
+  `Gate1.applyN` / `applyCNOTN` (on `ℕ`, definitionally the same; what
+  `evalFn` composes), plus the generic `Gate1.matD` / `applyOneD` mirror of
+  `applyOne`. A computational device only: `denote` stays over `Zeta8`.
 - `CircuitEq/Semantics.lean` — `Instr`, `Circuit n := List (Instr n)`,
   `denote`, `denoteₗ`, `Equivalent` (`≡ᵤ`), `EquivalentUpToPhase` (`≡ₚ`),
   `EquivalentUpToScalar` (`≡ₛ`, up to a unit of `Zeta8`; what a tableau
-  certifies), basis reduction, `evalList`, `Decidable` instances, `Trans`
-  instance for `calc`.
+  certifies), basis reduction, the evaluators `evalList` (reference, over
+  `Zeta8`), `evalListD` (its dyadic form) and `evalFn` (dyadic closures on
+  `ℕ` indices, what the instances run), `checkEquiv` /
+  `checkEquivUpToPhase`, `Decidable` instances, `Trans` instance for
+  `calc`.
 - `CircuitEq/Checker.lean` — the checker contract: `Checker n` is
   `check : Circuit n → Circuit n → Bool` plus `sound : check a b = true →
   a ≡ᵤ b` (`PhaseChecker`, `ScalarChecker` for `≡ₚ`, `≡ₛ`); `NormalForm n`
@@ -226,19 +237,46 @@ Do not run `lake build` between diagnostics edits; one build at the end.
 
 ## Kernel-cost notes
 
-The `Decidable` instances for `≡ᵤ` and `≡ₚ` run `evalList`
-(`Semantics.lean`), a materialised `List`-backed evaluator proved equal to
-`denote` (`evalList_toList`), so a depth-`d` decide on `k` qubits costs
-`O(d · 4^k)` list steps plus `d · 2^k` `Zeta8` multiplications; `denote`
-itself is nested closures and would re-read the input `2^d` times, so never
-`decide` through `denote` directly. The arithmetic dominates: a `Zeta8`
-product is 16 `Rat` products with gcd normalisation, and the kernel manages
-on the order of 10⁴–10⁵ `Rat` operations per second. Measured with cached
-imports: a two-qubit four-gate window ≈ 0.3 s, a three-qubit six-gate
-window ≈ 3 s, `Tof3.lean` (four windows) ≈ 5 s. Keep `decide` windows to
-three or four qubits and a handful of gates; anything larger wants a
-structural lemma. The next lever is a gcd-free coefficient representation
-(roadmap Rung 1).
+The `Decidable` instances for `≡ᵤ` and `≡ₚ` run `checkEquiv` and
+`checkEquivUpToPhase` (`Semantics.lean`): the closure evaluator `evalFn`
+over `Dyadic8` (`Dyadic.lean`), the gcd-free ring `ℤ[ω, 1/√2]`, on
+`ℕ`-indexed states, proved equal to `denote` (`toZeta8_evalFn`). The kernel
+memoises `whnf` by structural term equality, so a depth-`d` decide on `k`
+qubits costs `d · 2^k` memoised gate steps, each a coordinate shuffle or,
+for `H`, four integer sums, plus `4^k` final comparisons; the kernel never
+sees a rational and never walks a list. Never `decide` through `denote`
+directly: its closures are over `Fin`, whose indices carry proof terms that
+defeat the cache, so it re-reads the input `2^d` times.
+
+Measured on an Apple M4 (16 GB, shared with other builds), warm oleans,
+kernel type-checking time of the `decide`, before → after: a two-qubit
+five-gate window 0.35 s → 0.02 s; the three-qubit six-gate `Tof3` window
+2.66 s → 0.09 s. Whole files, wall time: `Examples.lean` 2.6 s → 1.2 s and
+`Tof3.lean` 4.2 s → 1.3 s, both now dominated by import time. The
+seven-qubit `SteanePlus` pair decided on the full basis (`original ≡ᵤ
+optimized` by `decide +kernel`, 32 gates × 128 basis states) is not
+measured: it is memory-bound on this 16 GB machine, both before and after.
+With the `Zeta8` `evalList` it did not finish in 15 minutes (71 s of CPU
+against 248 s of system time, 15.8 GB peak footprint; the estimate for its
+compute alone is 2 × 10⁵ Hadamard amplitude updates at some 10³ `Rat`
+operations each, hours of kernel time). With the closure evaluator,
+attempts of 9 and 3 minutes were stopped swap-starved (the 9-minute one
+before reads were forced: 2:22 of CPU, 9.9 GB resident; see `Dyadic.lean`
+on forcing). The expected cost is 5 × 10⁵ memoised gate steps and a cache
+of the order of 10⁷ terms, tens of seconds and a few GB; measure it on an
+idle machine before relying on the number.
+
+Two intermediate designs were measured on the way: the same dyadic
+arithmetic through the materialised list evaluator (`evalListD`, kept as
+the reference form) with the generic per-entry product (`applyOneD`) took
+0.66 s on the three-qubit window and could not do seven qubits either,
+because reading amplitude `x` of a list costs `x` steps and the kernel
+retains every intermediate term (`O(4^k)` per gate, so memory runs out
+before time does); the per-gate shuffles and the memoised closures with
+forced reads bring it to 0.1 s. Depth is now linear: eighteen Hadamards on
+one qubit decide in 42 ms, where the unforced closures did not finish in a
+minute. Memory is the limit before time: the kernel's `whnf` cache retains
+everything evaluated during one declaration.
 
 `Finset.sum` unfolding in the kernel is slow. `Gate1.mat` products are over
 `Bool` (a two-term sum) and are fine; do not introduce `Matrix (Fin (2 ^ n))`
