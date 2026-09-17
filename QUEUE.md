@@ -16,6 +16,25 @@ Nothing. All five parallel branches are merged (see "Done").
 
 ## Next
 
+0. **Canonical phase polynomials.** The scale test (`benchmarks/scale/`)
+   showed `PhasePoly.nf` is sound but not complete: the parity-basis
+   coefficient vector is not an invariant of the unitary over `ℤ/8` (`Z`
+   on `a ⊕ b` is `Z a · Z b`; on three wires the seven parities with
+   coefficient 2 sum to 0; on four wires a `T` on all fifteen parities is
+   the identity), and PyZX's rewrites move phases along these relations,
+   so equivalent 20-qubit CNOT+T circuits get different forms. Replace the
+   term list by the multilinear polynomial over `ℤ/8`, which is unique and
+   has degree at most 3: `n` counters mod 8, a mod-4 counter per pair and a
+   bit per triple, as `Nat` bit planes, updated in `O(w²)` bit operations
+   per phase gate on a weight-`w` parity via
+   `s mod 2 ≡ s − 2·C(s,2) + 4·C(s,3) (mod 8)`. Redo `phaseAt` and
+   `phaseAt_insertPhase` against it; keep `nf : Circuit n → Option NF` and
+   the `NormalForm` export unchanged so nothing downstream moves.
+   Acceptance: the 20-, 40- and 80-qubit CNOT+T rungs of
+   `scripts/scale_test.py` certify, and a completeness theorem within the
+   fragment (equal functions give equal forms) if time allows. M. Depends
+   on nothing. Blocks items 2, 5 and 6.
+
 1. **Replay memory.** `cuccaro_4`'s certificate (155 gates, 8 windows)
    is killed at 4.6 GB while the same windows pass on `cuccaro_3`, and a
    128-gate move-only replay peaks at 1.9 GB: the kernel's `whnf` cache

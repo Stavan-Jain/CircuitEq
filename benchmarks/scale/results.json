@@ -1,0 +1,174 @@
+[
+ {
+  "family": "clifford",
+  "qubits": 20,
+  "gates": 200,
+  "opt_gates": 597,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "H 17",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 2.6,
+   "max_rss_gb": 1.8,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 8.9,
+   "max_rss_gb": 3.18,
+   "errors": []
+  },
+  "kernel_s": 6.3
+ },
+ {
+  "family": "clifford",
+  "qubits": 40,
+  "gates": 400,
+  "opt_gates": 2346,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "H 38",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 3.0,
+   "max_rss_gb": 1.91,
+   "errors": []
+  },
+  "full": {
+   "status": "error",
+   "wall_s": 65.6,
+   "max_rss_gb": 6.15,
+   "errors": []
+  }
+ },
+ {
+  "family": "clifford",
+  "qubits": 80,
+  "gates": 800,
+  "opt_gates": 8261,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "H 70",
+  "seed": 1,
+  "defs": {
+   "status": "error",
+   "wall_s": 13.3,
+   "max_rss_gb": 2.27,
+   "errors": [
+    "/private/tmp/claude-501/-Users-stavanjain-Code-CircuitEq/e4f90212-810f-4fc3-ba65-b752b110d5fd/scratchpad/scale/lean/clifford_n80_g800_s1_defs.lean:106:4: error: maximum recursion depth reached in the code generator",
+    "/private/tmp/claude-501/-Users-stavanjain-Code-CircuitEq/e4f90212-810f-4fc3-ba65-b752b110d5fd/scratchpad/scale/lean/clifford_n80_g800_s1_defs.lean:1141:4: error: maximum recursion depth reached in the code generator"
+   ]
+  },
+  "full": {
+   "status": "error",
+   "wall_s": 393.3,
+   "max_rss_gb": null,
+   "errors": []
+  }
+ },
+ {
+  "family": "cnot_t",
+  "qubits": 10,
+  "gates": 100,
+  "opt_gates": 96,
+  "tcount": 30,
+  "opt_tcount": 18,
+  "in_fragment": true,
+  "deleted": "CX 7 6",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 16.0,
+   "max_rss_gb": 1.74,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 1.8,
+   "max_rss_gb": 1.81,
+   "errors": []
+  },
+  "kernel_s": -14.2
+ },
+ {
+  "family": "cnot_t",
+  "qubits": 20,
+  "gates": 200,
+  "opt_gates": 183,
+  "tcount": 71,
+  "opt_tcount": 39,
+  "in_fragment": true,
+  "deleted": "Sdg 17",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 1.7,
+   "max_rss_gb": 1.75,
+   "errors": []
+  },
+  "full": {
+   "status": "error",
+   "wall_s": 2.1,
+   "max_rss_gb": 1.91,
+   "errors": [
+    "/private/tmp/claude-501/-Users-stavanjain-Code-CircuitEq/e4f90212-810f-4fc3-ba65-b752b110d5fd/scratchpad/scale/lean/cnot_t_n20_g200_s1.lean:82:38: error: [Error pretty printing: maximum recursion depth has been reached"
+   ]
+  }
+ },
+ {
+  "family": "cnot_t",
+  "qubits": 40,
+  "gates": 400,
+  "opt_gates": 368,
+  "tcount": 129,
+  "opt_tcount": 63,
+  "in_fragment": true,
+  "deleted": "CX 32 25",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 1.8,
+   "max_rss_gb": 1.77,
+   "errors": []
+  },
+  "full": {
+   "status": "error",
+   "wall_s": 3.5,
+   "max_rss_gb": 2.25,
+   "errors": [
+    "/private/tmp/claude-501/-Users-stavanjain-Code-CircuitEq/e4f90212-810f-4fc3-ba65-b752b110d5fd/scratchpad/scale/lean/cnot_t_n40_g400_s1.lean:153:38: error: [Error pretty printing: maximum recursion depth has been reached"
+   ]
+  }
+ },
+ {
+  "family": "cnot_t",
+  "qubits": 80,
+  "gates": 800,
+  "opt_gates": 783,
+  "tcount": 271,
+  "opt_tcount": 155,
+  "in_fragment": true,
+  "deleted": "Z 58",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 2.3,
+   "max_rss_gb": 1.81,
+   "errors": []
+  },
+  "full": {
+   "status": "error",
+   "wall_s": 10.6,
+   "max_rss_gb": 3.49,
+   "errors": [
+    "/private/tmp/claude-501/-Users-stavanjain-Code-CircuitEq/e4f90212-810f-4fc3-ba65-b752b110d5fd/scratchpad/scale/lean/cnot_t_n80_g800_s1.lean:307:38: error: [Error pretty printing: maximum recursion depth has been reached"
+   ]
+  }
+ }
+]

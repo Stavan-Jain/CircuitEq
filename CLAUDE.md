@@ -93,10 +93,12 @@ Rules that follow, for anyone adding to the library:
   gate count and never `2 ^ n` (a 100-gate pair on ten wires is 0.2 s of
   kernel time); it decides T-count windows on many wires. A proof is
   `(phasePolyChecker n).sound _ _ (by decide +kernel)`; bare `decide` times
-  out at about a hundred gates. It is the deterministic counterpart of
-  TZAP's randomised parity analysis; the extension with Hadamard
-  variables that certifies TZAP output across `H` gates is `QUEUE.md`
-  item 2.
+  out at about a hundred gates. Known gap: the form is sound but not
+  canonical (the parity-basis coefficients are not an invariant over
+  `ℤ/8`), so equivalent circuits can get different forms and `check`
+  answers `false`; the multilinear canonical form is `QUEUE.md` item 0.
+  The extension with Hadamard variables that certifies TZAP output across
+  `H` gates is item 2.
 - `CircuitEq/Tableau.lean` — the Clifford tableau checker: `Pauli` strings
   (x-mask, z-mask, phase in `Fin 4`, denoting `i^p · Z^z · X^x`), the
   gate update rules with pointwise soundness (`conjH_sound`, …,

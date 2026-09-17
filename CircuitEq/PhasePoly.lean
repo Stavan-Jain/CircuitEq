@@ -44,9 +44,15 @@ bit `i` the parity of `rows[i] &&& y`) and `φ(y)` summed from the terms
 (`PhasePoly.phaseAt`). `PhasePoly.run_sound` shows each step of the
 normaliser tracks `Instr.apply`, through the two basis facts
 `applyCNOT_basis` and `applyOne_basis_of_diag`, and `PhasePoly.sound` closes
-with `equivalent_iff_basis`. Completeness (equivalent fragment circuits have
-equal forms) holds for this canonical representation but is not proved, and
-resynthesis of a circuit from a form is left for the optimiser.
+with `equivalent_iff_basis`. The form is *not* canonical: over `ℤ/8` the
+parity functions are linearly dependent (`Z` on `a ⊕ b` is `Z a · Z b`, and
+on four wires a `T` on all fifteen parities is the identity), so
+equivalent circuits can receive different term lists and `check` then
+answers `false`, which the `Checker` contract reads as "not decided", never
+as "inequivalent". `benchmarks/scale/README.md` shows this on a 20-qubit
+pair; the canonical replacement (the multilinear polynomial over `ℤ/8`,
+degree at most 3) is `QUEUE.md` item 0. Resynthesis of a circuit from a
+form is left for the optimiser.
 
 ## Kernel cost
 

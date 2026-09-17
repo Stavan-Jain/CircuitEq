@@ -117,6 +117,12 @@ three-controlled Toffoli, T-count 28 to 24 under phase teleportation, six
 one-wire windows emitted by the survey's diff-based search and checked by
 `circuit_windows` with no refinement.
 
+[`benchmarks/scale/`](benchmarks/scale/README.md) pushes the two checkers
+up a ladder of random circuits: the tableau certifies a 20-qubit Clifford
+pair re-synthesised by PyZX into 597 gates in 9 s and hits the kernel's
+memory ceiling at 40 qubits, and the phase-polynomial checker exposes its
+own incompleteness at 20 qubits (see the queue).
+
 [`benchmarks/survey/`](benchmarks/survey/README.md) is the evidence run for
 the roadmap's working hypothesis: eleven T-heavy circuits (Toffoli chains,
 Barenco's Toffoli, `mod5_4`, Cuccaro adders, seeded random circuits) against
@@ -194,7 +200,9 @@ applies next.
   certified normal form for CNOT-plus-diagonal circuits (an `𝔽₂`-linear
   part as row bitmasks, a phase polynomial in units of `π/4`): linear in
   gates, independent of `2 ^ n`, and the deterministic counterpart of what
-  T-count optimisers such as TZAP compute. `Tableau.lean` conjugates the
+  T-count optimisers such as TZAP compute; its current form is sound but
+  not yet canonical (`benchmarks/scale/`), which the queue's first item
+  fixes. `Tableau.lean` conjugates the
   `2n` Pauli generators through a Clifford circuit with `O(n)` bit
   operations per gate and certifies `≡ₛ`, equality up to a unit scalar,
   by the commutant argument on state vectors. Both export the `Checker`
