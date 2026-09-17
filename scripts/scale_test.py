@@ -89,9 +89,15 @@ def lean_source(family: str, n: int, orig: list[str], opt: list[str], mut: list[
            f"def mutant : Circuit {n} :=\n  {lean_list(mut)}", ""]
     if theorems:
         out += [f"theorem equiv : original {rel} optimized :=",
-                f"  ({checker}).sound _ _ (by decide +kernel)", "",
-                f"theorem mutant_rejected : ({checker}).check original mutant = false := by",
-                "  decide +kernel", ""]
+                f"  ({checker}).sound _ _ (by decide +kernel)", ""]
+        if family == "clifford":
+            out += [f"theorem mutant_rejected : ({checker}).check original mutant = false := by",
+                    "  decide +kernel", ""]
+        else:
+            # the phase-polynomial checker is complete on its fragment, so a mutant
+            # is refuted, not merely undecided
+            out += ["theorem mutant_refuted : ¬ (original ≡ᵤ mutant) :=",
+                    "  phasePolyRefutes_sound (by decide +kernel)", ""]
     return "\n".join(out)
 
 

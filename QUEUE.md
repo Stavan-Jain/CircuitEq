@@ -16,37 +16,23 @@ Nothing. All five parallel branches are merged (see "Done").
 
 ## Next
 
-0. **Canonical phase polynomials.** The scale test (`benchmarks/scale/`)
-   showed `PhasePoly.nf` is sound but not complete: the parity-basis
-   coefficient vector is not an invariant of the unitary over `ℤ/8` (`Z`
-   on `a ⊕ b` is `Z a · Z b`; on three wires the seven parities with
-   coefficient 2 sum to 0; on four wires a `T` on all fifteen parities is
-   the identity), and PyZX's rewrites move phases along these relations,
-   so equivalent 20-qubit CNOT+T circuits get different forms. Replace the
-   term list by the multilinear polynomial over `ℤ/8`, which is unique and
-   has degree at most 3: `n` counters mod 8, a mod-4 counter per pair and a
-   bit per triple, as `Nat` bit planes, updated in `O(w²)` bit operations
-   per phase gate on a weight-`w` parity via
-   `s mod 2 ≡ s − 2·C(s,2) + 4·C(s,3) (mod 8)`. Redo `phaseAt` and
-   `phaseAt_insertPhase` against it; keep `nf : Circuit n → Option NF` and
-   the `NormalForm` export unchanged so nothing downstream moves.
-   Acceptance: the 20-, 40- and 80-qubit CNOT+T rungs of
-   `scripts/scale_test.py` certify, and a completeness theorem within the
-   fragment (equal functions give equal forms) if time allows. M. Depends
-   on nothing. Blocks items 2, 5 and 6.
-
 1. **Replay memory.** `cuccaro_4`'s certificate (155 gates, 8 windows)
    is killed at 4.6 GB while the same windows pass on `cuccaro_3`, and a
    128-gate move-only replay peaks at 1.9 GB: the kernel's `whnf` cache
    retains every intermediate instruction list for the whole declaration.
    The same retention kills the seven-qubit `SteanePlus` basis decide at
-   6.9 GB after 20 s of a machine otherwise idle. Levers, in order: a
-   compact `Nat` (or `String`) encoding of the instruction list decoded by
-   the kernel; chunked replay and chunked evaluation (one theorem per
-   segment or per basis vector, composed by `Equivalent.trans` or
-   `equivalent_iff_basis`); cursor-based steps (item 4). Acceptance:
-   `cuccaro_4` / teleport checks under 2 GB, and the seven-qubit decide
-   finishes. M. Depends on nothing.
+   6.9 GB after 20 s of a machine otherwise idle, and the tableau at 40
+   qubits (`benchmarks/scale/`). Levers, in order: a compact `Nat` (or
+   `String`) encoding of the instruction list decoded by the kernel (the
+   canonical phase polynomial showed what this buys: packing the row
+   table into one `Nat` took a CNOT from about 1.5 MB of retained
+   `List.set` terms to a shift and an xor, and the 80-qubit rung from
+   5.2 GB to 3.1 GB); chunked replay and chunked evaluation (one theorem
+   per segment, per basis vector or per tableau generator, composed by
+   `Equivalent.trans`, `equivalent_iff_basis` or a per-generator
+   `tableau_sound`); cursor-based steps (item 4). Acceptance: `cuccaro_4`
+   / teleport checks under 2 GB, the seven-qubit decide finishes, and the
+   40- and 80-qubit tableau rungs certify. M. Depends on nothing.
 
 2. **Phase polynomials with Hadamard variables (path-sum form).** Extend
    `PhasePoly` so that an `H` on a wire introduces a fresh variable (bit
@@ -96,12 +82,17 @@ Nothing. All five parallel branches are merged (see "Done").
    through a control-only block) is a phase-polynomial identity. S.
    Depends on item 3 for `tzap`; nothing else.
 
-6. **Phase-polynomial follow-ups.** Completeness (equal unitaries in the
-   fragment give equal forms, so `false` is a refutation); the affine `X`
-   extension (a constant bit per row); `ofNF` resynthesis with
-   `nf (ofNF x) = some x`, which turns any untrusted synthesis heuristic
-   into a certified T-count optimiser for the fragment. M. Depends on
-   nothing; resynthesis is the first optimiser deliverable.
+6. **Phase-polynomial follow-ups.** The affine `X` extension (a constant
+   bit per row); `ofNF` resynthesis with `nf (ofNF x) = some x`, which
+   turns any untrusted synthesis heuristic into a certified T-count
+   optimiser for the fragment (completeness has landed, so the form is a
+   canonical target). Also the remaining kernel cost: a phase gate on a
+   parity of weight `w` costs `O(w)` shift-and-or steps on `C(n, 3)`-bit
+   planes, about 10 ms and 2.5 MB of retained terms at 80 wires, so the
+   80-qubit rung is 271 such gates; a bounded-width or sparse
+   representation of the triple plane is the next lever if wider
+   registers matter. M. Depends on nothing; resynthesis is the first
+   optimiser deliverable.
 
 7. **The 19-origin Clifford run.** Every QECUnitaryCircuits origin against
    its PyZX `full_reduce` twin by the tableau checker (`≡ₛ`), the
@@ -118,8 +109,10 @@ Nothing. All five parallel branches are merged (see "Done").
 
 9. **Refutation certificates.** Step kinds that prove `¬ (a ≡ᵤ b)`: a
    basis vector on which the evaluators differ, a Pauli whose images under
-   the two tableaux differ. Needed for mutants and for the survey's
-   negative results. S. Depends on item 1.
+   the two tableaux differ. `phasePolyRefutes` already does this for the
+   CNOT-plus-diagonal fragment by completeness (`PhasePoly.refutes_sound`);
+   the step kinds make it composable. Needed for mutants and for the
+   survey's negative results. S. Depends on item 1.
 
 10. **Rung 2 conformance.** A Qiskit statevector check of
     `lean_instructions` on the benchmark files and a few hundred random
@@ -154,11 +147,18 @@ Nothing. All five parallel branches are merged (see "Done").
 - `≡ₛ → ≡ₚ` for Clifford circuits (units and the prime over 2 in `ℤ[ω]`).
 - `Zeta8.toComplex`, unitarity of every gate, the QECLean bridge.
 - Dyadic normalisation tuning once the ring's measurements are in.
-- Rung 8: the phase-polynomial form with phases in `ZMod (2 ^ m)`.
+- Rung 8: the phase-polynomial form with phases in `ZMod (2 ^ m)` (the
+  degree bound becomes `m`, so the planes grow with it).
 - Kernel engineering: recursion depth on long lists, chunked replay.
 
 ## Done
 
+- (this commit) Canonical phase polynomials: `PhasePoly` stores the
+  multilinear polynomial over `ℤ/8` (degree at most three) as `Nat` bit
+  planes indexed in the combinatorial number system, with packed rows;
+  soundness redone, completeness proved (`PhasePoly.complete`), the
+  refuter `phasePolyRefutes` exported, the 20-, 40- and 80-qubit CNOT+T
+  rungs of the scale test certified and their mutants refuted.
 - `7641f8e` (merged `90ca69c`) T-count survey: eleven circuits, two
   pipelines, scripted alignment, `barenco_tof_3` promoted; rerun of the
   width-blocked pairs on the dyadic evaluator (`tof_4`, `cuccaro_2`,

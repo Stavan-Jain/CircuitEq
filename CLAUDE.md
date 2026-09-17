@@ -85,20 +85,31 @@ Rules that follow, for anyone adding to the library:
   `not_touches_of_disjoint`; `Rewriting.lean` adds
   `Instr.CanCommute.of_disjoint` and `gate_block_comm_of_disjoint`. Do not
   invent a second encoding of wire sets.
-- `CircuitEq/PhasePoly.lean` — the phase-polynomial normal form for the
+- `CircuitEq/PhasePoly.lean` — the phase-polynomial canonical form for the
   CNOT-plus-diagonal fragment (`CX` and `Z, S, Sdg, T, Tdg`): `PhasePoly`
-  (one row bitmask per wire for the 𝔽₂-linear part, a sorted `(mask, phase)`
-  list with `phase : Fin 8` for the phases), `PhasePoly.nf`,
-  `phasePolyNormalForm n` and `phasePolyChecker n`. Cost is linear in the
-  gate count and never `2 ^ n` (a 100-gate pair on ten wires is 0.2 s of
-  kernel time); it decides T-count windows on many wires. A proof is
-  `(phasePolyChecker n).sound _ _ (by decide +kernel)`; bare `decide` times
-  out at about a hundred gates. Known gap: the form is sound but not
-  canonical (the parity-basis coefficients are not an invariant over
-  `ℤ/8`), so equivalent circuits can get different forms and `check`
-  answers `false`; the multilinear canonical form is `QUEUE.md` item 0.
-  The extension with Hadamard variables that certifies TZAP output across
-  `H` gates is item 2.
+  is the `𝔽₂`-linear part as `rows`, one `Nat` holding `n` bitmasks of
+  `n` bits (`row n R i`), and the phase function as its multilinear
+  polynomial over `ℤ/8`, which has degree at most three and is unique:
+  `deg1`, `deg2`, `deg3 : Lanes`, three bit planes each, the coefficient
+  of `yᵢ` in lane `i`, of `yᵢ yⱼ` in lane `tri j + i` and of `yᵢ yⱼ yₗ`
+  in lane `tet l + tri j + i` (`C(j,2)`, `C(l,3)`: the planes are exactly
+  `C(n,2)` and `C(n,3)` bits). A CNOT is a shift and an xor; a phase gate
+  of phase `k` on a parity `m` adds `k`, `−2k`, `4k` on the lanes of the
+  wires, pairs and triples of `m` (`Lanes.addOn`, a ripple-carry adder on
+  planes; `pairMask`, `tripMask`, one shift-and-or per set bit). `nf`,
+  `phasePolyNormalForm n`, `phasePolyChecker n` as before; new:
+  `phasePolyRefutes n a b`, whose `true` proves `¬ a ≡ᵤ b`
+  (`PhasePoly.complete`: equal unitaries give equal forms), so within the
+  fragment `check` is a decision procedure (`phasePolyChecker_check_iff`).
+  Cost is linear in the gate count and never `2 ^ n`: the scale test's
+  random CNOT+T pairs on 20, 40 and 80 wires (200, 400, 800 gates) certify
+  in about 0.3, 1 and 4 s of kernel time at 2.0, 2.2 and 3.1 GB; the
+  remaining cost is the phase gates on dense parities (`QUEUE.md` item 6).
+  A proof is `(phasePolyChecker n).sound _ _ (by decide +kernel)`, a
+  refutation `phasePolyRefutes_sound (by decide +kernel)`; bare `decide`
+  times out at about a hundred gates. The extension with Hadamard
+  variables that certifies TZAP output across `H` gates is `QUEUE.md`
+  item 2.
 - `CircuitEq/Tableau.lean` — the Clifford tableau checker: `Pauli` strings
   (x-mask, z-mask, phase in `Fin 4`, denoting `i^p · Z^z · X^x`), the
   gate update rules with pointwise soundness (`conjH_sound`, …,

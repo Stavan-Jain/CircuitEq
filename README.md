@@ -120,8 +120,12 @@ one-wire windows emitted by the survey's diff-based search and checked by
 [`benchmarks/scale/`](benchmarks/scale/README.md) pushes the two checkers
 up a ladder of random circuits: the tableau certifies a 20-qubit Clifford
 pair re-synthesised by PyZX into 597 gates in 9 s and hits the kernel's
-memory ceiling at 40 qubits, and the phase-polynomial checker exposes its
-own incompleteness at 20 qubits (see the queue).
+memory ceiling at 40 qubits, and the phase-polynomial checker certifies
+PyZX's phase folding of 200-, 400- and 800-gate CNOT+T circuits on 20,
+40 and 80 qubits in about 0.3, 1 and 4 s of kernel time, refuting a
+gate-deleted mutant of each. The ladder's first run found the earlier
+parity-basis form incomplete at 20 qubits, which is why the form is now
+the multilinear polynomial.
 
 [`benchmarks/survey/`](benchmarks/survey/README.md) is the evidence run for
 the roadmap's working hypothesis: eleven T-heavy circuits (Toffoli chains,
@@ -197,12 +201,13 @@ applies next.
   Neither searches for alignments: a move the checks do not license, or a
   false window, is an error naming the gate or the window.
 - **Fragment checkers decide windows symbolically.** `PhasePoly.lean` is a
-  certified normal form for CNOT-plus-diagonal circuits (an `𝔽₂`-linear
-  part as row bitmasks, a phase polynomial in units of `π/4`): linear in
-  gates, independent of `2 ^ n`, and the deterministic counterpart of what
-  T-count optimisers such as TZAP compute; its current form is sound but
-  not yet canonical (`benchmarks/scale/`), which the queue's first item
-  fixes. `Tableau.lean` conjugates the
+  certified canonical form for CNOT-plus-diagonal circuits (an
+  `𝔽₂`-linear part as packed row bitmasks, the phase function as its
+  multilinear polynomial over `ℤ/8`, degree at most three, as `Nat` bit
+  planes): linear in gates, independent of `2 ^ n`, complete on its
+  fragment (equal unitaries give equal forms, so `phasePolyRefutes`
+  proves inequivalence), and the deterministic counterpart of what
+  T-count optimisers such as TZAP compute. `Tableau.lean` conjugates the
   `2n` Pauli generators through a Clifford circuit with `O(n)` bit
   operations per gate and certifies `≡ₛ`, equality up to a unit scalar,
   by the commutant argument on state vectors. Both export the `Checker`
