@@ -176,6 +176,13 @@ Rules that follow, for anyone adding to the library:
   pipeline (https://github.com/qqq-wisc/tzap) is queued; TZAP reads and
   writes the same `rz` convention as PyZX.
 - `scripts/AxiomCheck.lean` — CI axiom policy; not in any `lean_lib`.
+- `scripts/check_debug_options.py`, `scripts/SkipKernelTCFixture.lean`,
+  `scripts/check_replay_fixture.sh` — the kernel-replay policy's text guard
+  (an early warning, not sound), its regression fixture (`2 + 2 = 5` behind
+  `debug.skipKernelTC`; not in any `lean_lib`, never imported, the one file
+  the guard exempts) and the CI assertion that the fixture compiles clean,
+  is flagged by the guard and is rejected by `leanchecker`. See
+  "Conventions".
 
 Namespaces: `Quantum.Zeta8` for the field, `Quantum.Circuit` for everything
 else (the type `Quantum.Circuit n` lives at the namespace's own name, like
@@ -196,6 +203,32 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
   `[propext, Classical.choice, Quot.sound]`. Check a result with
   `#print axioms`. `sorry` only on WIP branches, tagged
   `sorry -- TODO(<tag>): <goal shape>`.
+- **`debug.*` options are banned, and the kernel replay is the other half of
+  the trust policy.** `set_option debug.skipKernelTC true` makes Lean add a
+  declaration without sending it to the kernel. `decide +kernel` leaves its
+  whole check to the kernel, so under the option a false leaf proof
+  elaborates without an error and the axiom check reports it clean: it
+  depends on no axioms at all (verified on this toolchain, 18 September
+  2026: `2 + 2 = 5`, and `[H 0] ≡ᵤ [X 0]` inside a library module, with
+  `lake build` and `AxiomCheck` both green). So CI also replays every
+  declaration of the built `.olean` files through the kernel,
+  `LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq`, in a process where
+  no option or meta code of the library runs. `leanchecker` is the former
+  lean4checker, shipped inside the toolchain since v4.28 (the separate
+  repository is deprecated and has no tag for this toolchain), so it always
+  matches `lean-toolchain`. `scripts/check_replay_fixture.sh` asserts on
+  every CI run that the replay rejects the repro kept in
+  `scripts/SkipKernelTCFixture.lean`. `scripts/check_debug_options.py` is a
+  text guard for the obvious spellings in the Lean sources and
+  `lakefile.toml`; it is an early warning and is not sound, because an
+  option can be set from meta code under a name no search recognises (a
+  variant that assembles the name from string pieces passes the guard and
+  the axiom check, and the replay rejects it). The replay is the defence.
+  It re-checks this library's modules against their imports as delivered:
+  mathlib and core are trusted as the cache provides them, and it is the
+  same kernel again, not an independent checker. Never set a `debug.*`
+  option in the library, in `scripts/` or in `lakefile.toml`; a proof that
+  needs one is not a proof.
 - **No `set_option linter.* false`.** Fix the warning or leave it visible.
   The build is currently warning-free; keep it that way.
 - **Docstring prose wraps at 80 columns**, code at 100 (the `longLine`
@@ -228,11 +261,25 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
 ```bash
 lake build                            # whole library (~1 min warm)
 lake env lean scripts/AxiomCheck.lean # axiom policy, needs a completed build
+LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq  # kernel replay, same
+bash scripts/check_replay_fixture.sh  # the replay still rejects the repro
+python3 scripts/check_debug_options.py  # text guard, needs no build
 lake env lean /tmp/probe.lean         # one-off file check
 ```
 
 Always `lake build` before claiming a fix works; the error output prints the
 residual goal under each failure.
+
+**The replay runs on one thread.** `leanchecker` replays modules in
+parallel, and every replay beyond the first loads a private copy of the
+mathlib imports. Measured on the M4 (18 September 2026, 22 modules, 2040
+declarations): one thread 28 s, 0.33 GB peak footprint (1.7 GB resident,
+almost all of it the mapped mathlib `.olean` files); two threads 16 s and
+2.1 GB; the default ten threads were killed by the OS after 4 minutes at a
+26 GB footprint. Never run it without `LEAN_NUM_THREADS=1`, and count it
+as a lake process for the rule below. It replays whatever `.olean` files
+are under `.lake/build`, so delete the build products of a module you
+remove (`lake build` does not) or the replay keeps checking the stale file.
 
 **Sharing mathlib with QECLean.** This project pins the same mathlib commit
 as the sibling repo `../QECLean`. `.lake/packages` may be a symlink to

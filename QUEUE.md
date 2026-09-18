@@ -153,7 +153,14 @@ Nothing. All five parallel branches are merged (see "Done").
 
 ## Done
 
-- (this commit) Canonical phase polynomials: `PhasePoly` stores the
+- (this commit) Kernel replay in CI. The axiom check could not see a false
+  `decide +kernel` theorem sealed behind `debug.skipKernelTC` (no axioms,
+  no error); CI now replays the built `.olean` files with the toolchain's
+  `leanchecker` on one thread (28 s, 0.33 GB here; ten threads die at
+  26 GB), asserts on every run that the replay rejects the repro in
+  `scripts/SkipKernelTCFixture.lean`, and runs
+  `scripts/check_debug_options.py` as an early, unsound text guard.
+- `86a8b99` Canonical phase polynomials: `PhasePoly` stores the
   multilinear polynomial over `ℤ/8` (degree at most three) as `Nat` bit
   planes indexed in the combinatorial number system, with packed rows;
   soundness redone, completeness proved (`PhasePoly.complete`), the
