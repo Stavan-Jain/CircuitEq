@@ -64,14 +64,26 @@ Rules that follow, for anyone adding to the library:
   `Gate1.applyN` / `applyCNOTN` (on `ℕ`, definitionally the same; what
   `evalFn` composes), plus the generic `Gate1.matD` / `applyOneD` mirror of
   `applyOne`. A computational device only: `denote` stays over `Zeta8`.
+- `CircuitEq/Chunk.lean` — chunked kernel evaluation: `AllBelow P k`
+  (`P y = true` for every `y < k`), `AllBelow.zero`, `AllBelow.add` (extend
+  by a range `(List.range' lo len).all P = true`, itself one
+  `decide +kernel`). The kernel keeps its reduction cache for a whole
+  declaration, so a check over many indices is proved one range per
+  declaration and assembled by a constant-size term; peak memory is one
+  chunk's. Generated files must start with `set_option Elab.async false`,
+  or the memory of one declaration is not returned before the next
+  starts. Consumers: `equivalent_of_allBelow`,
+  `equivalentUpToPhase_of_allBelow`, `tableau_sound_of_allBelow`.
 - `CircuitEq/Semantics.lean` — `Instr`, `Circuit n := List (Instr n)`,
   `denote`, `denoteₗ`, `Equivalent` (`≡ᵤ`), `EquivalentUpToPhase` (`≡ₚ`),
   `EquivalentUpToScalar` (`≡ₛ`, up to a unit of `Zeta8`; what a tableau
   certifies), basis reduction, the evaluators `evalList` (reference, over
   `Zeta8`), `evalListD` (its dyadic form) and `evalFn` (dyadic closures on
   `ℕ` indices, what the instances run), `checkEquiv` /
-  `checkEquivUpToPhase`, `Decidable` instances, `Trans` instance for
-  `calc`.
+  `checkEquivUpToPhase`, their per-basis-vector chunks `checkEquivAt` /
+  `checkEquivUpToPhaseAt` with `equivalent_of_allBelow` /
+  `equivalentUpToPhase_of_allBelow`, `Decidable` instances, `Trans`
+  instance for `calc`.
 - `CircuitEq/Checker.lean` — the checker contract: `Checker n` is
   `check : Circuit n → Circuit n → Bool` plus `sound : check a b = true →
   a ≡ᵤ b` (`PhaseChecker`, `ScalarChecker` for `≡ₚ`, `≡ₛ`); `NormalForm n`
@@ -103,7 +115,7 @@ Rules that follow, for anyone adding to the library:
   fragment `check` is a decision procedure (`phasePolyChecker_check_iff`).
   Cost is linear in the gate count and never `2 ^ n`: the scale test's
   random CNOT+T pairs on 20, 40 and 80 wires (200, 400, 800 gates) certify
-  in about 0.3, 1 and 4 s of kernel time at 2.0, 2.2 and 3.1 GB; the
+  in 0.2, 0.9 and 3.9 s of kernel time at 1.9, 2.1 and 2.9 GB; the
   remaining cost is the phase gates on dense parities (`QUEUE.md` item 6).
   A proof is `(phasePolyChecker n).sound _ _ (by decide +kernel)`, a
   refutation `phasePolyRefutes_sound (by decide +kernel)`; bare `decide`
@@ -117,9 +129,16 @@ Rules that follow, for anyone adding to the library:
   `none` outside the fragment or for `CX c c`), `tableauCheck`,
   `tableau_sound` (equal tableaux give `≡ₛ`, the normal-form shape) and
   the export `tableauChecker n : ScalarChecker n`; `witness` names the
-  first disagreeing generator. Structure-independent, `O(n)` bit
-  operations per gate, no `Zeta8` arithmetic in the kernel: the 15-qubit
-  Reed–Muller pair decides in about 0.3 s. Extend `Gate1.conj` (with a
+  first disagreeing generator. The soundness argument is stated on
+  `ConjAgree a b` (every generator has the same image), so the chunked
+  form shares it: `genAt n g` numbers the `2n` generators on `ℕ`,
+  `tableauCheckGen a b g` checks one, and `tableau_sound_of_allBelow`
+  turns `AllBelow (tableauCheckGen a b) (2 * n)` into `a ≡ₛ b`.
+  Structure-independent, `O(n)` bit operations per gate, no `Zeta8`
+  arithmetic in the kernel: the 15-qubit Reed–Muller pair decides in
+  about 0.3 s; about 0.2 ms of kernel time per generator and gate, so
+  cost is `2n · gates` and past a few thousand gates the check must be
+  chunked (`scripts/scale_test.py --chunk`). Extend `Gate1.conj` (with a
   `sound` case) if the Clifford alphabet grows.
 - `CircuitEq/Structural.lean` — the parametric toolkit: fusion,
   commutation, `denote_applyOne_comm_of_not_touches`, `layer`, `hLayer`.
@@ -175,6 +194,13 @@ Rules that follow, for anyone adding to the library:
   `rz(k·π/4)` to the diagonal Clifford+T gate with that matrix. A `tzap`
   pipeline (https://github.com/qqq-wisc/tzap) is queued; TZAP reads and
   writes the same `rz` convention as PyZX.
+- `scripts/scale_test.py` — the scale ladder (`benchmarks/scale/`): seeded
+  families (`clifford`, `cnot_t` random; `ghz`, `surface`, `ccz_net`
+  structured), PyZX pipelines including the peephole `basic`, `--chunk G`
+  for the chunked tableau, and a Python mirror of the Pauli update rules
+  that pre-checks a pair and names a mutant's witness generator.
+  `scripts/chunked_decide.py <Module>` emits and times the chunked basis
+  decide of a benchmark module; `scripts/chunks.py` is what both share.
 - `scripts/AxiomCheck.lean` — CI axiom policy; not in any `lean_lib`.
 
 Namespaces: `Quantum.Zeta8` for the field, `Quantum.Circuit` for everything
@@ -295,10 +321,20 @@ on forcing). The expected cost is 5 × 10⁵ memoised gate steps and a cache
 of the order of 10⁷ terms, tens of seconds and a few GB. Measured on an
 idle machine (16 September 2026): a 6 GB watchdog killed the kernel after
 20 s at 6.9 GB resident and still growing, 19 s of CPU. The cache, not the
-arithmetic, is the wall; chunked evaluation (one lemma per basis vector or
-per gate block, composed by `equivalent_iff_basis` or `Equivalent.trans`)
-is the lever, and the same retention limits certificate replay
-(`QUEUE.md`, item 1).
+arithmetic, is the wall, and chunked evaluation is the lever
+(`CircuitEq/Chunk.lean`): with one basis vector per declaration the same
+pair decides in 78 s at 1.98 GB peak, 0.06 GB above the imports
+(`scripts/chunked_decide.py SteanePlus --chunk 1`, 18 September 2026).
+A basis vector costs about 0.6 s and 165 MB of retained terms here (32
+gates, 128 amplitudes: some 150 µs and 40 KB per amplitude and gate), so
+the cost of a whole-register decide is `gates · 4^n` of those steps: about
+five minutes at eight qubits, over an hour at ten. Two facts that matter
+for every chunked file: memory is returned at a declaration boundary only
+with `set_option Elab.async false` (with asynchronous elaboration on,
+sixteen 4-vector declarations peak at 3.6 GB instead of 2.6 GB, and a
+128-declaration file at 5.2 GB), and `lean -j1` does not help. The same
+retention limits certificate replay (`QUEUE.md`, item 1), where the lever
+is a compact encoding of the instruction list.
 
 Two intermediate designs were measured on the way: the same dyadic
 arithmetic through the materialised list evaluator (`evalListD`, kept as
@@ -311,6 +347,17 @@ forced reads bring it to 0.1 s. Depth is now linear: eighteen Hadamards on
 one qubit decide in 42 ms, where the unforced closures did not finish in a
 minute. Memory is the limit before time: the kernel's `whnf` cache retains
 everything evaluated during one declaration.
+
+Kernel facts measured while scaling the fragment checkers
+(`benchmarks/scale/README.md`): a step of structural recursion with a few
+`Nat` operations costs 150 to 200 µs and retains 10 to 40 KB;
+`List.set` / `List.getD` on an 80-element list retain about 1.5 MB per
+update (pack tables into one `Nat`); `Nat.log2` is *not* accelerated
+(`Nat.add, sub, mul, div, mod, gcd, beq, ble, land, lor, xor, shiftLeft,
+shiftRight, pow` are); a loop that returns its accumulator unchanged
+should return the same term, not `0 ||| acc`, which allocates a fresh
+literal; a `def` of a list literal beyond about a thousand elements needs
+`set_option maxRecDepth` for the code generator.
 
 `Finset.sum` unfolding in the kernel is slow. `Gate1.mat` products are over
 `Bool` (a two-term sum) and are fine; do not introduce `Matrix (Fin (2 ^ n))`

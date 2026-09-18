@@ -117,15 +117,19 @@ three-controlled Toffoli, T-count 28 to 24 under phase teleportation, six
 one-wire windows emitted by the survey's diff-based search and checked by
 `circuit_windows` with no refinement.
 
-[`benchmarks/scale/`](benchmarks/scale/README.md) pushes the two checkers
-up a ladder of random circuits: the tableau certifies a 20-qubit Clifford
-pair re-synthesised by PyZX into 597 gates in 9 s and hits the kernel's
-memory ceiling at 40 qubits, and the phase-polynomial checker certifies
-PyZX's phase folding of 200-, 400- and 800-gate CNOT+T circuits on 20,
-40 and 80 qubits in about 0.3, 1 and 4 s of kernel time, refuting a
-gate-deleted mutant of each. The ladder's first run found the earlier
-parity-basis form incomplete at 20 qubits, which is why the form is now
-the multilinear polynomial.
+[`benchmarks/scale/`](benchmarks/scale/README.md) pushes the checkers up
+ladders of random and structured circuits. The phase-polynomial checker
+certifies PyZX's phase folding of 200-, 400- and 800-gate CNOT+T circuits
+on 20, 40 and 80 qubits in 0.2, 0.9 and 3.9 s of kernel time, refuting a
+gate-deleted mutant of each; the ladder's first run found the earlier
+parity-basis form incomplete, which is why the form is now the multilinear
+polynomial. The tableau, proved one range of generators per declaration
+(`CircuitEq/Chunk.lean`), certifies an 80-qubit random Clifford pair
+re-synthesised into 8261 gates in 7 minutes and a 161-qubit round of
+surface-code syndrome extraction in 39 s; in one declaration it ran out of
+memory at 40 qubits. The same chunking decides the seven-qubit Steane pair
+on its full basis in 78 s under 2 GB, where the single `decide` was killed
+at 7 GB.
 
 [`benchmarks/survey/`](benchmarks/survey/README.md) is the evidence run for
 the roadmap's working hypothesis: eleven T-heavy circuits (Toffoli chains,
@@ -228,6 +232,7 @@ CircuitEq/
 ├── Bits.lean               bit / flipBit on Fin (2 ^ n), commutation lemmas
 ├── Gates.lean              Gate1 alphabet, 2×2 matrices, applyOne / applyCNOT
 ├── Dyadic.lean             ℤ[ω, 1/√2]: the gcd-free ring the kernel computes in
+├── Chunk.lean              chunked kernel evaluation: one declaration per index range
 ├── Semantics.lean          Instr, Circuit, denote, ≡ᵤ, ≡ₚ, ≡ₛ, decidability
 ├── Checker.lean            the checker contract: check + sound, normal forms
 ├── Structural.lean         the parametric toolkit: fusion, commutation, layers
@@ -245,6 +250,7 @@ benchmarks/                 QASM fixtures and provenance for each benchmark
 scripts/AxiomCheck.lean     CI: standard three axioms only
 scripts/check_pyzx_benchmarks.py   reproduce the PyZX fixtures (pyzx==0.9.0)
 scripts/certificate.py      Python mirror of the certificate language
+scripts/scale_test.py       the scale ladder; scripts/chunked_decide.py, chunks.py
 QUEUE.md                    the ordered list of next work
 ```
 

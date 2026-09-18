@@ -5,6 +5,7 @@ Authors: Stavan Jain
 -/
 import CircuitEq.Gates
 import CircuitEq.Dyadic
+import CircuitEq.Chunk
 import Mathlib.LinearAlgebra.Pi
 
 /-!
@@ -537,6 +538,44 @@ theorem checkEquivUpToPhase_iff (c₁ c₂ : Circuit n) :
     refine ⟨k.val, k.isLt, fun y hy x hx => ?_⟩
     rw [toZeta8_evalFn _ _ hx, toZeta8_evalFn _ _ hx, toZeta8_comp_basisN hy, h]
     rfl
+
+/-! ### The chunked basis decision
+
+`checkEquiv` evaluates all `2 ^ n` basis vectors inside one declaration, and
+the kernel keeps every memoised amplitude until that declaration ends, so
+memory runs out at seven qubits. `checkEquivAt` is the check on one basis
+vector; a file proves it on ranges of basis vectors, one declaration per
+range, and `equivalent_of_allBelow` assembles them (`CircuitEq.Chunk`). -/
+
+/-- The basis decision on the basis vector `|y⟩` alone: every amplitude of
+the two closure evaluations agrees. -/
+def checkEquivAt (c₁ c₂ : Circuit n) (y : ℕ) : Bool :=
+  (List.range (2 ^ n)).all fun x =>
+    Dyadic8.eqv ((evalFn c₁ (basisN y)).at x) ((evalFn c₂ (basisN y)).at x)
+
+/-- `checkEquiv` is `checkEquivAt` on every basis vector. -/
+lemma checkEquiv_eq_all (c₁ c₂ : Circuit n) :
+    checkEquiv c₁ c₂ = (List.range (2 ^ n)).all (checkEquivAt c₁ c₂) := rfl
+
+/-- The chunked basis decision: `checkEquivAt` on every basis vector,
+proved a range at a time, gives `≡ᵤ`. -/
+theorem equivalent_of_allBelow {c₁ c₂ : Circuit n}
+    (h : AllBelow (checkEquivAt c₁ c₂) (2 ^ n)) : c₁ ≡ᵤ c₂ :=
+  (checkEquiv_iff c₁ c₂).1 (by rw [checkEquiv_eq_all]; exact h.all_range)
+
+/-- The basis decision up to the phase `ω ^ k` on the basis vector `|y⟩`
+alone. -/
+def checkEquivUpToPhaseAt (c₁ c₂ : Circuit n) (k y : ℕ) : Bool :=
+  (List.range (2 ^ n)).all fun x =>
+    Dyadic8.eqv ((evalFn c₁ (basisN y)).at x)
+      (Dyadic8.mul (Dyadic8.ωPow k) ((evalFn c₂ (basisN y)).at x))
+
+/-- The chunked basis decision up to a phase: one phase `ω ^ k`, named by
+the file, on every basis vector gives `≡ₚ`. -/
+theorem equivalentUpToPhase_of_allBelow {c₁ c₂ : Circuit n} {k : ℕ} (hk : k < 8)
+    (h : AllBelow (checkEquivUpToPhaseAt c₁ c₂ k) (2 ^ n)) : c₁ ≡ₚ c₂ := by
+  rw [← checkEquivUpToPhase_iff, checkEquivUpToPhase, List.any_eq_true]
+  exact ⟨k, List.mem_range.2 hk, h.all_range⟩
 
 /-- Equivalence of concrete circuits is decidable: run the closure
 evaluator on the `2 ^ n` basis vectors. -/

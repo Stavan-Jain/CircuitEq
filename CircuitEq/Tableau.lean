@@ -576,13 +576,20 @@ theorem eq_smul_of_comm_generators (W : Vec n →ₗ[Zeta8] Vec n)
 
 /-! ### Soundness of the checker -/
 
-/-- One direction of the scalar relation between circuits with the same
-tableau: `denote (inverse b) ∘ denote a` commutes with every generator. -/
-lemma exists_scalar_of_tableau_eq {a b : Circuit n} {T : List Pauli}
-    (ha : tableau a = some T) (hb : tableau b = some T) :
+/-- The two circuits send every generator to the same Pauli string. -/
+def ConjAgree (a b : Circuit n) : Prop :=
+  ∀ P ∈ generators n, ∃ Q, conj a P = some Q ∧ conj b P = some Q
+
+/-- Agreement on the generators is symmetric. -/
+lemma ConjAgree.symm {a b : Circuit n} (h : ConjAgree a b) : ConjAgree b a := fun P hP =>
+  let ⟨Q, h1, h2⟩ := h P hP
+  ⟨Q, h2, h1⟩
+
+/-- One direction of the scalar relation between circuits that agree on the
+generators: `denote (inverse b) ∘ denote a` commutes with every generator. -/
+lemma exists_scalar_of_conjAgree {a b : Circuit n} (key : ConjAgree a b)
+    (hbp : ∀ c t, Instr.cnot c t ∈ b → c ≠ t) :
     ∃ lam : Zeta8, ∀ ψ, denote (inverse b) (denote a ψ) = lam • ψ := by
-  have key := mapOpt_eq_some ha hb
-  have hbp := tableau_proper hb
   let W : Vec n →ₗ[Zeta8] Vec n := (denoteₗ (inverse b)).comp (denoteₗ a)
   have hW : ∀ P ∈ generators n, ∀ ψ, W (P.op ψ) = P.op (W ψ) := by
     intro P hP ψ
@@ -597,14 +604,13 @@ lemma exists_scalar_of_tableau_eq {a b : Circuit n} {T : List Pauli}
     (fun j ψ => hW _ (xGen_mem_generators j) ψ) (fun j ψ => hW _ (zGen_mem_generators j) ψ)
   exact ⟨lam, fun ψ => hlam ψ⟩
 
-/-- Equal tableaux certify equivalence up to a unit scalar: the shape of
-`NormalForm.sound`, for `≡ₛ`. -/
-theorem tableau_sound {a b : Circuit n} {T : List Pauli} (ha : tableau a = some T)
-    (hb : tableau b = some T) : a ≡ₛ b := by
-  obtain ⟨lam, hlam⟩ := exists_scalar_of_tableau_eq ha hb
-  obtain ⟨mu, hmu⟩ := exists_scalar_of_tableau_eq hb ha
-  have hap := tableau_proper ha
-  have hbp := tableau_proper hb
+/-- Circuits that agree on every generator are equivalent up to a unit
+scalar; the form of the argument that a chunked check can feed. -/
+theorem equivalentUpToScalar_of_conjAgree {a b : Circuit n} (key : ConjAgree a b)
+    (hap : ∀ c t, Instr.cnot c t ∈ a → c ≠ t) (hbp : ∀ c t, Instr.cnot c t ∈ b → c ≠ t) :
+    a ≡ₛ b := by
+  obtain ⟨lam, hlam⟩ := exists_scalar_of_conjAgree key hbp
+  obtain ⟨mu, hmu⟩ := exists_scalar_of_conjAgree key.symm hap
   have hab : ∀ ψ, denote a ψ = lam • denote b ψ := fun ψ => by
     rw [← denote_smul, ← hlam ψ, denote_denote_inverse b hbp]
   have hunit : lam * mu = 1 := by
@@ -613,6 +619,13 @@ theorem tableau_sound {a b : Circuit n} {T : List Pauli} (ha : tableau a = some 
     have := congrFun h2 ⟨0, Nat.two_pow_pos n⟩
     simpa [basis] using this
   exact ⟨lam, ⟨⟨lam, mu, hunit, (mul_comm mu lam).trans hunit⟩, rfl⟩, hab⟩
+
+/-- Equal tableaux certify equivalence up to a unit scalar: the shape of
+`NormalForm.sound`, for `≡ₛ`. -/
+theorem tableau_sound {a b : Circuit n} {T : List Pauli} (ha : tableau a = some T)
+    (hb : tableau b = some T) : a ≡ₛ b :=
+  equivalentUpToScalar_of_conjAgree (mapOpt_eq_some ha hb) (tableau_proper ha)
+    (tableau_proper hb)
 
 /-- The tableau check is sound. -/
 theorem tableauCheck_sound (a b : Circuit n) (h : tableauCheck a b = true) : a ≡ₛ b := by
@@ -626,6 +639,57 @@ theorem tableauCheck_sound (a b : Circuit n) (h : tableauCheck a b = true) : a �
 bit operations per gate. -/
 def tableauChecker (n : ℕ) : ScalarChecker n :=
   ⟨tableauCheck, tableauCheck_sound⟩
+
+/-! ### The chunked check
+
+`tableauCheck` conjugates all `2n` generators inside one declaration, and
+the kernel keeps every intermediate Pauli string until it ends: the
+40-qubit rung of the scale test was killed at 6.3 GB. `tableauCheckGen` is
+the check on one generator, numbered on `ℕ` by `genAt`; a file proves it
+on ranges of generators, one declaration per range, and
+`tableau_sound_of_allBelow` assembles them (`CircuitEq.Chunk`). -/
+
+/-- Generator number `g` of the `2n`, on `ℕ` so that a chunked check can
+range over it: `X_g` for `g < n`, `Z_{g − n}` from `n` on. -/
+def genAt (n g : ℕ) : Pauli := if g < n then ⟨2 ^ g, 0, 0⟩ else ⟨0, 2 ^ (g - n), 0⟩
+
+/-- The tableau check on one generator: both images exist and agree. -/
+def tableauCheckGen (a b : Circuit n) (g : ℕ) : Bool :=
+  match conj a (genAt n g), conj b (genAt n g) with
+  | some P, some Q => decide (P = Q)
+  | _, _ => false
+
+/-- A passed generator check names the common image. -/
+lemma exists_of_tableauCheckGen {a b : Circuit n} {g : ℕ} (h : tableauCheckGen a b g = true) :
+    ∃ Q, conj a (genAt n g) = some Q ∧ conj b (genAt n g) = some Q := by
+  unfold tableauCheckGen at h
+  split at h
+  · next P Q ha hb => exact ⟨P, ha, by rw [hb, of_decide_eq_true h]⟩
+  · exact absurd h Bool.false_ne_true
+
+/-- The chunked tableau check: `tableauCheckGen` on all `2n` generators,
+proved a range at a time, gives `≡ₛ`. -/
+theorem tableau_sound_of_allBelow {a b : Circuit n}
+    (h : AllBelow (tableauCheckGen a b) (2 * n)) : a ≡ₛ b := by
+  have key : ConjAgree a b := by
+    intro P hP
+    simp only [generators, List.mem_append, List.mem_map, List.mem_finRange, true_and] at hP
+    rcases hP with ⟨j, rfl⟩ | ⟨j, rfl⟩
+    · have hx : genAt n j.val = Pauli.xGen j := by simp [genAt, Pauli.xGen, j.isLt]
+      rw [← hx]
+      exact exists_of_tableauCheckGen (h j.val (by omega))
+    · have hz : genAt n (n + j.val) = Pauli.zGen j := by simp [genAt, Pauli.zGen]
+      rw [← hz]
+      exact exists_of_tableauCheckGen (h (n + j.val) (by omega))
+  have proper : ∀ {c : Circuit n}, (∃ Q, conj c (genAt n 0) = some Q) →
+      ∀ x t, Instr.cnot x t ∈ c → x ≠ t := fun ⟨_, hQ⟩ => conj_proper hQ
+  have h0 : ∀ x : Fin n, ∃ Q, conj a (genAt n 0) = some Q ∧ conj b (genAt n 0) = some Q :=
+    fun x => exists_of_tableauCheckGen (h 0 (by have := x.pos; omega))
+  refine equivalentUpToScalar_of_conjAgree key (fun x t hm => ?_) (fun x t hm => ?_)
+  · obtain ⟨Q, hQa, -⟩ := h0 x
+    exact proper ⟨Q, hQa⟩ x t hm
+  · obtain ⟨Q, -, hQb⟩ := h0 x
+    exact proper ⟨Q, hQb⟩ x t hm
 
 /-- The first generator whose images under the two circuits differ, for
 diagnosing a `false`; `none` when every generator agrees. -/
@@ -704,6 +768,29 @@ def steaneOptimized : Circuit 7 :=
 /-- The benchmark pair, decided by the tableau on seven qubits. -/
 theorem steane : steaneOriginal ≡ₛ steaneOptimized :=
   (tableauChecker 7).sound _ _ (by decide +kernel)
+
+/-! The same pair by the chunked check (`CircuitEq.Chunk`): the seven `X`
+generators in one declaration, the seven `Z` generators in another, and a
+constant-size term to assemble them. At this size nothing is gained; the
+40- and 80-qubit rungs of `benchmarks/scale/` need it. -/
+
+/-- The `X` generators of the Steane pair agree. -/
+theorem steane_x :
+    (List.range' 0 7).all (tableauCheckGen steaneOriginal steaneOptimized) = true := by
+  decide +kernel
+
+/-- The `Z` generators of the Steane pair agree. -/
+theorem steane_z :
+    (List.range' 7 7).all (tableauCheckGen steaneOriginal steaneOptimized) = true := by
+  decide +kernel
+
+/-- The benchmark pair again, assembled from the two chunks. -/
+theorem steane_chunked : steaneOriginal ≡ₛ steaneOptimized :=
+  tableau_sound_of_allBelow (((AllBelow.zero _).add steane_x).add steane_z)
+
+/-- A generator on which `[H 0]` and `[S 0]` differ: the chunked form of a
+rejection. -/
+theorem not_H_S_gen : tableauCheckGen ([H 0] : Circuit 1) [S 0] 0 = false := by decide +kernel
 
 end Tableau.Tests
 

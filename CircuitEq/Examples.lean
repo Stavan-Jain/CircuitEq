@@ -13,7 +13,8 @@ import CircuitEq.Tactic
 Concrete circuit identities, established four ways:
 
 1. **decided** — the kernel checks the `2 ^ n` computational-basis vectors
-   (`decide +kernel`, via `decidableEquivalent`);
+   (`decide +kernel`, via `decidableEquivalent`), in one declaration or in
+   chunks (`CircuitEq.Chunk`);
 2. **disproved** — the same decision procedure refutes a false equivalence,
    and separates "equal" from "equal up to a global phase";
 3. **structural** — parametric in the qubit count `n` and the qubit indices,
@@ -75,6 +76,41 @@ theorem T_cnot_comm₂ : ([T 0, CX 0 1] : Circuit 2) ≡ᵤ [CX 0 1, T 0] := by 
 /-- A CNOT ladder over a middle qubit implements a long-range CNOT. -/
 theorem cx_ladder : ([CX 0 1, CX 1 2, CX 0 1, CX 1 2] : Circuit 3) ≡ᵤ [CX 0 2] := by
   decide +kernel
+
+/-! ### Decided in chunks
+
+The same decision, one declaration per range of basis vectors
+(`CircuitEq.Chunk`), so the kernel's memory is that of one range. It buys
+nothing at three qubits; at seven it is the difference between finishing
+under 2 GB and being killed at 7 GB (`scripts/chunked_decide.py`, which
+emits such files, with `set_option Elab.async false` so that the memory of
+one declaration is returned before the next starts). -/
+
+/-- The ladder identity on the basis vectors `|0⟩, …, |3⟩`. -/
+theorem cx_ladder_lo :
+    (List.range' 0 4).all
+      (checkEquivAt ([CX 0 1, CX 1 2, CX 0 1, CX 1 2] : Circuit 3) [CX 0 2]) = true := by
+  decide +kernel
+
+/-- The ladder identity on the basis vectors `|4⟩, …, |7⟩`. -/
+theorem cx_ladder_hi :
+    (List.range' 4 4).all
+      (checkEquivAt ([CX 0 1, CX 1 2, CX 0 1, CX 1 2] : Circuit 3) [CX 0 2]) = true := by
+  decide +kernel
+
+/-- The ladder identity, assembled from its two chunks. -/
+theorem cx_ladder_chunked : ([CX 0 1, CX 1 2, CX 0 1, CX 1 2] : Circuit 3) ≡ᵤ [CX 0 2] :=
+  equivalent_of_allBelow (((AllBelow.zero _).add cx_ladder_lo).add cx_ladder_hi)
+
+/-- Up to a phase, chunk by chunk: `Z X = −X Z`, with the phase `ω ^ 4 = −1`
+named by the proof. -/
+theorem Z_X_phase_chunk :
+    (List.range' 0 2).all (checkEquivUpToPhaseAt ([Z 0, X 0] : Circuit 1) [X 0, Z 0] 4) = true := by
+  decide +kernel
+
+/-- `Z X ≡ₚ X Z`, assembled from its one chunk. -/
+theorem Z_X_phase_chunked : ([Z 0, X 0] : Circuit 1) ≡ₚ [X 0, Z 0] :=
+  equivalentUpToPhase_of_allBelow (by decide) ((AllBelow.zero _).add Z_X_phase_chunk)
 
 /-! ### Disproved -/
 
