@@ -40,12 +40,16 @@ jobs:
       # lean4checker, shipped inside the toolchain since v4.28, so it always
       # matches `lean-toolchain`. One thread on purpose: each parallel replay
       # loads a private copy of the mathlib imports (about 2 GB per extra
-      # thread; ten threads were killed at 26 GB), while one thread maps them
-      # once: about 30 s and 0.4 GB here.
+      # thread; ten threads were killed at 26 GB on a 16 GB machine), while
+      # one thread maps them once: 38 s on this runner, 28 s and 0.33 GB on
+      # an M4. A step of its own, not lean-action's `leanchecker` input: the
+      # thread cap would have to sit on that whole step and would slow the
+      # build too. `-v` lists each module replayed, so the log shows what
+      # was covered.
       - name: Kernel replay (leanchecker over the CircuitEq oleans)
         env:
           LEAN_NUM_THREADS: "1"
-        run: lake env leanchecker CircuitEq
+        run: lake env leanchecker -v CircuitEq
       # The replay must reject `2 + 2 = 5` sealed behind `debug.skipKernelTC`
       # (`scripts/SkipKernelTCFixture.lean`, not part of any `lean_lib`), the
       # text guard must flag it, and it must still compile clean, so that a

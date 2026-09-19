@@ -276,10 +276,15 @@ mathlib imports. Measured on the M4 (18 September 2026, 22 modules, 2040
 declarations): one thread 28 s, 0.33 GB peak footprint (1.7 GB resident,
 almost all of it the mapped mathlib `.olean` files); two threads 16 s and
 2.1 GB; the default ten threads were killed by the OS after 4 minutes at a
-26 GB footprint. Never run it without `LEAN_NUM_THREADS=1`, and count it
-as a lake process for the rule below. It replays whatever `.olean` files
-are under `.lake/build`, so delete the build products of a module you
-remove (`lake build` does not) or the replay keeps checking the stale file.
+26 GB footprint. On GitHub's `ubuntu-latest` runner the one-thread replay
+is a 38 s step in a 2.5 minute job, and the fixture check 2 s. It is a CI
+step of its own, not lean-action's `leanchecker` input, because the thread
+cap would sit on that whole step and slow the build too; `-v` makes the
+log list the modules replayed. Never run it without `LEAN_NUM_THREADS=1`,
+and count it as a lake process for the rule below. It replays whatever
+`.olean` files are under `.lake/build`, so delete the build products of a
+module you remove (`lake build` does not) or the replay keeps checking the
+stale file.
 
 **Sharing mathlib with QECLean.** This project pins the same mathlib commit
 as the sibling repo `../QECLean`. `.lake/packages` may be a symlink to
