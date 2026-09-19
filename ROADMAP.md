@@ -326,8 +326,10 @@ because a `CZ` commuted through control-only blocks is not a gate-by-gate
 move. Re-synthesised output never aligns except as a whole-register decide
 (`mod5_4`, `random_4q`), which proves the pair but says nothing about
 locality. Three random pairs are equal only up to a global phase, which
-`circuit_windows` cannot state. The decisive observation for what comes
-next: every wide window of the structured pairs is one or two
+`circuit_windows` could not state at the time; it now accepts `≡ₚ` and
+`≡ₚ[k]` goals, with windows that hold up to a phase of their own, though
+those three pairs have no alignment either way. The decisive observation
+for what comes next: every wide window of the structured pairs is one or two
 CNOT-plus-diagonal segments around a single interior Hadamard, each an
 equivalence on its own, so with the phase-polynomial checker as the leaf and
 windows cut at common Hadamard layers, the structured teleportation pairs

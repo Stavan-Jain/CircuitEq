@@ -50,12 +50,17 @@ Rules that follow, for anyone adding to the library:
 - `CircuitEq.lean` — umbrella; every module must be imported here or it is
   never built, never linted, and its errors are invisible.
 - `CircuitEq/Zeta8.lean` — `Quantum.Zeta8`, computable ℚ(ζ₈). Constants
-  `ω`, `I`, `sqrt2`, `invSqrt2`; identities by `decide +kernel`.
+  `ω`, `I`, `sqrt2`, `invSqrt2`; identities by `decide +kernel`. Exponents
+  of `ω` live in `Fin 8`: `ω_pow_mod`, `ω_pow_val_add` (`ω ^ ↑(j + k) =
+  ω ^ ↑j * ω ^ ↑k`) and `ω_pow_val_neg_mul` are what makes global phases
+  compose.
 - `CircuitEq/Bits.lean` — `bit`, `flipBit` on `Fin (2 ^ n)`; the four lemmas
   `bit_flipBit_self`, `bit_flipBit_of_ne`, `flipBit_flipBit_self`,
   `flipBit_comm` are what every commutation proof rewrites with.
 - `CircuitEq/Gates.lean` — `Gate1`, `Gate1.mat : Matrix Bool Bool Zeta8`,
-  `Vec n`, `applyOne`, `applyCNOT`, linearity, fusion, commutation.
+  `Vec n`, `applyOne`, `applyCNOT`, linearity, fusion, commutation;
+  `applyOne_smul_one` (a scalar matrix on any wire scales the state) and
+  `Gate1.S_mul_H_pow_three` (`(S H)³ = ω`), the leaves of the phase gadget.
 - `CircuitEq/Dyadic.lean` — `Quantum.Dyadic8`, the gcd-free ring
   `ℤ[ω, 1/√2]` the decision procedure computes in: four `ℤ` coordinates and
   a `√2` exponent, `add` / `mul` / `eqv` by exponent alignment, `toZeta8`
@@ -83,12 +88,40 @@ Rules that follow, for anyone adding to the library:
   `checkEquivUpToPhase`, their per-basis-vector chunks `checkEquivAt` /
   `checkEquivUpToPhaseAt` with `equivalent_of_allBelow` /
   `equivalentUpToPhase_of_allBelow`, `Decidable` instances, `Trans`
-  instance for `calc`.
+  instance for `calc`. Up to a global phase there are two relations and
+  one algebra: `EquivalentWithPhase k` (`a ≡ₚ[k] b`, `k : Fin 8`: `a` is
+  `ω ^ k` times `b`) and `≡ₚ`, which is `∃ k` of it by definition
+  (`equivalentUpToPhase_iff_exists`). `EquivalentWithPhase.refl` (phase
+  `0`), `symm` (`-k`), `trans` and `append` (`j + k`, modulo eight because
+  it is `Fin 8`), `append_left` / `append_right` / `cons` /
+  `trans_equivalent` (the phase is kept), `cast` (restate an exponent that
+  arithmetic produced), `toUpToPhase`, `toEquivalent` and
+  `equivalentWithPhase_zero_iff` (`≡ₚ[0]` is `≡ᵤ`); the `≡ₚ` lemmas
+  (`@[refl]`, `@[symm]`, `@[trans]`, `append`, `cons`) are these with the
+  exponent forgotten. `Trans` instances for every pair among `≡ᵤ`,
+  `≡ₚ[k]` and `≡ₚ`, so one `calc` mixes them: exact steps keep a named
+  phase, named phases add (a goal stated with the numeral closes by
+  unification), and one `≡ₚ` step makes the chain `≡ₚ`.
+  `checkEquivWithPhase a b k` with `checkEquivWithPhase_iff` and the
+  `Decidable` instance for `≡ₚ[k]` (one phase, so `decide +kernel` names
+  a window's phase and refutes a wrong one), the chunked
+  `equivalentWithPhase_of_allBelow`, and `findPhase` (`findPhase_sound`,
+  `findPhase_isSome_iff`), the first of the eight phases that passes. When
+  you destructure `h : a ≡ₚ b`, ascribe the component,
+  `obtain ⟨k, (hk : a ≡ₚ[k] b)⟩ := h`, or `hk` has the unfolded type and
+  dot notation fails.
 - `CircuitEq/Checker.lean` — the checker contract: `Checker n` is
   `check : Circuit n → Circuit n → Bool` plus `sound : check a b = true →
   a ≡ᵤ b` (`PhaseChecker`, `ScalarChecker` for `≡ₚ`, `≡ₛ`); `NormalForm n`
   with `toChecker`; `Checker.orElse`; `syntacticChecker`; `evalChecker`
-  (the basis decide as a checker). A checker module imports only
+  (the basis decide as a checker). Up to phase there are two contracts: a
+  `PhaseChecker` answers `Bool` and proves `a ≡ₚ b` (`evalPhaseChecker`,
+  `PhaseChecker.orElse`), a `PhaseFinder` answers `find a b : Option (Fin
+  8)` and proves `a ≡ₚ[k] b`, which is what a certificate needs, because
+  the phases of its windows have to be added up: `evalPhaseFinder` (the
+  basis evaluator by `findPhase`), `Checker.toFinder` (an exact checker
+  finds `0` or nothing), `PhaseFinder.orElse`, `PhaseFinder.toChecker`.
+  A checker module imports only
   `Semantics`, `Structural`, `Support` and `Checker`, writes `check` as
   kernel-friendly `Bool` code, and exports exactly one checker.
 - `CircuitEq/Support.lean` — wire sets as `Nat` bitmasks, the one encoding
@@ -146,9 +179,18 @@ Rules that follow, for anyone adding to the library:
   chunked (`scripts/scale_test.py --chunk`). Extend `Gate1.conj` (with a
   `sound` case) if the Clifford alphabet grows.
 - `CircuitEq/Structural.lean` — the parametric toolkit: fusion,
-  commutation, `denote_applyOne_comm_of_not_touches`, `layer`, `hLayer`.
+  commutation, `denote_applyOne_comm_of_not_touches`, `layer`, `hLayer`,
+  and the phase gadget: `phaseGadget k i` is `k` rounds of `H S H S H S`
+  on wire `i`, Clifford gates only, and denotes the scalar `ω ^ k` on every
+  register (`denote_phaseGadget`; `phaseGadget_comm`, `phaseGadget_wire`,
+  `phaseGadget_eight`, `phaseGadget_equivalentWithPhase`). The bridge
+  `equivalentWithPhase_iff_phaseGadget : a ≡ₚ[k] b ↔ a ≡ᵤ b ++ phaseGadget
+  k i` (and `equivalentUpToPhase_iff_phaseGadget` with `∃ k`) normalises a
+  pair that is equal only up to a phase to an exact one at no `T`-cost.
 - `CircuitEq/Rewriting.lean` — rewriting on instruction lists:
-  `Equivalent.in_context`, the decidable checks `Instr.CanCommute` /
+  `Equivalent.in_context` (and `EquivalentWithPhase.in_context`,
+  `EquivalentUpToPhase.in_context`: a window's phase is the phase of the
+  whole), the decidable checks `Instr.CanCommute` /
   `Instr.CanCancel` with their `sound` lemmas, `gate_block_comm`,
   `blocks_comm`, `perm_equivalent`, `pull_cons`, `cancel_window`.
   `CanCommute` licenses: equal gates, disjoint wires, two diagonal gates on
@@ -172,6 +214,27 @@ Rules that follow, for anyone adding to the library:
   macro `circuit_replay Cs steps`. Never imported by a checker module. A
   new proof technique is a new step kind here with its case in
   `replayStep_sound`; the kernel evaluates `replay` once per proof.
+  The same `Step`s replay up to a global phase: `replayPhase Fs steps c :
+  Option (Fin 8 × Circuit n)` reads a `window` against a `PhaseTable` of
+  `PhaseFinder`s (`windowPhase`), places it syntactically (`placeFront`)
+  and adds the exponent found to an accumulator; every other step is the
+  exact rewrite. `replayPhase_sound : replayPhase Fs steps c = some (k, c')
+  → c ≡ₚ[k] c'`, so the kernel computes the phase of the whole pair;
+  `replayUpToPhase` / `replayUpToPhase_sound` forget it and conclude
+  `c ≡ₚ c'`; `defaultPhaseFinders` (index 0: `phasePolyChecker` lifted,
+  then `evalPhaseFinder`; index 1: syntactic) and the macro
+  `circuit_replay_phase Fs steps`, which closes either goal. `replay`,
+  `replayStep` and `replay_sound` are unchanged; `rewriteAt_rel` is
+  `rewriteAt_sound` for any relation that `cons` preserves, and a new step
+  kind needs its case in `replayStepPhase_sound` too. Measured: the phase
+  replay costs 1.2 times the exact one on `Tof3`'s trace (62 steps, four
+  windows: 0.19 s against 0.16 s of kernel time, the same whether the
+  phase is named or not), and 128 one-wire phase windows replay in 0.7 s
+  against 0.4 s for 128 exact ones. Measure with `set_option Elab.async
+  false`: with asynchronous elaboration the kernel checks of neighbouring
+  declarations overlap and the profiler's figures grow with position in
+  the file. The scalar replay for `≡ₛ` (so that the tableau can justify a
+  window) is still open (`QUEUE.md`).
 - `CircuitEq/Tactic.lean` — `circuit_simp` (cancel checked inverse pairs
   through commuting gates, then align two concrete lists gate by gate) and
   `circuit_windows [(a₁, b₁), …]` (the window pattern: each window is
@@ -181,10 +244,24 @@ Rules that follow, for anyone adding to the library:
   so the kernel evaluates `replay` once; moves found on the right-hand
   circuit are inverted into the same trace. Both read lists by `whnf`, so
   `layer`, `cnotNetwork`, `hLayer` and named circuit `def`s are fine as
-  inputs. Neither searches for an alignment.
+  inputs. Neither searches for an alignment. Both accept a goal
+  `a ≡ₚ b` or `a ≡ₚ[k] b` as well: the search and the trace are the same,
+  the trace is replayed by `replayPhase` under `defaultPhaseFinders`, each
+  window may hold only up to a phase of its own (`Z X` against `X Z`), and
+  on `≡ₚ[k]` the windows' phases must add up to `k`. The errors say which
+  case failed: a window the kernel refutes even up to phase, a named phase
+  that is wrong (the message names the right one), or, on an exact goal, a
+  window that holds only up to phase (the message says to state the goal
+  on `≡ₚ`).
 - `CircuitEq/Embedding.lean` — the locality theorem: `rename f c` places a
   circuit on the wires `f : Fin m ↪ Fin n`, `rename_equivalent_iff`,
-  `Equivalent.rename`, `wires₂` / `wires₃` for concrete embeddings.
+  `Equivalent.rename`, `wires₁` / `wires₂` / `wires₃` for concrete
+  embeddings. Up to a scalar the slicing argument is the same, so it is
+  proved once for an arbitrary `s : Zeta8` (`denote_rename_eq_smul`,
+  `denote_eq_smul_of_rename`) and specialised: `EquivalentWithPhase.rename`
+  / `of_rename` / `rename_equivalentWithPhase_iff` (the phase is kept),
+  `EquivalentUpToPhase.rename` / `of_rename` /
+  `rename_equivalentUpToPhase_iff`, and `EquivalentUpToScalar.rename`.
 - `CircuitEq/Examples.lean` — worked identities; add new showcase results
   here, new general lemmas to `Structural.lean`, `Rewriting.lean` or
   `Layers.lean`.
@@ -265,10 +342,12 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
 - **Docstring prose wraps at 80 columns**, code at 100 (the `longLine`
   linter only fails at 100, the 80 is house style). Fenced code blocks may
   exceed 80 if they must.
-- **Notation.** `≡ᵤ` and `≡ₚ` are `scoped infix` in `Quantum.Circuit`. Do not
-  use `≈`: on `List` it already means `List.Perm`. Ascribe one side of a
-  concrete equivalence with `: Circuit n`; the qubit count is not inferable
-  from `[H 0, T 0]`.
+- **Notation.** `≡ᵤ` and `≡ₚ` are `scoped infix` in `Quantum.Circuit`, and
+  `a ≡ₚ[k] b` is `EquivalentWithPhase k a b`. `≡ₚ[` is a token of its own,
+  so keep the space in `a ≡ₚ [X 0]`: without it the list is read as a
+  phase. Do not use `≈`: on `List` it already means `List.Perm`. Ascribe
+  one side of a concrete equivalence with `: Circuit n`; the qubit count is
+  not inferable from `[H 0, T 0]`.
 - **Hand-written algebraic instances** on this mathlib (v4.30.0-rc2) must
   supply `nsmul := nsmulRec` and `zsmul := zsmulRec` explicitly in a
   `CommRing`; there is no default.
@@ -286,6 +365,14 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
   `(before, after)` pairs rather than writing `in_context`, `rename` and
   `decide +kernel` by hand; a window's decide costs `2 ^ k` for its `k`
   wires, not `2 ^ n`.
+- **A pair that is equal only up to a global phase is stated on `≡ₚ`**, and
+  proved with the same tools: `circuit_windows` on the `≡ₚ` goal, `calc`
+  chains that mix `≡ᵤ` and `≡ₚ` steps, `append` and `in_context` for
+  segments. PyZX and TZAP drop scalars, so expect this of their output.
+  State `≡ₚ[k]` when the phase matters (the error names the right `k` if
+  yours is wrong), and use `equivalentWithPhase_iff_phaseGadget` to turn it
+  into an exact statement against `optimized ++ phaseGadget k i`. Never
+  decide a phase on the whole register when a window can carry it.
 
 ## Build and verification
 

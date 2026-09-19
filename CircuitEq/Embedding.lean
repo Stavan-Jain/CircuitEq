@@ -16,6 +16,12 @@ decided by the kernel on `m` qubits, at cost `2 ^ m`, holds on any `m`
 distinct wires of any register (`Equivalent.rename`), and a window of a big
 circuit that touches only `m` wires can be checked on `m` qubits.
 
+The same holds up to a global phase, with the phase kept:
+`rename_equivalentWithPhase_iff` for `≡ₚ[k]`, `rename_equivalentUpToPhase_iff`
+for `≡ₚ`, and `EquivalentWithPhase.rename` / `EquivalentUpToPhase.rename`
+to place an identity; `EquivalentUpToScalar.rename` places one up to a unit
+scalar.
+
 The proof slices an arbitrary large-register vector by fixing the unused
 bits. Only the proof's indexing helpers are noncomputable; circuit placement
 is a computable map of instructions, and `simp` evaluates it.
@@ -113,6 +119,10 @@ def rename (f : Fin m ↪ Fin n) (c : Circuit m) : Circuit n := c.map (Instr.ren
 @[simp] lemma rename_cons (f : Fin m ↪ Fin n) (g : Instr m) (c : Circuit m) :
     rename f (g :: c) = g.rename f :: rename f c := rfl
 
+/-- The embedding of a one-qubit register on a wire. -/
+def wires₁ (i : Fin n) : Fin 1 ↪ Fin n :=
+  ⟨![i], Function.injective_of_subsingleton _⟩
+
 /-- The embedding of a two-qubit register on two distinct wires. -/
 def wires₂ {i j : Fin n} (h : i ≠ j) : Fin 2 ↪ Fin n :=
   ⟨![i, j], by intro a b hab; fin_cases a <;> fin_cases b <;> simp_all⟩
@@ -177,5 +187,90 @@ theorem rename_equivalent_iff (f : Fin m ↪ Fin n) (a b : Circuit m) :
     simp [slice]
   have hs := congrArg (slice f 0) (h (fun x => ψ (restrictBits f x)))
   rwa [slice_denote, slice_denote, hψ] at hs
+
+/-! ### Locality up to a scalar
+
+The slicing argument does not care what relates the two small circuits: if
+`a` is `s` times `b` as operators, for any scalar `s`, then so are their
+placements, and conversely. With `s = ω ^ k` this is the locality theorem
+for a named phase, from which the one for `≡ₚ` follows, so a window that
+holds only up to a global phase is still decided on its own wires, at cost
+`2 ^ m`, and its phase is the phase it contributes to the whole circuit.
+With a unit `s` it is the placement lemma for `≡ₛ`. -/
+
+/-- Slicing commutes with scaling. -/
+lemma slice_smul (f : Fin m ↪ Fin n) (x : Fin (2 ^ n)) (s : Zeta8) (ψ : Vec n) :
+    slice f x (s • ψ) = s • slice f x ψ := rfl
+
+/-- Placement preserves a scalar relation between two circuits. -/
+lemma denote_rename_eq_smul {a b : Circuit m} {s : Zeta8}
+    (h : ∀ ψ, denote a ψ = s • denote b ψ) (f : Fin m ↪ Fin n) (ψ : Vec n) :
+    denote (rename f a) ψ = s • denote (rename f b) ψ := by
+  funext x
+  have hs := h (slice f x ψ)
+  rw [← slice_denote f x a ψ, ← slice_denote f x b ψ] at hs
+  have hx := congrFun hs (restrictBits f x)
+  simpa [slice] using hx
+
+/-- Placement reflects a scalar relation between two circuits. -/
+lemma denote_eq_smul_of_rename {a b : Circuit m} {s : Zeta8} (f : Fin m ↪ Fin n)
+    (h : ∀ ψ, denote (rename f a) ψ = s • denote (rename f b) ψ) (ψ : Vec m) :
+    denote a ψ = s • denote b ψ := by
+  have hψ : slice f 0 (fun x => ψ (restrictBits f x)) = ψ := by
+    funext y
+    simp [slice]
+  have hs := congrArg (slice f 0) (h (fun x => ψ (restrictBits f x)))
+  rwa [slice_smul, slice_denote, slice_denote, hψ] at hs
+
+/-- Any identity with a named phase can be placed on arbitrary distinct
+wires, and keeps its phase. -/
+theorem EquivalentWithPhase.rename {k : Fin 8} {a b : Circuit m} (h : a ≡ₚ[k] b)
+    (f : Fin m ↪ Fin n) : rename f a ≡ₚ[k] rename f b :=
+  denote_rename_eq_smul h f
+
+/-- Transfer an identity with a named phase on `m` qubits to its placement
+on `m` wires of a larger register, with the placed circuits given up to
+definitional unfolding; the phase form of `Equivalent.of_rename`. -/
+theorem EquivalentWithPhase.of_rename {k : Fin 8} (f : Fin m ↪ Fin n)
+    {a' b' : Circuit m} {a b : Circuit n} (h : a' ≡ₚ[k] b')
+    (ha : Quantum.Circuit.rename f a' = a) (hb : Quantum.Circuit.rename f b' = b) :
+    a ≡ₚ[k] b := by
+  subst ha hb
+  exact h.rename f
+
+/-- The locality theorem with a named phase: on selected wires the phase is
+the phase of the smaller problem. -/
+theorem rename_equivalentWithPhase_iff (f : Fin m ↪ Fin n) (k : Fin 8) (a b : Circuit m) :
+    rename f a ≡ₚ[k] rename f b ↔ a ≡ₚ[k] b :=
+  ⟨fun h => denote_eq_smul_of_rename f h, fun h => h.rename f⟩
+
+/-- Any identity up to a global phase can be placed on arbitrary distinct
+wires. -/
+theorem EquivalentUpToPhase.rename {a b : Circuit m} (h : a ≡ₚ b) (f : Fin m ↪ Fin n) :
+    rename f a ≡ₚ rename f b := by
+  obtain ⟨k, (hk : a ≡ₚ[k] b)⟩ := h
+  exact ⟨k, hk.rename f⟩
+
+/-- Transfer an identity up to a global phase on `m` qubits to its placement
+on `m` wires of a larger register; the phase form of
+`Equivalent.of_rename`. -/
+theorem EquivalentUpToPhase.of_rename (f : Fin m ↪ Fin n) {a' b' : Circuit m}
+    {a b : Circuit n} (h : a' ≡ₚ b') (ha : Quantum.Circuit.rename f a' = a)
+    (hb : Quantum.Circuit.rename f b' = b) : a ≡ₚ b := by
+  subst ha hb
+  exact h.rename f
+
+/-- The locality theorem up to a global phase: equivalence up to phase on
+selected wires is equivalent to the smaller problem. -/
+theorem rename_equivalentUpToPhase_iff (f : Fin m ↪ Fin n) (a b : Circuit m) :
+    rename f a ≡ₚ rename f b ↔ a ≡ₚ b :=
+  exists_congr fun k => rename_equivalentWithPhase_iff f k a b
+
+/-- Any identity up to a unit scalar can be placed on arbitrary distinct
+wires. -/
+theorem EquivalentUpToScalar.rename {a b : Circuit m} (h : a ≡ₛ b) (f : Fin m ↪ Fin n) :
+    rename f a ≡ₛ rename f b := by
+  obtain ⟨s, hs, h⟩ := h
+  exact ⟨s, hs, denote_rename_eq_smul h f⟩
 
 end Quantum.Circuit

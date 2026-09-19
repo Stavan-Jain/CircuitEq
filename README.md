@@ -31,9 +31,10 @@ open Quantum.Circuit Instr
 theorem hh_cnot_hh : ([H 0, H 1, CX 0 1, H 0, H 1] : Circuit 2) ≡ᵤ [CX 1 0] := by
   decide +kernel
 
--- concrete refutation, and the up-to-global-phase repair
+-- concrete refutation, and the up-to-global-phase repair, with the phase named if wanted
 theorem not_Z_X_comm : ¬ (([Z 0, X 0] : Circuit 1) ≡ᵤ [X 0, Z 0]) := by decide +kernel
 theorem Z_X_phase_X_Z : ([Z 0, X 0] : Circuit 1) ≡ₚ [X 0, Z 0] := by decide +kernel
+theorem Z_X_eq_neg_X_Z : ([Z 0, X 0] : Circuit 1) ≡ₚ[4] [X 0, Z 0] := by decide +kernel  -- ω⁴ = −1
 
 -- structural: for every qubit count n and every pair of distinct qubits
 theorem H_T_H_eq_T {n} {i j : Fin n} (h : i ≠ j) : [H i, T j, H i] ≡ᵤ ([T j] : Circuit n) :=
@@ -63,6 +64,18 @@ theorem original_equiv_optimized : original ≡ᵤ optimized :=
 theorem two_windows :
     ([T 0, CX 1 2, T 0, H 5, X 3, H 5] : Circuit 6) ≡ᵤ [CX 1 2, S 0, X 3] := by
   circuit_windows [([T 0, T 0], [S 0]), ([H 5, H 5], [])]
+
+-- up to a global phase: the second window holds only up to ω⁴; the kernel finds that on
+-- wire 3 alone, adds the windows' phases up, and checks the sum against the statement's 4
+theorem two_windows_phase_named :
+    ([T 0, CX 1 2, T 0, Z 3, X 3, H 5] : Circuit 6) ≡ₚ[4] [CX 1 2, S 0, X 3, Z 3, H 5] := by
+  circuit_windows [([T 0, T 0], [S 0]), ([Z 3, X 3], [X 3, Z 3])]
+
+-- and exact again, at no T-cost: four rounds of the Clifford gadget H S H S H S denote ω⁴
+theorem two_windows_phase_exact :
+    ([T 0, CX 1 2, T 0, Z 3, X 3, H 5] : Circuit 6) ≡ᵤ
+      [CX 1 2, S 0, X 3, Z 3, H 5] ++ phaseGadget 4 0 :=
+  (equivalentWithPhase_iff_phaseGadget 4 0 _ _).1 two_windows_phase_named
 
 -- fragment checkers: symbolic, linear in the gate count, never 2^n
 theorem gadgets_merge :
@@ -140,7 +153,9 @@ both PyZX pipelines, aligned by script. Phase-teleportation output aligns
 by windows on the structured circuits (seven pairs kernel-checked in 2 to
 10 s each on the dyadic evaluator, one memory-bound), re-synthesised output
 never does except as a whole-register decide, three random pairs are equal
-only up to a global phase, and every wide window is CNOT-plus-diagonal
+only up to a global phase (the window pattern has since learned `≡ₚ`, but
+these three have no alignment, so they stay whole-register decides of
+`≡ₚ`), and every wide window is CNOT-plus-diagonal
 segments around one Hadamard, which is where the phase-polynomial checker
 applies next.
 
@@ -167,6 +182,20 @@ applies next.
   gcd-free ring `ℤ[ω, 1/√2]`, proved equal to `denote`, so the kernel never
   sees a rational and a decide is linear in depth: a three-qubit six-gate
   window is 0.09 s where the rational list evaluator took 3 s.
+- **A global phase composes.** Optimisers preserve a circuit only up to a
+  global phase (PyZX drops the scalar at extraction), and the phase shows
+  up inside a window, so `≡ₚ` has everything `≡ᵤ` has: `refl`, `symm`,
+  `trans`, `append`, `cons`, `in_context`, `Trans` instances that let one
+  `calc` mix `≡ᵤ` and `≡ₚ` steps, the locality theorem
+  (`rename_equivalentUpToPhase_iff`) and the window pattern. Underneath is
+  `a ≡ₚ[k] b`, the same relation with the phase named, `a = ω ^ k · b`
+  with `k : Fin 8`; `≡ₚ` is `∃ k` of it by definition. Named phases add
+  along a chain and across a composition, modulo eight because `Fin 8`
+  does, placement keeps them, and `decide +kernel` decides one on a window.
+  `phaseGadget k i`, `k` rounds of the Clifford circuit `H S H S H S`
+  (`(S H)³ = ω`), denotes the scalar `ω ^ k` on any wire of any register,
+  and `a ≡ₚ[k] b ↔ a ≡ᵤ b ++ phaseGadget k i`, so a pair that is equal
+  only up to a phase becomes an exact one at no `T`-cost.
 - **Kernel-only.** `decide +kernel` is required because `Rat.add` and
   `Rat.mul` are `@[irreducible]`, which stalls elaborator-level `decide`; the
   kernel ignores reducibility and evaluates `Nat.gcd` with GMP. No
@@ -199,15 +228,23 @@ applies next.
   justified by a checker from a table) with a kernel-friendly interpreter
   `replay` and one theorem `replay_sound`. A proof is
   `replay_sound Cs steps (by decide +kernel)`: the kernel evaluates
-  `replay` once, cost linear in the trace. `scripts/certificate.py` mirrors
-  the language in Python so external tools can emit traces.
+  `replay` once, cost linear in the trace. The same steps replay up to a
+  global phase: under `replayPhase` a window names a phase finder instead
+  of a checker, the interpreter adds the windows' exponents up, and
+  `replayPhase_sound` concludes `c₁ ≡ₚ[k] c₂` with `k` computed by the
+  kernel, at 1.2 times the cost of the exact replay on `tof_3`'s trace.
+  `scripts/certificate.py` mirrors both interpreters in Python so external
+  tools can emit traces.
 - **The tactics emit certificates.** `circuit_simp` cancels checked inverse
   pairs and aligns two concrete lists; `circuit_windows` takes an alignment
   as input, a list of windows `(aᵢ, bᵢ)` on the full register in the order
   they occur, and checks every other move as a commutation. Both search in
   meta, emit a `List Step`, and close the goal with a single `replay_sound`.
   Neither searches for alignments: a move the checks do not license, or a
-  false window, is an error naming the gate or the window.
+  false window, is an error naming the gate or the window. On a goal
+  `c₁ ≡ₚ c₂` or `c₁ ≡ₚ[k] c₂` they do the same through `replayPhase`, and
+  each window may hold only up to a phase of its own; a wrong `k` is an
+  error naming the right one.
 - **Fragment checkers decide windows symbolically.** `PhasePoly.lean` is a
   certified canonical form for CNOT-plus-diagonal circuits (an
   `𝔽₂`-linear part as packed row bitmasks, the phase function as its
@@ -226,6 +263,8 @@ applies next.
   `rename f a ≡ᵤ rename f b ↔ a ≡ᵤ b`. So a `decide +kernel` on `m` qubits,
   at cost `2 ^ m`, yields the identity on any `m` distinct wires of any
   register, and a window that touches `m` wires costs `2 ^ m`, never `2 ^ n`.
+  The slicing argument is indifferent to a scalar, so the same holds for
+  `≡ₚ[k]` with the phase kept, for `≡ₚ`, and as a placement lemma for `≡ₛ`.
 
 ## Layout
 
@@ -237,7 +276,7 @@ CircuitEq/
 ├── Gates.lean              Gate1 alphabet, 2×2 matrices, applyOne / applyCNOT
 ├── Dyadic.lean             ℤ[ω, 1/√2]: the gcd-free ring the kernel computes in
 ├── Chunk.lean              chunked kernel evaluation: one declaration per index range
-├── Semantics.lean          Instr, Circuit, denote, ≡ᵤ, ≡ₚ, ≡ₛ, decidability
+├── Semantics.lean          Instr, Circuit, denote, ≡ᵤ, ≡ₚ, ≡ₚ[k], ≡ₛ, decidability
 ├── Checker.lean            the checker contract: check + sound, normal forms
 ├── Structural.lean         the parametric toolkit: fusion, commutation, layers
 ├── Support.lean            wire sets as Nat bitmasks
@@ -245,8 +284,8 @@ CircuitEq/
 ├── Tableau.lean            Clifford tableau checker, soundness to ≡ₛ
 ├── Rewriting.lean          rewriting in context, checked swaps and cancellations
 ├── Layers.lean             Hadamard-layer algebra, CNOT-network conjugation
-├── Certificate.lean        Step, replay, replay_sound, the checker table
-├── Tactic.lean             circuit_simp, circuit_windows (emit certificates)
+├── Certificate.lean        Step, replay, replay_sound, replayPhase, the tables
+├── Tactic.lean             circuit_simp, circuit_windows (emit certificates; ≡ᵤ, ≡ₚ, ≡ₚ[k])
 ├── Embedding.lean          the locality theorem: circuits on selected wires
 ├── Examples.lean           worked identities: decided, refuted, structural, placed
 └── Benchmarks/             original-versus-PyZX proofs

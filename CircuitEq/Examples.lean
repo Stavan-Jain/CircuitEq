@@ -10,7 +10,7 @@ import CircuitEq.Tactic
 /-!
 # Worked equivalences
 
-Concrete circuit identities, established four ways:
+Concrete circuit identities, established six ways:
 
 1. **decided** — the kernel checks the `2 ^ n` computational-basis vectors
    (`decide +kernel`, via `decidableEquivalent`), in one declaration or in
@@ -23,7 +23,10 @@ Concrete circuit identities, established four ways:
 4. **placed** — a decided identity on `k` qubits, lifted to any `k` distinct
    wires of any register by `Equivalent.rename` (`CircuitEq.Embedding`);
 5. **certified** — a list of rewrite steps, found by a tactic or written by
-   hand, replayed and checked by the kernel once (`CircuitEq.Certificate`).
+   hand, replayed and checked by the kernel once (`CircuitEq.Certificate`);
+6. **up to a global phase** — all of the above for `≡ₚ`, and for `≡ₚ[k]`
+   with the exponent of `ω` named: decided, chained in `calc`, placed, and
+   certified with windows that hold only up to a phase.
 
 The structural and placed proofs are the point of the prototype: they hold
 for every `n` and every choice of qubits, which no fixed-size equivalence
@@ -123,6 +126,13 @@ theorem not_Z_X_comm : ¬ (([Z 0, X 0] : Circuit 1) ≡ᵤ [X 0, Z 0]) := by dec
 /-- … but they are equal up to the global phase `-1 = ω⁴`. -/
 theorem Z_X_phase_X_Z : ([Z 0, X 0] : Circuit 1) ≡ₚ [X 0, Z 0] := by decide +kernel
 
+/-- The same with the phase named: `Z X = ω⁴ · X Z`, and no other power. -/
+theorem Z_X_eq_neg_X_Z : ([Z 0, X 0] : Circuit 1) ≡ₚ[4] [X 0, Z 0] := by decide +kernel
+
+/-- The named form is refutable too: the phase is not `ω³`. -/
+theorem not_Z_X_phase_three : ¬ (([Z 0, X 0] : Circuit 1) ≡ₚ[3] [X 0, Z 0]) := by
+  decide +kernel
+
 /-- `T` on the *target* does not commute through a CNOT. -/
 theorem not_T_target_cnot_comm : ¬ (([T 1, CX 0 1] : Circuit 2) ≡ᵤ [CX 0 1, T 1]) := by
   decide +kernel
@@ -210,5 +220,84 @@ theorem two_windows_certificate :
   circuit_replay defaultCheckers
     [.moveLeft 2 1, .window 0 [0] ([T 0, T 0] : Circuit 1) [S 0] 0, .moveLeft 1 1,
       .moveLeft 4 1, .window 2 [5] ([H 0, H 0] : Circuit 1) [] 0]
+
+/-! ### Up to a global phase
+
+An optimiser preserves a circuit only up to a global phase, and the phase
+appears inside a window: `Z X` against `X Z` is `ω⁴`. `≡ₚ` composes as `≡ᵤ`
+does: in `calc`, under `append` and `in_context`, by the locality theorem,
+and in the window pattern. `≡ₚ[k]` is the same relation with the exponent
+of `ω` named, and the exponents add modulo eight. -/
+
+/-- `Y = i · X Z`: as a circuit, `Y` is `Z` then `X`, up to `ω² = i`. -/
+theorem Y_eq_Z_X : ([Y 0] : Circuit 1) ≡ₚ[2] [Z 0, X 0] := by decide +kernel
+
+/-- A `calc` that mixes the relations: an exact fusion, then a step that
+holds only up to a phase. One `≡ₚ` step makes the chain `≡ₚ`. -/
+theorem T_T_Z_X_phase : ([T 0, T 0, Z 0, X 0] : Circuit 1) ≡ₚ [S 0, X 0, Z 0] :=
+  calc ([T 0, T 0, Z 0, X 0] : Circuit 1)
+      = [T 0, T 0] ++ [Z 0, X 0] := rfl
+    _ ≡ᵤ [S 0] ++ [Z 0, X 0] := T_T_eq_S.append (Equivalent.refl _)
+    _ ≡ₚ [S 0] ++ [X 0, Z 0] := (EquivalentUpToPhase.refl _).append Z_X_phase_X_Z
+    _ = [S 0, X 0, Z 0] := rfl
+
+/-- With the phases named, a `calc` adds them: `ω² · ω⁴ = ω⁶`, and the
+statement's `6` is checked against `2 + 4` by unification. -/
+theorem Y_Z_X_phase : ([Y 0, Z 0, X 0] : Circuit 1) ≡ₚ[6] [Z 0, X 0, X 0, Z 0] :=
+  calc ([Y 0, Z 0, X 0] : Circuit 1)
+      = [Y 0] ++ [Z 0, X 0] := rfl
+    _ ≡ₚ[2] [Z 0, X 0] ++ [Z 0, X 0] := Y_eq_Z_X.append_right _
+    _ ≡ₚ[4] [Z 0, X 0] ++ [X 0, Z 0] := Z_X_eq_neg_X_Z.append_left _
+    _ = [Z 0, X 0, X 0, Z 0] := rfl
+
+/-- `Z X = −X Z` on any wire of any register: the one-qubit fact, placed by
+the locality theorem for phase, which keeps the phase. -/
+theorem Z_X_eq_neg_X_Z' (i : Fin n) : [Z i, X i] ≡ₚ[4] ([X i, Z i] : Circuit n) := by
+  simpa [wires₁] using Z_X_eq_neg_X_Z.rename (wires₁ i)
+
+/-- The window pattern up to a global phase. The first window is an exact
+fusion; the second holds only up to `ω⁴`, which the kernel finds on wire
+`3` alone, and every other move is an exact commutation. -/
+theorem two_windows_phase :
+    ([T 0, CX 1 2, T 0, Z 3, X 3, H 5] : Circuit 6) ≡ₚ [CX 1 2, S 0, X 3, Z 3, H 5] := by
+  circuit_windows [([T 0, T 0], [S 0]), ([Z 3, X 3], [X 3, Z 3])]
+
+/-- The same proof with the phase named: the kernel adds the windows'
+phases up, `0 + 4`, and compares the sum with the statement's. -/
+theorem two_windows_phase_named :
+    ([T 0, CX 1 2, T 0, Z 3, X 3, H 5] : Circuit 6) ≡ₚ[4] [CX 1 2, S 0, X 3, Z 3, H 5] := by
+  circuit_windows [([T 0, T 0], [S 0]), ([Z 3, X 3], [X 3, Z 3])]
+
+/-- The same as an explicit certificate, replayed up to phase: the steps
+are those of an exact certificate, and only the table differs. -/
+theorem two_windows_phase_certificate :
+    ([T 0, CX 1 2, T 0, Z 3, X 3, H 5] : Circuit 6) ≡ₚ[4] [CX 1 2, S 0, X 3, Z 3, H 5] := by
+  circuit_replay_phase defaultPhaseFinders
+    [.moveLeft 2 1, .window 0 [0] ([T 0, T 0] : Circuit 1) [S 0] 0, .moveLeft 1 1,
+      .window 2 [3] ([Z 0, X 0] : Circuit 1) [X 0, Z 0] 0]
+
+/-- A segment of a longer circuit, proved on its own: phase `ω⁴`. -/
+theorem segment_one : ([Z 0, X 0, CX 0 1] : Circuit 2) ≡ₚ[4] [X 0, Z 0, CX 0 1] := by
+  circuit_windows [([Z 0, X 0], [X 0, Z 0])]
+
+/-- The next segment, proved on its own: phase `ω²`. -/
+theorem segment_two : ([Y 1, H 0] : Circuit 2) ≡ₚ[2] [Z 1, X 1, H 0] := by
+  circuit_windows [([Y 1], [Z 1, X 1])]
+
+/-- Segments compose, and their phases add: `ω⁴ · ω² = ω⁶`. Each segment is
+its own declaration, so the kernel holds one segment's replay at a time;
+this is how a long pair is proved without one long replay. -/
+theorem segments_phase :
+    ([Z 0, X 0, CX 0 1, Y 1, H 0] : Circuit 2) ≡ₚ[6] [X 0, Z 0, CX 0 1, Z 1, X 1, H 0] :=
+  segment_one.append segment_two
+
+/-- A named phase is an exact equivalence once the phase gadget is
+appended: four rounds of `H S H S H S`, Clifford gates only, denote `ω⁴`.
+This is how a pair that is equal only up to a phase is normalised to an
+exact one at no `T`-cost. -/
+theorem two_windows_phase_exact :
+    ([T 0, CX 1 2, T 0, Z 3, X 3, H 5] : Circuit 6) ≡ᵤ
+      [CX 1 2, S 0, X 3, Z 3, H 5] ++ phaseGadget 4 0 :=
+  (equivalentWithPhase_iff_phaseGadget 4 0 _ _).1 two_windows_phase_named
 
 end Quantum.Circuit.Examples

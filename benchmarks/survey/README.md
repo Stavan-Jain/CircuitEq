@@ -283,6 +283,15 @@ one extra step kind in the certificate language (a scalar window), not a
 new technique. Until then these pairs are out of reach and are reported as
 such rather than as alignment failures.
 
+*Since this run:* the window pattern has learned `≡ₚ`. `circuit_windows`
+accepts a goal `a ≡ₚ b` or `a ≡ₚ[k] b`, each window may hold up to a phase
+of its own, and the certificate is replayed by `replayPhase`, which adds
+the windows' phases up (`CircuitEq/Certificate.lean`). It took no new step
+kind, only a second interpretation of `window`. The survey has not been
+rerun: its three phase-only pairs are random circuits with no alignment,
+so for them the statement is now available but the proof is still the
+whole-register decide of `≡ₚ` (`scripts/chunked_decide.py --phase`).
+
 ### 3. A diagonal two-qubit gate commuted through a control-only block
 
 `basic_optimization` rewrites `H t; CX c t` as `CZ c t; H t` and then
