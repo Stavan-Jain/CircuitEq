@@ -1,0 +1,82 @@
+{
+  "name": "peephole_8q_1000g_s1",
+  "kind": "optimize",
+  "qubits": 8,
+  "relation": "p",
+  "cost_order": [
+    "tCount",
+    "cxCount",
+    "gateCount"
+  ],
+  "original_cost": {
+    "tCount": 257,
+    "cxCount": 323,
+    "gateCount": 1000
+  },
+  "gates": {
+    "CX": 323,
+    "H": 150,
+    "S": 72,
+    "Sdg": 50,
+    "T": 172,
+    "Tdg": 85,
+    "X": 51,
+    "Y": 49,
+    "Z": 48
+  },
+  "split": "held-out",
+  "family": "peephole",
+  "rung": 1000,
+  "source": {
+    "generator": "scripts/peephole_pairs.py",
+    "seed": 1,
+    "rewrites": 182,
+    "tcount": [
+      257,
+      127
+    ],
+    "alphabet": [
+      "CX",
+      "H",
+      "S",
+      "Sdg",
+      "T",
+      "Tdg",
+      "X",
+      "Y",
+      "Z"
+    ],
+    "float_distance_on_a_random_state": 1.5888218580782548e-14,
+    "equivalence_task": "peephole_8q_1000g_s1"
+  },
+  "baselines": {
+    "scripts/peephole_pairs.py": {
+      "relation": "u",
+      "certified": "benchmarks/harness/results/20260919-171348-e58dbd",
+      "tCount": 127,
+      "cxCount": 301,
+      "gateCount": 752,
+      "note": "our peephole pass, the twin of the equivalence task peephole_8q_1000g_s1; an agent proved the pair equal in run 20260919-171348-e58dbd of the equivalence harness"
+    },
+    "pyzx teleport": {
+      "relation": "p",
+      "certified": false,
+      "tCount": 109,
+      "note": "PyZX phase teleportation (benchmarks/harness/notes/optimisers.py); equal to the original only up to a global phase, no proof"
+    },
+    "pyzx full_reduce": {
+      "relation": "p",
+      "certified": false,
+      "tCount": 101,
+      "note": "PyZX full_reduce + extraction (benchmarks/harness/notes/optimisers.py); equal to the original only up to a global phase, no proof"
+    }
+  },
+  "holdout": {
+    "modules": [],
+    "redact": [],
+    "delete": [
+      "scripts/peephole_pairs.py"
+    ]
+  },
+  "known_leaks": []
+}

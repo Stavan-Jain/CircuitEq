@@ -43,7 +43,7 @@ the structured encoders where the same pipeline shrinks circuits. And the
 kernel's `whnf` cache retains every intermediate row table for the whole
 declaration, so memory, not time, is the ceiling: a few thousand gates times
 a hundred rows on this machine. Chunked evaluation, one theorem per
-generator, is the lever (`QUEUE.md`, item 1). A fairer ladder for the
+generator, is the lever (`QUEUE.md`, item 3). A fairer ladder for the
 tableau uses structured Clifford families (GHZ and cat-state ladders,
 syndrome extraction) or inputs sparse enough not to be generic.
 

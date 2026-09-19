@@ -1,0 +1,74 @@
+{
+  "name": "tof_3",
+  "kind": "optimize",
+  "qubits": 5,
+  "relation": "p",
+  "cost_order": [
+    "tCount",
+    "cxCount",
+    "gateCount"
+  ],
+  "original_cost": {
+    "tCount": 21,
+    "cxCount": 18,
+    "gateCount": 45
+  },
+  "gates": {
+    "CX": 18,
+    "H": 6,
+    "T": 12,
+    "Tdg": 9
+  },
+  "split": "dev",
+  "family": "tof",
+  "rung": 3,
+  "source": {
+    "module": "CircuitEq/Benchmarks/Tof3.lean",
+    "pipeline": "pyzx teleport"
+  },
+  "baselines": {
+    "pyzx teleport": {
+      "tCount": 19,
+      "cxCount": 18,
+      "gateCount": 50,
+      "relation": "u",
+      "certified": "CircuitEq/Benchmarks/Tof3.lean",
+      "note": "the benchmark's `optimized`, proved equivalent in the repository"
+    },
+    "pyzx full_reduce": {
+      "relation": "u",
+      "certified": false,
+      "tCount": 15,
+      "gateCount": 51,
+      "note": "PyZX 0.9.0 full_reduce + extraction, from benchmarks/survey/results.json; numerically exact, no proof"
+    },
+    "tzap 0.6.1 -O2 --decompose-rz --decompose-cz": {
+      "relation": "u",
+      "certified": false,
+      "tCount": 15,
+      "gateCount": 38,
+      "note": "the twin of the equivalence task tof_3_tzap; numerically exact (numpy, full unitary), no proof"
+    }
+  },
+  "holdout": {
+    "modules": [
+      "CircuitEq.Benchmarks.Tof3",
+      "CircuitEq.Benchmarks.BarencoTof3"
+    ],
+    "redact": [
+      {
+        "file": "scripts/tcount_survey.py",
+        "pattern": "^    hand = \\[.*?^    al = ",
+        "replacement": "    hand = []  # held out\n    al = ",
+        "flags": "ms"
+      }
+    ],
+    "delete": []
+  },
+  "known_leaks": [
+    "the original is a promoted benchmark of this repository (CircuitEq/Benchmarks/Tof3.lean), whose PyZX twin (T-count 19) and its proof are in the repository and its history, so a model may have seen both; removed from the run copy: the module, README.md, benchmarks/, the window table of scripts/certificate.py, and the hand alignment in the self-test of scripts/tcount_survey.py",
+    "CircuitEq/PhasePoly.lean keeps three test theorems about sub-blocks of this circuit (`tof3_merge`, `tof3_controls`, `tof3_core`), which state the `T 0, T 0 = S 0` merge that is the whole of PyZX's T-count gain; not redacted, since that would rebuild the largest module of the library on every run",
+    "scripts/tcount_survey.py generates this original (`tof(3)`) and scripts/check_pyzx_benchmarks.py names the PyZX pipeline that was used on it; calling PyZX is allowed anyway",
+    "CircuitEq/Benchmarks/BarencoTof3.lean is held out as well: it is the same Toffoli decomposition through the same PyZX pipeline, with its optimised twin and the windows of its proof, which give this task's answer away"
+  ]
+}

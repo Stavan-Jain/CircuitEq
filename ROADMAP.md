@@ -145,6 +145,79 @@ construction, which makes it the more tractable product in the long run. The
 checker is built first because it is what lets the optimiser absorb external
 tools' results instead of competing with them.
 
+What the optimiser certifies is `c ≡ᵤ c'` (or `≡ₚ`) together with a cost
+computed in Lean, `tCount c' = k` (`QUEUE.md`, item 2). It does not certify
+optimality: nothing proves that no cheaper circuit exists. Quality is
+reported by comparison, the certified T-count against the uncertified
+T-count of TZAP and PyZX on the same input. The agent may call those tools,
+but it must certify whatever it ships.
+
+### What is strictly needed, and what the library adds
+
+Stated minimally, the checker's problem is: given Clifford+T circuits `c₁`
+and `c₂`, produce a Lean proof of `c₁ ≡ᵤ c₂` or `c₁ ≡ₚ c₂`, or of the
+negation. Three things are strictly needed for that, and they are the
+trusted part.
+
+- A semantics for the gate set: `Gate1.mat`, `applyOne`, `applyCNOT`,
+  `denote`.
+- The definition of the relation: `≡ᵤ`, `≡ₚ`.
+- A rule for what counts as a proof: the statement as given, checked by the
+  kernel, on `[propext, Classical.choice, Quot.sound]`, with no
+  `native_decide` and no `sorry`. The agent harness enforces this
+  mechanically (`QUEUE.md`, item 1), because an agent under a time limit
+  reaches for exactly those shortcuts.
+
+Everything else in the library is optional in principle. An agent is free
+to prove the statement however it likes, new lemmas and new checkers
+included, and anything the kernel accepts counts. The library exists for
+two independent reasons.
+
+- **Finding proofs.** Today's agents do not develop a tableau or a
+  phase-polynomial normal form inside one proof attempt. Lemmas that split
+  and recombine circuits (`Equivalent.append`, `Equivalent.in_context`,
+  `rename_equivalent_iff`), checked rewrites (`Instr.CanCommute`,
+  `Instr.CanCancel`, fusion) and certified fragment checkers are the
+  vocabulary that makes the search tractable. That this vocabulary lets
+  agents prove larger and deeper pairs is a hypothesis, and it is measured
+  rather than assumed: the harness runs one prompt under one set of limits
+  against the library as it grows, and against the trusted modules alone.
+- **Checking proofs.** This reason does not go away with a better agent.
+  The kernel cannot finish a seven-qubit basis check in 6 GB, and a proof
+  term assembled gate by gate is quadratic, so any agent, however capable,
+  has to route a large concrete proof through reflection: a computable
+  structure, a soundness theorem, one kernel evaluation. The library
+  amortises what every agent would otherwise rebuild. This is why, for
+  concrete circuits, the supported path is a certificate, data replayed by
+  `replay_sound`, and the agent's freedom is spent on finding the structure
+  (the alignment, the cut points, the template instance). Free-form Lean is
+  for parametric theorems and for the `calc` that composes around a
+  certificate.
+
+Where the infrastructure stands against that problem statement
+(18 September 2026), so that nobody over-reads it:
+
+- **Three relations exist, not two.** The tableau certifies `≡ₛ`, equality
+  up to a unit of `Zeta8`. `Zeta8` is a field, so that is any nonzero
+  scalar, and it is weaker than `≡ₚ` until the scalar of a Clifford pair is
+  proved to be a power of `ω` (open, Rung 4). Certificates and
+  `circuit_windows` state only `≡ᵤ`, so a pair equal only up to a global
+  phase is reachable today only by a whole-register decide. The scalar
+  replay (`QUEUE.md`, item 13) is the fix.
+- **The fragments are narrower than their names.** The phase-polynomial
+  checker covers `CX` with `Z, S, S†, T, T†`: `H` ends the fragment, and
+  for now so do `X` and `Y` (`QUEUE.md`, item 8). On that fragment it is
+  sound and complete, so it also refutes. The tableau covers `CX` with the
+  single-qubit Cliffords and is sound; its completeness is open, so a
+  differing tableau is a witness and not yet a kernel-checked refutation.
+- **The target is optimiser output, not arbitrary pairs**, for the reasons
+  under "What 'structure' means for compiled circuits", and the measure is
+  S against QCEC, PyZX and Feynman, with gate-deleted mutants refuted
+  alongside. A benchmark "of increasing complexity" therefore means
+  optimiser pairs of increasing size and structural distance (reordering,
+  then phase teleportation and TZAP, then `full_reduce` and Qiskit at
+  level 3), not random pairs.
+
 ### The architecture both share
 
 1. **A trusted core.** `denote` over state vectors and the definition of
@@ -175,7 +248,8 @@ tools' results instead of competing with them.
    Large concrete circuits enter as compact data the kernel decodes. Routing
    is a wire relabelling; ancilla subspaces are a side condition on
    congruence. Cost functions (T-count, depth, gate count) are computed in
-   Lean, so "this circuit has T-count 19" is a checked claim.
+   Lean, so "this circuit has T-count 19" is a checked claim (none exists
+   yet: `QUEUE.md`, item 2).
 6. **The agent.** External tools (TZAP, PyZX, Feynman, quizx, Qiskit) are
    untrusted oracles it uses to see where the structure is. It never sees a
    million gates; it works at the level of blocks and delegates below that
@@ -203,7 +277,7 @@ rotations, edits angles and cancels `XX`/`HH` pairs), so a TZAP pair is
 alignable by construction. The optimiser's oracle-guided mode is therefore
 concrete: run TZAP in milliseconds, certify in the kernel with the
 phase-polynomial checker extended by Hadamard variables (`QUEUE.md`,
-item 2), and never rely on the `2⁻¹²⁸`. The Feynman and Cobble suites it
+item 4), and never rely on the `2⁻¹²⁸`. The Feynman and Cobble suites it
 is evaluated on are the T-heavy benchmark family Rung 3 asks for.
 
 **Parametric proofs are not displaced.** A theorem for all `n` is an
@@ -226,9 +300,10 @@ goals with one `replay_sound`. Two fragment checkers are behind it, the
 phase polynomial (`PhasePoly.lean`, `≡ᵤ`) and the Clifford tableau
 (`Tableau.lean`, `≡ₛ`), the basis evaluator runs on the gcd-free ring
 (`Dyadic.lean`), and a Python mirror of the language exists. What is
-missing is in `QUEUE.md`: the scalar variant of replay so tableau windows
-and residuals compose, Hadamard variables in the phase polynomial, and the
-template step for registered parametric lemmas.
+missing is in `QUEUE.md`: the agent harness, without which the bet on the
+agent is unmeasured, cost functions in Lean, the scalar variant of replay
+so tableau windows and residuals compose, Hadamard variables in the phase
+polynomial, and the template step for registered parametric lemmas.
 
 ## The ladder
 
@@ -332,7 +407,7 @@ CNOT-plus-diagonal segments around a single interior Hadamard, each an
 equivalence on its own, so with the phase-polynomial checker as the leaf and
 windows cut at common Hadamard layers, the structured teleportation pairs
 become proofs with no basis decide wider than one wire (`QUEUE.md`,
-item 5). The residual pattern is still what `full_reduce` output needs.
+item 7). The residual pattern is still what `full_reduce` output needs.
 
 **Goal.** The direct route to S on real compiled circuits, and the empirical
 test of the working hypothesis above. Everything here is stated with `≡ᵤ` and
@@ -475,6 +550,13 @@ carry-chain invariants: the first place an agent must do mathematics rather
 than evaluation.
 
 ### Rung 7 — Agent milestone A: reproduce, then extend
+
+**Status (18 September 2026).** Not started, and until now every alignment
+was found by a person or by the survey's diff script. A first version of
+the harness is pulled forward to the top of `QUEUE.md` (item 1), so that the
+agent is measured while the library grows rather than after Rung 6. The
+acceptance below is unchanged; the early runs are the baseline it is read
+against.
 
 **Goal.** Establish that an agent can drive the library, on both proof shapes.
 

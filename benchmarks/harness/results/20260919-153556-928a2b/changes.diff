@@ -1,0 +1,21 @@
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-153556-928a2b/meta/snapshot/Solution.lean ~/.circuiteq-harness/runs/20260919-153556-928a2b/ws/Solution.lean
+--- ~/.circuiteq-harness/runs/20260919-153556-928a2b/meta/snapshot/Solution.lean	2026-09-19 11:35:56
++++ ~/.circuiteq-harness/runs/20260919-153556-928a2b/ws/Solution.lean	2026-09-19 11:48:35
+@@ -1,15 +1,6 @@
+ import CircuitEq
+ import Harness.Task
+ 
+-/-! # Solution
+-
+-Prove exactly one of the two theorems below. Then run `./submit equiv` or
+-`./submit not_equiv`.
+-
+-Lemmas may go in this file, and new modules under `Solution/` (import them
+-here). No other existing file may be edited.
+--/
+-
+ namespace Quantum.Circuit.Harness
+ 
+ open Instr
+Binary files ~/.circuiteq-harness/runs/20260919-153556-928a2b/meta/snapshot/scripts/__pycache__/check_pyzx_benchmarks.cpython-314.pyc and ~/.circuiteq-harness/runs/20260919-153556-928a2b/ws/scripts/__pycache__/check_pyzx_benchmarks.cpython-314.pyc differ
+Binary files ~/.circuiteq-harness/runs/20260919-153556-928a2b/meta/snapshot/scripts/__pycache__/tcount_survey.cpython-314.pyc and ~/.circuiteq-harness/runs/20260919-153556-928a2b/ws/scripts/__pycache__/tcount_survey.cpython-314.pyc differ

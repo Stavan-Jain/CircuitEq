@@ -1,0 +1,34 @@
+{
+  "name": "steane_plus",
+  "qubits": 7,
+  "relation": "u",
+  "expected": "equiv",
+  "split": "dev",
+  "family": "steane",
+  "rung": 7,
+  "source": {
+    "module": "CircuitEq/Benchmarks/SteanePlus.lean",
+    "pipeline": "pyzx full_reduce"
+  },
+  "holdout": {
+    "modules": [
+      "CircuitEq.Benchmarks.SteanePlus"
+    ],
+    "redact": [
+      {
+        "file": "CircuitEq/Tableau.lean",
+        "pattern": "^/-- The three-qubit phase-flip repetition encoder of\\n.*?(?=^end Tableau\\.Tests)",
+        "replacement": "",
+        "flags": "ms"
+      }
+    ]
+  },
+  "known_leaks": [
+    "the pair is a promoted benchmark of this repository, so a model may have seen its proof; removed from the run copy: its module, README.md, benchmarks/, and the window table of scripts/certificate.py",
+    "CircuitEq/Tableau.lean proves a copy of the pair up to a scalar (redacted in the run copy, at the price of rebuilding that module during setup)"
+  ],
+  "gates": [
+    19,
+    13
+  ]
+}

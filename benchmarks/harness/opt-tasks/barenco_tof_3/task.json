@@ -1,0 +1,73 @@
+{
+  "name": "barenco_tof_3",
+  "kind": "optimize",
+  "qubits": 5,
+  "relation": "p",
+  "cost_order": [
+    "tCount",
+    "cxCount",
+    "gateCount"
+  ],
+  "original_cost": {
+    "tCount": 28,
+    "cxCount": 24,
+    "gateCount": 60
+  },
+  "gates": {
+    "CX": 24,
+    "H": 8,
+    "T": 16,
+    "Tdg": 12
+  },
+  "split": "dev",
+  "family": "barenco_tof",
+  "rung": 3,
+  "source": {
+    "module": "CircuitEq/Benchmarks/BarencoTof3.lean",
+    "pipeline": "pyzx teleport"
+  },
+  "baselines": {
+    "pyzx teleport": {
+      "tCount": 24,
+      "cxCount": 24,
+      "gateCount": 62,
+      "relation": "u",
+      "certified": "CircuitEq/Benchmarks/BarencoTof3.lean",
+      "note": "the benchmark's `optimized`, proved equivalent in the repository"
+    },
+    "pyzx full_reduce": {
+      "relation": "u",
+      "certified": false,
+      "tCount": 16,
+      "gateCount": 75,
+      "note": "PyZX 0.9.0 full_reduce + extraction, from benchmarks/survey/results.json; numerically exact, no proof"
+    },
+    "tzap 0.6.1 -Osuper --decompose-rz --decompose-cz": {
+      "relation": "u",
+      "certified": false,
+      "tCount": 16,
+      "gateCount": 42,
+      "note": "the twin of the equivalence task barenco_tof_3_tzap; numerically exact (numpy, full unitary), no proof"
+    }
+  },
+  "holdout": {
+    "modules": [
+      "CircuitEq.Benchmarks.BarencoTof3",
+      "CircuitEq.Benchmarks.Tof3"
+    ],
+    "redact": [
+      {
+        "file": "scripts/tcount_survey.py",
+        "pattern": "^    hand = \\[.*?^    al = ",
+        "replacement": "    hand = []  # held out\n    al = ",
+        "flags": "ms"
+      }
+    ],
+    "delete": []
+  },
+  "known_leaks": [
+    "the original is a promoted benchmark of this repository (CircuitEq/Benchmarks/BarencoTof3.lean), whose PyZX twin (T-count 24) and its proof are in the repository and its history, so a model may have seen both; removed from the run copy: the module, README.md, benchmarks/, the window table of scripts/certificate.py, and the hand alignment of `tof_3` in the self-test of scripts/tcount_survey.py",
+    "scripts/tcount_survey.py generates this original (`barenco_tof(3)`) and scripts/check_pyzx_benchmarks.py names the PyZX pipeline that was used on it; calling PyZX is allowed anyway",
+    "CircuitEq/Benchmarks/Tof3.lean is held out as well: it is the same Toffoli decomposition through the same PyZX pipeline, with its optimised twin and the windows of its proof, which give this task's answer away"
+  ]
+}

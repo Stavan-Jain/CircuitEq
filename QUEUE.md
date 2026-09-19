@@ -10,13 +10,81 @@ are optimising for"); the rules for new modules are in the docstrings of
 
 Sizes: S is a session, M a few sessions, L a milestone.
 
-## In flight (16 September 2026)
+## In flight (19 September 2026)
 
-Nothing. All five parallel branches are merged (see "Done").
+Item 1, the agent harness: a draft is in `scripts/agent_harness.py` and
+`benchmarks/harness/` with eight development tasks and one held-out pair
+of 1000 gates, the prompt, the playbook (`PLAYBOOK.md`) and a judge by
+restatement, axioms and kernel replay. Three runs so far, the third
+proved (`benchmarks/harness/README.md`). Open before it is "done": the held-out ladder with a QASM
+importer, the baselines, repeated runs with a summary table, and the
+record of which declarations a proof uses (`benchmarks/harness/README.md`,
+"Not built yet").
 
 ## Next
 
-1. **Replay memory.** `cuccaro_4`'s certificate (155 gates, 8 windows)
+1. **Agent harness v0.** The project's bet is that this infrastructure
+   lets an agent prove pairs it otherwise could not, and nothing measures
+   it: every alignment so far was found by a person or by the diff script
+   in `scripts/tcount_survey.py`. Build the instrument now, so that each
+   later item is judged by what it moves, and rerun it as the library
+   grows. `scripts/agent_harness.py` takes a task and an agent command
+   (Claude Code headless first) and: copies the repository at a pinned
+   commit into a scratch directory, without `.git`; holds the answer out
+   (deletes the pair's module under `CircuitEq/Benchmarks/`, its import
+   and its `benchmarks/<name>/README.md`; `Tableau.lean` also embeds the
+   `rep3` and Steane pairs with proofs, so those two are development
+   tasks at best, and a test task is a pair that appears nowhere in the
+   repository); writes a statement file with the two
+   circuit `def`s and `theorem … : original ≡ᵤ optimized := by sorry`
+   (the relation is per task: `≡ᵤ`, `≡ₚ`, `≡ₛ`, or a negation for a
+   mutant); gives the agent one checked-in prompt
+   (`benchmarks/harness/PROMPT.md`), the lean-lsp tools and the benchmark
+   protocol's limits (one hour, 16 GB); then judges. The agent may write
+   any Lean it likes, new lemmas, checkers and step kinds included. The
+   judge for v0 is a person reading the diff: no existing file changed
+   (the modules up to `Semantics.lean`, the circuit `def`s and the
+   statement above all), `lake build` passes and `#print axioms` shows
+   the standard three. The axiom check alone is not enough: on this
+   toolchain `set_option debug.skipKernelTC true` lets a false
+   `decide +kernel` through with a clean axiom report, so the review also
+   looks for `debug.` options until the CI guard against them lands. An
+   automated judge that replays the solution through the kernel is
+   deferred (see "Later"). Record outcome (proved, refuted, no
+   certificate), wall time, kernel time, tokens, and which library
+   declarations the proof uses (the roadmap's flywheel record).
+   Tasks v0, ordered by gates times width: the five promoted pairs, the
+   survey's eleven circuits under both pipelines, and one gate-deleted
+   mutant of each. Two configurations, the full library and the modules
+   up to `Semantics.lean` alone, since their difference is the
+   hypothesis. An optimiser track follows item 2: the input is one
+   circuit, the answer is `c'` with a proof of `c ≡ᵤ c'` and
+   `tCount c' = k`, and `k` is reported against the uncertified T-counts
+   of PyZX and TZAP, which the agent may call. Acceptance: the v0 table
+   is checked in under `benchmarks/harness/` with a written failure mode
+   for every miss; a run is reproducible from commit, prompt and task;
+   submissions that use `native_decide`, `sorry`, `debug.skipKernelTC` or
+   an edited statement are rejected. S to M. Depends on nothing; the
+   optimiser track on item 2.
+
+2. **Cost functions in Lean.** The roadmap's architecture says costs are
+   computed in Lean so that "this circuit has T-count 19" is a checked
+   claim; nothing exists yet, and the optimiser cannot state its result
+   without it. A module `CircuitEq/Cost.lean` importing only `Semantics`
+   (and imported by the umbrella): `tCount` (`T` and `Tdg`), `cxCount`,
+   `gateCount : Circuit n → ℕ`, with `tCount_append` there and
+   `tCount_rename` beside `rename` in `Embedding.lean` (and the same for
+   the others), so that costs compose under `in_context`, windows and
+   `rename`; depth, by per-wire time stamps, only when a benchmark needs
+   it. The optimiser's statement shape is `c ≡ᵤ c' ∧ tCount c' = k`, the
+   second half pure `Nat` evaluation. Acceptance: the T-counts the README
+   quotes for `tof_3` (21 to 19) and `barenco_tof_3` (28 to 24) are
+   theorems beside the equivalence in their benchmark modules (extend the
+   convention in `CLAUDE.md`, which today allows only the two `def`s and
+   the equivalence), and `scripts/check_pyzx_benchmarks.py` cross-checks
+   them against PyZX's own count. S. Depends on nothing.
+
+3. **Replay memory.** `cuccaro_4`'s certificate (155 gates, 8 windows)
    is killed at 4.6 GB while the same windows pass on `cuccaro_3`, and a
    128-gate move-only replay peaks at 1.9 GB: the kernel's `whnf` cache
    retains every intermediate instruction list for the whole declaration.
@@ -30,11 +98,11 @@ Nothing. All five parallel branches are merged (see "Done").
    5.2 GB to 3.1 GB); chunked replay and chunked evaluation (one theorem
    per segment, per basis vector or per tableau generator, composed by
    `Equivalent.trans`, `equivalent_iff_basis` or a per-generator
-   `tableau_sound`); cursor-based steps (item 4). Acceptance: `cuccaro_4`
+   `tableau_sound`); cursor-based steps (item 6). Acceptance: `cuccaro_4`
    / teleport checks under 2 GB, the seven-qubit decide finishes, and the
    40- and 80-qubit tableau rungs certify. M. Depends on nothing.
 
-2. **Phase polynomials with Hadamard variables (path-sum form).** Extend
+4. **Phase polynomials with Hadamard variables (path-sum form).** Extend
    `PhasePoly` so that an `H` on a wire introduces a fresh variable (bit
    `n + j` of the masks) instead of ending the fragment: the linear part
    ranges over initial and Hadamard variables, the phase polynomial too,
@@ -50,7 +118,7 @@ Nothing. All five parallel branches are merged (see "Done").
    few thousand gates certified in minutes of kernel time. M. Depends on
    nothing.
 
-3. **TZAP as a pipeline.** Build `tzap` from
+5. **TZAP as a pipeline.** Build `tzap` from
    https://github.com/qqq-wisc/tzap, add a `tzap` pipeline to
    `scripts/check_pyzx_benchmarks.py` and the survey script, and add pairs
    from the Feynman suite (`gf2^k_mult`, `mod_adder`, `barenco_tof`,
@@ -59,17 +127,17 @@ Nothing. All five parallel branches are merged (see "Done").
    pairs), so its pairs are alignable by construction. Acceptance: the
    fixture script reproduces TZAP output byte for byte and the Lean lists
    match. S for the script; certification beyond `H`-free regions depends
-   on item 2.
+   on item 4.
 
-4. **Linear certificates.** Make traces cursor-based (a position carried
+6. **Linear certificates.** Make traces cursor-based (a position carried
    along, not re-indexed into a `List` per step) so replay is linear in
    trace plus circuit length; add a `template` step kind that applies a
    registered lemma proved for all `n` at a concrete `n`; add the Python
    mirror `scripts/certificate.py` if the in-flight branch did not.
    Acceptance: kernel time on `Tof3.lean` alignment linear in gates;
-   `layer_cnotNetwork_hLayer` usable as a step. M. Depends on item 1.
+   `layer_cnotNetwork_hLayer` usable as a step. M. Depends on item 3.
 
-5. **Survey v1: cut at Hadamards.** Replace diff-sized windows with the
+7. **Survey v1: cut at Hadamards.** Replace diff-sized windows with the
    largest contiguous `H`-free regions (pulled together by commutations)
    checked by the phase-polynomial checker, keep the basis decide for the
    residue near Hadamards, add the `tzap` pipeline, rerun, and record
@@ -80,9 +148,9 @@ Nothing. All five parallel branches are merged (see "Done").
    proofs with no basis decide wider than one wire, and the recurring
    library gap (`[CX 4 3, CZ 3 4] ≡ᵤ [Sdg 3, CX 4 3, S 4, S 3]`, a `CZ`
    through a control-only block) is a phase-polynomial identity. S.
-   Depends on item 3 for `tzap`; nothing else.
+   Depends on item 5 for `tzap`; nothing else.
 
-6. **Phase-polynomial follow-ups.** The affine `X` extension (a constant
+8. **Phase-polynomial follow-ups.** The affine `X` extension (a constant
    bit per row); `ofNF` resynthesis with `nf (ofNF x) = some x`, which
    turns any untrusted synthesis heuristic into a certified T-count
    optimiser for the fragment (completeness has landed, so the form is a
@@ -94,50 +162,57 @@ Nothing. All five parallel branches are merged (see "Done").
    registers matter. M. Depends on nothing; resynthesis is the first
    optimiser deliverable.
 
-7. **The 19-origin Clifford run.** Every QECUnitaryCircuits origin against
+9. **The 19-origin Clifford run.** Every QECUnitaryCircuits origin against
    its PyZX `full_reduce` twin by the tableau checker (`≡ₛ`), the
    gate-deleted mutants refuted with a Pauli witness, and the table
    published with kernel times: this is Rung 1's acceptance test for that
    family and Rung 4's first evidence. S to M. Depends on the tableau
    branch.
 
-8. **Residual pattern.** Cut points where one circuit's prefix times the
-   inverse of the other's is a Clifford (tableau) or a diagonal (phase
-   polynomial), proved preserved step by step, as a certificate step kind.
-   First target: `tof_3` against `full_reduce` (T-count 15), which has no
-   window alignment. L. Depends on the tableau branch and item 2.
+10. **Residual pattern.** Cut points where one circuit's prefix times the
+    inverse of the other's is a Clifford (tableau) or a diagonal (phase
+    polynomial), proved preserved step by step, as a certificate step
+    kind. First target: `tof_3` against `full_reduce` (T-count 15), which
+    has no window alignment. L. Depends on the tableau branch and item 4.
 
-9. **Refutation certificates.** Step kinds that prove `¬ (a ≡ᵤ b)`: a
-   basis vector on which the evaluators differ, a Pauli whose images under
-   the two tableaux differ. `phasePolyRefutes` already does this for the
-   CNOT-plus-diagonal fragment by completeness (`PhasePoly.refutes_sound`);
-   the step kinds make it composable. Needed for mutants and for the
-   survey's negative results. S. Depends on item 1.
+11. **Refutation certificates.** Step kinds that prove `¬ (a ≡ᵤ b)`: a
+    basis vector on which the evaluators differ, a Pauli whose images
+    under the two tableaux differ. `phasePolyRefutes` already does this
+    for the CNOT-plus-diagonal fragment by completeness
+    (`PhasePoly.refutes_sound`); the step kinds make it composable. Needed
+    for mutants and for the survey's negative results. S. Depends on
+    item 3.
 
-10. **Rung 2 conformance.** A Qiskit statevector check of
+12. **Rung 2 conformance.** A Qiskit statevector check of
     `lean_instructions` on the benchmark files and a few hundred random
     circuits (the `rz` global-phase trap), run in CI. S. Depends on
     nothing.
 
-11. **The scalar replay.** A `ScalarCheckerTable`, a window step whose
+13. **The scalar replay.** A `ScalarCheckerTable`, a window step whose
     soundness uses `EquivalentUpToScalar.append` and a rename lemma for
     `≡ₛ`, and `replayₛ_sound : … → c ≡ₛ c'`, so that `tableauChecker` can
     justify windows and, later, residuals, and so that pairs equal only up
     to a global phase (three of the survey's random pairs) can be stated
     at all by the window pattern. S to M. Depends on nothing.
 
-12. **A block-theorem step.** A step kind that applies a registered lemma
+14. **A block-theorem step.** A step kind that applies a registered lemma
     such as `layer_cnotNetwork_hLayer` at a position, so the Steane proof
     and the Python mirror no longer need a `calc` around the certificate;
-    this is the first form of the template step of item 4. S. Depends on
+    this is the first form of the template step of item 6. S. Depends on
     nothing.
 
-13. *(done, folded into item 1)* The seven-qubit decide was measured on
+15. *(done, folded into item 3)* The seven-qubit decide was measured on
     an idle machine: killed by a 6 GB watchdog after 20 s at 6.9 GB and
     growing, so memory is the limit and chunked evaluation is the lever.
 
 ## Later
 
+- A stronger judge for the agent harness. It now restates the theorem in a
+  file it owns, checks the axioms and replays the solution through the
+  kernel with the toolchain's `leanchecker`. Left: judging in a pristine
+  checkout that receives only the agent's new files, isolation of the
+  agent (it has a shell under the user's account), and an independent
+  checker (SafeVerify, or `leanprover/comparator` on the Linux CI).
 - Hierarchical circuits (named blocks, congruence) and compact encodings
   decoded by the kernel, before any circuit above a few thousand gates.
 - The wire-index decision (`Fin n` versus `ℕ` with well-formedness) before

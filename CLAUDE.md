@@ -104,12 +104,12 @@ Rules that follow, for anyone adding to the library:
   Cost is linear in the gate count and never `2 ^ n`: the scale test's
   random CNOT+T pairs on 20, 40 and 80 wires (200, 400, 800 gates) certify
   in about 0.3, 1 and 4 s of kernel time at 2.0, 2.2 and 3.1 GB; the
-  remaining cost is the phase gates on dense parities (`QUEUE.md` item 6).
+  remaining cost is the phase gates on dense parities (`QUEUE.md` item 8).
   A proof is `(phasePolyChecker n).sound _ _ (by decide +kernel)`, a
   refutation `phasePolyRefutes_sound (by decide +kernel)`; bare `decide`
   times out at about a hundred gates. The extension with Hadamard
   variables that certifies TZAP output across `H` gates is `QUEUE.md`
-  item 2.
+  item 4.
 - `CircuitEq/Tableau.lean` — the Clifford tableau checker: `Pauli` strings
   (x-mask, z-mask, phase in `Fin 4`, denoting `i^p · Z^z · X^x`), the
   gate update rules with pointwise soundness (`conjH_sound`, …,
@@ -175,6 +175,19 @@ Rules that follow, for anyone adding to the library:
   `rz(k·π/4)` to the diagonal Clifford+T gate with that matrix. A `tzap`
   pipeline (https://github.com/qqq-wisc/tzap) is queued; TZAP reads and
   writes the same `rz` convention as PyZX.
+- `PLAYBOOK.md` — the prover's guide: what exists, what it costs, and in
+  which order to try it on a concrete pair. The agent harness installs it
+  as the `CLAUDE.md` of every run, so it is all an agent under test knows
+  about the library. **When a checker, a tactic, a certificate step or a
+  block theorem lands, update its decision list in the same commit**, and
+  the commit named at its top.
+- `scripts/agent_harness.py`, `benchmarks/harness/` — the agent harness for
+  the equivalence-checking task (`benchmarks/harness/README.md`): one fixed
+  prompt (`PROMPT.md`), tasks as circuit pairs, a warm clone of a library
+  commit with the answer held out, a budget, a memory watchdog, and a judge
+  that restates the claim and checks its axioms. It refuses to run lake
+  where mathlib is not already compiled. Changing the prompt, the judge or
+  the agent configuration changes the instrument: bump `HARNESS_VERSION`.
 - `scripts/AxiomCheck.lean` — CI axiom policy; not in any `lean_lib`.
 
 Namespaces: `Quantum.Zeta8` for the field, `Quantum.Circuit` for everything
@@ -298,7 +311,7 @@ idle machine (16 September 2026): a 6 GB watchdog killed the kernel after
 arithmetic, is the wall; chunked evaluation (one lemma per basis vector or
 per gate block, composed by `equivalent_iff_basis` or `Equivalent.trans`)
 is the lever, and the same retention limits certificate replay
-(`QUEUE.md`, item 1).
+(`QUEUE.md`, item 3).
 
 Two intermediate designs were measured on the way: the same dyadic
 arithmetic through the materialised list evaluator (`evalListD`, kept as

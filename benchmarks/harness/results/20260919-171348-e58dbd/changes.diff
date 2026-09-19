@@ -1,0 +1,814 @@
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg0.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg0.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg0.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg0.lean	2026-09-19 13:24:25
+@@ -0,0 +1,19 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a0 : Circuit 8 :=
++  [CX 1 2, CX 7 3]
++
++def b0 : Circuit 8 :=
++  [CX 1 2, CX 7 3]
++
++theorem s0 : a0 ≡ᵤ b0 := by
++  circuit_simp
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg1.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg1.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg1.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg1.lean	2026-09-19 13:24:25
+@@ -0,0 +1,47 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a1 : Circuit 8 :=
++  [Tdg 3, CX 0 6, H 0, S 4, S 3, Tdg 1, X 0, CX 0 3, S 6, S 3, Sdg 7, T 5,
++    CX 3 6, T 4, X 6, Z 1, CX 4 0, S 6, T 3, H 7, Z 6, Tdg 0, T 6, H 2, H 5,
++    CX 1 6, CX 6 2, T 0, T 4, S 6, Tdg 2, T 0, Sdg 3, H 5, Y 5, T 4, Tdg 0, H 2,
++    T 3, H 0, T 5, T 3, X 6, T 5, H 0, T 5, T 0, Sdg 2, T 2, Z 4, CX 1 0, Z 7,
++    CX 4 1, CX 2 7, CX 2 1, CX 2 5, CX 4 3, S 7, T 0, H 5, H 3, CX 4 5, T 3,
++    Y 6, Sdg 0, CX 6 1, CX 2 3, S 6, T 3, Y 7, CX 0 3, Tdg 5, Tdg 6, CX 4 1,
++    Y 0, H 1, H 4, S 6, T 2, CX 0 4, Sdg 7, CX 0 3, CX 1 7, T 6]
++
++def b1 : Circuit 8 :=
++  [CX 0 6, H 0, T 3, Tdg 1, X 0, CX 0 3, S 6, Sdg 7, T 5, CX 3 6, X 6, Z 1,
++    CX 4 0, H 7, Tdg 6, H 2, CX 1 6, CX 6 2, S 6, Tdg 2, Y 5, T 4, H 2, S 3,
++    T 3, X 6, S 5, T 5, T 0, CX 1 0, Z 7, CX 2 7, CX 2 1, CX 2 5, CX 4 3, S 7,
++    H 5, H 3, CX 4 5, T 3, Y 6, Tdg 0, CX 6 1, CX 2 3, T 3, Y 7, CX 0 3, Tdg 5,
++    Y 0, H 1, H 4, CX 0 4, Sdg 7, CX 0 3, CX 1 7, Z 6]
++
++theorem s1 : a1 ≡ᵤ b1 := by
++  circuit_windows
++    [([Tdg 3, S 3],
++        [T 3]),
++      ([S 4, T 4, Sdg 3, T 4, T 3, T 3, Z 4],
++        []),
++      ([H 5, H 5],
++        []),
++      ([S 6, Z 6, T 6],
++        [Tdg 6]),
++      ([T 5, T 5],
++        [S 5]),
++      ([Sdg 2, T 2, T 2],
++        []),
++      ([Tdg 0, T 0, Tdg 0, H 0, H 0, T 0, CX 1 0, CX 2 1, T 0, Sdg 0],
++        [CX 1 0, CX 2 1, Tdg 0]),
++      ([CX 4 1, CX 4 1],
++        []),
++      ([S 6, Tdg 6, S 6, T 6],
++        [Z 6])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg10.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg10.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg10.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg10.lean	2026-09-19 13:24:25
+@@ -0,0 +1,21 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a10 : Circuit 8 :=
++  [X 2, CX 6 3, CX 0 5, CX 2 3, Sdg 4, X 2, Y 1, X 0, T 3, T 6, Y 3, Y 2,
++    Tdg 5]
++
++def b10 : Circuit 8 :=
++  [X 2, CX 6 3, CX 0 5, CX 2 3, Sdg 4, X 2, Y 1, X 0, T 3, T 6, Y 3, Y 2,
++    Tdg 5]
++
++theorem s10 : a10 ≡ᵤ b10 := by
++  circuit_simp
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg11.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg11.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg11.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg11.lean	2026-09-19 13:24:25
+@@ -0,0 +1,55 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a11 : Circuit 8 :=
++  [Tdg 1, Sdg 2, CX 0 4, CX 3 6, CX 3 5, T 1, CX 7 0, T 0, H 1, Tdg 7, CX 3 6,
++    CX 4 3, CX 6 1, Tdg 5, Sdg 7, Y 6, T 6, S 3, T 4, H 2, CX 4 6, CX 1 5, H 2,
++    CX 4 2, H 7, CX 2 7, CX 1 6, T 3, T 3, T 7, H 3, CX 1 7, Sdg 0, CX 6 3, H 2,
++    Tdg 2, Tdg 1, X 6, CX 3 5, S 6, H 2, CX 2 7, T 4, CX 4 1, S 0, CX 1 4, H 7,
++    CX 0 7, Z 5, CX 2 5, Z 1, Z 3, S 6, CX 3 6, X 2, Sdg 4, S 1, Sdg 6, Tdg 3,
++    CX 2 5, Tdg 3, Z 4, Sdg 6, H 7, CX 2 1, T 7, S 7, CX 5 1, CX 0 6, H 7,
++    CX 2 4, T 6, T 3, CX 1 2, X 7, CX 2 1, Z 4, T 1, Y 6, CX 6 7, T 4, H 5, T 0,
++    T 7, CX 4 7, S 2, Tdg 4, CX 5 3, H 0, T 1, CX 0 7, X 5, X 0, Tdg 1, T 1,
++    Z 7, H 0, X 5]
++
++def b11 : Circuit 8 :=
++  [Sdg 2, CX 0 4, CX 3 5, CX 7 0, H 1, Tdg 7, CX 4 3, CX 6 1, Tdg 5, Sdg 7,
++    Y 6, T 6, CX 4 6, CX 1 5, CX 4 2, H 7, CX 2 7, CX 1 6, Z 3, T 7, H 3,
++    CX 1 7, CX 6 3, H 2, Tdg 2, Tdg 1, X 6, CX 3 5, H 2, CX 2 7, S 4, CX 4 1,
++    CX 1 4, H 7, CX 0 7, Z 5, CX 2 5, Z 3, Z 6, CX 3 6, X 2, Sdg 1, CX 2 5, S 4,
++    Z 6, H 7, CX 2 1, T 7, S 7, CX 5 1, CX 0 6, H 7, CX 2 4, T 6, Tdg 3, CX 1 2,
++    X 7, CX 2 1, Z 4, Y 6, CX 6 7, H 5, S 0, T 7, CX 4 7, S 2, CX 5 3, H 0,
++    CX 0 7, X 0, S 1, Z 7, H 0]
++
++theorem s11 : a11 ≡ᵤ b11 := by
++  circuit_windows
++    [([CX 3 6, CX 3 6, H 2, H 2],
++        []),
++      ([T 4, T 4],
++        [S 4]),
++      ([Tdg 1, T 1, T 0, Sdg 0, S 0, T 0],
++        [S 0]),
++      ([S 3, T 3, T 3],
++        [Z 3]),
++      ([S 6, S 6],
++        [Z 6]),
++      ([Z 1, S 1],
++        [Sdg 1]),
++      ([Sdg 4, Z 4],
++        [S 4]),
++      ([Sdg 6, Tdg 3, Sdg 6, T 3],
++        [Z 6]),
++      ([T 4, Tdg 4],
++        []),
++      ([T 1, T 1, Tdg 1, T 1],
++        [S 1]),
++      ([X 5, X 5],
++        [])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg12.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg12.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg12.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg12.lean	2026-09-19 13:24:25
+@@ -0,0 +1,29 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a12 : Circuit 8 :=
++  [H 2, X 2, Tdg 6, H 6, Z 5, Z 5, CX 1 6, Tdg 4, S 6, T 1, CX 2 7, H 2,
++    CX 4 1, CX 4 5, T 4, Sdg 3, Z 1, T 5, X 2, CX 5 6, S 0, Y 6, S 0, S 6,
++    CX 3 1, CX 2 4, T 4, T 0, H 7, H 5, CX 0 7, Y 0]
++
++def b12 : Circuit 8 :=
++  [H 2, X 2, Tdg 6, H 6, CX 1 6, S 6, T 1, CX 2 7, H 2, CX 4 1, CX 4 5, Sdg 3,
++    Z 1, T 5, X 2, CX 5 6, Y 6, Z 0, S 6, CX 3 1, CX 2 4, T 4, T 0, H 7, H 5,
++    CX 0 7, Y 0]
++
++theorem s12 : a12 ≡ᵤ b12 := by
++  circuit_windows
++    [([Z 5, Z 5],
++        []),
++      ([Tdg 4, T 4],
++        []),
++      ([S 0, S 0],
++        [Z 0])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg13.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg13.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg13.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg13.lean	2026-09-19 13:24:25
+@@ -0,0 +1,36 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a13 : Circuit 8 :=
++  [CX 0 7, CX 1 4, Sdg 0, X 3, CX 4 1, T 5, H 1, CX 2 1, S 4, Y 6, Tdg 5,
++    CX 0 7, Tdg 6, Z 5, H 6, CX 7 6, Z 7, Tdg 7, Tdg 2, Z 4, T 6, Tdg 4, CX 0 4,
++    S 7, T 5, CX 7 1, S 5, S 2, H 6, CX 1 2, Z 0, CX 0 2, H 5, H 0, CX 1 2,
++    CX 1 7]
++
++def b13 : Circuit 8 :=
++  [CX 1 4, X 3, CX 4 1, H 1, CX 2 1, Y 6, Tdg 6, H 6, CX 7 6, Tdg 7, Sdg 4,
++    T 6, Tdg 4, CX 0 4, Sdg 7, CX 7 1, Tdg 5, T 2, H 6, S 0, CX 0 2, H 5, H 0,
++    CX 1 7]
++
++theorem s13 : a13 ≡ᵤ b13 := by
++  circuit_windows
++    [([CX 0 7, Sdg 0, CX 0 7, Z 0],
++        [S 0]),
++      ([Tdg 2, S 2],
++        [T 2]),
++      ([Z 7, S 7],
++        [Sdg 7]),
++      ([T 5, Z 5, T 5, S 5],
++        []),
++      ([S 4, Z 4],
++        [Sdg 4]),
++      ([CX 1 2, CX 1 2],
++        [])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg14.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg14.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg14.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg14.lean	2026-09-19 13:24:25
+@@ -0,0 +1,34 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a14 : Circuit 8 :=
++  [Sdg 4, Y 5, CX 2 6, Sdg 5, H 6, H 7, Sdg 1, X 6, X 0, Tdg 3, CX 6 3,
++    CX 2 5, Y 5, CX 4 3, T 2, CX 5 3, T 7, H 1, Tdg 4, Sdg 4, H 4, S 7, CX 3 6,
++    Tdg 4, H 3, CX 2 1, CX 0 7, CX 0 3, S 0, CX 0 7, T 5, Sdg 0, T 7, CX 4 7,
++    T 4, X 2, CX 0 1, Y 7, CX 5 3, CX 2 4, Tdg 2, CX 2 7, X 1, CX 5 7, CX 7 1,
++    CX 4 2, CX 1 3, CX 3 5, CX 0 1, CX 1 0, Y 3, X 4, T 3, S 4]
++
++def b14 : Circuit 8 :=
++  [Y 5, CX 2 6, Sdg 5, H 6, H 7, Sdg 1, X 6, X 0, Tdg 3, CX 6 3, CX 2 5, Y 5,
++    CX 4 3, T 2, CX 5 3, H 1, Tdg 4, Z 4, H 4, CX 3 6, H 3, CX 2 1, CX 0 3, T 5,
++    Z 7, CX 4 7, X 2, CX 0 1, Y 7, CX 5 3, CX 2 4, Tdg 2, CX 2 7, X 1, CX 5 7,
++    CX 7 1, CX 4 2, CX 1 3, CX 3 5, CX 0 1, CX 1 0, Y 3, X 4, T 3, S 4]
++
++theorem s14 : a14 ≡ᵤ b14 := by
++  circuit_windows
++    [([Sdg 4, Sdg 4],
++        [Z 4]),
++      ([S 0, Sdg 0],
++        []),
++      ([T 7, S 7, CX 0 7, CX 0 7, T 7],
++        [Z 7]),
++      ([Tdg 4, T 4],
++        [])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg15.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg15.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg15.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg15.lean	2026-09-19 13:24:25
+@@ -0,0 +1,40 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a15 : Circuit 8 :=
++  [Sdg 5, H 7, Sdg 6, Z 6, CX 3 6, Z 5, X 1, CX 6 2, T 5, S 5, H 5, H 6, Y 0,
++    H 4, CX 2 6, T 2, CX 2 1, CX 4 1, H 5, CX 7 2, CX 2 4, H 7, X 2, S 1, S 7,
++    T 0, S 3, Tdg 5, T 5, Z 5, H 1, CX 6 0, Y 3, CX 4 2, T 3, H 0, CX 4 5, T 3,
++    CX 2 1, H 4, CX 3 0, H 6, Z 7, Tdg 7, CX 5 1, H 1, CX 3 6, CX 3 0, CX 5 1,
++    CX 5 0, Tdg 3, CX 3 4, H 0, CX 7 4, CX 0 6, H 5, CX 1 4, H 4, Tdg 1, T 6,
++    Z 4, CX 5 0, Y 5, CX 4 6, Sdg 4, Y 6, Y 4, CX 4 0, CX 6 4, CX 5 6, Tdg 7]
++
++def b15 : Circuit 8 :=
++  [H 7, S 6, CX 3 6, X 1, CX 6 2, T 5, H 6, Y 0, H 4, CX 2 6, T 2, CX 2 1,
++    CX 4 1, CX 7 2, CX 2 4, H 7, X 2, S 1, T 0, S 3, H 1, CX 6 0, Y 3, CX 4 2,
++    H 0, CX 4 5, CX 2 1, H 4, H 6, CX 5 1, H 1, CX 3 6, CX 5 1, CX 5 0, T 3,
++    CX 3 4, H 0, CX 7 4, CX 0 6, H 5, CX 1 4, H 4, Tdg 1, T 6, CX 5 0, Y 5,
++    CX 4 6, S 4, Y 6, Y 4, CX 4 0, CX 6 4, CX 5 6, Z 7]
++
++theorem s15 : a15 ≡ᵤ b15 := by
++  circuit_windows
++    [([Sdg 5, S 5],
++        []),
++      ([Sdg 6, Z 6, Z 5, T 5, H 5, H 5, Tdg 5, T 5, Z 5],
++        [S 6, T 5]),
++      ([S 7, Tdg 7, Tdg 7],
++        []),
++      ([T 3, Tdg 3],
++        []),
++      ([CX 3 0, CX 3 0],
++        []),
++      ([Z 4, Sdg 4],
++        [S 4])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg16.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg16.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg16.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg16.lean	2026-09-19 13:24:25
+@@ -0,0 +1,36 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a16 : Circuit 8 :=
++  [T 4, Tdg 5, CX 1 3, H 3, H 7, CX 7 5, CX 3 0, S 0, T 7, T 5, X 2, T 7, H 6,
++    T 7, CX 5 0, Z 5, Z 7, CX 4 6, CX 5 1, CX 7 6, CX 5 4, H 2, T 7, CX 3 4,
++    CX 2 4, CX 6 3, CX 4 1, Y 5, CX 4 1, T 6, T 4, CX 4 7, Z 3, CX 2 5, CX 5 0,
++    H 2, Tdg 7, T 7, H 3, CX 1 0, T 2, T 2, T 0, Tdg 7, T 4, X 2, Z 4, CX 0 4,
++    CX 1 4, CX 5 3, H 1, H 7, CX 6 3, H 1, CX 6 4, S 7, T 5, CX 2 4, CX 3 7]
++
++def b16 : Circuit 8 :=
++  [T 4, Tdg 5, CX 1 3, H 3, H 7, CX 7 5, CX 3 0, S 0, T 5, X 2, H 6, CX 5 0,
++    Z 5, CX 4 6, CX 5 1, CX 7 6, CX 5 4, H 2, CX 3 4, CX 2 4, CX 6 3, Y 5, T 6,
++    CX 4 7, Z 3, CX 2 5, CX 5 0, H 2, H 3, CX 1 0, S 2, T 0, Tdg 7, X 2, Sdg 4,
++    CX 0 4, CX 1 4, CX 5 3, H 7, CX 6 3, CX 6 4, S 7, T 5, CX 2 4, CX 3 7]
++
++theorem s16 : a16 ≡ᵤ b16 := by
++  circuit_windows
++    [([T 7, T 7, T 7, Z 7, T 7],
++        []),
++      ([CX 4 1, CX 4 1],
++        []),
++      ([T 4, T 4, Z 4],
++        [Sdg 4]),
++      ([T 2, T 2],
++        [S 2]),
++      ([T 7, Tdg 7, H 1, H 1],
++        [])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg17.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg17.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg17.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg17.lean	2026-09-19 13:24:25
+@@ -0,0 +1,42 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a17 : Circuit 8 :=
++  [Tdg 2, CX 1 3, CX 2 7, T 4, H 6, T 7, H 4, Tdg 6, H 4, CX 7 1, T 7, CX 1 4,
++    H 7, Y 5, S 5, T 7, H 6, Z 3, CX 3 6, Tdg 3, CX 5 4, S 5, H 0, H 5, Tdg 6,
++    CX 4 1, H 6, Tdg 2, CX 5 4, Sdg 3, CX 5 3, CX 4 0, H 5, CX 6 1, CX 2 6, H 6,
++    H 4, X 3, CX 2 4, CX 2 0, T 2, H 5, Tdg 5, Tdg 0, H 2, CX 7 4, T 1, CX 7 4,
++    Y 3, H 2, CX 5 0, H 0, T 3, S 3, S 0, S 4, CX 3 0, Sdg 1, Z 5, CX 7 5]
++
++def b17 : Circuit 8 :=
++  [CX 1 3, CX 2 7, T 4, H 6, Tdg 6, CX 7 1, S 7, CX 1 4, H 7, Y 5, T 7, H 6,
++    CX 3 6, CX 5 4, Z 5, H 0, H 5, Tdg 6, CX 4 1, H 6, CX 5 4, T 3, CX 5 3,
++    CX 4 0, CX 6 1, CX 2 6, H 6, H 4, X 3, CX 2 4, CX 2 0, Tdg 2, Tdg 5, Tdg 0,
++    Y 3, CX 5 0, H 0, T 3, S 3, S 0, S 4, CX 3 0, Tdg 1, Z 5, CX 7 5]
++
++theorem s17 : a17 ≡ᵤ b17 := by
++  circuit_windows
++    [([Z 3, Tdg 3, Tdg 2, Sdg 3, T 2],
++        [T 3]),
++      ([T 7, T 7],
++        [S 7]),
++      ([H 4, H 4],
++        []),
++      ([S 5, S 5],
++        [Z 5]),
++      ([H 5, H 5],
++        []),
++      ([T 1, Sdg 1],
++        [Tdg 1]),
++      ([CX 7 4, CX 7 4],
++        []),
++      ([H 2, H 2],
++        [])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg18.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg18.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg18.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg18.lean	2026-09-19 13:24:25
+@@ -0,0 +1,31 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a18 : Circuit 8 :=
++  [CX 6 2, Tdg 6, H 5, Y 3, CX 2 1, CX 3 5, H 7, T 0, CX 0 7, H 4, H 3, S 5,
++    X 5, Tdg 0, T 2, S 5, Tdg 5, CX 3 5, Tdg 6, Y 0, H 2, CX 7 5, CX 1 6, Sdg 6,
++    CX 1 7, T 6, Tdg 6, CX 6 3, Z 5, H 1, CX 5 0, CX 1 7, CX 1 0]
++
++def b18 : Circuit 8 :=
++  [CX 6 2, H 5, Y 3, CX 2 1, CX 3 5, H 7, CX 0 7, H 4, H 3, S 5, X 5, T 2,
++    T 5, CX 3 5, Sdg 6, Y 0, H 2, CX 7 5, CX 1 6, CX 1 7, Sdg 6, CX 6 3, Z 5,
++    H 1, CX 5 0, CX 1 7, CX 1 0]
++
++theorem s18 : a18 ≡ᵤ b18 := by
++  circuit_windows
++    [([T 0, Tdg 0],
++        []),
++      ([Tdg 6, Tdg 6],
++        [Sdg 6]),
++      ([S 5, Tdg 5],
++        [T 5]),
++      ([T 6, Tdg 6],
++        [])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg2.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg2.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg2.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg2.lean	2026-09-19 13:24:25
+@@ -0,0 +1,36 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a2 : Circuit 8 :=
++  [Tdg 7, CX 6 2, T 0, H 6, X 0, CX 5 6, Y 2, H 3, CX 1 6, H 5, X 7, Sdg 3,
++    CX 0 7, CX 2 4, CX 5 4, T 4, H 5, CX 3 6, X 7, CX 1 2, CX 1 3, Z 2, Z 5,
++    CX 6 0, T 3, T 4, H 4, T 1, T 4, CX 0 6, CX 0 7, H 0, CX 6 1, CX 2 5,
++    CX 1 3, X 6, Sdg 4, T 7, H 3, Tdg 0, CX 4 5, Tdg 7, H 6, CX 5 4, Y 1,
++    CX 7 5, H 2, T 4, CX 5 0, Sdg 1, Y 7, CX 5 1, H 4, CX 2 7, Sdg 4, CX 1 4,
++    Tdg 1, CX 0 6, CX 1 2, T 1]
++
++def b2 : Circuit 8 :=
++  [Tdg 7, CX 6 2, T 0, H 6, X 0, CX 5 6, Y 2, H 3, CX 1 6, H 5, Sdg 3, CX 0 7,
++    CX 2 4, CX 5 4, H 5, CX 3 6, CX 1 2, CX 1 3, Z 2, Z 5, CX 6 0, T 3, S 4,
++    H 4, T 1, CX 0 6, CX 0 7, H 0, CX 6 1, CX 2 5, CX 1 3, X 6, Tdg 4, H 3,
++    Tdg 0, CX 4 5, H 6, CX 5 4, Y 1, CX 7 5, H 2, T 4, CX 5 0, Sdg 1, Y 7,
++    CX 5 1, H 4, CX 2 7, Sdg 4, CX 1 4, CX 0 6, CX 1 2]
++
++theorem s2 : a2 ≡ᵤ b2 := by
++  circuit_windows
++    [([T 4, T 4],
++        [S 4]),
++      ([T 4, Sdg 4],
++        [Tdg 4]),
++      ([X 7, X 7, T 7, Tdg 7],
++        []),
++      ([Tdg 1, T 1],
++        [])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg3.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg3.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg3.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg3.lean	2026-09-19 13:24:25
+@@ -0,0 +1,31 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a3 : Circuit 8 :=
++  [S 0, Tdg 4, S 5, T 2, CX 5 0, T 2, CX 2 1, Z 5, H 4, CX 3 1, T 0, Sdg 3,
++    CX 6 4, CX 3 2, Sdg 7, Sdg 4, T 7, CX 5 1, CX 0 6, Tdg 6, Y 0, CX 5 4,
++    CX 2 1, CX 4 3, T 2, Tdg 3, T 2, T 7, X 3, CX 7 5, T 3]
++
++def b3 : Circuit 8 :=
++  [S 0, Tdg 4, CX 5 0, S 2, CX 2 1, Sdg 5, H 4, CX 3 1, T 0, Sdg 3, CX 6 4,
++    CX 3 2, Sdg 4, CX 5 1, CX 0 6, Tdg 6, Y 0, CX 5 4, CX 2 1, CX 4 3, Tdg 3,
++    S 2, X 3, CX 7 5, T 3]
++
++theorem s3 : a3 ≡ᵤ b3 := by
++  circuit_windows
++    [([T 2, T 2],
++        [S 2]),
++      ([S 5, Z 5],
++        [Sdg 5]),
++      ([Sdg 7, T 7, T 7],
++        []),
++      ([T 2, T 2],
++        [S 2])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg4.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg4.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg4.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg4.lean	2026-09-19 13:24:25
+@@ -0,0 +1,40 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a4 : Circuit 8 :=
++  [S 5, T 4, Y 3, CX 1 6, T 5, CX 3 2, CX 4 6, T 2, S 7, Tdg 1, X 6, CX 4 3,
++    CX 0 3, S 5, H 2, T 0, T 1, Sdg 1, CX 1 7, Y 1, T 3, Y 6, X 6, H 5, H 7,
++    Y 1, H 6, X 4, CX 6 5, T 3, T 0, CX 3 6, CX 2 7, CX 3 2, H 4, Z 7, Sdg 2,
++    T 7, H 1, Sdg 6, CX 1 6, CX 0 4, CX 2 0, T 4, H 5, S 5, CX 7 5, T 4, T 5,
++    Sdg 7, CX 6 3, CX 0 2]
++
++def b4 : Circuit 8 :=
++  [T 4, Y 3, CX 1 6, T 5, CX 3 2, CX 4 6, T 2, S 7, X 6, CX 4 3, CX 0 3, Z 5,
++    H 2, Sdg 1, CX 1 7, Y 6, X 6, H 5, H 7, H 6, X 4, CX 6 5, S 3, S 0, CX 3 6,
++    CX 2 7, CX 3 2, H 4, Sdg 2, T 7, H 1, Sdg 6, CX 1 6, CX 0 4, CX 2 0, H 5,
++    S 5, CX 7 5, S 4, T 5, S 7, CX 6 3, CX 0 2]
++
++theorem s4 : a4 ≡ᵤ b4 := by
++  circuit_windows
++    [([T 0, T 0],
++        [S 0]),
++      ([Tdg 1, T 1],
++        []),
++      ([S 5, S 5],
++        [Z 5]),
++      ([T 3, T 3],
++        [S 3]),
++      ([Y 1, Y 1, H 1],
++        [H 1]),
++      ([Z 7, Sdg 7],
++        [S 7]),
++      ([T 4, T 4],
++        [S 4])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg5.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg5.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg5.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg5.lean	2026-09-19 13:24:25
+@@ -0,0 +1,39 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a5 : Circuit 8 :=
++  [Tdg 3, Y 7, Tdg 6, X 4, S 7, Tdg 3, H 0, Tdg 6, Y 5, Z 1, T 3, Tdg 4,
++    Tdg 6, S 2, Tdg 6, Sdg 2, Sdg 0, H 4, Sdg 6, Z 4, CX 4 3, CX 0 2, T 6,
++    CX 1 5, T 2, T 2, S 6, Tdg 4, Tdg 3, T 3, X 4, CX 5 3, T 0, CX 4 2, Tdg 3,
++    H 6, CX 4 6, Tdg 3, CX 3 6, Tdg 6, H 6, X 3, Sdg 3, CX 2 6, Y 7, Tdg 2,
++    Tdg 4, T 2, CX 2 5, T 4, S 3, CX 3 5, S 1, CX 6 2, T 1, Y 0, CX 0 6, CX 0 3,
++    S 7, H 4, CX 2 0, CX 3 7, T 2, Y 3, Z 7, T 6, CX 4 2, T 1]
++
++def b5 : Circuit 8 :=
++  [Y 7, X 4, S 7, H 0, Y 5, Tdg 3, Tdg 4, H 4, Z 4, CX 4 3, CX 0 2, T 6,
++    CX 1 5, S 2, Z 6, Tdg 4, X 4, CX 5 3, Tdg 0, CX 4 2, H 6, CX 4 6, Sdg 3,
++    CX 3 6, Tdg 6, H 6, X 3, CX 2 6, Y 7, CX 2 5, CX 3 5, CX 6 2, Y 0, CX 0 6,
++    CX 0 3, S 7, H 4, CX 2 0, CX 3 7, T 2, Y 3, Z 7, T 6, CX 4 2]
++
++theorem s5 : a5 ≡ᵤ b5 := by
++  circuit_windows
++    [([Tdg 3, T 3],
++        []),
++      ([Z 1, S 2, Sdg 2, Sdg 0, CX 0 2, T 2, T 2, T 0, S 1, T 1, Y 0, T 1],
++        [CX 0 2, S 2, Tdg 0, Y 0]),
++      ([Tdg 3, T 3],
++        []),
++      ([Tdg 6, Tdg 6, Tdg 6, Tdg 6, Sdg 6, S 6, CX 5 3, Tdg 3, Tdg 3],
++        [Z 6, CX 5 3, Sdg 3]),
++      ([Tdg 2, T 2],
++        []),
++      ([Sdg 3, Tdg 4, T 4, S 3],
++        [])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg6.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg6.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg6.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg6.lean	2026-09-19 13:24:25
+@@ -0,0 +1,34 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a6 : Circuit 8 :=
++  [X 1, CX 0 6, T 6, Z 4, X 6, CX 2 6, X 0, H 0, T 4, CX 7 5, Z 0, CX 0 4,
++    Z 0, X 1, H 3, CX 2 5, CX 3 5, T 5, Tdg 4, Tdg 3, CX 2 7, H 0, X 6, T 6,
++    X 1, S 1, CX 1 7, CX 3 6, H 0, CX 1 6, T 5, CX 5 0, CX 0 3, Tdg 6, Sdg 7,
++    CX 4 0, CX 5 0, H 6, CX 4 2, S 4, Sdg 1, Z 4, CX 3 4, T 5]
++
++def b6 : Circuit 8 :=
++  [CX 0 6, T 6, Z 4, CX 2 6, X 0, H 0, T 4, CX 7 5, CX 0 4, H 3, CX 2 5,
++    CX 3 5, Tdg 3, CX 2 7, T 6, X 1, CX 1 7, CX 3 6, CX 1 6, S 5, CX 5 0,
++    CX 0 3, Tdg 6, Sdg 7, CX 4 0, CX 5 0, H 6, CX 4 2, T 4, Z 4, CX 3 4, T 5]
++
++theorem s6 : a6 ≡ᵤ b6 := by
++  circuit_windows
++    [([X 6, X 6],
++        []),
++      ([Z 0, Z 0],
++        []),
++      ([Tdg 4, H 0, H 0, S 4],
++        [T 4]),
++      ([T 5, T 5],
++        [S 5]),
++      ([X 1, X 1, S 1, Sdg 1],
++        [])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg7.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg7.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg7.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg7.lean	2026-09-19 13:24:25
+@@ -0,0 +1,41 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a7 : Circuit 8 :=
++  [X 6, Y 7, CX 7 4, Y 0, X 4, S 3, H 5, CX 5 1, T 0, H 5, H 5, H 5, S 0, T 2,
++    H 5, Sdg 1, T 4, T 5, X 6, Sdg 1, X 0, CX 7 4, Z 4, Sdg 5, H 5, H 7, Tdg 5,
++    T 2, CX 4 5, CX 2 0, CX 6 5, Tdg 1, Y 4, S 3, CX 1 6, CX 3 5, Z 6, CX 5 6,
++    T 4, CX 3 4, T 3, H 5, T 3, Sdg 1, Sdg 4, H 0, S 6, T 7, CX 6 0, H 7,
++    CX 4 5, S 0, T 4, T 5, Y 4, T 6, Tdg 4, T 2, T 2, T 2, CX 0 3, S 0, H 6,
++    CX 0 7, X 0, H 7, CX 5 7, S 7, Sdg 6, T 1, T 2, H 0, Y 4, H 2, Tdg 4, X 6,
++    CX 4 5, H 4, H 7, CX 7 3, S 1]
++
++def b7 : Circuit 8 :=
++  [Y 7, CX 7 4, Y 0, X 4, H 5, CX 5 1, T 0, S 0, T 4, X 0, CX 7 4, Z 4, Tdg 5,
++    H 5, H 7, Tdg 5, CX 4 5, CX 2 0, CX 6 5, Y 4, CX 1 6, CX 3 5, Z 6, CX 5 6,
++    T 4, CX 3 4, H 5, Sdg 3, H 0, S 6, T 7, CX 6 0, H 7, CX 4 5, Tdg 4, T 5,
++    Y 4, T 6, Tdg 4, CX 0 3, Z 0, H 6, CX 0 7, X 0, H 7, CX 5 7, S 7, Sdg 6,
++    Sdg 2, H 0, Y 4, H 2, Tdg 4, X 6, CX 4 5, H 4, H 7, CX 7 3, Z 1]
++
++theorem s7 : a7 ≡ᵤ b7 := by
++  circuit_windows
++    [([S 3, T 2, T 2, S 3, T 3, T 3, T 2, T 2, T 2, T 2],
++        [Sdg 3, Sdg 2]),
++      ([X 6, X 6],
++        []),
++      ([Sdg 1, Sdg 1, Tdg 1, Sdg 1, T 1, S 1],
++        [Z 1]),
++      ([H 5, H 5, H 5, H 5, T 5, Sdg 5, H 5],
++        [Tdg 5, H 5]),
++      ([Sdg 4, T 4],
++        [Tdg 4]),
++      ([S 0, S 0],
++        [Z 0])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg8.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg8.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg8.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg8.lean	2026-09-19 13:24:25
+@@ -0,0 +1,21 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a8 : Circuit 8 :=
++  [CX 3 1, CX 0 7, CX 7 6, Y 6, Tdg 2, Z 1, H 0, T 6, H 1, S 6, Z 1, Y 4,
++    CX 0 6, CX 1 6, H 7, CX 7 3, CX 7 0, CX 3 1]
++
++def b8 : Circuit 8 :=
++  [CX 3 1, CX 0 7, CX 7 6, Y 6, Tdg 2, Z 1, H 0, T 6, H 1, S 6, Z 1, Y 4,
++    CX 0 6, CX 1 6, H 7, CX 7 3, CX 7 0, CX 3 1]
++
++theorem s8 : a8 ≡ᵤ b8 := by
++  circuit_simp
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg9.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg9.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution/Seg9.lean	1969-12-31 19:00:00
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution/Seg9.lean	2026-09-19 13:29:59
+@@ -0,0 +1,52 @@
++import CircuitEq
++import Harness.Task
++
++set_option Elab.async false
++
++namespace Quantum.Circuit.Harness.Seg
++
++open Instr
++
++def a9 : Circuit 8 :=
++  [T 6, S 4, Z 3, Sdg 5, Z 1, CX 5 7, CX 7 2, S 1, CX 4 2, S 6, CX 4 1, H 0,
++    T 2, X 4, CX 4 2, T 7, H 7, CX 2 4, S 7, T 0, T 2, Tdg 3, H 7, T 1, CX 2 5,
++    CX 1 5, T 0, T 1, CX 3 4, T 4, H 0, Sdg 4, Z 3, CX 3 2, S 5, CX 6 0, CX 5 1,
++    CX 2 5, T 5, CX 1 2, H 4, T 5, CX 2 3, H 3, CX 5 2, CX 5 0, H 2, Tdg 4, H 7,
++    T 6, H 3, Tdg 2, CX 1 7, CX 6 2, T 4, T 4, T 6, S 5, CX 5 4, T 0, Tdg 7,
++    S 2, CX 2 5, Z 3, T 5, H 4, CX 6 7, H 1, Y 2, CX 0 4, Y 2, H 1, T 6, Tdg 6,
++    CX 5 3, H 7, CX 7 6, CX 0 6, CX 1 4, CX 5 4, CX 5 6, T 3, X 3, CX 5 6,
++    CX 0 5, H 5, CX 0 4, H 6, H 5, T 3, Tdg 2, CX 1 4, CX 7 2, S 1, Y 0, T 3,
++    H 2, H 3, CX 5 2, Tdg 7, S 5, T 3, H 6, T 7]
++
++def b9 : Circuit 8 :=
++  [S 4, Sdg 5, CX 5 7, CX 7 2, Sdg 1, CX 4 2, CX 4 1, H 0, T 2, X 4, CX 4 2,
++    T 7, H 7, CX 2 4, S 7, T 2, Tdg 3, CX 2 5, CX 1 5, S 0, S 1, CX 3 4, H 0,
++    Tdg 4, CX 3 2, S 5, CX 6 0, CX 5 1, CX 2 5, CX 1 2, H 4, CX 2 3, CX 5 2,
++    CX 5 0, H 2, Z 6, Tdg 2, CX 1 7, CX 6 2, T 4, Z 5, CX 5 4, T 0, Tdg 7,
++    CX 2 5, Z 3, T 5, H 4, CX 6 7, T 6, CX 5 3, H 7, CX 7 6, CX 0 6, CX 5 4,
++    T 3, X 3, CX 0 5, T 2, CX 7 2, S 1, Y 0, S 3, H 2, H 3, CX 5 2, S 5, T 3]
++
++theorem s9 : a9 ≡ᵤ b9 := by
++  circuit_windows
++    [([Z 3, Z 3], []),
++      ([Z 1, S 1], [Sdg 1]),
++      ([H 7, H 7], []),
++      ([T 0, T 0], [S 0]),
++      ([T 1, T 1], [S 1]),
++      ([T 4, Sdg 4], [Tdg 4]),
++      ([H 3, H 3], []),
++      ([T 6, S 6, T 6], [Z 6]),
++      ([Tdg 4, T 4, T 4], [T 4]),
++      ([T 5, T 5, S 5], [Z 5]),
++      ([S 2, CX 2 5, Y 2, Y 2, Tdg 2], [CX 2 5, T 2]),
++      ([T 6, T 6, Tdg 6], [T 6]),
++      ([H 1, H 1], []),
++      ([CX 5 6, CX 5 6], []),
++      ([CX 0 4, CX 0 4], []),
++      ([CX 1 4, CX 1 4], []),
++      ([H 5, H 5], []),
++      ([H 6, H 6], []),
++      ([Tdg 7, T 7], []),
++      ([T 3, T 3], [S 3])]
++
++end Quantum.Circuit.Harness.Seg
+diff -ruN --exclude=.lake --exclude=.harness --exclude=Judge.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution.lean ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution.lean
+--- ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/Solution.lean	2026-09-19 13:13:48
++++ ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/Solution.lean	2026-09-19 13:26:56
+@@ -1,13 +1,30 @@
+ import CircuitEq
+ import Harness.Task
++import Solution.Seg0
++import Solution.Seg1
++import Solution.Seg2
++import Solution.Seg3
++import Solution.Seg4
++import Solution.Seg5
++import Solution.Seg6
++import Solution.Seg7
++import Solution.Seg8
++import Solution.Seg9
++import Solution.Seg10
++import Solution.Seg11
++import Solution.Seg12
++import Solution.Seg13
++import Solution.Seg14
++import Solution.Seg15
++import Solution.Seg16
++import Solution.Seg17
++import Solution.Seg18
+ 
+ /-! # Solution
+ 
+-Prove exactly one of the two theorems below. Then run `./submit equiv` or
+-`./submit not_equiv`.
+-
+-Lemmas may go in this file, and new modules under `Solution/` (import them
+-here). No other existing file may be edited.
++The pair is cut into segments at points where the two circuits agree on the
++state; each segment is proved by `circuit_windows` in its own module under
++`Solution/`, and the segments are assembled here by `Equivalent.append`.
+ -/
+ 
+ namespace Quantum.Circuit.Harness
+@@ -15,8 +32,10 @@
+ open Instr
+ 
+ /-- The claim holds. -/
+-theorem equiv : original ≡ᵤ optimized := by
+-  sorry
++theorem equiv : original ≡ᵤ optimized :=
++  calc original = Seg.a0 ++ (Seg.a1 ++ (Seg.a2 ++ (Seg.a3 ++ (Seg.a4 ++ (Seg.a5 ++ (Seg.a6 ++ (Seg.a7 ++ (Seg.a8 ++ (Seg.a9 ++ (Seg.a10 ++ (Seg.a11 ++ (Seg.a12 ++ (Seg.a13 ++ (Seg.a14 ++ (Seg.a15 ++ (Seg.a16 ++ (Seg.a17 ++ (Seg.a18)))))))))))))))))) := by decide +kernel
++    _ ≡ᵤ Seg.b0 ++ (Seg.b1 ++ (Seg.b2 ++ (Seg.b3 ++ (Seg.b4 ++ (Seg.b5 ++ (Seg.b6 ++ (Seg.b7 ++ (Seg.b8 ++ (Seg.b9 ++ (Seg.b10 ++ (Seg.b11 ++ (Seg.b12 ++ (Seg.b13 ++ (Seg.b14 ++ (Seg.b15 ++ (Seg.b16 ++ (Seg.b17 ++ (Seg.b18)))))))))))))))))) := Seg.s0.append (Seg.s1.append (Seg.s2.append (Seg.s3.append (Seg.s4.append (Seg.s5.append (Seg.s6.append (Seg.s7.append (Seg.s8.append (Seg.s9.append (Seg.s10.append (Seg.s11.append (Seg.s12.append (Seg.s13.append (Seg.s14.append (Seg.s15.append (Seg.s16.append (Seg.s17.append (Seg.s18))))))))))))))))))
++    _ = optimized := by decide +kernel
+ 
+ /-- The claim fails. -/
+ theorem not_equiv : ¬ (original ≡ᵤ optimized) := by
+Binary files ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/scripts/__pycache__/check_pyzx_benchmarks.cpython-314.pyc and ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/scripts/__pycache__/check_pyzx_benchmarks.cpython-314.pyc differ
+Binary files ~/.circuiteq-harness/runs/20260919-171348-e58dbd/meta/snapshot/scripts/__pycache__/tcount_survey.cpython-314.pyc and ~/.circuiteq-harness/runs/20260919-171348-e58dbd/ws/scripts/__pycache__/tcount_survey.cpython-314.pyc differ
