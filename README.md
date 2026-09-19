@@ -170,7 +170,9 @@ applies next.
 - **Kernel-only.** `decide +kernel` is required because `Rat.add` and
   `Rat.mul` are `@[irreducible]`, which stalls elaborator-level `decide`; the
   kernel ignores reducibility and evaluates `Nat.gcd` with GMP. No
-  `native_decide` anywhere, enforced by `scripts/AxiomCheck.lean` in CI.
+  `native_decide` anywhere, enforced by `scripts/AxiomCheck.lean` in CI,
+  and CI replays the built `.olean` files through the kernel, so a leaf
+  that skipped the kernel cannot hide (see "Trust").
 - **The structural toolkit is the agent's vocabulary.** `fuse`, `fuse₃`,
   `cancel_of_mul_eq_one`, `one_one_comm`, `cnot_diag_control_comm`,
   `denote_applyOne_comm_of_not_touches` (move a gate past any circuit that
@@ -250,6 +252,9 @@ CircuitEq/
 └── Benchmarks/             original-versus-PyZX proofs
 benchmarks/                 QASM fixtures and provenance for each benchmark
 scripts/AxiomCheck.lean     CI: standard three axioms only
+scripts/check_debug_options.py     CI: text guard against debug.* options
+scripts/SkipKernelTCFixture.lean   the repro the kernel replay must reject
+scripts/check_replay_fixture.sh    CI: asserts that it does
 scripts/check_pyzx_benchmarks.py   reproduce the PyZX fixtures (pyzx==0.9.0)
 scripts/certificate.py      Python mirror of the certificate language
 scripts/scale_test.py       the scale ladder; scripts/chunked_decide.py, chunks.py
@@ -262,6 +267,7 @@ QUEUE.md                    the ordered list of next work
 lake exe cache get   # mathlib oleans (one-time, several GB)
 lake build
 lake env lean scripts/AxiomCheck.lean
+LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq   # kernel replay, see "Trust"
 ```
 
 If [QECLean](https://github.com/Stavan-Jain/QECLean) is checked out as a
@@ -297,6 +303,36 @@ Every declaration must depend on exactly `[propext, Classical.choice,
 Quot.sound]`. `scripts/AxiomCheck.lean` walks the whole library and fails CI
 otherwise. `native_decide` is banned; `sorry` is for WIP branches only. Check a
 single result with `#print axioms Quantum.Circuit.Examples.hh_cnot_hh`.
+
+The axiom check is half of the policy, because it cannot see a declaration
+that never reached the kernel. `set_option debug.skipKernelTC true` makes
+Lean add a declaration unchecked, and `decide +kernel`, the leaf of every
+proof here, leaves its whole check to the kernel: under the option
+`2 + 2 = 5` elaborates without an error and `#print axioms` reports no
+axioms. So CI also replays every declaration of the built `.olean` files
+through the kernel, in a process where no option or meta code of the library
+runs:
+
+```bash
+LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq   # about 30 s, 0.4 GB
+```
+
+`leanchecker` is the former lean4checker; it ships inside the toolchain
+since Lean v4.28, so it always matches `lean-toolchain`. One thread is
+deliberate: every parallel replay loads its own copy of the mathlib imports,
+about 2 GB per extra thread, and the default thread count does not fit in
+16 GB. `scripts/SkipKernelTCFixture.lean` keeps the `2 + 2 = 5` repro outside
+every `lean_lib`, and `scripts/check_replay_fixture.sh` asserts on every CI
+run that it still compiles clean and that the replay rejects it, so a
+toolchain bump cannot quietly turn the replay into a no-op.
+`scripts/check_debug_options.py` fails CI early when a `debug.*` option is
+set in the Lean sources or in `lakefile.toml`. That guard is a text search,
+an early warning and not sound: an option can be set from meta code under a
+name no search recognises. The replay is the defence.
+
+What the replay does not do: it re-checks this library's modules against
+their imports as delivered, so mathlib and core are trusted as the cache
+provides them, and it is the Lean kernel again, not an independent checker.
 
 ## Related
 

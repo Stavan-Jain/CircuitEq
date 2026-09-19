@@ -164,7 +164,14 @@ Nothing. All five parallel branches are merged (see "Done").
 
 ## Done
 
-- (this commit) Phase gates cost their parity's weight, not the register
+- `16a1a02` Kernel replay in CI. The axiom check could not see a false
+  `decide +kernel` theorem sealed behind `debug.skipKernelTC` (no axioms,
+  no error); CI now replays the built `.olean` files with the toolchain's
+  `leanchecker` on one thread (28 s, 0.33 GB here; ten threads die at
+  26 GB), asserts on every run that the replay rejects the repro in
+  `scripts/SkipKernelTCFixture.lean`, and runs
+  `scripts/check_debug_options.py` as an early, unsound text guard.
+- `5178a32` Phase gates cost their parity's weight, not the register
   width: `sparseFold` (set bits by `gcd` and a checked population count)
   behind `maskFold`, and `Lanes.addOnz`; the CCZ-network family added to
   the scale test and certified to 300 wires and 10200 gates in 10 s of

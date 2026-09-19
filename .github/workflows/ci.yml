@@ -17,6 +17,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Early warning, NOT a defence: a text search for `debug.*` options in
+      # the Lean sources and the Lake configuration. `debug.skipKernelTC`
+      # switches the kernel off, and the axiom check below cannot see it (a
+      # false `decide +kernel` theorem then depends on no axioms at all). A
+      # text search is not sound: an option can be set from meta code under a
+      # name no search recognises. The kernel replay below is the defence;
+      # this step only names the file and line before a build is paid for.
+      - name: Option guard (no debug.* options; early warning only)
+        run: python3 scripts/check_debug_options.py
       # Fetches the mathlib olean cache and runs `lake build`.
       - uses: leanprover/lean-action@v1
       # Every declaration must depend on exactly [propext, Classical.choice,
@@ -24,3 +33,26 @@ jobs:
       # against the build lean-action just produced.
       - name: Axiom policy (standard three axioms only)
         run: lake env lean scripts/AxiomCheck.lean
+      # Every declaration of the built CircuitEq `.olean` files goes through
+      # the kernel again, in a process where no option or meta code of the
+      # library runs. This is what catches `debug.skipKernelTC` and any other
+      # way of adding a declaration unchecked. `leanchecker` is the former
+      # lean4checker, shipped inside the toolchain since v4.28, so it always
+      # matches `lean-toolchain`. One thread on purpose: each parallel replay
+      # loads a private copy of the mathlib imports (about 2 GB per extra
+      # thread; ten threads were killed at 26 GB on a 16 GB machine), while
+      # one thread maps them once: 38 s on this runner, 28 s and 0.33 GB on
+      # an M4. A step of its own, not lean-action's `leanchecker` input: the
+      # thread cap would have to sit on that whole step and would slow the
+      # build too. `-v` lists each module replayed, so the log shows what
+      # was covered.
+      - name: Kernel replay (leanchecker over the CircuitEq oleans)
+        env:
+          LEAN_NUM_THREADS: "1"
+        run: lake env leanchecker -v CircuitEq
+      # The replay must reject `2 + 2 = 5` sealed behind `debug.skipKernelTC`
+      # (`scripts/SkipKernelTCFixture.lean`, not part of any `lean_lib`), the
+      # text guard must flag it, and it must still compile clean, so that a
+      # toolchain bump cannot silently turn the replay into a no-op.
+      - name: Replay regression fixture (2 + 2 = 5 must be rejected)
+        run: bash scripts/check_replay_fixture.sh
