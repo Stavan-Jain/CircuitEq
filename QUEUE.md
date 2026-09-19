@@ -20,19 +20,17 @@ Nothing. All five parallel branches are merged (see "Done").
    is killed at 4.6 GB while the same windows pass on `cuccaro_3`, and a
    128-gate move-only replay peaks at 1.9 GB: the kernel's `whnf` cache
    retains every intermediate instruction list for the whole declaration.
-   The same retention kills the seven-qubit `SteanePlus` basis decide at
-   6.9 GB after 20 s of a machine otherwise idle, and the tableau at 40
-   qubits (`benchmarks/scale/`). Levers, in order: a compact `Nat` (or
-   `String`) encoding of the instruction list decoded by the kernel (the
-   canonical phase polynomial showed what this buys: packing the row
-   table into one `Nat` took a CNOT from about 1.5 MB of retained
-   `List.set` terms to a shift and an xor, and the 80-qubit rung from
-   5.2 GB to 3.1 GB); chunked replay and chunked evaluation (one theorem
-   per segment, per basis vector or per tableau generator, composed by
-   `Equivalent.trans`, `equivalent_iff_basis` or a per-generator
-   `tableau_sound`); cursor-based steps (item 4). Acceptance: `cuccaro_4`
-   / teleport checks under 2 GB, the seven-qubit decide finishes, and the
-   40- and 80-qubit tableau rungs certify. M. Depends on nothing.
+   The two other victims of that retention are done (see "Done": the
+   chunked basis decide and the chunked tableau, `CircuitEq/Chunk.lean`);
+   replay is what is left. Levers, in order: a compact `Nat` (or `String`)
+   encoding of the instruction list decoded by the kernel (the canonical
+   phase polynomial showed what this buys: packing the row table into one
+   `Nat` took a CNOT from about 1.5 MB of retained `List.set` terms to a
+   shift and an xor); chunked replay, one theorem per segment of the
+   trace composed by `Equivalent.trans`, in a file with
+   `set_option Elab.async false`; cursor-based steps (item 4).
+   Acceptance: `cuccaro_4` / teleport checks under 2 GB. M. Depends on
+   nothing.
 
 2. **Phase polynomials with Hadamard variables (path-sum form).** Extend
    `PhasePoly` so that an `H` on a wire introduces a fresh variable (bit
@@ -94,7 +92,19 @@ Nothing. All five parallel branches are merged (see "Done").
    registers matter. M. Depends on nothing; resynthesis is the first
    optimiser deliverable.
 
-7. **The 19-origin Clifford run.** Every QECUnitaryCircuits origin against
+7. **A column-packed tableau.** The tableau walks the circuit once per
+   generator, `2n · gates` steps at 0.2 to 0.3 ms each: 7 minutes for the
+   80-qubit random rung (`benchmarks/scale/`). Keep the whole tableau as
+   two `Nat` bit matrices (bit `2n·j + g` for wire `j`, generator `g`) and
+   two phase planes, so a gate is a few shifts and xors on all generators
+   at once and the cost is `gates`: an estimated factor of sixty at 80
+   qubits, and no chunking. Soundness by decoding: the row `g` of the
+   packed state after a gate is `Gate1.conj` of the row before, so the
+   final state gives `ConjAgree` and `equivalentUpToScalar_of_conjAgree`
+   applies unchanged. Acceptance: the 80-qubit rung in seconds, 500
+   structured qubits. M. Depends on nothing.
+
+7a. **The 19-origin Clifford run.** Every QECUnitaryCircuits origin against
    its PyZX `full_reduce` twin by the tableau checker (`≡ₛ`), the
    gate-deleted mutants refuted with a Pauli witness, and the table
    published with kernel times: this is Rung 1's acceptance test for that
@@ -153,13 +163,21 @@ Nothing. All five parallel branches are merged (see "Done").
 
 ## Done
 
-- (this commit) Kernel replay in CI. The axiom check could not see a false
+- `16a1a02` Kernel replay in CI. The axiom check could not see a false
   `decide +kernel` theorem sealed behind `debug.skipKernelTC` (no axioms,
   no error); CI now replays the built `.olean` files with the toolchain's
   `leanchecker` on one thread (28 s, 0.33 GB here; ten threads die at
   26 GB), asserts on every run that the replay rejects the repro in
   `scripts/SkipKernelTCFixture.lean`, and runs
   `scripts/check_debug_options.py` as an early, unsound text guard.
+- `ec9976c` Chunked evaluation (`CircuitEq/Chunk.lean`): `AllBelow`
+  assembles a check proved one index range per declaration;
+  `checkEquivAt` / `equivalent_of_allBelow` (and the `≡ₚ` form) for the
+  basis decide, `tableauCheckGen` / `tableau_sound_of_allBelow` for the
+  tableau, emitters in `scripts/`. The seven-qubit `SteanePlus` decide
+  finishes (78 s, 1.98 GB); the 40- and 80-qubit Clifford rungs certify
+  (39 s at 2.9 GB, 7 min at 4.0 GB); structured Clifford families to 200
+  qubits in seconds. Needs `set_option Elab.async false` in the file.
 - `86a8b99` Canonical phase polynomials: `PhasePoly` stores the
   multilinear polynomial over `ℤ/8` (degree at most three) as `Nat` bit
   planes indexed in the combinatorial number system, with packed rows;
