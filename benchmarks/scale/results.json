@@ -335,6 +335,64 @@
  },
  {
   "family": "surface",
+  "pipeline": "basic",
+  "chunk": 8,
+  "qubits": 161,
+  "gates": 736,
+  "opt_gates": 656,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "CX 37 112",
+  "seed": 1,
+  "rounds": 2,
+  "mirror_agrees": true,
+  "mutant_witness": 37,
+  "defs": {
+   "status": "ok",
+   "wall_s": 2.9,
+   "max_rss_gb": 1.82,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 69.6,
+   "max_rss_gb": 2.28,
+   "errors": []
+  },
+  "kernel_s": 66.7
+ },
+ {
+  "family": "surface",
+  "pipeline": "basic",
+  "chunk": 8,
+  "qubits": 241,
+  "gates": 1120,
+  "opt_gates": 1000,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "H 226",
+  "seed": 1,
+  "rounds": 2,
+  "mirror_agrees": true,
+  "mutant_witness": 226,
+  "defs": {
+   "status": "ok",
+   "wall_s": 3.1,
+   "max_rss_gb": 1.86,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 167.1,
+   "max_rss_gb": 2.55,
+   "errors": []
+  },
+  "kernel_s": 164.0
+ },
+ {
+  "family": "surface",
   "pipeline": "full_reduce",
   "chunk": 8,
   "qubits": 49,
@@ -451,6 +509,8 @@
  },
  {
   "family": "cnot_t",
+  "pipeline": "teleport",
+  "chunk": 0,
   "qubits": 10,
   "gates": 100,
   "opt_gates": 96,
@@ -461,7 +521,7 @@
   "seed": 1,
   "defs": {
    "status": "ok",
-   "wall_s": 1.7,
+   "wall_s": 1.8,
    "max_rss_gb": 1.8,
    "errors": []
   },
@@ -471,12 +531,12 @@
    "max_rss_gb": 1.83,
    "errors": []
   },
-  "kernel_s": 0.1,
-  "pipeline": "teleport",
-  "chunk": 0
+  "kernel_s": 0.0
  },
  {
   "family": "cnot_t",
+  "pipeline": "teleport",
+  "chunk": 0,
   "qubits": 20,
   "gates": 200,
   "opt_gates": 183,
@@ -494,15 +554,15 @@
   "full": {
    "status": "ok",
    "wall_s": 2.0,
-   "max_rss_gb": 1.89,
+   "max_rss_gb": 1.88,
    "errors": []
   },
-  "kernel_s": 0.2,
-  "pipeline": "teleport",
-  "chunk": 0
+  "kernel_s": 0.2
  },
  {
   "family": "cnot_t",
+  "pipeline": "teleport",
+  "chunk": 0,
   "qubits": 40,
   "gates": 400,
   "opt_gates": 368,
@@ -513,22 +573,22 @@
   "seed": 1,
   "defs": {
    "status": "ok",
-   "wall_s": 1.9,
+   "wall_s": 2.0,
    "max_rss_gb": 1.83,
    "errors": []
   },
   "full": {
    "status": "ok",
-   "wall_s": 2.8,
-   "max_rss_gb": 2.07,
+   "wall_s": 2.6,
+   "max_rss_gb": 2.02,
    "errors": []
   },
-  "kernel_s": 0.9,
-  "pipeline": "teleport",
-  "chunk": 0
+  "kernel_s": 0.6
  },
  {
   "family": "cnot_t",
+  "pipeline": "teleport",
+  "chunk": 0,
   "qubits": 80,
   "gates": 800,
   "opt_gates": 783,
@@ -539,18 +599,146 @@
   "seed": 1,
   "defs": {
    "status": "ok",
-   "wall_s": 2.3,
+   "wall_s": 2.8,
    "max_rss_gb": 1.86,
    "errors": []
   },
   "full": {
    "status": "ok",
-   "wall_s": 6.2,
-   "max_rss_gb": 2.85,
+   "wall_s": 4.7,
+   "max_rss_gb": 2.48,
    "errors": []
   },
-  "kernel_s": 3.9,
+  "kernel_s": 1.9
+ },
+ {
+  "family": "ccz_net",
   "pipeline": "teleport",
-  "chunk": 0
+  "chunk": 0,
+  "qubits": 25,
+  "gates": 850,
+  "opt_gates": 714,
+  "tcount": 350,
+  "opt_tcount": 286,
+  "in_fragment": true,
+  "deleted": "CX 4 24",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 2.3,
+   "max_rss_gb": 1.85,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 2.9,
+   "max_rss_gb": 2.03,
+   "errors": []
+  },
+  "kernel_s": 0.6
+ },
+ {
+  "family": "ccz_net",
+  "pipeline": "teleport",
+  "chunk": 0,
+  "qubits": 50,
+  "gates": 1700,
+  "opt_gates": 1429,
+  "tcount": 700,
+  "opt_tcount": 566,
+  "in_fragment": true,
+  "deleted": "T 48",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 2.9,
+   "max_rss_gb": 1.92,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 4.2,
+   "max_rss_gb": 2.24,
+   "errors": []
+  },
+  "kernel_s": 1.3
+ },
+ {
+  "family": "ccz_net",
+  "pipeline": "teleport",
+  "chunk": 0,
+  "qubits": 100,
+  "gates": 3400,
+  "opt_gates": 2846,
+  "tcount": 1400,
+  "opt_tcount": 1136,
+  "in_fragment": true,
+  "deleted": "CX 3 2",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 4.5,
+   "max_rss_gb": 2.05,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 7.3,
+   "max_rss_gb": 2.71,
+   "errors": []
+  },
+  "kernel_s": 2.8
+ },
+ {
+  "family": "ccz_net",
+  "pipeline": "teleport",
+  "chunk": 0,
+  "qubits": 200,
+  "gates": 6800,
+  "opt_gates": 5714,
+  "tcount": 2800,
+  "opt_tcount": 2274,
+  "in_fragment": true,
+  "deleted": "CX 195 196",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 7.9,
+   "max_rss_gb": 2.33,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 13.8,
+   "max_rss_gb": 3.81,
+   "errors": []
+  },
+  "kernel_s": 5.9
+ },
+ {
+  "family": "ccz_net",
+  "pipeline": "teleport",
+  "chunk": 0,
+  "qubits": 300,
+  "gates": 10200,
+  "opt_gates": 8563,
+  "tcount": 4200,
+  "opt_tcount": 3416,
+  "in_fragment": true,
+  "deleted": "S 4",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 11.6,
+   "max_rss_gb": 2.67,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 21.7,
+   "max_rss_gb": 5.26,
+   "errors": []
+  },
+  "kernel_s": 10.1
  }
 ]

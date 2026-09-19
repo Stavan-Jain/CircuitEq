@@ -84,12 +84,13 @@ Nothing. All five parallel branches are merged (see "Done").
    bit per row); `ofNF` resynthesis with `nf (ofNF x) = some x`, which
    turns any untrusted synthesis heuristic into a certified T-count
    optimiser for the fragment (completeness has landed, so the form is a
-   canonical target). Also the remaining kernel cost: a phase gate on a
-   parity of weight `w` costs `O(w)` shift-and-or steps on `C(n, 3)`-bit
-   planes, about 10 ms and 2.5 MB of retained terms at 80 wires, so the
-   80-qubit rung is 271 such gates; a bounded-width or sparse
-   representation of the triple plane is the next lever if wider
-   registers matter. M. Depends on nothing; resynthesis is the first
+   canonical target). Also the remaining kernel cost: the triple plane
+   is one `C(n, 3)`-bit `Nat`, 164 KB at 200 wires, and every gate that
+   changes it copies it, which is the 5.3 GB of the 300-wire CCZ rung
+   (`benchmarks/scale/`). A plane split by top wire, in a structure the
+   kernel can update without walking a list (a binary trie of `Nat`s), is
+   the lever past a few hundred wires. M. Depends on nothing; resynthesis
+   is the first
    optimiser deliverable.
 
 7. **A column-packed tableau.** The tableau walks the circuit once per
@@ -163,7 +164,14 @@ Nothing. All five parallel branches are merged (see "Done").
 
 ## Done
 
-- (this commit) Chunked evaluation (`CircuitEq/Chunk.lean`): `AllBelow`
+- (this commit) Phase gates cost their parity's weight, not the register
+  width: `sparseFold` (set bits by `gcd` and a checked population count)
+  behind `maskFold`, and `Lanes.addOnz`; the CCZ-network family added to
+  the scale test and certified to 300 wires and 10200 gates in 10 s of
+  kernel time, the 100-wire rung from 40 s at 6.8 GB to 7 s at 2.7 GB;
+  the 161- and 241-qubit surface-code rungs certified. The pass-through
+  chain trap recorded in CLAUDE.md.
+- `ec9976c` Chunked evaluation (`CircuitEq/Chunk.lean`): `AllBelow`
   assembles a check proved one index range per declaration;
   `checkEquivAt` / `equivalent_of_allBelow` (and the `≡ₚ` form) for the
   basis decide, `tableauCheckGen` / `tableau_sound_of_allBelow` for the
