@@ -705,7 +705,10 @@ checking at every `n`; the advantage there is T, not S.
   `CircuitEq/Tactic.lean` are the interim form.
 - **Trust, proportionate.** Semantics reviewed by hand and pinned by identity
   lemmas; the evaluator proved, not tested; the generator conformance-checked
-  against Qiskit in CI; the axiom policy in CI. Nothing uses `native_decide`.
+  against Qiskit in CI; the axiom policy in CI, and with it the kernel replay
+  of the built `.olean` files (`leanchecker`), since an axiom check cannot see
+  a declaration that skipped the kernel. Nothing uses `native_decide` or a
+  `debug.*` option.
 - **Flywheel.** Every proved equivalence is a lemma. Keep `Structural.lean`
   curated, grow a `simp` set, and record which lemmas agents actually reach for
   and which alignments they find.

@@ -13,13 +13,14 @@ Sizes: S is a session, M a few sessions, L a milestone.
 ## In flight (19 September 2026)
 
 Item 1, the agent harness: a draft is in `scripts/agent_harness.py` and
-`benchmarks/harness/` with eight development tasks and one held-out pair
-of 1000 gates, the prompt, the playbook (`PLAYBOOK.md`) and a judge by
-restatement, axioms and kernel replay. Three runs so far, the third
-proved (`benchmarks/harness/README.md`). Open before it is "done": the held-out ladder with a QASM
-importer, the baselines, repeated runs with a summary table, and the
-record of which declarations a proof uses (`benchmarks/harness/README.md`,
-"Not built yet").
+`benchmarks/harness/` with eight development tasks, one held-out pair of
+1000 gates and two TZAP pairs, the prompt, the playbook (`PLAYBOOK.md`)
+and a judge by restatement, axioms and kernel replay. Three runs so far,
+the third proved. The optimisation harness (`scripts/optimizer_harness.py`)
+is built on the same pieces and tested by hand, with no agent run yet. Open
+before item 1 is "done": the held-out ladder with a QASM importer, the
+baselines, repeated runs with a summary table, and the record of which
+declarations a proof uses (`benchmarks/harness/README.md`).
 
 ## Next
 
@@ -88,19 +89,17 @@ record of which declarations a proof uses (`benchmarks/harness/README.md`,
    is killed at 4.6 GB while the same windows pass on `cuccaro_3`, and a
    128-gate move-only replay peaks at 1.9 GB: the kernel's `whnf` cache
    retains every intermediate instruction list for the whole declaration.
-   The same retention kills the seven-qubit `SteanePlus` basis decide at
-   6.9 GB after 20 s of a machine otherwise idle, and the tableau at 40
-   qubits (`benchmarks/scale/`). Levers, in order: a compact `Nat` (or
-   `String`) encoding of the instruction list decoded by the kernel (the
-   canonical phase polynomial showed what this buys: packing the row
-   table into one `Nat` took a CNOT from about 1.5 MB of retained
-   `List.set` terms to a shift and an xor, and the 80-qubit rung from
-   5.2 GB to 3.1 GB); chunked replay and chunked evaluation (one theorem
-   per segment, per basis vector or per tableau generator, composed by
-   `Equivalent.trans`, `equivalent_iff_basis` or a per-generator
-   `tableau_sound`); cursor-based steps (item 6). Acceptance: `cuccaro_4`
-   / teleport checks under 2 GB, the seven-qubit decide finishes, and the
-   40- and 80-qubit tableau rungs certify. M. Depends on nothing.
+   The two other victims of that retention are done (see "Done": the
+   chunked basis decide and the chunked tableau, `CircuitEq/Chunk.lean`);
+   replay is what is left. Levers, in order: a compact `Nat` (or `String`)
+   encoding of the instruction list decoded by the kernel (the canonical
+   phase polynomial showed what this buys: packing the row table into one
+   `Nat` took a CNOT from about 1.5 MB of retained `List.set` terms to a
+   shift and an xor); chunked replay, one theorem per segment of the
+   trace composed by `Equivalent.trans`, in a file with
+   `set_option Elab.async false`; cursor-based steps (item 6).
+   Acceptance: `cuccaro_4` / teleport checks under 2 GB. M. Depends on
+   nothing.
 
 4. **Phase polynomials with Hadamard variables (path-sum form).** Extend
    `PhasePoly` so that an `H` on a wire introduces a fresh variable (bit
@@ -154,15 +153,28 @@ record of which declarations a proof uses (`benchmarks/harness/README.md`,
    bit per row); `ofNF` resynthesis with `nf (ofNF x) = some x`, which
    turns any untrusted synthesis heuristic into a certified T-count
    optimiser for the fragment (completeness has landed, so the form is a
-   canonical target). Also the remaining kernel cost: a phase gate on a
-   parity of weight `w` costs `O(w)` shift-and-or steps on `C(n, 3)`-bit
-   planes, about 10 ms and 2.5 MB of retained terms at 80 wires, so the
-   80-qubit rung is 271 such gates; a bounded-width or sparse
-   representation of the triple plane is the next lever if wider
-   registers matter. M. Depends on nothing; resynthesis is the first
+   canonical target). Also the remaining kernel cost: the triple plane
+   is one `C(n, 3)`-bit `Nat`, 164 KB at 200 wires, and every gate that
+   changes it copies it, which is the 5.3 GB of the 300-wire CCZ rung
+   (`benchmarks/scale/`). A plane split by top wire, in a structure the
+   kernel can update without walking a list (a binary trie of `Nat`s), is
+   the lever past a few hundred wires. M. Depends on nothing; resynthesis
+   is the first
    optimiser deliverable.
 
-9. **The 19-origin Clifford run.** Every QECUnitaryCircuits origin against
+9. **A column-packed tableau.** The tableau walks the circuit once per
+   generator, `2n · gates` steps at 0.2 to 0.3 ms each: 7 minutes for the
+   80-qubit random rung (`benchmarks/scale/`). Keep the whole tableau as
+   two `Nat` bit matrices (bit `2n·j + g` for wire `j`, generator `g`) and
+   two phase planes, so a gate is a few shifts and xors on all generators
+   at once and the cost is `gates`: an estimated factor of sixty at 80
+   qubits, and no chunking. Soundness by decoding: the row `g` of the
+   packed state after a gate is `Gate1.conj` of the row before, so the
+   final state gives `ConjAgree` and `equivalentUpToScalar_of_conjAgree`
+   applies unchanged. Acceptance: the 80-qubit rung in seconds, 500
+   structured qubits. M. Depends on nothing.
+
+9a. **The 19-origin Clifford run.** Every QECUnitaryCircuits origin against
    its PyZX `full_reduce` twin by the tableau checker (`≡ₛ`), the
    gate-deleted mutants refuted with a Pauli witness, and the table
    published with kernel times: this is Rung 1's acceptance test for that
@@ -171,17 +183,16 @@ record of which declarations a proof uses (`benchmarks/harness/README.md`,
 
 10. **Residual pattern.** Cut points where one circuit's prefix times the
     inverse of the other's is a Clifford (tableau) or a diagonal (phase
-    polynomial), proved preserved step by step, as a certificate step
-    kind. First target: `tof_3` against `full_reduce` (T-count 15), which
-    has no window alignment. L. Depends on the tableau branch and item 4.
+    polynomial), proved preserved step by step, as a certificate step kind.
+    First target: `tof_3` against `full_reduce` (T-count 15), which has no
+    window alignment. L. Depends on the tableau branch and item 4.
 
 11. **Refutation certificates.** Step kinds that prove `¬ (a ≡ᵤ b)`: a
-    basis vector on which the evaluators differ, a Pauli whose images
-    under the two tableaux differ. `phasePolyRefutes` already does this
-    for the CNOT-plus-diagonal fragment by completeness
-    (`PhasePoly.refutes_sound`); the step kinds make it composable. Needed
-    for mutants and for the survey's negative results. S. Depends on
-    item 3.
+    basis vector on which the evaluators differ, a Pauli whose images under
+    the two tableaux differ. `phasePolyRefutes` already does this for the
+    CNOT-plus-diagonal fragment by completeness (`PhasePoly.refutes_sound`);
+    the step kinds make it composable. Needed for mutants and for the
+    survey's negative results. S. Depends on item 3.
 
 12. **Rung 2 conformance.** A Qiskit statevector check of
     `lean_instructions` on the benchmark files and a few hundred random
@@ -228,7 +239,29 @@ record of which declarations a proof uses (`benchmarks/harness/README.md`,
 
 ## Done
 
-- (this commit) Canonical phase polynomials: `PhasePoly` stores the
+- `16a1a02` Kernel replay in CI. The axiom check could not see a false
+  `decide +kernel` theorem sealed behind `debug.skipKernelTC` (no axioms,
+  no error); CI now replays the built `.olean` files with the toolchain's
+  `leanchecker` on one thread (28 s, 0.33 GB here; ten threads die at
+  26 GB), asserts on every run that the replay rejects the repro in
+  `scripts/SkipKernelTCFixture.lean`, and runs
+  `scripts/check_debug_options.py` as an early, unsound text guard.
+- `5178a32` Phase gates cost their parity's weight, not the register
+  width: `sparseFold` (set bits by `gcd` and a checked population count)
+  behind `maskFold`, and `Lanes.addOnz`; the CCZ-network family added to
+  the scale test and certified to 300 wires and 10200 gates in 10 s of
+  kernel time, the 100-wire rung from 40 s at 6.8 GB to 7 s at 2.7 GB;
+  the 161- and 241-qubit surface-code rungs certified. The pass-through
+  chain trap recorded in CLAUDE.md.
+- `ec9976c` Chunked evaluation (`CircuitEq/Chunk.lean`): `AllBelow`
+  assembles a check proved one index range per declaration;
+  `checkEquivAt` / `equivalent_of_allBelow` (and the `≡ₚ` form) for the
+  basis decide, `tableauCheckGen` / `tableau_sound_of_allBelow` for the
+  tableau, emitters in `scripts/`. The seven-qubit `SteanePlus` decide
+  finishes (78 s, 1.98 GB); the 40- and 80-qubit Clifford rungs certify
+  (39 s at 2.9 GB, 7 min at 4.0 GB); structured Clifford families to 200
+  qubits in seconds. Needs `set_option Elab.async false` in the file.
+- `86a8b99` Canonical phase polynomials: `PhasePoly` stores the
   multilinear polynomial over `ℤ/8` (degree at most three) as `Nat` bit
   planes indexed in the combinatorial number system, with packed rows;
   soundness redone, completeness proved (`PhasePoly.complete`), the

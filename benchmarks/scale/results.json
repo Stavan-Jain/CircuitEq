@@ -21,7 +21,9 @@
    "max_rss_gb": 3.18,
    "errors": []
   },
-  "kernel_s": 6.3
+  "kernel_s": 6.3,
+  "pipeline": "full_reduce",
+  "chunk": 0
  },
  {
   "family": "clifford",
@@ -44,7 +46,9 @@
    "wall_s": 65.6,
    "max_rss_gb": 6.15,
    "errors": []
-  }
+  },
+  "pipeline": "full_reduce",
+  "chunk": 0
  },
  {
   "family": "clifford",
@@ -70,10 +74,443 @@
    "wall_s": 393.3,
    "max_rss_gb": null,
    "errors": []
-  }
+  },
+  "pipeline": "full_reduce",
+  "chunk": 0
+ },
+ {
+  "family": "clifford",
+  "pipeline": "full_reduce",
+  "chunk": 8,
+  "qubits": 20,
+  "gates": 200,
+  "opt_gates": 597,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "H 17",
+  "seed": 1,
+  "mirror_agrees": true,
+  "mutant_witness": 2,
+  "defs": {
+   "status": "ok",
+   "wall_s": 2.1,
+   "max_rss_gb": 1.8,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 6.7,
+   "max_rss_gb": 2.07,
+   "errors": []
+  },
+  "kernel_s": 4.6
+ },
+ {
+  "family": "clifford",
+  "pipeline": "full_reduce",
+  "chunk": 8,
+  "qubits": 40,
+  "gates": 400,
+  "opt_gates": 2346,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "H 38",
+  "seed": 1,
+  "mirror_agrees": true,
+  "mutant_witness": 10,
+  "defs": {
+   "status": "ok",
+   "wall_s": 3.1,
+   "max_rss_gb": 1.91,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 42.1,
+   "max_rss_gb": 2.87,
+   "errors": []
+  },
+  "kernel_s": 39.0
+ },
+ {
+  "family": "clifford",
+  "pipeline": "full_reduce",
+  "chunk": 4,
+  "qubits": 80,
+  "gates": 800,
+  "opt_gates": 8261,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "H 70",
+  "seed": 1,
+  "mirror_agrees": true,
+  "mutant_witness": 50,
+  "defs": {
+   "status": "ok",
+   "wall_s": 7.7,
+   "max_rss_gb": 2.32,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 429.6,
+   "max_rss_gb": 3.95,
+   "errors": []
+  },
+  "kernel_s": 421.9
+ },
+ {
+  "family": "ghz",
+  "pipeline": "full_reduce",
+  "chunk": 16,
+  "qubits": 50,
+  "gates": 50,
+  "opt_gates": 50,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "CX 2 3",
+  "seed": 1,
+  "mirror_agrees": true,
+  "mutant_witness": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 1.7,
+   "max_rss_gb": 1.76,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 2.3,
+   "max_rss_gb": 1.8,
+   "errors": []
+  },
+  "kernel_s": 0.6
+ },
+ {
+  "family": "ghz",
+  "pipeline": "full_reduce",
+  "chunk": 16,
+  "qubits": 100,
+  "gates": 100,
+  "opt_gates": 100,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "CX 6 7",
+  "seed": 1,
+  "mirror_agrees": true,
+  "mutant_witness": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 1.9,
+   "max_rss_gb": 1.77,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 4.0,
+   "max_rss_gb": 1.83,
+   "errors": []
+  },
+  "kernel_s": 2.1
+ },
+ {
+  "family": "ghz",
+  "pipeline": "full_reduce",
+  "chunk": 16,
+  "qubits": 200,
+  "gates": 200,
+  "opt_gates": 200,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "CX 13 14",
+  "seed": 1,
+  "mirror_agrees": true,
+  "mutant_witness": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 2.0,
+   "max_rss_gb": 1.78,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 13.5,
+   "max_rss_gb": 1.92,
+   "errors": []
+  },
+  "kernel_s": 11.5
+ },
+ {
+  "family": "surface",
+  "pipeline": "basic",
+  "chunk": 8,
+  "qubits": 17,
+  "gates": 64,
+  "opt_gates": 56,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "CX 5 15",
+  "seed": 1,
+  "mirror_agrees": true,
+  "mutant_witness": 5,
+  "defs": {
+   "status": "ok",
+   "wall_s": 2.0,
+   "max_rss_gb": 1.76,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 3.0,
+   "max_rss_gb": 1.81,
+   "errors": []
+  },
+  "kernel_s": 1.0,
+  "rounds": 2
+ },
+ {
+  "family": "surface",
+  "pipeline": "basic",
+  "chunk": 8,
+  "qubits": 49,
+  "gates": 208,
+  "opt_gates": 184,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "CX 30 3",
+  "seed": 1,
+  "mirror_agrees": true,
+  "mutant_witness": 52,
+  "defs": {
+   "status": "ok",
+   "wall_s": 2.0,
+   "max_rss_gb": 1.78,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 7.9,
+   "max_rss_gb": 1.92,
+   "errors": []
+  },
+  "kernel_s": 5.9,
+  "rounds": 2
+ },
+ {
+  "family": "surface",
+  "pipeline": "basic",
+  "chunk": 8,
+  "qubits": 97,
+  "gates": 432,
+  "opt_gates": 384,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "H 62",
+  "seed": 1,
+  "mirror_agrees": true,
+  "mutant_witness": 62,
+  "defs": {
+   "status": "ok",
+   "wall_s": 2.1,
+   "max_rss_gb": 1.79,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 26.6,
+   "max_rss_gb": 2.05,
+   "errors": []
+  },
+  "kernel_s": 24.5,
+  "rounds": 2
+ },
+ {
+  "family": "surface",
+  "pipeline": "basic",
+  "chunk": 8,
+  "qubits": 161,
+  "gates": 736,
+  "opt_gates": 656,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "CX 37 112",
+  "seed": 1,
+  "rounds": 2,
+  "mirror_agrees": true,
+  "mutant_witness": 37,
+  "defs": {
+   "status": "ok",
+   "wall_s": 2.9,
+   "max_rss_gb": 1.82,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 69.6,
+   "max_rss_gb": 2.28,
+   "errors": []
+  },
+  "kernel_s": 66.7
+ },
+ {
+  "family": "surface",
+  "pipeline": "basic",
+  "chunk": 8,
+  "qubits": 241,
+  "gates": 1120,
+  "opt_gates": 1000,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "H 226",
+  "seed": 1,
+  "rounds": 2,
+  "mirror_agrees": true,
+  "mutant_witness": 226,
+  "defs": {
+   "status": "ok",
+   "wall_s": 3.1,
+   "max_rss_gb": 1.86,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 167.1,
+   "max_rss_gb": 2.55,
+   "errors": []
+  },
+  "kernel_s": 164.0
+ },
+ {
+  "family": "surface",
+  "pipeline": "full_reduce",
+  "chunk": 8,
+  "qubits": 49,
+  "gates": 104,
+  "opt_gates": 122,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "CX 18 44",
+  "seed": 1,
+  "rounds": 1,
+  "mirror_agrees": true,
+  "mutant_witness": 18,
+  "defs": {
+   "status": "ok",
+   "wall_s": 1.8,
+   "max_rss_gb": 1.77,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 4.5,
+   "max_rss_gb": 1.85,
+   "errors": []
+  },
+  "kernel_s": 2.7
+ },
+ {
+  "family": "surface",
+  "pipeline": "full_reduce",
+  "chunk": 8,
+  "qubits": 97,
+  "gates": 216,
+  "opt_gates": 250,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "CX 95 45",
+  "seed": 1,
+  "rounds": 1,
+  "mirror_agrees": true,
+  "mutant_witness": 142,
+  "defs": {
+   "status": "ok",
+   "wall_s": 1.9,
+   "max_rss_gb": 1.78,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 14.4,
+   "max_rss_gb": 1.93,
+   "errors": []
+  },
+  "kernel_s": 12.5
+ },
+ {
+  "family": "surface",
+  "pipeline": "full_reduce",
+  "chunk": 8,
+  "qubits": 161,
+  "gates": 368,
+  "opt_gates": 436,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "H 90",
+  "seed": 1,
+  "rounds": 1,
+  "mirror_agrees": true,
+  "mutant_witness": 90,
+  "defs": {
+   "status": "ok",
+   "wall_s": 2.1,
+   "max_rss_gb": 1.8,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 40.6,
+   "max_rss_gb": 2.09,
+   "errors": []
+  },
+  "kernel_s": 38.5
+ },
+ {
+  "family": "surface",
+  "pipeline": "full_reduce",
+  "chunk": 8,
+  "qubits": 97,
+  "gates": 432,
+  "opt_gates": 0,
+  "tcount": 0,
+  "opt_tcount": 0,
+  "in_fragment": true,
+  "deleted": "CX 55 10",
+  "seed": 1,
+  "rounds": 2,
+  "mirror_agrees": true,
+  "mutant_witness": 107,
+  "defs": {
+   "status": "ok",
+   "wall_s": 2.0,
+   "max_rss_gb": 1.78,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 13.8,
+   "max_rss_gb": 1.93,
+   "errors": []
+  },
+  "kernel_s": 11.8
  },
  {
   "family": "cnot_t",
+  "pipeline": "teleport",
+  "chunk": 0,
   "qubits": 10,
   "gates": 100,
   "opt_gates": 96,
@@ -84,7 +521,7 @@
   "seed": 1,
   "defs": {
    "status": "ok",
-   "wall_s": 1.7,
+   "wall_s": 1.8,
    "max_rss_gb": 1.8,
    "errors": []
   },
@@ -94,10 +531,12 @@
    "max_rss_gb": 1.83,
    "errors": []
   },
-  "kernel_s": 0.1
+  "kernel_s": 0.0
  },
  {
   "family": "cnot_t",
+  "pipeline": "teleport",
+  "chunk": 0,
   "qubits": 20,
   "gates": 200,
   "opt_gates": 183,
@@ -115,13 +554,15 @@
   "full": {
    "status": "ok",
    "wall_s": 2.0,
-   "max_rss_gb": 1.89,
+   "max_rss_gb": 1.88,
    "errors": []
   },
   "kernel_s": 0.2
  },
  {
   "family": "cnot_t",
+  "pipeline": "teleport",
+  "chunk": 0,
   "qubits": 40,
   "gates": 400,
   "opt_gates": 368,
@@ -132,20 +573,22 @@
   "seed": 1,
   "defs": {
    "status": "ok",
-   "wall_s": 1.9,
+   "wall_s": 2.0,
    "max_rss_gb": 1.83,
    "errors": []
   },
   "full": {
    "status": "ok",
-   "wall_s": 2.8,
-   "max_rss_gb": 2.07,
+   "wall_s": 2.6,
+   "max_rss_gb": 2.02,
    "errors": []
   },
-  "kernel_s": 0.9
+  "kernel_s": 0.6
  },
  {
   "family": "cnot_t",
+  "pipeline": "teleport",
+  "chunk": 0,
   "qubits": 80,
   "gates": 800,
   "opt_gates": 783,
@@ -156,16 +599,146 @@
   "seed": 1,
   "defs": {
    "status": "ok",
-   "wall_s": 2.3,
+   "wall_s": 2.8,
    "max_rss_gb": 1.86,
    "errors": []
   },
   "full": {
    "status": "ok",
-   "wall_s": 6.2,
-   "max_rss_gb": 2.85,
+   "wall_s": 4.7,
+   "max_rss_gb": 2.48,
    "errors": []
   },
-  "kernel_s": 3.9
+  "kernel_s": 1.9
+ },
+ {
+  "family": "ccz_net",
+  "pipeline": "teleport",
+  "chunk": 0,
+  "qubits": 25,
+  "gates": 850,
+  "opt_gates": 714,
+  "tcount": 350,
+  "opt_tcount": 286,
+  "in_fragment": true,
+  "deleted": "CX 4 24",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 2.3,
+   "max_rss_gb": 1.85,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 2.9,
+   "max_rss_gb": 2.03,
+   "errors": []
+  },
+  "kernel_s": 0.6
+ },
+ {
+  "family": "ccz_net",
+  "pipeline": "teleport",
+  "chunk": 0,
+  "qubits": 50,
+  "gates": 1700,
+  "opt_gates": 1429,
+  "tcount": 700,
+  "opt_tcount": 566,
+  "in_fragment": true,
+  "deleted": "T 48",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 2.9,
+   "max_rss_gb": 1.92,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 4.2,
+   "max_rss_gb": 2.24,
+   "errors": []
+  },
+  "kernel_s": 1.3
+ },
+ {
+  "family": "ccz_net",
+  "pipeline": "teleport",
+  "chunk": 0,
+  "qubits": 100,
+  "gates": 3400,
+  "opt_gates": 2846,
+  "tcount": 1400,
+  "opt_tcount": 1136,
+  "in_fragment": true,
+  "deleted": "CX 3 2",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 4.5,
+   "max_rss_gb": 2.05,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 7.3,
+   "max_rss_gb": 2.71,
+   "errors": []
+  },
+  "kernel_s": 2.8
+ },
+ {
+  "family": "ccz_net",
+  "pipeline": "teleport",
+  "chunk": 0,
+  "qubits": 200,
+  "gates": 6800,
+  "opt_gates": 5714,
+  "tcount": 2800,
+  "opt_tcount": 2274,
+  "in_fragment": true,
+  "deleted": "CX 195 196",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 7.9,
+   "max_rss_gb": 2.33,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 13.8,
+   "max_rss_gb": 3.81,
+   "errors": []
+  },
+  "kernel_s": 5.9
+ },
+ {
+  "family": "ccz_net",
+  "pipeline": "teleport",
+  "chunk": 0,
+  "qubits": 300,
+  "gates": 10200,
+  "opt_gates": 8563,
+  "tcount": 4200,
+  "opt_tcount": 3416,
+  "in_fragment": true,
+  "deleted": "S 4",
+  "seed": 1,
+  "defs": {
+   "status": "ok",
+   "wall_s": 11.6,
+   "max_rss_gb": 2.67,
+   "errors": []
+  },
+  "full": {
+   "status": "ok",
+   "wall_s": 21.7,
+   "max_rss_gb": 5.26,
+   "errors": []
+  },
+  "kernel_s": 10.1
  }
 ]

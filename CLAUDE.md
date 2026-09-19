@@ -64,14 +64,26 @@ Rules that follow, for anyone adding to the library:
   `Gate1.applyN` / `applyCNOTN` (on `ℕ`, definitionally the same; what
   `evalFn` composes), plus the generic `Gate1.matD` / `applyOneD` mirror of
   `applyOne`. A computational device only: `denote` stays over `Zeta8`.
+- `CircuitEq/Chunk.lean` — chunked kernel evaluation: `AllBelow P k`
+  (`P y = true` for every `y < k`), `AllBelow.zero`, `AllBelow.add` (extend
+  by a range `(List.range' lo len).all P = true`, itself one
+  `decide +kernel`). The kernel keeps its reduction cache for a whole
+  declaration, so a check over many indices is proved one range per
+  declaration and assembled by a constant-size term; peak memory is one
+  chunk's. Generated files must start with `set_option Elab.async false`,
+  or the memory of one declaration is not returned before the next
+  starts. Consumers: `equivalent_of_allBelow`,
+  `equivalentUpToPhase_of_allBelow`, `tableau_sound_of_allBelow`.
 - `CircuitEq/Semantics.lean` — `Instr`, `Circuit n := List (Instr n)`,
   `denote`, `denoteₗ`, `Equivalent` (`≡ᵤ`), `EquivalentUpToPhase` (`≡ₚ`),
   `EquivalentUpToScalar` (`≡ₛ`, up to a unit of `Zeta8`; what a tableau
   certifies), basis reduction, the evaluators `evalList` (reference, over
   `Zeta8`), `evalListD` (its dyadic form) and `evalFn` (dyadic closures on
   `ℕ` indices, what the instances run), `checkEquiv` /
-  `checkEquivUpToPhase`, `Decidable` instances, `Trans` instance for
-  `calc`.
+  `checkEquivUpToPhase`, their per-basis-vector chunks `checkEquivAt` /
+  `checkEquivUpToPhaseAt` with `equivalent_of_allBelow` /
+  `equivalentUpToPhase_of_allBelow`, `Decidable` instances, `Trans`
+  instance for `calc`.
 - `CircuitEq/Checker.lean` — the checker contract: `Checker n` is
   `check : Circuit n → Circuit n → Bool` plus `sound : check a b = true →
   a ≡ᵤ b` (`PhaseChecker`, `ScalarChecker` for `≡ₚ`, `≡ₛ`); `NormalForm n`
@@ -96,15 +108,20 @@ Rules that follow, for anyone adding to the library:
   `C(n,2)` and `C(n,3)` bits). A CNOT is a shift and an xor; a phase gate
   of phase `k` on a parity `m` adds `k`, `−2k`, `4k` on the lanes of the
   wires, pairs and triples of `m` (`Lanes.addOn`, a ripple-carry adder on
-  planes; `pairMask`, `tripMask`, one shift-and-or per set bit). `nf`,
-  `phasePolyNormalForm n`, `phasePolyChecker n` as before; new:
-  `phasePolyRefutes n a b`, whose `true` proves `¬ a ≡ᵤ b`
+  planes; `pairMask`, `tripMask`, one shift-and-or per set bit by
+  `maskFold`, which visits only the set bits of a sparse parity, lowest
+  bit by `gcd`, index by a population count checked on 1024 powers of two,
+  and tests every index of a dense one; `Lanes.addOnz` skips a plane with
+  nothing to add). `nf`, `phasePolyNormalForm n`, `phasePolyChecker n` as
+  before; new: `phasePolyRefutes n a b`, whose `true` proves `¬ a ≡ᵤ b`
   (`PhasePoly.complete`: equal unitaries give equal forms), so within the
   fragment `check` is a decision procedure (`phasePolyChecker_check_iff`).
   Cost is linear in the gate count and never `2 ^ n`: the scale test's
   random CNOT+T pairs on 20, 40 and 80 wires (200, 400, 800 gates) certify
-  in about 0.3, 1 and 4 s of kernel time at 2.0, 2.2 and 3.1 GB; the
-  remaining cost is the phase gates on dense parities (`QUEUE.md` item 8).
+  in 0.2, 0.6 and 1.9 s of kernel time at 1.9, 2.0 and 2.5 GB, and CCZ
+  networks of 3400, 6800 and 10200 gates on 100, 200 and 300 wires in 2.8,
+  5.9 and 10.1 s at 2.7, 3.8 and 5.3 GB; what grows is the `C(n,3)`-bit
+  triple plane, copied by every gate that changes it (`QUEUE.md` item 8).
   A proof is `(phasePolyChecker n).sound _ _ (by decide +kernel)`, a
   refutation `phasePolyRefutes_sound (by decide +kernel)`; bare `decide`
   times out at about a hundred gates. The extension with Hadamard
@@ -117,9 +134,16 @@ Rules that follow, for anyone adding to the library:
   `none` outside the fragment or for `CX c c`), `tableauCheck`,
   `tableau_sound` (equal tableaux give `≡ₛ`, the normal-form shape) and
   the export `tableauChecker n : ScalarChecker n`; `witness` names the
-  first disagreeing generator. Structure-independent, `O(n)` bit
-  operations per gate, no `Zeta8` arithmetic in the kernel: the 15-qubit
-  Reed–Muller pair decides in about 0.3 s. Extend `Gate1.conj` (with a
+  first disagreeing generator. The soundness argument is stated on
+  `ConjAgree a b` (every generator has the same image), so the chunked
+  form shares it: `genAt n g` numbers the `2n` generators on `ℕ`,
+  `tableauCheckGen a b g` checks one, and `tableau_sound_of_allBelow`
+  turns `AllBelow (tableauCheckGen a b) (2 * n)` into `a ≡ₛ b`.
+  Structure-independent, `O(n)` bit operations per gate, no `Zeta8`
+  arithmetic in the kernel: the 15-qubit Reed–Muller pair decides in
+  about 0.3 s; about 0.2 ms of kernel time per generator and gate, so
+  cost is `2n · gates` and past a few thousand gates the check must be
+  chunked (`scripts/scale_test.py --chunk`). Extend `Gate1.conj` (with a
   `sound` case) if the Clifford alphabet grows.
 - `CircuitEq/Structural.lean` — the parametric toolkit: fusion,
   commutation, `denote_applyOne_comm_of_not_touches`, `layer`, `hLayer`.
@@ -175,6 +199,13 @@ Rules that follow, for anyone adding to the library:
   `rz(k·π/4)` to the diagonal Clifford+T gate with that matrix. A `tzap`
   pipeline (https://github.com/qqq-wisc/tzap) is queued; TZAP reads and
   writes the same `rz` convention as PyZX.
+- `scripts/scale_test.py` — the scale ladder (`benchmarks/scale/`): seeded
+  families (`clifford`, `cnot_t` random; `ghz`, `surface`, `ccz_net`
+  structured), PyZX pipelines including the peephole `basic`, `--chunk G`
+  for the chunked tableau, and a Python mirror of the Pauli update rules
+  that pre-checks a pair and names a mutant's witness generator.
+  `scripts/chunked_decide.py <Module>` emits and times the chunked basis
+  decide of a benchmark module; `scripts/chunks.py` is what both share.
 - `PLAYBOOK.md` — the prover's guide: what exists, what it costs, and in
   which order to try it on a concrete pair. The agent harness installs it
   as the `CLAUDE.md` of every run, so it is all an agent under test knows
@@ -189,6 +220,13 @@ Rules that follow, for anyone adding to the library:
   where mathlib is not already compiled. Changing the prompt, the judge or
   the agent configuration changes the instrument: bump `HARNESS_VERSION`.
 - `scripts/AxiomCheck.lean` — CI axiom policy; not in any `lean_lib`.
+- `scripts/check_debug_options.py`, `scripts/SkipKernelTCFixture.lean`,
+  `scripts/check_replay_fixture.sh` — the kernel-replay policy's text guard
+  (an early warning, not sound), its regression fixture (`2 + 2 = 5` behind
+  `debug.skipKernelTC`; not in any `lean_lib`, never imported, the one file
+  the guard exempts) and the CI assertion that the fixture compiles clean,
+  is flagged by the guard and is rejected by `leanchecker`. See
+  "Conventions".
 
 Namespaces: `Quantum.Zeta8` for the field, `Quantum.Circuit` for everything
 else (the type `Quantum.Circuit n` lives at the namespace's own name, like
@@ -209,6 +247,32 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
   `[propext, Classical.choice, Quot.sound]`. Check a result with
   `#print axioms`. `sorry` only on WIP branches, tagged
   `sorry -- TODO(<tag>): <goal shape>`.
+- **`debug.*` options are banned, and the kernel replay is the other half of
+  the trust policy.** `set_option debug.skipKernelTC true` makes Lean add a
+  declaration without sending it to the kernel. `decide +kernel` leaves its
+  whole check to the kernel, so under the option a false leaf proof
+  elaborates without an error and the axiom check reports it clean: it
+  depends on no axioms at all (verified on this toolchain, 18 September
+  2026: `2 + 2 = 5`, and `[H 0] ≡ᵤ [X 0]` inside a library module, with
+  `lake build` and `AxiomCheck` both green). So CI also replays every
+  declaration of the built `.olean` files through the kernel,
+  `LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq`, in a process where
+  no option or meta code of the library runs. `leanchecker` is the former
+  lean4checker, shipped inside the toolchain since v4.28 (the separate
+  repository is deprecated and has no tag for this toolchain), so it always
+  matches `lean-toolchain`. `scripts/check_replay_fixture.sh` asserts on
+  every CI run that the replay rejects the repro kept in
+  `scripts/SkipKernelTCFixture.lean`. `scripts/check_debug_options.py` is a
+  text guard for the obvious spellings in the Lean sources and
+  `lakefile.toml`; it is an early warning and is not sound, because an
+  option can be set from meta code under a name no search recognises (a
+  variant that assembles the name from string pieces passes the guard and
+  the axiom check, and the replay rejects it). The replay is the defence.
+  It re-checks this library's modules against their imports as delivered:
+  mathlib and core are trusted as the cache provides them, and it is the
+  same kernel again, not an independent checker. Never set a `debug.*`
+  option in the library, in `scripts/` or in `lakefile.toml`; a proof that
+  needs one is not a proof.
 - **No `set_option linter.* false`.** Fix the warning or leave it visible.
   The build is currently warning-free; keep it that way.
 - **Docstring prose wraps at 80 columns**, code at 100 (the `longLine`
@@ -241,11 +305,32 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
 ```bash
 lake build                            # whole library (~1 min warm)
 lake env lean scripts/AxiomCheck.lean # axiom policy, needs a completed build
+LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq  # kernel replay, same
+bash scripts/check_replay_fixture.sh  # the replay still rejects the repro
+python3 scripts/check_debug_options.py  # text guard, needs no build
 lake env lean /tmp/probe.lean         # one-off file check
 ```
 
 Always `lake build` before claiming a fix works; the error output prints the
 residual goal under each failure.
+
+**The kernel replay runs on one thread.** (Not the certificate `replay` of
+`Certificate.lean`: this is `leanchecker` over the `.olean` files.) It
+replays modules in parallel, and every replay beyond the first loads a
+private copy of the mathlib imports. Measured on the M4 (18 and 19
+September 2026; 23 modules, 2119 declarations): one thread 22 to 28 s,
+0.33 to 0.41 GB peak footprint (1.7 to 1.8 GB resident, almost all of it
+the mapped mathlib `.olean` files); two threads 16 s and 2.1 GB; the
+default ten threads were killed by the OS after 4 minutes at a 26 GB
+footprint. On GitHub's `ubuntu-latest` runner the one-thread replay is a
+25 to 39 s step in a 2 to 3 minute job, and the fixture check 2 s. It is a CI
+step of its own, not lean-action's `leanchecker` input, because the thread
+cap would sit on that whole step and slow the build too; `-v` makes the
+log list the modules replayed. Never run it without `LEAN_NUM_THREADS=1`,
+and count it as a lake process for the rule below. It replays whatever
+`.olean` files are under `.lake/build`, so delete the build products of a
+module you remove (`lake build` does not) or the replay keeps checking the
+stale file.
 
 **Sharing mathlib with QECLean.** This project pins the same mathlib commit
 as the sibling repo `../QECLean`. `.lake/packages` may be a symlink to
@@ -308,10 +393,20 @@ on forcing). The expected cost is 5 × 10⁵ memoised gate steps and a cache
 of the order of 10⁷ terms, tens of seconds and a few GB. Measured on an
 idle machine (16 September 2026): a 6 GB watchdog killed the kernel after
 20 s at 6.9 GB resident and still growing, 19 s of CPU. The cache, not the
-arithmetic, is the wall; chunked evaluation (one lemma per basis vector or
-per gate block, composed by `equivalent_iff_basis` or `Equivalent.trans`)
-is the lever, and the same retention limits certificate replay
-(`QUEUE.md`, item 3).
+arithmetic, is the wall, and chunked evaluation is the lever
+(`CircuitEq/Chunk.lean`): with one basis vector per declaration the same
+pair decides in 78 s at 1.98 GB peak, 0.06 GB above the imports
+(`scripts/chunked_decide.py SteanePlus --chunk 1`, 18 September 2026).
+A basis vector costs about 0.6 s and 165 MB of retained terms here (32
+gates, 128 amplitudes: some 150 µs and 40 KB per amplitude and gate), so
+the cost of a whole-register decide is `gates · 4^n` of those steps: about
+five minutes at eight qubits, over an hour at ten. Two facts that matter
+for every chunked file: memory is returned at a declaration boundary only
+with `set_option Elab.async false` (with asynchronous elaboration on,
+sixteen 4-vector declarations peak at 3.6 GB instead of 2.6 GB, and a
+128-declaration file at 5.2 GB), and `lean -j1` does not help. The same
+retention limits certificate replay (`QUEUE.md`, item 3), where the lever
+is a compact encoding of the instruction list.
 
 Two intermediate designs were measured on the way: the same dyadic
 arithmetic through the materialised list evaluator (`evalListD`, kept as
@@ -324,6 +419,25 @@ forced reads bring it to 0.1 s. Depth is now linear: eighteen Hadamards on
 one qubit decide in 42 ms, where the unforced closures did not finish in a
 minute. Memory is the limit before time: the kernel's `whnf` cache retains
 everything evaluated during one declaration.
+
+Kernel facts measured while scaling the fragment checkers
+(`benchmarks/scale/README.md`): a step of structural recursion with a few
+`Nat` operations costs 150 to 200 µs and retains 10 to 40 KB;
+`List.set` / `List.getD` on an 80-element list retain about 1.5 MB per
+update (pack tables into one `Nat`); `Nat.log2` is *not* accelerated
+(`Nat.add, sub, mul, div, mod, gcd, beq, ble, land, lor, xor, shiftLeft,
+shiftRight, pow` are); a loop that returns its accumulator unchanged
+should return the same term, not `0 ||| acc`, which allocates a fresh
+literal; a `def` of a list literal beyond about a thousand elements needs
+`set_option maxRecDepth` for the code generator. And the trap behind that
+advice: a value that *every* step reads must be a literal at every step.
+`whnf` follows a chain of pass-through terms (`if c then x else …`
+returning `x`, a structure field copied by `{ s with … }`) without
+consulting its cache, so reading it at each of `k` steps costs `k²` (a
+field passed through 4000 steps: 0.8 s, forced by `||| 0`: 0.05 s; doing
+it to the planes inside `Lanes.add` turned a 3 s check into minutes).
+Pass-through is fine for a value read rarely, which is why
+`Lanes.addOnz` skips at the gate level only.
 
 `Finset.sum` unfolding in the kernel is slow. `Gate1.mat` products are over
 `Bool` (a two-term sum) and are fine; do not introduce `Matrix (Fin (2 ^ n))`

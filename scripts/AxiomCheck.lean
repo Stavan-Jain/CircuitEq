@@ -13,6 +13,14 @@ This catches, without a hand-maintained list of capstones:
 * `sorry`, which emits `sorryAx`;
 * bespoke `axiom` declarations, reported even when nothing uses them.
 
+What it cannot catch is a declaration that never reached the kernel: Lean has
+a debug option that adds declarations unchecked, meta code can do the same, and
+a false `decide +kernel` theorem sealed that way depends on no axioms at all.
+That half of the policy is the kernel replay CI runs next,
+`LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq`; see CLAUDE.md §
+"Conventions". (The option is not named here on purpose: the text guard
+`scripts/check_debug_options.py` scans this file too.)
+
 Run with `lake env lean scripts/AxiomCheck.lean`; it exits non-zero and prints
 every offender on failure. Not part of any `lean_lib`, so `lake build` does not
 pay for it, but it needs a completed build to run against.
