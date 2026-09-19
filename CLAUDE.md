@@ -108,15 +108,20 @@ Rules that follow, for anyone adding to the library:
   `C(n,2)` and `C(n,3)` bits). A CNOT is a shift and an xor; a phase gate
   of phase `k` on a parity `m` adds `k`, `−2k`, `4k` on the lanes of the
   wires, pairs and triples of `m` (`Lanes.addOn`, a ripple-carry adder on
-  planes; `pairMask`, `tripMask`, one shift-and-or per set bit). `nf`,
-  `phasePolyNormalForm n`, `phasePolyChecker n` as before; new:
-  `phasePolyRefutes n a b`, whose `true` proves `¬ a ≡ᵤ b`
+  planes; `pairMask`, `tripMask`, one shift-and-or per set bit by
+  `maskFold`, which visits only the set bits of a sparse parity, lowest
+  bit by `gcd`, index by a population count checked on 1024 powers of two,
+  and tests every index of a dense one; `Lanes.addOnz` skips a plane with
+  nothing to add). `nf`, `phasePolyNormalForm n`, `phasePolyChecker n` as
+  before; new: `phasePolyRefutes n a b`, whose `true` proves `¬ a ≡ᵤ b`
   (`PhasePoly.complete`: equal unitaries give equal forms), so within the
   fragment `check` is a decision procedure (`phasePolyChecker_check_iff`).
   Cost is linear in the gate count and never `2 ^ n`: the scale test's
   random CNOT+T pairs on 20, 40 and 80 wires (200, 400, 800 gates) certify
-  in 0.2, 0.9 and 3.9 s of kernel time at 1.9, 2.1 and 2.9 GB; the
-  remaining cost is the phase gates on dense parities (`QUEUE.md` item 6).
+  in 0.2, 0.6 and 1.9 s of kernel time at 1.9, 2.0 and 2.5 GB, and CCZ
+  networks of 3400, 6800 and 10200 gates on 100, 200 and 300 wires in 2.8,
+  5.9 and 10.1 s at 2.7, 3.8 and 5.3 GB; what grows is the `C(n,3)`-bit
+  triple plane, copied by every gate that changes it (`QUEUE.md` item 6).
   A proof is `(phasePolyChecker n).sound _ _ (by decide +kernel)`, a
   refutation `phasePolyRefutes_sound (by decide +kernel)`; bare `decide`
   times out at about a hundred gates. The extension with Hadamard
@@ -300,12 +305,12 @@ residual goal under each failure.
 `Certificate.lean`: this is `leanchecker` over the `.olean` files.) It
 replays modules in parallel, and every replay beyond the first loads a
 private copy of the mathlib imports. Measured on the M4 (18 and 19
-September 2026; 23 modules, 2084 declarations with `Chunk.lean`): one
-thread 22 to 28 s, 0.33 GB peak footprint (1.7 GB resident, almost all of
-it the mapped mathlib `.olean` files); two threads 16 s and 2.1 GB; the
+September 2026; 23 modules, 2119 declarations): one thread 22 to 28 s,
+0.33 to 0.41 GB peak footprint (1.7 to 1.8 GB resident, almost all of it
+the mapped mathlib `.olean` files); two threads 16 s and 2.1 GB; the
 default ten threads were killed by the OS after 4 minutes at a 26 GB
-footprint. On GitHub's `ubuntu-latest` runner the one-thread replay
-is a 38 s step in a 2.5 minute job, and the fixture check 2 s. It is a CI
+footprint. On GitHub's `ubuntu-latest` runner the one-thread replay is a
+25 to 39 s step in a 2 to 3 minute job, and the fixture check 2 s. It is a CI
 step of its own, not lean-action's `leanchecker` input, because the thread
 cap would sit on that whole step and slow the build too; `-v` makes the
 log list the modules replayed. Never run it without `LEAN_NUM_THREADS=1`,
@@ -411,7 +416,15 @@ update (pack tables into one `Nat`); `Nat.log2` is *not* accelerated
 shiftRight, pow` are); a loop that returns its accumulator unchanged
 should return the same term, not `0 ||| acc`, which allocates a fresh
 literal; a `def` of a list literal beyond about a thousand elements needs
-`set_option maxRecDepth` for the code generator.
+`set_option maxRecDepth` for the code generator. And the trap behind that
+advice: a value that *every* step reads must be a literal at every step.
+`whnf` follows a chain of pass-through terms (`if c then x else …`
+returning `x`, a structure field copied by `{ s with … }`) without
+consulting its cache, so reading it at each of `k` steps costs `k²` (a
+field passed through 4000 steps: 0.8 s, forced by `||| 0`: 0.05 s; doing
+it to the planes inside `Lanes.add` turned a 3 s check into minutes).
+Pass-through is fine for a value read rarely, which is why
+`Lanes.addOnz` skips at the gate level only.
 
 `Finset.sum` unfolding in the kernel is slow. `Gate1.mat` products are over
 `Bool` (a two-term sum) and are fine; do not introduce `Matrix (Fin (2 ^ n))`

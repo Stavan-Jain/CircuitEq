@@ -119,14 +119,16 @@ one-wire windows emitted by the survey's diff-based search and checked by
 
 [`benchmarks/scale/`](benchmarks/scale/README.md) pushes the checkers up
 ladders of random and structured circuits. The phase-polynomial checker
-certifies PyZX's phase folding of 200-, 400- and 800-gate CNOT+T circuits
-on 20, 40 and 80 qubits in 0.2, 0.9 and 3.9 s of kernel time, refuting a
+certifies PyZX's phase folding of 200-, 400- and 800-gate random CNOT+T
+circuits on 20, 40 and 80 qubits in 0.2, 0.6 and 1.9 s of kernel time, and
+of a 10200-gate network of CCZ gadgets on 300 qubits in 10 s, refuting a
 gate-deleted mutant of each; the ladder's first run found the earlier
 parity-basis form incomplete, which is why the form is now the multilinear
 polynomial. The tableau, proved one range of generators per declaration
 (`CircuitEq/Chunk.lean`), certifies an 80-qubit random Clifford pair
-re-synthesised into 8261 gates in 7 minutes and a 161-qubit round of
-surface-code syndrome extraction in 39 s; in one declaration it ran out of
+re-synthesised into 8261 gates in 7 minutes, a 161-qubit round of
+surface-code syndrome extraction in 39 s and two rounds on 241 qubits in
+under three minutes; in one declaration it ran out of
 memory at 40 qubits. The same chunking decides the seven-qubit Steane pair
 on its full basis in 78 s under 2 GB, where the single `decide` was killed
 at 7 GB.

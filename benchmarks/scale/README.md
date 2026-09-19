@@ -11,13 +11,14 @@ regenerate the table with `--table`.
 
 Families: `clifford` and `cnot_t` are random; `ghz` (the GHZ ladder),
 `surface ×r` (`r` rounds of syndrome extraction of the rotated surface code,
-unitary part only, on `2d² − 1` qubits) and `ccz_net` (CCZ gadgets, not yet
-run) are structured. Pipelines: `full_reduce` re-synthesises, `teleport`
+unitary part only, on `2d² − 1` qubits) and `ccz_net` (`2n` CCZ gadgets on
+random triples of `n` wires, `CX` and `T` only, every parity of weight at
+most three) are structured. Pipelines: `full_reduce` re-synthesises, `teleport`
 folds phases and keeps the skeleton, `basic` is PyZX's peephole pass alone.
 "Chunk" is the number of tableau generators per declaration
 (`CircuitEq/Chunk.lean`); "—" is the whole check in one declaration.
 
-## Results (16 and 18 September 2026)
+## Results (16 to 19 September 2026)
 
 | Family | Pipeline | Qubits | Gates | T-count | Optimised gates | Chunk | Defs only | With theorems | Kernel share | Peak memory | Status |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
@@ -33,14 +34,21 @@ folds phases and keeps the skeleton, `basic` is PyZX's peephole pass alone.
 | surface ×2 | basic | 17 | 64 | 0 → 0 | 56 | 8 | 2.0 s | 3.0 s | 1.0 s | 1.81 GB | ok |
 | surface ×2 | basic | 49 | 208 | 0 → 0 | 184 | 8 | 2.0 s | 7.9 s | 5.9 s | 1.92 GB | ok |
 | surface ×2 | basic | 97 | 432 | 0 → 0 | 384 | 8 | 2.1 s | 26.6 s | 24.5 s | 2.05 GB | ok |
+| surface ×2 | basic | 161 | 736 | 0 → 0 | 656 | 8 | 2.9 s | 69.6 s | 66.7 s | 2.28 GB | ok |
+| surface ×2 | basic | 241 | 1120 | 0 → 0 | 1000 | 8 | 3.1 s | 167.1 s | 164.0 s | 2.55 GB | ok |
 | surface ×1 | full_reduce | 49 | 104 | 0 → 0 | 122 | 8 | 1.8 s | 4.5 s | 2.7 s | 1.85 GB | ok |
 | surface ×1 | full_reduce | 97 | 216 | 0 → 0 | 250 | 8 | 1.9 s | 14.4 s | 12.5 s | 1.93 GB | ok |
 | surface ×1 | full_reduce | 161 | 368 | 0 → 0 | 436 | 8 | 2.1 s | 40.6 s | 38.5 s | 2.09 GB | ok |
 | surface ×2 | full_reduce | 97 | 432 | 0 → 0 | 0 | 8 | 2.0 s | 13.8 s | 11.8 s | 1.93 GB | ok |
-| cnot_t | teleport | 10 | 100 | 30 → 18 | 96 | — | 1.7 s | 1.8 s | 0.1 s | 1.83 GB | ok |
-| cnot_t | teleport | 20 | 200 | 71 → 39 | 183 | — | 1.8 s | 2.0 s | 0.2 s | 1.89 GB | ok |
-| cnot_t | teleport | 40 | 400 | 129 → 63 | 368 | — | 1.9 s | 2.8 s | 0.9 s | 2.07 GB | ok |
-| cnot_t | teleport | 80 | 800 | 271 → 155 | 783 | — | 2.3 s | 6.2 s | 3.9 s | 2.85 GB | ok |
+| cnot_t | teleport | 10 | 100 | 30 → 18 | 96 | — | 1.8 s | 1.8 s | 0.0 s | 1.83 GB | ok |
+| cnot_t | teleport | 20 | 200 | 71 → 39 | 183 | — | 1.8 s | 2.0 s | 0.2 s | 1.88 GB | ok |
+| cnot_t | teleport | 40 | 400 | 129 → 63 | 368 | — | 2.0 s | 2.6 s | 0.6 s | 2.02 GB | ok |
+| cnot_t | teleport | 80 | 800 | 271 → 155 | 783 | — | 2.8 s | 4.7 s | 1.9 s | 2.48 GB | ok |
+| ccz_net | teleport | 25 | 850 | 350 → 286 | 714 | — | 2.3 s | 2.9 s | 0.6 s | 2.03 GB | ok |
+| ccz_net | teleport | 50 | 1700 | 700 → 566 | 1429 | — | 2.9 s | 4.2 s | 1.3 s | 2.24 GB | ok |
+| ccz_net | teleport | 100 | 3400 | 1400 → 1136 | 2846 | — | 4.5 s | 7.3 s | 2.8 s | 2.71 GB | ok |
+| ccz_net | teleport | 200 | 6800 | 2800 → 2274 | 5714 | — | 7.9 s | 13.8 s | 5.9 s | 3.81 GB | ok |
+| ccz_net | teleport | 300 | 10200 | 4200 → 3416 | 8563 | — | 11.6 s | 21.7 s | 10.1 s | 5.26 GB | ok |
 
 Every "ok" is two theorems: the equivalence (`≡ₛ` for the tableau, `≡ᵤ` for
 the phase polynomial) and the mutant (`tableauCheckGen … = false` on the
@@ -76,7 +84,9 @@ gate, and re-synthesis of random circuits is what makes it large.** PyZX's
 `1.5 n²` gates (597, 2346 and 8261), so the random rungs cost 4.6 s, 39 s
 and 422 s. Structured circuits do not blow up: a round of surface-code
 syndrome extraction on 161 qubits goes from 368 to 436 gates and certifies
-in 39 s at 2.1 GB, a 200-qubit GHZ ladder in 12 s, and the two-round
+in 39 s at 2.1 GB, two rounds on 241 qubits against their peephole-optimised
+form (1120 and 1000 gates) in under three minutes at 2.6 GB, a 200-qubit
+GHZ ladder in 12 s, and the two-round
 circuit on 97 qubits, which PyZX reduces to the *empty* circuit because the
 `X` and `Z` extraction circuits commute, is certified equal to nothing in
 12 s. At these sizes memory stays at the imports. The remaining lever for
@@ -121,9 +131,38 @@ and an xor, removed it. Indexing the triple plane with stride `n²` made it
 `n³` bits, which mattered less than expected (5.2 GB to 4.5 GB at 80
 qubits); the combinatorial indexing keeps it at `C(n,3)`. Peeling set bits
 with `Nat.log2` was slower than testing each index, because the kernel does
-not accelerate `log2`. What remains is the phase gates on dense parities:
-about 10 ms and 2.5 MB per gate at 80 wires, 271 of them in the 80-qubit
-original, which is the 3.9 s and the 1.1 GB above the import baseline.
+not accelerate `log2`.
+
+**Structured CNOT+T circuits found the next cost, and it was the loop, not
+the arithmetic.** A network of CCZ gadgets has parities of weight at most
+three, so its phase gates should be nearly free. The first run said
+otherwise: 40 s and 6.8 GB at 100 wires, 15 ms and 1.9 MB per phase gate,
+because each gate ran two loops over all hundred wire indices and the
+kernel retains about 10 KB per iteration. `sparseFold` visits only the set
+bits with operations the kernel does accelerate (the lowest set bit is
+`gcd m 2^W`; its index is a word-parallel population count of its
+predecessor, whose correctness on the 1024 powers of two is one finite
+check), a population count picks between it and the index loop, and the
+same specification covers both, so no proof downstream moved. That took the
+100-wire rung to 7 s at 2.8 GB and, because a random circuit's parities are
+sparse early on, the dense 80-qubit rung from 3.9 s to 1.9 s. The 200- and
+300-wire networks, 6800 and 10200 gates, certify in 5.9 s and 10.1 s of
+kernel time. What grows now is the triple plane itself, 164 KB at 200 wires
+and copied by every gate that changes it, which is the 5.3 GB at 300 wires.
+
+One attempted saving is recorded because it failed instructively. The
+kernel allocates a fresh literal even for `x ^^^ 0`, so returning an
+unchanged plane as the same term looked free. Done inside the plane adder
+it made the 25-wire rung go from 3 s to minutes: a value that every step
+reads, passed through unchanged, becomes a chain of pass-through terms, and
+the kernel's `whnf` follows such a chain without consulting its cache, so
+every gate re-walks it, quadratic time. A three-line probe shows it in
+isolation: a structure field passed through 2000 and 4000 steps, each of
+which reads it, costs 0.2 s and 0.8 s; forced through `||| 0` at each step,
+0.01 s and 0.05 s. The version that works skips a plane update only at the
+gate level and only when there is nothing to add (`Lanes.addOnz`), where
+the plane is read by the next gate that changes it and by nobody in
+between; that took the 200-wire rung from 4.6 GB to 3.8 GB.
 
 A smaller usability point: when `decide +kernel` refuses a proof on a
 circuit of a few hundred gates, Lean's error message fails to pretty-print
@@ -135,8 +174,8 @@ script's Python mirror answers the same question before Lean runs.
 
 | Tool | Relation | Cost, measured | Reach on this machine |
 |---|---|---|---|
-| Phase polynomial | `≡ᵤ`, and `¬ ≡ᵤ` | 0.2 ms per CNOT; up to 10 ms per phase gate on a dense 80-wire parity | 80 qubits, 800 gates in 4 s; no chunking needed |
-| Tableau, chunked | `≡ₛ` | 0.2 to 0.3 ms per generator and gate | 80 random qubits (8261 gates) in 7 min; 161 structured qubits in 39 s |
+| Phase polynomial | `≡ᵤ`, and `¬ ≡ᵤ` | 0.2 ms per CNOT; about 1 ms per phase gate on a sparse parity, up to 10 ms on a dense 80-wire one | 80 random qubits, 800 gates in 1.9 s; 300 structured qubits, 10200 gates in 10 s at 5.3 GB; no chunking needed |
+| Tableau, chunked | `≡ₛ` | 0.2 to 0.3 ms per generator and gate | 80 random qubits (8261 gates) in 7 min; 241 structured qubits (2120 gates) in under 3 min |
 | Basis decide, chunked | `≡ᵤ`, `≡ₚ` | 0.6 s and 165 MB per basis vector at 7 qubits, 32 gates | 7 qubits in 78 s; `gates · 4^n` scaling puts 8 qubits at minutes, 10 at hours |
 | Certificate replay | `≡ᵤ` | not rerun here | about 150 gates, bound by replay memory (`QUEUE.md`, item 1) |
 
@@ -152,7 +191,9 @@ $PY scripts/scale_test.py --family ghz --sizes 50 100 200 --chunk 16 \
   --workdir /tmp/scale --results benchmarks/scale/results.json
 $PY scripts/scale_test.py --family surface --rounds 1 --sizes 5 7 9 --chunk 8 \
   --workdir /tmp/scale --results benchmarks/scale/results.json
-$PY scripts/scale_test.py --family surface --pipeline basic --sizes 3 5 7 --chunk 8 \
+$PY scripts/scale_test.py --family surface --pipeline basic --sizes 3 5 7 9 11 --chunk 8 \
+  --timeout 1500 --workdir /tmp/scale --results benchmarks/scale/results.json
+$PY scripts/scale_test.py --family ccz_net --sizes 25 50 100 200 300 \
   --workdir /tmp/scale --results benchmarks/scale/results.json
 $PY scripts/scale_test.py --family cnot_t --sizes 10 20 40 80 \
   --workdir /tmp/scale --results benchmarks/scale/results.json
