@@ -1,0 +1,82 @@
+{
+ "name": "gen_surface_3__pyzx_teleport",
+ "qubits": 17,
+ "relation": "u",
+ "expected": "equiv",
+ "split": "held-out",
+ "family": "gen_surface",
+ "rung": 3,
+ "source": {
+  "generator": "scripts/circuit_pairs.py",
+  "optimiser": "pyzx_teleport",
+  "circuit": "gen_surface_3",
+  "circuit_source": {
+   "source": "generated",
+   "path": null,
+   "sha256": null
+  },
+  "circuit_licence": "this repository's",
+  "twin": "pyzx_teleport",
+  "twin_tool": {
+   "tool": "pyzx teleport_reduce + basic_optimization (scripts/check_pyzx_benchmarks.py optimize)",
+   "pyzx": "0.9.0",
+   "seconds": 0.06
+  },
+  "tier": 2,
+  "relation_found": {
+   "method": "2 random state(s)",
+   "relation": "exact",
+   "max_abs_diff": 7.881187822749161e-18
+  },
+  "gates": [
+   64,
+   56
+  ],
+  "t_count": [
+   0,
+   0
+  ],
+  "h_count": [
+   16,
+   8
+  ],
+  "cx_count": [
+   48,
+   48
+  ],
+  "fragment": [
+   "Clifford",
+   "Clifford"
+  ],
+  "diff_matched": {
+   "raw": {
+    "matched": 22,
+    "of": 64,
+    "fraction": 0.3438
+   },
+   "greedy/cancommute": {
+    "matched": 45,
+    "of": 64,
+    "fraction": 0.7031
+   }
+  },
+  "segments": {
+   "raw": {
+    "segments": 4,
+    "longest": 114
+   },
+   "greedy/cancommute": {
+    "segments": 28,
+    "longest": 34
+   }
+  }
+ },
+ "holdout_delete": [
+  "scripts/circuit_pairs.py",
+  "scripts/circuit_sources.py",
+  "scripts/peephole_pairs.py"
+ ],
+ "known_leaks": [],
+ "original": ["H 9", "CX 9 1", "CX 9 2", "H 9", "CX 0 10", "CX 3 10", "H 11", "CX 11 0", "CX 11 1", "CX 11 3", "CX 11 4", "H 11", "CX 1 12", "CX 2 12", "CX 4 12", "CX 5 12", "CX 3 13", "CX 4 13", "CX 6 13", "CX 7 13", "H 14", "CX 14 4", "CX 14 5", "CX 14 7", "CX 14 8", "H 14", "CX 5 15", "CX 8 15", "H 16", "CX 16 6", "CX 16 7", "H 16", "H 9", "CX 9 1", "CX 9 2", "H 9", "CX 0 10", "CX 3 10", "H 11", "CX 11 0", "CX 11 1", "CX 11 3", "CX 11 4", "H 11", "CX 1 12", "CX 2 12", "CX 4 12", "CX 5 12", "CX 3 13", "CX 4 13", "CX 6 13", "CX 7 13", "H 14", "CX 14 4", "CX 14 5", "CX 14 7", "CX 14 8", "H 14", "CX 5 15", "CX 8 15", "H 16", "CX 16 6", "CX 16 7", "H 16"],
+ "optimized": ["H 9", "CX 9 1", "CX 9 2", "CX 3 10", "CX 0 10", "H 11", "CX 11 4", "CX 11 1", "CX 5 12", "CX 6 13", "CX 7 13", "H 14", "CX 14 8", "H 16", "CX 11 3", "CX 11 0", "CX 4 12", "CX 1 12", "CX 2 12", "CX 4 13", "CX 14 5", "CX 14 7", "CX 8 15", "CX 16 6", "CX 16 7", "CX 9 1", "CX 9 2", "H 9", "CX 3 10", "CX 0 10", "CX 11 4", "CX 11 1", "CX 5 12", "CX 3 13", "CX 6 13", "CX 7 13", "CX 14 4", "CX 14 8", "CX 5 15", "CX 11 3", "CX 11 0", "H 11", "CX 4 12", "CX 1 12", "CX 2 12", "CX 4 13", "CX 14 5", "CX 14 7", "CX 8 15", "CX 16 6", "CX 16 7", "H 16", "CX 3 13", "CX 14 4", "H 14", "CX 5 15"]
+}
