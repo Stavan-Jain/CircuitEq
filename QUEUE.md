@@ -17,10 +17,15 @@ Item 1, the agent harness: a draft is in `scripts/agent_harness.py` and
 1000 gates and two TZAP pairs, the prompt, the playbook (`PLAYBOOK.md`)
 and a judge by restatement, axioms and kernel replay. Three runs so far,
 the third proved. The optimisation harness (`scripts/optimizer_harness.py`)
-is built on the same pieces and tested by hand, with no agent run yet. Open
-before item 1 is "done": the held-out ladder with a QASM importer, the
-baselines, repeated runs with a summary table, and the record of which
-declarations a proof uses (`benchmarks/harness/README.md`).
+is built on the same pieces and tested by hand, with no agent run yet. The
+held-out ladder and the baselines landed on 21 September (`720583d` and
+the TZAP follow-up): `benchmarks/circuits/`, 147 real circuits in four
+tiers with an exact-or-refuse QASM importer, 390 pairs with the relation
+that actually holds (ten imported as held-out tasks), and
+`optimization.json` with what PyZX, TZAP, Nam et al. and T-par reach on
+every T-bearing circuit. Still open before item 1 is "done": repeated runs
+with a summary table, and the record of which declarations a proof uses
+(`benchmarks/harness/README.md`).
 
 ## Next
 
@@ -126,7 +131,12 @@ declarations a proof uses (`benchmarks/harness/README.md`).
    pairs), so its pairs are alignable by construction. Acceptance: the
    fixture script reproduces TZAP output byte for byte and the Lean lists
    match. S for the script; certification beyond `H`-free regions depends
-   on item 4.
+   on item 4. Partly done on 21 September 2026 in `benchmarks/circuits/`:
+   TZAP 0.6.1 is a twin kind of `scripts/circuit_pairs.py`, run on every
+   T-bearing circuit of the catalogue, tier 4 included, with the relation
+   that holds recorded per pair (`pairs/index.json`) and its T-counts in
+   `optimization.json`. Still open: the `tzap` pipeline of
+   `check_pyzx_benchmarks.py` and the byte-for-byte fixture.
 
 6. **Linear certificates.** Make traces cursor-based (a position carried
    along, not re-indexed into a `List` per step) so replay is linear in

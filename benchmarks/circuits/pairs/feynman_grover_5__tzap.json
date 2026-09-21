@@ -1,0 +1,83 @@
+{
+ "name": "feynman_grover_5__tzap",
+ "qubits": 9,
+ "relation": "p",
+ "expected": "equiv",
+ "split": "held-out",
+ "family": "grover",
+ "rung": 5,
+ "source": {
+  "generator": "scripts/circuit_pairs.py",
+  "optimiser": "tzap",
+  "circuit": "feynman_grover_5",
+  "circuit_source": {
+   "source": "feynman",
+   "path": "benchmarks/qasm/grover_5.qasm",
+   "sha256": "dccb7c3a0e4811e8b30af7d1ae5186e9e628ab5a2c8d70d88aa7868b9dc434de"
+  },
+  "circuit_licence": "BSD-3-Clause",
+  "twin": "tzap",
+  "twin_tool": {
+   "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+   "tzap": "tzap 0.6.1",
+   "options": "-O2 --decompose-rz --decompose-cz",
+   "seconds": 0.07
+  },
+  "tier": 2,
+  "relation_found": {
+   "method": "unitary",
+   "relation": "phase",
+   "omega_power": 2
+  },
+  "gates": [
+   1023,
+   587
+  ],
+  "t_count": [
+   336,
+   166
+  ],
+  "h_count": [
+   334,
+   124
+  ],
+  "cx_count": [
+   288,
+   222
+  ],
+  "fragment": [
+   "general",
+   "general"
+  ],
+  "diff_matched": {
+   "raw": {
+    "matched": 221,
+    "of": 1023,
+    "fraction": 0.216
+   },
+   "greedy/cancommute": {
+    "matched": 245,
+    "of": 1023,
+    "fraction": 0.2395
+   }
+  },
+  "segments": {
+   "raw": {
+    "segments": 8,
+    "longest": 1016
+   },
+   "greedy/cancommute": {
+    "segments": 14,
+    "longest": 1580
+   }
+  }
+ },
+ "holdout_delete": [
+  "scripts/circuit_pairs.py",
+  "scripts/circuit_sources.py",
+  "scripts/peephole_pairs.py"
+ ],
+ "known_leaks": [],
+ "original": ["X 5", "H 0", "H 1", "H 2", "H 3", "H 4", "H 5", "X 4", "X 0", "X 1", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 8", "H 8", "H 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 7", "T 8", "H 8", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 8", "H 8", "H 5", "H 5", "H 5", "CX 8 5", "Tdg 5", "CX 4 5", "T 5", "CX 8 5", "Tdg 5", "CX 4 5", "T 8", "T 5", "H 5", "CX 4 8", "T 4", "Tdg 8", "CX 4 8", "H 5", "H 5", "H 8", "H 8", "H 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 7", "T 8", "H 8", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 8", "H 8", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "X 4", "X 0", "X 1", "H 0", "H 1", "H 2", "H 3", "H 4", "X 4", "X 0", "X 1", "X 2", "X 3", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 4", "H 4", "H 4", "CX 7 4", "Tdg 4", "CX 3 4", "T 4", "CX 7 4", "Tdg 4", "CX 3 4", "T 7", "T 4", "H 4", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 4", "H 4", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "X 4", "X 0", "X 1", "X 2", "X 3", "H 0", "H 1", "H 2", "H 3", "H 4", "X 4", "X 0", "X 1", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 8", "H 8", "H 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 7", "T 8", "H 8", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 8", "H 8", "H 5", "H 5", "H 5", "CX 8 5", "Tdg 5", "CX 4 5", "T 5", "CX 8 5", "Tdg 5", "CX 4 5", "T 8", "T 5", "H 5", "CX 4 8", "T 4", "Tdg 8", "CX 4 8", "H 5", "H 5", "H 8", "H 8", "H 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 7", "T 8", "H 8", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 8", "H 8", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "X 4", "X 0", "X 1", "H 0", "H 1", "H 2", "H 3", "H 4", "X 4", "X 0", "X 1", "X 2", "X 3", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 4", "H 4", "H 4", "CX 7 4", "Tdg 4", "CX 3 4", "T 4", "CX 7 4", "Tdg 4", "CX 3 4", "T 7", "T 4", "H 4", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 4", "H 4", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "X 4", "X 0", "X 1", "X 2", "X 3", "H 0", "H 1", "H 2", "H 3", "H 4", "X 4", "X 0", "X 1", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 8", "H 8", "H 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 7", "T 8", "H 8", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 8", "H 8", "H 5", "H 5", "H 5", "CX 8 5", "Tdg 5", "CX 4 5", "T 5", "CX 8 5", "Tdg 5", "CX 4 5", "T 8", "T 5", "H 5", "CX 4 8", "T 4", "Tdg 8", "CX 4 8", "H 5", "H 5", "H 8", "H 8", "H 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 7", "T 8", "H 8", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 8", "H 8", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "X 4", "X 0", "X 1", "H 0", "H 1", "H 2", "H 3", "H 4", "X 4", "X 0", "X 1", "X 2", "X 3", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 4", "H 4", "H 4", "CX 7 4", "Tdg 4", "CX 3 4", "T 4", "CX 7 4", "Tdg 4", "CX 3 4", "T 7", "T 4", "H 4", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 4", "H 4", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "X 4", "X 0", "X 1", "X 2", "X 3", "H 0", "H 1", "H 2", "H 3", "H 4", "X 4", "X 0", "X 1", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 8", "H 8", "H 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 7", "T 8", "H 8", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 8", "H 8", "H 5", "H 5", "H 5", "CX 8 5", "Tdg 5", "CX 4 5", "T 5", "CX 8 5", "Tdg 5", "CX 4 5", "T 8", "T 5", "H 5", "CX 4 8", "T 4", "Tdg 8", "CX 4 8", "H 5", "H 5", "H 8", "H 8", "H 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 7", "T 8", "H 8", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 8", "H 8", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "X 4", "X 0", "X 1", "H 0", "H 1", "H 2", "H 3", "H 4", "X 4", "X 0", "X 1", "X 2", "X 3", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 4", "H 4", "H 4", "CX 7 4", "Tdg 4", "CX 3 4", "T 4", "CX 7 4", "Tdg 4", "CX 3 4", "T 7", "T 4", "H 4", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 4", "H 4", "H 7", "H 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 6", "T 7", "H 7", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "H 7", "H 6", "H 6", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 1", "T 6", "H 6", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 6", "H 6", "X 4", "X 0", "X 1", "X 2", "X 3", "H 0", "H 1", "H 2", "H 3", "H 4"],
+ "optimized": ["X 5", "H 0", "H 1", "H 2", "H 3", "H 4", "X 4", "X 0", "X 1", "H 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "H 6", "H 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "H 7", "H 8", "T 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "Tdg 8", "CX 3 8", "H 8", "T 8", "CX 5 8", "Tdg 8", "CX 4 8", "T 8", "CX 5 8", "Tdg 8", "CX 4 8", "H 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "H 3", "Tdg 8", "CX 7 3", "H 3", "CX 3 8", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "H 2", "Tdg 7", "CX 6 2", "H 2", "CX 2 7", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "H 0", "CX 1 0", "H 0", "X 0", "X 1", "X 4", "H 0", "H 1", "H 2", "H 3", "S 6", "CX 0 6", "T 6", "CX 1 6", "T 6", "CX 0 6", "T 6", "CX 1 6", "X 0", "X 1", "X 2", "X 3", "H 6", "S 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "H 7", "CX 7 4", "Tdg 4", "CX 3 4", "T 4", "CX 7 4", "Tdg 4", "CX 3 4", "T 7", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "H 2", "Tdg 7", "CX 6 2", "H 2", "CX 2 7", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "H 0", "CX 1 0", "H 0", "X 0", "X 1", "X 2", "X 3", "H 0", "H 1", "H 2", "H 3", "S 6", "CX 0 6", "T 6", "CX 1 6", "T 6", "CX 0 6", "T 6", "CX 1 6", "X 4", "X 0", "X 1", "H 6", "S 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "H 7", "S 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "Tdg 8", "CX 3 8", "H 8", "T 8", "CX 5 8", "Tdg 8", "CX 4 8", "T 8", "CX 5 8", "Tdg 8", "CX 4 8", "H 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "H 3", "Tdg 8", "CX 7 3", "H 3", "CX 3 8", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "H 2", "Tdg 7", "CX 6 2", "H 2", "CX 2 7", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "H 0", "CX 1 0", "H 0", "X 0", "X 1", "X 4", "H 0", "H 1", "H 2", "H 3", "S 6", "CX 0 6", "T 6", "CX 1 6", "T 6", "CX 0 6", "T 6", "CX 1 6", "X 0", "X 1", "X 2", "X 3", "H 6", "S 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "H 7", "CX 7 4", "Tdg 4", "CX 3 4", "T 4", "CX 7 4", "Tdg 4", "CX 3 4", "T 7", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "H 2", "Tdg 7", "CX 6 2", "H 2", "CX 2 7", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "H 0", "CX 1 0", "H 0", "X 0", "X 1", "X 2", "X 3", "H 0", "H 1", "H 2", "H 3", "S 6", "CX 0 6", "T 6", "CX 1 6", "T 6", "CX 0 6", "T 6", "CX 1 6", "X 4", "X 0", "X 1", "H 6", "S 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "H 7", "S 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "Tdg 8", "CX 3 8", "H 8", "T 8", "CX 5 8", "Tdg 8", "CX 4 8", "T 8", "CX 5 8", "Tdg 8", "CX 4 8", "H 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "H 3", "Tdg 8", "CX 7 3", "H 3", "CX 3 8", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "H 2", "Tdg 7", "CX 6 2", "H 2", "CX 2 7", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "H 0", "CX 1 0", "H 0", "X 0", "X 1", "X 4", "H 0", "H 1", "H 2", "H 3", "S 6", "CX 0 6", "T 6", "CX 1 6", "T 6", "CX 0 6", "T 6", "CX 1 6", "X 0", "X 1", "X 2", "X 3", "H 6", "S 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "H 7", "CX 7 4", "Tdg 4", "CX 3 4", "T 4", "CX 7 4", "Tdg 4", "CX 3 4", "T 7", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "H 2", "Tdg 7", "CX 6 2", "H 2", "CX 2 7", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "H 0", "CX 1 0", "H 0", "X 0", "X 1", "X 2", "X 3", "H 0", "H 1", "H 2", "H 3", "S 6", "CX 0 6", "T 6", "CX 1 6", "T 6", "CX 0 6", "T 6", "CX 1 6", "X 4", "X 0", "X 1", "H 6", "S 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "H 7", "S 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "Tdg 8", "CX 3 8", "H 8", "CX 8 5", "Tdg 5", "CX 4 5", "Z 4", "T 5", "T 8", "CX 4 5", "CX 8 5", "CX 4 8", "Tdg 8", "CX 4 8", "H 5", "H 8", "CX 7 8", "Tdg 8", "CX 3 8", "T 8", "CX 7 8", "Tdg 8", "H 3", "CX 7 3", "H 3", "CX 3 8", "T 8", "H 8", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "H 2", "Tdg 7", "CX 6 2", "H 2", "CX 2 7", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "H 0", "CX 1 0", "H 0", "X 0", "X 1", "X 4", "H 0", "H 1", "H 2", "H 3", "S 6", "CX 0 6", "T 6", "CX 1 6", "T 6", "CX 0 6", "T 6", "CX 1 6", "X 0", "X 1", "X 2", "X 3", "H 6", "S 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "CX 2 7", "H 7", "CX 7 4", "Tdg 4", "CX 3 4", "T 4", "CX 7 4", "Tdg 4", "CX 3 4", "T 7", "CX 3 7", "T 3", "Tdg 7", "CX 3 7", "H 7", "CX 6 7", "Tdg 7", "CX 2 7", "T 7", "CX 6 7", "Tdg 7", "H 2", "CX 6 2", "H 2", "CX 2 7", "T 7", "H 7", "H 6", "CX 1 6", "Tdg 6", "CX 0 6", "T 6", "CX 1 6", "Tdg 6", "CX 0 6", "H 0", "CX 1 0", "H 0", "X 0", "X 1", "T 6", "H 6", "X 2", "X 3", "H 0", "H 1", "H 2", "H 3"]
+}

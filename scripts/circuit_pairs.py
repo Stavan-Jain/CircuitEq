@@ -3,7 +3,7 @@
 
 A pair is a catalogue circuit (``scripts/circuit_sources.py``) and a twin of
 it, written as the JSON that ``scripts/agent_harness.py import-pair`` reads.
-Three kinds of twin:
+Four kinds of twin:
 
 * ``peephole``: the pass of ``scripts/peephole_pairs.py`` (the library's own
   commutation and cancellation rules plus one-wire phase fusions), exact by
@@ -11,6 +11,11 @@ Three kinds of twin:
 * ``pyzx_teleport`` and ``pyzx_full_reduce``: the two pipelines of
   ``scripts/check_pyzx_benchmarks.py`` (pyzx 0.9.0), run in a child process
   under a time limit. ``Y`` is handed to PyZX as ``Sdg; X; S``;
+* ``tzap``: TZAP 0.6.1 (``github.com/qqq-wisc/tzap``) at ``-O2`` with its
+  ``rz`` and ``cz`` decomposed, on the circuit as OpenQASM in the alphabet's
+  own gates (``Y`` written ``sdg; x; s``), read back with
+  ``circuit_sources.parse_qasm``. Linear in the gate count, so it is the one
+  tool run on every T-bearing circuit of the catalogue, tier 4 included;
 * ``nam_light``, ``nam_heavy``, ``tpar``, ``pyzx_published``: optimiser
   outputs published for the Feynman suite and kept in the PyZX repository,
   paired with the catalogue's copy of the same circuit after checking that the
@@ -29,12 +34,14 @@ equal up to a phase becomes ``u`` with ``expected: not_equiv``.
 
 Nothing here is trusted; the Lean kernel judges the pair.
 
-Usage (the virtualenv Python has numpy and pyzx)::
+Usage (the virtualenv Python has numpy and pyzx; ``benchmarks/circuits/README.md``,
+"Reproduce")::
 
-    PY=/tmp/circuiteq-pyzx-venv/bin/python
+    PY=~/.circuiteq-harness/envs/pyzx/bin/python
     $PY scripts/circuit_pairs.py --self-test
-    $PY scripts/circuit_pairs.py make feynman_tof_5 --twin pyzx_teleport
+    $PY scripts/circuit_pairs.py make feynman_tof_5 --twin pyzx_teleport tzap
     $PY scripts/circuit_pairs.py batch            # the first batch, into benchmarks/circuits/pairs
+    $PY scripts/circuit_pairs.py batch --tcounts --twin tzap   # TZAP on every T-bearing circuit
     $PY scripts/circuit_pairs.py optimization     # benchmarks/circuits/optimization.json
     $PY scripts/circuit_pairs.py table            # the pairs as Markdown
 """
@@ -45,6 +52,7 @@ import argparse
 import difflib
 import heapq
 import json
+import os
 import random
 import subprocess
 import sys
@@ -61,7 +69,7 @@ PAIRS = cs.CATALOGUE / "pairs"
 INDEX = PAIRS / "index.json"
 OPTIMIZATION = cs.CATALOGUE / "optimization.json"
 
-OWN_TWINS = ("peephole", "pyzx_teleport", "pyzx_full_reduce")
+OWN_TWINS = ("peephole", "pyzx_teleport", "pyzx_full_reduce", "tzap")
 PUBLISHED_TWINS = {"nam_light": "nam_light", "nam_heavy": "nam_heavy", "tpar": "tpar",
                    "pyzx_published": "pyzx"}
 # Twins whose gate lists may be copied into the repository: ours, and PyZX's
@@ -80,6 +88,13 @@ def in_repo(circuit: str, kind: str) -> tuple[bool, str]:
 
 TWIN_TIMEOUT_S = 240       # each twin is made in a child process under this limit
 PYZX_MAX_GATES = 8000      # hwb8 (18 220 gates) did not finish either pipeline in 200 s
+# TZAP is the wheel `tzap==0.6.1` in its own virtualenv (`benchmarks/harness/notes/README.md`);
+# `CIRCUITEQ_TZAP` names another binary. `-O2` is the documented level (`-Osuper` was a hundred
+# times slower for the same T-count there); `rz` and `cz` in its output are decomposed, so it
+# is read back in the alphabet. About a second per million gates.
+TZAP = Path(os.environ.get("CIRCUITEQ_TZAP",
+                           "~/.circuiteq-harness/envs/tzap/bin/tzap")).expanduser()
+TZAP_ARGS = ("-O2", "--decompose-rz", "--decompose-cz")
 DIFF_MAX_CELLS = 3e7       # len(a) * len(b) for difflib
 SEGMENT_MAX_QUBITS = 20
 SEGMENT_WORK = 2e10        # (len(a) + len(b)) * 2^n * probes
@@ -89,7 +104,7 @@ DIAG = {"Z", "S", "Sdg", "T", "Tdg"}
 HOLDOUT_DELETE = ["scripts/circuit_pairs.py", "scripts/circuit_sources.py",
                   "scripts/peephole_pairs.py"]
 
-# The first batch: circuits across the tiers that get our three twins.
+# The first batch: circuits across the tiers that get our four twins.
 BATCH = [
     # tier 1
     "feynman_tof_3", "feynman_tof_5", "feynman_mod5_4", "feynman_vbe_adder_3",
@@ -184,12 +199,37 @@ def pyzx_twin(strings: list[str], n: int, pipeline: str) -> tuple[list[str], dic
     return cpb.lean_instructions(out), {"pyzx": zx.__version__}
 
 
+def tzap_twin(strings: list[str], n: int, work: Path) -> tuple[list[str], dict]:
+    """TZAP on the circuit as OpenQASM in the alphabet's own gates, its output read back with
+    the catalogue's parser. TZAP has no ``y``: ``Y = S X Sdg`` exactly, ``Sdg; X; S`` in time
+    order."""
+    plain = []
+    for g in strings:
+        name, *w = g.split()
+        plain += [f"Sdg {w[0]}", f"X {w[0]}", f"S {w[0]}"] if name == "Y" else [g]
+    src, dst = work / "in.qasm", work / "out.qasm"
+    src.write_text(cs.to_qasm("circuit_pairs.py tzap twin", n, plain))
+    p = subprocess.run([str(TZAP), str(src), "-o", str(dst), *TZAP_ARGS],
+                       capture_output=True, text=True)
+    if p.returncode != 0 or not dst.exists():
+        last = (p.stderr.strip().splitlines() or [f"exit status {p.returncode}"])[-1]
+        raise RuntimeError(f"tzap: {last}")
+    parsed = cs.parse_qasm(dst.read_text())
+    if parsed["qubits"] != n:
+        raise ValueError(f"TZAP wrote a register of {parsed['qubits']} qubits for {n}")
+    version = subprocess.run([str(TZAP), "-v"], capture_output=True, text=True).stdout.strip()
+    return [cs.show(g) for g in cs.translate(parsed["ops"])], \
+        {"tzap": version, "options": " ".join(TZAP_ARGS)}
+
+
 def twin_worker(kind: str, src: str, dst: str) -> None:
     """Child process: make one twin and write it with the tool's own account."""
     data = json.loads(Path(src).read_text())
     t0 = time.time()
     if kind == "peephole":
         gates, info = peephole_twin(data["gates"])
+    elif kind == "tzap":
+        gates, info = tzap_twin(data["gates"], data["qubits"], Path(src).parent)
     else:
         gates, info = pyzx_twin(data["gates"], data["qubits"], kind.removeprefix("pyzx_"))
     Path(dst).write_text(json.dumps({"gates": gates,
@@ -200,16 +240,19 @@ TOOLS = {"peephole": "scripts/peephole_pairs.py peephole",
          "pyzx_teleport": "pyzx teleport_reduce + basic_optimization "
                           "(scripts/check_pyzx_benchmarks.py optimize)",
          "pyzx_full_reduce": "pyzx full_reduce + extract_circuit + basic_optimization "
-                             "(scripts/check_pyzx_benchmarks.py optimize)"}
+                             "(scripts/check_pyzx_benchmarks.py optimize)",
+         "tzap": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)"}
 
 
 def own_twin(kind: str, strings: list[str], n: int,
              timeout: float = TWIN_TIMEOUT_S) -> tuple[list[str] | None, dict]:
     """A twin made here, in a child process that is stopped at the time limit."""
     tool = {"tool": TOOLS[kind]}
-    if kind != "peephole" and len(strings) > PYZX_MAX_GATES:
+    if kind.startswith("pyzx_") and len(strings) > PYZX_MAX_GATES:
         return None, {**tool, "status": f"skipped: {len(strings)} gates is past the bound of "
                                         f"{PYZX_MAX_GATES} for a {timeout:.0f} s PyZX run"}
+    if kind == "tzap" and not TZAP.exists():
+        return None, {**tool, "status": f"skipped: TZAP is not installed ({TZAP})"}
     (cs.cache_dir() / "tmp").mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=cs.cache_dir() / "tmp") as d:
         src, dst = Path(d) / "in.json", Path(d) / "out.json"
@@ -555,12 +598,13 @@ def cmd_batch(args) -> None:
     done = {r["name"] for r in index["pairs"]} if not args.force else set()
     jobs = [(c, k) for c in BATCH for k in OWN_TWINS]
     jobs += [("feynman_" + cs._clean(b), k) for b in cs.PUBLISHED_BASES for k in PUBLISHED_TWINS]
-    if args.tcounts:  # PyZX on every other T-bearing circuit it can take, smallest first
-        rest = sorted((r for r in cs.load_manifest()["circuits"]
-                       if r["t_count"] and r["name"] not in BATCH
-                       and (r["tier"] <= 3 or r["gates"] <= PYZX_MAX_GATES)),
-                      key=lambda r: r["gates"])
-        jobs += [(r["name"], k) for r in rest for k in OWN_TWINS[1:]]
+    if args.tcounts:  # every other T-bearing circuit, smallest first: TZAP at any size, PyZX
+        rest = sorted((r for r in cs.load_manifest()["circuits"]  # where it can run
+                       if r["t_count"] and r["name"] not in BATCH), key=lambda r: r["gates"])
+        jobs += [(r["name"], k) for r in rest for k in OWN_TWINS[1:]
+                 if k == "tzap" or r["tier"] <= 3 or r["gates"] <= PYZX_MAX_GATES]
+    if args.twin:
+        jobs = [(c, k) for c, k in jobs if k in args.twin]
     deadline = time.time() + args.minutes * 60
     for circuit, kind in jobs:
         name = f"{circuit}__{kind}"
@@ -586,7 +630,7 @@ def cmd_batch(args) -> None:
 def optimization_table() -> str:
     """The recommended ladder of `optimization.json` as Markdown."""
     data = json.loads(OPTIMIZATION.read_text())
-    kinds = ("pyzx_teleport", "pyzx_full_reduce", "nam_heavy", "tpar", "pyzx_published")
+    kinds = ("pyzx_teleport", "pyzx_full_reduce", "nam_heavy", "tpar", "pyzx_published", "tzap")
     out = ["| Circuit | Tier | Qubits | Gates | T | PyZX teleport | PyZX full_reduce | "
            "Nam heavy | T-par | PyZX published | TZAP |", "|---|---:|" + "---:|" * 9]
     for tier in sorted(k for k in data if k.startswith("tier_")):
@@ -604,7 +648,7 @@ def optimization_table() -> str:
                     flag = "\\*" if t["relation_to_source"] == "different" else ""
                     cells.append(f"{t['t_count']}{flag}")
             out.append(f"| `{e['name']}` | {tier[-1]} | {e['qubits']} | {e['gates']} | "
-                       f"{e['t_count']} | " + " | ".join(cells) + " | |")
+                       f"{e['t_count']} | " + " | ".join(cells) + " |")
     return "\n".join(out)
 
 
@@ -630,7 +674,7 @@ def cmd_optimization(args) -> None:
             if row is None:
                 if kind in OWN_TWINS:
                     tools[kind] = {"status": "not run" + (" at this size" if rec["tier"] == 4
-                                                           else "")}
+                                                           and kind != "tzap" else "")}
                 continue
             if row["status"] != "ok":
                 if kind in OWN_TWINS:
@@ -649,7 +693,7 @@ def cmd_optimization(args) -> None:
                  "fragment": rec["fragment"], "source": rec["source"],
                  "translated_sha256": rec["translated_sha256"],
                  "best_uncertified_t_count": min(known) if known else None,
-                 "tools": {**tools, "tzap": None}}
+                 "tools": tools}
         tiers.setdefault(f"tier_{rec['tier']}", []).append(entry)
     for entries in tiers.values():
         entries.sort(key=lambda e: (e["gates"], e["name"]))
@@ -674,8 +718,9 @@ def cmd_optimization(args) -> None:
                     "ancillas start in |0>, see `relation_to_source`",
             "pyzx_published": "PyZX's published outputs (arXiv:1903.10477), which add phase "
                               "gadget optimisation (TODD) on some circuits",
-            "tzap": "to be filled in; TZAP is being installed separately. Its benchmark copy "
-                    "of the Feynman suite is these gate lists exactly",
+            "tzap": "TZAP 0.6.1 -O2 --decompose-rz --decompose-cz (github.com/qqq-wisc/tzap), "
+                    "run here on every T-bearing circuit, tier 4 included (linear in the gate "
+                    "count). Its own copy of the Feynman suite is these gate lists exactly",
         },
         **dict(sorted(tiers.items())),
     }
@@ -804,6 +849,13 @@ def self_test() -> None:
     twin, tool = own_twin("peephole", strings, 5)
     assert len(twin) < len(strings) and tool["rewrites"] > 0 and "seconds" in tool
     assert own_twin("pyzx_teleport", ["H 0"] * (PYZX_MAX_GATES + 1), 1)[0] is None
+    if TZAP.exists():  # `Y` goes to TZAP as `Sdg; X; S`; its output is equal up to a phase
+        tz, tool = own_twin("tzap", strings, 5)
+        assert tz is not None and tool["tzap"] and "seconds" in tool, tool
+        assert {g.split()[0] for g in tz} <= set(cs.ALPHABET) - {"Y"}
+        assert describe(strings, tz, 5)["relation_found"]["relation"] in ("exact", "phase")
+    else:
+        print(f"(TZAP not installed at {TZAP}: skipped its twin)")
     meta = describe(strings, twin, 5)
     assert meta["relation_found"]["relation"] == "exact"
     assert meta["segments"]["raw"]["segments"] > 1
@@ -869,7 +921,9 @@ def main() -> None:
     p.add_argument("--only", nargs="*", help="pair-name prefixes")
     p.add_argument("--force", action="store_true", help="remake pairs already in the index")
     p.add_argument("--tcounts", action="store_true",
-                   help="also run PyZX on the other T-bearing circuits of tiers 1 to 3")
+                   help="also the other T-bearing circuits: TZAP at any size, PyZX to 8000 gates")
+    p.add_argument("--twin", nargs="*", choices=list(OWN_TWINS) + list(PUBLISHED_TWINS),
+                   help="only these twin kinds")
     p = sub.add_parser("optimization", help="write optimization.json from the index")
     p.add_argument("--table", action="store_true", help="print its recommended ladder instead")
     p.add_argument("--readme", action="store_true",

@@ -402,7 +402,7 @@ Recorded in `manifest.json` (`rejected`), by the parser or by the survey:
 `scripts/circuit_pairs.py` pairs a catalogue circuit with a twin and writes
 the JSON that `scripts/agent_harness.py import-pair` reads (and
 `scripts/optimizer_harness.py import-pair`, which keeps the original and
-files the twin as a baseline under `source.optimiser`). Three kinds of twin:
+files the twin as a baseline under `source.optimiser`). Four kinds of twin:
 
 - **`peephole`**: the pass of `scripts/peephole_pairs.py`, exact by
   construction. This is the biased twin, made with the library's own rules;
@@ -411,6 +411,15 @@ files the twin as a baseline under `source.optimiser`). Three kinds of twin:
   `scripts/check_pyzx_benchmarks.py` (pyzx 0.9.0), each in a child process
   stopped at 240 s, and not started past 8000 gates (`hwb8`, 18 220 gates,
   did not finish either pipeline in 200 s). `Y` goes to PyZX as `Sdg; X; S`.
+- **`tzap`**: TZAP 0.6.1 ([qqq-wisc/tzap](https://github.com/qqq-wisc/tzap),
+  Apache-2.0; the install is in `benchmarks/harness/notes/README.md`) at
+  `-O2` with its `rz` and `cz` decomposed, run on the circuit as OpenQASM in
+  the alphabet's own gates (`Y` written `sdg; x; s`, exact) and read back
+  with the catalogue's parser. Linear in the gate count, about a second per
+  million gates, so it is the one twin made for every T-bearing circuit,
+  tier 4 included. Its benchmark copies of the Feynman suite are these gate
+  lists exactly, so what it reports on its own files is about these
+  originals.
 - **`nam_light`**, **`nam_heavy`**, **`tpar`**, **`pyzx_published`**: outputs
   that other people published for the Feynman suite, kept in the PyZX
   repository: Nam, Ross, Su, Childs and Maslov's optimiser, T-par, and PyZX
@@ -423,14 +432,13 @@ files the twin as a baseline under `source.optimiser`). Three kinds of twin:
   other side of a Hadamard, so its four pairs use the published input itself
   as the original.
 
-285 pairs were made (`pairs/index.json`, and as a table in
-`pairs/README.md`; ten more rows are runs that were skipped); 112 are in the
-repository (2.5 MB): the three twins of 29 circuits across tiers 1 to 3, less
-two PyZX runs past the gate bound, and PyZX's published output for 27
-circuits. The rest are in the cache only: the
-Nam and T-par pairs, whose sources have no clear licence to redistribute,
-and the PyZX runs on the other T-bearing circuits of tiers 1 to 3, made for
-`optimization.json`.
+390 pairs were made (`pairs/index.json`, and as a table in
+`pairs/README.md`; fourteen more rows are runs that were skipped or stopped);
+141 are in the repository (2.6 MB): the four twins of 29 circuits across
+tiers 1 to 3, less two PyZX runs past the gate bound, and PyZX's published
+output for 27 circuits. The rest are in the cache only: the Nam and T-par
+pairs, whose sources have no clear licence to redistribute, and the PyZX and
+TZAP runs on the other T-bearing circuits, made for `optimization.json`.
 
 For each pair the index records what `benchmarks/harness/notes/distance.py`
 and `optimisers.py` measure: the relation that holds numerically (full
@@ -441,21 +449,25 @@ both lists are put in one canonical order under `Instr.CanCommute`, and the
 number of segments and the longest segment between points where the two
 prefix states agree up to a phase. Prefix states are compared through four
 random projections, not stored, which takes the segmentation to 20 qubits;
-it was skipped on 99 pairs wider or longer than that, and the diff on 5
+it was skipped on 152 pairs wider or longer than that, and the diff on 30
 pairs past some 5500 gates a side. Medians over the pairs of each kind:
 
 | Twin | Pairs | Diff, raw | Diff, canonical | Segments | Longest segment, share of the pair |
 |---|---:|---:|---:|---:|---:|
 | `peephole` | 29 | 0.73 | 0.75 | 180 | 0.01 |
-| `pyzx_teleport` | 72 | 0.35 | 0.70 | 28 | 0.53 |
+| `pyzx_teleport` | 77 | 0.34 | 0.70 | 28 | 0.53 |
+| `tzap` | 99 | 0.56 | 0.56 | 8 | 0.92 |
 | `pyzx_published` | 28 | 0.34 | 0.49 | 5 | 0.93 |
 | `nam_light`, `nam_heavy` | 56 | 0.43 | 0.47 | 3 | 0.97 |
-| `pyzx_full_reduce` | 72 | 0.08 | 0.10 | 2 | 1.00 |
+| `pyzx_full_reduce` | 73 | 0.08 | 0.09 | 2 | 1.00 |
 | `tpar` | 28 | 0.05 | 0.06 | 1 | 1.00 |
 
 That is the ladder's second axis. A peephole twin cuts every few gates. Phase
 teleportation keeps the skeleton, the diff finds 70 % of it once commuting
-gates are ordered, and half of a typical pair is still one segment. What
+gates are ordered, and half of a typical pair is still one segment. TZAP's
+`-O2` output sits between that and the published outputs: a diff on the lists
+as they are matches more of it (56 % against 35 %), ordering commuting gates
+adds nothing, and the longest segment spans 92 % of a typical pair. What
 other people's optimisers published cuts hardly at all: the cut-and-window
 recipe of the playbook has nothing to hold on to, and those are the real
 pairs.
@@ -463,13 +475,14 @@ pairs.
 ### What the batch found
 
 - **PyZX's output is usually equal exactly, not only up to a phase.** Of the
-  144 PyZX twins, 96 are exact and 21 more are exact on every sampled input;
-  16 could not be checked (wide registers with Hadamard layers). Eleven are
-  equal only up to a phase: `ω⁴ = −1` nine times (`sat_n7`, `qram_n20`,
-  `hwb6`, `qcla_mod_7`, `bigadder_n18`, `sat_n11`, `ham15-high`), `ω⁷` once
-  (`teleportation_n3`, full_reduce) and `ω` once (`adder_n28`, full_reduce,
-  sampled). Those tasks state `≡ₚ`; all others state `≡ᵤ`. Nothing was found
-  unequal, so no convention bug in the translation to and from PyZX.
+  150 PyZX twins, 96 are exact and 23 more are exact on every sampled input;
+  19 could not be checked (wide registers with Hadamard layers). Twelve are
+  equal only up to a phase: `ω⁴ = −1` ten times (`sat_n7`, `qram_n20`,
+  `hwb6`, `qcla_mod_7`, `bigadder_n18`, `sat_n11`, `ham15-high`,
+  `adder_n118`), `ω⁷` once (`teleportation_n3`, full_reduce) and `ω` once
+  (`adder_n28`, full_reduce, sampled). Those tasks state `≡ₚ`; all others
+  state `≡ᵤ`. Nothing was found unequal, so no convention bug in the
+  translation to and from PyZX.
 - **One published output is wrong.** Nam et al.'s heavy output for
   `qcla_mod_7` (T-count 235, against 237 for the light one) is not
   equivalent to its input: on about half of all basis inputs the original
@@ -494,8 +507,22 @@ pairs.
 - **`full_reduce` does not always reduce.** It takes the T-count of
   `gf2^16_mult` from 1792 to 1040 (teleport: 1536) and its 4459 gates to
   12 235; the 1455 gates of `gen_tof_50` become 1882.
-- **TZAP's benchmark files are these originals**, gate for gate, so its
-  twins will keep the skeleton of the circuits listed here.
+- **TZAP's output is equal up to a global phase, and every power of `ω`
+  occurs.** Of its 99 twins (every T-bearing circuit, tier 4 included, and
+  the first batch's Clifford circuits), 68 are exact, 11 are equal up to a
+  power of `ω` and 20 could not be checked (the wide registers with Hadamard
+  layers); none was found unequal. `ω` on `hwb8`, `ω²` on `qft_4` and
+  `grover_5`, `ω³` on `hwb11` and `spectral_thresholding`, `ω⁴` on
+  `adder_8` and `sat_n11`, `ω⁵` on `mod_mult_55`, `ω⁶` on `adder_n4` and
+  `matrix_inversion`, `ω⁷` on `hamiltonian_simulation`: those tasks state
+  `≡ₚ`. It never made a T-count worse; the median twin has 57 % of the
+  original's `T` gates and 67 % of its gates. TZAP itself took under 5 s on
+  any circuit, the QASM round trip included, and 34 s on all 99 (the
+  1 115 899 gates of `gf2^256_mult` in 1.5 s); the batch's seven minutes went
+  into measuring the pairs in Python. Its `-O2` keeps less of the skeleton
+  than phase teleportation does (the medians above), so these pairs, too,
+  need the Hadamard-variable form (`QUEUE.md`, item 4) or cut points that
+  hold up to a residual.
 
 ### The handful imported as harness tasks
 
@@ -531,7 +558,8 @@ uncertified tools reach on the same gate list: T-count, gates, `CX` count,
 seconds, and how the output relates to the source. `best_uncertified_t_count`
 is the smallest T-count among outputs that were not found to differ from the
 source, so the wrong `qcla_mod_7` output (235) and T-par's differing outputs
-do not count. `tzap` is `null` everywhere, to be filled in.
+do not count; TZAP's twenty `unchecked` outputs count, as PyZX's do. Every
+circuit has a `best_uncertified_t_count`.
 
 - `pyzx_teleport` and `pyzx_full_reduce` were run here on every T-bearing
   circuit up to 8000 gates. Our full_reduce numbers reproduce PyZX's
@@ -540,15 +568,84 @@ do not count. `tzap` is `null` everywhere, to be filled in.
 - `nam_light`, `nam_heavy`, `tpar`, `pyzx_published` are the published
   outputs, for the 28 Feynman circuits that have them. They match the
   literature's tables (`adder_8`: 399 to 215 by Nam et al., 173 by PyZX).
-- Past 8000 gates nothing was run. Those rungs (`hwb8`, `gf2^32_mult`,
-  `multiplier_n75` and all of tier 4) are where TZAP's numbers belong: it is
-  the one tool here that is linear in the gate count.
+- `tzap` was run on all 96, the one tool here that is linear in the gate
+  count. On the 74 circuits where another tool's output stands, TZAP's `-O2`
+  T-count equals the best of them on 64 and is smaller on the four tier-4
+  rungs where only teleportation had run; six times PyZX's `full_reduce`
+  (and, where it exists, PyZX's published output) is smaller: `mod5_4` 8
+  against 16, `adder_8` 173 against 215, `ham15_med` 212 against 234,
+  `csla_mux_3` 62 against 64, `multiplier_n15` 70 against 74,
+  `multiplier_n45` 634 against 650. On the 22 circuits past 8000 gates it is
+  the only number: `hwb8` 5887 to 3561, `gf2^32_mult` 7168 to 4128,
+  `multiplier_n75` 7560 to 1802, `multiplier_n400` 222 320 to 51 202,
+  `hwb12` 171 465 to 86 173, `gf2^256_mult` 458 752 to 262 400; the
+  synthesised QFTs give up the least (`qft_q050` 557 027 to 405 409).
+- The tier-4 circuits under 8000 gates got PyZX too: teleportation finished
+  on all five, `full_reduce` on `adder_n118` alone (equal up to `−1`) and was
+  stopped at 240 s on the other four.
 
 The recommended ladder (`scripts/circuit_pairs.py optimization --table`; a
 starred T-count belongs to an output that differs from its source, an empty
 cell means no published output, `—` that the tool was not run at that size):
 
 <!-- BEGIN OPTIMISATION TABLE -->
+| Circuit | Tier | Qubits | Gates | T | PyZX teleport | PyZX full_reduce | Nam heavy | T-par | PyZX published | TZAP |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `feynman_tof_3` | 1 | 5 | 57 | 21 | 19 | 15 | 15 | 15 | 15 | 15 |
+| `feynman_mod5_4` | 1 | 5 | 79 | 28 | 22 | 8 | 16 | 16 | 8 | 16 |
+| `feynman_tof_5` | 1 | 9 | 133 | 49 | 43 | 31 | 31 | 31\* | 31 | 31 |
+| `gen_cuccaro_4` | 1 | 10 | 137 | 56 | 48 | 32 |  |  |  | 32 |
+| `qasmbench_adder_n10` | 1 | 10 | 142 | 56 | 48 | 32 |  |  |  | 32 |
+| `feynman_barenco_tof_4` | 1 | 7 | 146 | 56 | 48 | 28 | 28 | 28 | 28 | 28 |
+| `feynman_mod_mult_55` | 1 | 9 | 147 | 49 | 43 | 35 | 35 | 37\* | 35 | 35 |
+| `qasmbench_sat_n7` | 1 | 7 | 180 | 70 | 62 | 46 |  |  |  | 46 |
+| `feynman_qft_4` | 1 | 5 | 187 | 69 | 67 | 67 |  |  |  | 67 |
+| `feynman_vbe_adder_3` | 1 | 10 | 190 | 70 | 56 | 24 | 24 | 24 | 24 | 24 |
+| `feynman_csla_mux_3` | 2 | 15 | 210 | 70 | 64 | 62 | 64 | 62\* | 62 | 64 |
+| `feynman_rc_adder_6` | 2 | 14 | 244 | 77 | 59 | 47 | 47 | 63\* | 47 | 47 |
+| `feynman_gf2_4_mult` | 2 | 12 | 289 | 112 | 96 | 68 | 68 | 68\* | 68 | 68 |
+| `feynman_hwb6` | 2 | 7 | 319 | 105 | 95 | 75 |  |  |  | 75 |
+| `qasmbench_qram_n20` | 2 | 20 | 321 | 140 | 128 | 96 |  |  |  | 96 |
+| `feynman_tof_10` | 2 | 19 | 323 | 119 | 103 | 71 | 71 | 71\* | 71 | 71 |
+| `feynman_mod_red_21` | 2 | 11 | 346 | 119 | 107 | 73 | 73 | 73\* | 73 | 73 |
+| `qasmbench_adder_n28` | 2 | 28 | 424 | 168 | 144 | 96 |  |  |  | 96 |
+| `gen_cuccaro_14` | 2 | 30 | 477 | 196 | 168 | 112 |  |  |  | 112 |
+| `feynman_csum_mux_9` | 2 | 30 | 532 | 196 | 168 | 84 | 84 | 112 | 84 | 84 |
+| `feynman_ham15_low` | 2 | 17 | 535 | 161 | 147 | 97 |  |  |  | 97 |
+| `feynman_qcla_com_7` | 2 | 24 | 559 | 203 | 169 | 95 | 95 | 95\* | 95 | 95 |
+| `qasmbench_multiplier_n15` | 2 | 15 | 574 | 252 | 204 | 70 |  |  |  | 74 |
+| `feynman_barenco_tof_10` | 2 | 19 | 578 | 224 | 192 | 100 | 100 | 100 | 100 | 100 |
+| `qasmbench_sat_n11` | 2 | 11 | 679 | 294 | 254 | 126 |  |  |  | 126 |
+| `feynman_gf2_7_mult` | 2 | 21 | 865 | 343 | 301 | 217 | 217 | 217\* | 217 | 217 |
+| `feynman_grover_5` | 2 | 9 | 1023 | 336 | 290 | 166 |  |  |  | 166 |
+| `feynman_qcla_mod_7` | 2 | 26 | 1120 | 413 | 351 | 237 | 235\* | 249\* | 237 | 237 |
+| `feynman_adder_8` | 2 | 24 | 1128 | 399 | 349 | 173 | 215 | 215\* | 173 | 215 |
+| `feynman_ham15_med` | 2 | 17 | 1600 | 574 | 504 | 212 |  |  |  | 234 |
+| `feynman_gf2_10_mult` | 2 | 30 | 1747 | 700 | 600 | 410 | 410 | 410 | 410 | 410 |
+| `feynman_qcla_adder_10` | 3 | 36 | 657 | 238 | 208 | 162 |  |  |  | 162 |
+| `qasmbench_adder_n64` | 3 | 64 | 988 | 392 | 336 | 224 |  |  |  | 224 |
+| `gen_tof_50` | 3 | 99 | 1455 | 679 | 583 | 391 |  |  |  | 391 |
+| `gen_cuccaro_49` | 3 | 100 | 1667 | 686 | 588 | 392 |  |  |  | 392 |
+| `gen_barenco_tof_50` | 3 | 99 | 2880 | 1344 | 1152 | 580 |  |  |  | 580 |
+| `feynman_gf2_16_mult` | 3 | 48 | 4459 | 1792 | 1536 | 1040 | 1040 | 1040 | 1040 | 1040 |
+| `feynman_mod_adder_1024` | 3 | 28 | 5425 | 1995 | 1739 | 1011 | 1011 | 1011 | 1011 | 1011 |
+| `qasmbench_multiplier_n45` | 3 | 45 | 5981 | 2646 | 2124 | 634 |  |  |  | 650 |
+| `feynman_ham15_high` | 3 | 20 | 6712 | 2457 | 2173 | 1019 |  |  |  | 1019 |
+| `qasmbench_multiplier_n75` | 3 | 75 | 17077 | 7560 | — | — |  |  |  | 1802 |
+| `feynman_gf2_32_mult` | 3 | 96 | 17658 | 7168 | — | — |  |  |  | 4128 |
+| `feynman_hwb8` | 3 | 12 | 18220 | 5887 | — | — |  |  |  | 3561 |
+| `qasmbench_adder_n433` | 4 | 433 | 6769 | 2688 | 2304 | — |  |  |  | 1536 |
+| `gen_cuccaro_512` | 4 | 1026 | 17409 | 7168 | — | — |  |  |  | 4096 |
+| `tzap_cobble_t_laplacian_filter` | 4 | 11 | 34138 | 13442 | — | — |  |  |  | 12842 |
+| `feynman_gf2_64_mult` | 4 | 192 | 70075 | 28672 | — | — |  |  |  | 16448 |
+| `feynman_hwb10` | 4 | 16 | 91642 | 29939 | — | — |  |  |  | 15921 |
+| `feynman_gf2_128_mult` | 4 | 384 | 279419 | 114688 | — | — |  |  |  | 65664 |
+| `tzap_qft_qft_q020_d32421` | 4 | 20 | 309835 | 167567 | — | — |  |  |  | 122387 |
+| `qasmbench_multiplier_n400` | 4 | 400 | 501877 | 222320 | — | — |  |  |  | 51202 |
+| `feynman_hwb12` | 4 | 20 | 514412 | 171465 | — | — |  |  |  | 86173 |
+| `tzap_cobble_t_ols_ridge` | 4 | 22 | 587755 | 255692 | — | — |  |  |  | 119052 |
+| `tzap_qft_qft_q050_d87171` | 4 | 50 | 1030570 | 557027 | — | — |  |  |  | 405409 |
+| `feynman_gf2_256_mult` | 4 | 768 | 1115899 | 458752 | — | — |  |  |  | 262400 |
 <!-- END OPTIMISATION TABLE -->
 
 A translated circuit is obtained with `scripts/circuit_sources.py translate
@@ -560,25 +657,31 @@ same list. `scripts/optimizer_harness.py import-pair` takes any file under
 
 ## Reproduce
 
-The virtualenv Python has numpy and pyzx 0.9.0; the system `python3` has
-neither. Fetching and translating need no package; the numeric checks need
+The virtualenv Python has numpy and pyzx 0.9.0 (`uv venv --python 3.12
+~/.circuiteq-harness/envs/pyzx`, then `uv pip install --python
+~/.circuiteq-harness/envs/pyzx/bin/python numpy pyzx==0.9.0`); the system
+`python3` has neither. TZAP lives in the virtualenv next to it
+(`benchmarks/harness/notes/README.md`; `CIRCUITEQ_TZAP` names another
+binary). Fetching and translating need no package; the numeric checks need
 numpy; the PyZX twins and the PyZX parser cross-check need pyzx.
 
 ```bash
-PY=/tmp/circuiteq-pyzx-venv/bin/python
+PY=~/.circuiteq-harness/envs/pyzx/bin/python
 $PY scripts/circuit_sources.py --self-test
 $PY scripts/circuit_sources.py fetch                  # tiers 1 to 3: 2.5 MB, 15 s
 $PY scripts/circuit_sources.py fetch --all            # tier 4 and the published outputs: 85 MB
 $PY scripts/circuit_sources.py translate feynman_tof_5 gen_cuccaro_64 --qasm --out /tmp/circuits
 $PY scripts/circuit_sources.py catalogue --write      # recompute manifest.json, about 15 minutes
-$PY scripts/circuit_sources.py catalogue --table      # the tier tables above
+$PY scripts/circuit_sources.py catalogue --table      # the tier tables above; --readme puts them here
 
 $PY scripts/circuit_pairs.py --self-test
 $PY scripts/circuit_pairs.py batch                    # the first batch; resumes; 8 minutes a call
-$PY scripts/circuit_pairs.py batch --tcounts          # PyZX on every other T-bearing circuit
-$PY scripts/circuit_pairs.py make gen_cuccaro_64 --twin peephole pyzx_teleport --out /tmp/pairs
+$PY scripts/circuit_pairs.py batch --tcounts          # PyZX and TZAP on every other T-bearing circuit
+$PY scripts/circuit_pairs.py batch --tcounts --twin tzap --minutes 30   # TZAP alone, tier 4 included
+$PY scripts/circuit_pairs.py make gen_cuccaro_64 --twin peephole tzap --out /tmp/pairs
 $PY scripts/circuit_pairs.py optimization             # optimization.json, from pairs/index.json
-$PY scripts/circuit_pairs.py table                    # the pairs table above
+$PY scripts/circuit_pairs.py optimization --readme    # its recommended ladder, into this file
+$PY scripts/circuit_pairs.py table                    # the pairs table above; --write puts it in pairs/README.md
 
 python3 scripts/agent_harness.py import-pair benchmarks/circuits/pairs/feynman_tof_5__pyzx_teleport.json
 ```

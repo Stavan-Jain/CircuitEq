@@ -9,7 +9,7 @@
   "nam_light, nam_heavy": "published outputs of Nam, Ross, Su, Childs, Maslov (arXiv:1710.07345), from the PyZX repository",
   "tpar": "published T-par outputs, from the PyZX repository; T-par may assume that ancillas start in |0>, see `relation_to_source`",
   "pyzx_published": "PyZX's published outputs (arXiv:1903.10477), which add phase gadget optimisation (TODD) on some circuits",
-  "tzap": "to be filled in; TZAP is being installed separately. Its benchmark copy of the Feynman suite is these gate lists exactly"
+  "tzap": "TZAP 0.6.1 -O2 --decompose-rz --decompose-cz (github.com/qqq-wisc/tzap), run here on every T-bearing circuit, tier 4 included (linear in the gate count). Its own copy of the Feynman suite is these gate lists exactly"
  },
  "tier_1": [
   {
@@ -40,7 +40,13 @@
      "relation_to_source": "phase",
      "seconds": 0.05
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 1,
+     "gates": 8,
+     "cx_count": 2,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -71,7 +77,13 @@
      "relation_to_source": "exact",
      "seconds": 0.05
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 7,
+     "gates": 17,
+     "cx_count": 6,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -102,7 +114,13 @@
      "relation_to_source": "exact",
      "seconds": 0.05
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 1,
+     "gates": 18,
+     "cx_count": 11,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -133,7 +151,13 @@
      "relation_to_source": "exact",
      "seconds": 0.06
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 7,
+     "gates": 18,
+     "cx_count": 8,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -164,7 +188,13 @@
      "relation_to_source": "exact",
      "seconds": 0.06
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 8,
+     "gates": 20,
+     "cx_count": 8,
+     "relation_to_source": "phase",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -195,7 +225,13 @@
      "relation_to_source": "exact",
      "seconds": 0.05
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 1,
+     "gates": 12,
+     "cx_count": 9,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -226,7 +262,13 @@
      "relation_to_source": "exact",
      "seconds": 0.06
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 0,
+     "gates": 13,
+     "cx_count": 4,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -257,7 +299,13 @@
      "relation_to_source": "exact",
      "seconds": 0.06
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 15,
+     "gates": 38,
+     "cx_count": 15,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -288,6 +336,13 @@
      "relation_to_source": "exact",
      "seconds": 0.05
     },
+    "tzap": {
+     "t_count": 15,
+     "gates": 38,
+     "cx_count": 15,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 15,
      "gates": 35,
@@ -311,8 +366,7 @@
      "gates": 44,
      "cx_count": 16,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -343,7 +397,13 @@
      "relation_to_source": "exact",
      "seconds": 0.06
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 16,
+     "gates": 46,
+     "cx_count": 19,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -374,7 +434,13 @@
      "relation_to_source": "exact",
      "seconds": 0.06
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 16,
+     "gates": 57,
+     "cx_count": 27,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -405,6 +471,13 @@
      "relation_to_source": "exact",
      "seconds": 0.06
     },
+    "tzap": {
+     "t_count": 16,
+     "gates": 46,
+     "cx_count": 19,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 16,
      "gates": 42,
@@ -428,8 +501,7 @@
      "gates": 56,
      "cx_count": 22,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -460,6 +532,13 @@
      "relation_to_source": "exact",
      "seconds": 0.05
     },
+    "tzap": {
+     "t_count": 16,
+     "gates": 55,
+     "cx_count": 26,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 16,
      "gates": 51,
@@ -483,8 +562,7 @@
      "gates": 56,
      "cx_count": 27,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -515,6 +593,13 @@
      "relation_to_source": "exact",
      "seconds": 0.06
     },
+    "tzap": {
+     "t_count": 23,
+     "gates": 61,
+     "cx_count": 24,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 23,
      "gates": 55,
@@ -538,8 +623,7 @@
      "gates": 71,
      "cx_count": 26,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -570,7 +654,13 @@
      "relation_to_source": "exact",
      "seconds": 0.06
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 31,
+     "gates": 84,
+     "cx_count": 33,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -601,6 +691,13 @@
      "relation_to_source": "exact",
      "seconds": 0.06
     },
+    "tzap": {
+     "t_count": 31,
+     "gates": 84,
+     "cx_count": 33,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
     "nam_light": {
      "t_count": 31,
      "gates": 75,
@@ -624,8 +721,7 @@
      "gates": 98,
      "cx_count": 36,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -656,7 +752,13 @@
      "relation_to_source": "exact",
      "seconds": 0.07
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 32,
+     "gates": 113,
+     "cx_count": 53,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -687,7 +789,13 @@
      "relation_to_source": "exact",
      "seconds": 0.07
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 32,
+     "gates": 117,
+     "cx_count": 53,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -718,6 +826,13 @@
      "relation_to_source": "exact",
      "seconds": 0.06
     },
+    "tzap": {
+     "t_count": 28,
+     "gates": 87,
+     "cx_count": 37,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 28,
      "gates": 78,
@@ -741,8 +856,7 @@
      "gates": 105,
      "cx_count": 44,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -773,6 +887,13 @@
      "relation_to_source": "exact",
      "seconds": 0.07
     },
+    "tzap": {
+     "t_count": 35,
+     "gates": 99,
+     "cx_count": 40,
+     "relation_to_source": "phase",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 35,
      "gates": 91,
@@ -796,8 +917,7 @@
      "gates": 97,
      "cx_count": 42,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -828,7 +948,13 @@
      "relation_to_source": "exact",
      "seconds": 0.08
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 40,
+     "gates": 128,
+     "cx_count": 55,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -859,7 +985,13 @@
      "relation_to_source": "phase",
      "seconds": 0.07
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 46,
+     "gates": 134,
+     "cx_count": 46,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -890,7 +1022,13 @@
      "relation_to_source": "exact",
      "seconds": 0.07
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 67,
+     "gates": 157,
+     "cx_count": 46,
+     "relation_to_source": "phase",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -921,6 +1059,13 @@
      "relation_to_source": "exact",
      "seconds": 0.07
     },
+    "tzap": {
+     "t_count": 24,
+     "gates": 94,
+     "cx_count": 47,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 24,
      "gates": 89,
@@ -944,8 +1089,7 @@
      "gates": 115,
      "cx_count": 54,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   }
  ],
@@ -978,7 +1122,13 @@
      "relation_to_source": "exact",
      "seconds": 0.05
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 15,
+     "gates": 15,
+     "cx_count": 0,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -1009,7 +1159,13 @@
      "relation_to_source": "exact",
      "seconds": 0.06
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 32,
+     "gates": 93,
+     "cx_count": 40,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -1040,7 +1196,13 @@
      "relation_to_source": "exact",
      "seconds": 0.1
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 55,
+     "gates": 153,
+     "cx_count": 60,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -1071,6 +1233,13 @@
      "relation_to_source": "exact",
      "seconds": 0.08
     },
+    "tzap": {
+     "t_count": 64,
+     "gates": 153,
+     "cx_count": 70,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 64,
      "gates": 161,
@@ -1094,8 +1263,7 @@
      "gates": 164,
      "cx_count": 75,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -1126,6 +1294,13 @@
      "relation_to_source": "exact",
      "seconds": 0.08
     },
+    "tzap": {
+     "t_count": 40,
+     "gates": 128,
+     "cx_count": 55,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 40,
      "gates": 114,
@@ -1149,8 +1324,7 @@
      "gates": 158,
      "cx_count": 66,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -1181,6 +1355,13 @@
      "relation_to_source": "exact",
      "seconds": 0.09
     },
+    "tzap": {
+     "t_count": 47,
+     "gates": 163,
+     "cx_count": 75,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 47,
      "gates": 142,
@@ -1204,8 +1385,7 @@
      "gates": 191,
      "cx_count": 75,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -1236,7 +1416,13 @@
      "relation_to_source": "exact",
      "seconds": 0.14
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 64,
+     "gates": 225,
+     "cx_count": 105,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -1267,7 +1453,13 @@
      "relation_to_source": "phase",
      "seconds": 0.12
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 64,
+     "gates": 233,
+     "cx_count": 106,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -1298,6 +1490,13 @@
      "relation_to_source": "exact",
      "seconds": 0.1
     },
+    "tzap": {
+     "t_count": 68,
+     "gates": 193,
+     "cx_count": 99,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 68,
      "gates": 187,
@@ -1321,8 +1520,7 @@
      "gates": 199,
      "cx_count": 99,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -1353,7 +1551,13 @@
      "relation_to_source": "exact",
      "seconds": 0.1
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 75,
+     "gates": 221,
+     "cx_count": 108,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -1384,7 +1588,13 @@
      "relation_to_source": "phase",
      "seconds": 0.16
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 96,
+     "gates": 261,
+     "cx_count": 123,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -1415,6 +1625,13 @@
      "relation_to_source": "exact",
      "seconds": 0.12
     },
+    "tzap": {
+     "t_count": 71,
+     "gates": 199,
+     "cx_count": 78,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 71,
      "gates": 175,
@@ -1438,8 +1655,7 @@
      "gates": 233,
      "cx_count": 86,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -1470,6 +1686,13 @@
      "relation_to_source": "exact",
      "seconds": 0.1
     },
+    "tzap": {
+     "t_count": 73,
+     "gates": 214,
+     "cx_count": 86,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 73,
      "gates": 184,
@@ -1493,8 +1716,7 @@
      "gates": 254,
      "cx_count": 93,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -1525,7 +1747,13 @@
      "relation_to_source": "phase",
      "seconds": 0.29
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 96,
+     "gates": 352,
+     "cx_count": 159,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -1556,6 +1784,13 @@
      "relation_to_source": "exact",
      "seconds": 0.13
     },
+    "tzap": {
+     "t_count": 115,
+     "gates": 303,
+     "cx_count": 154,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 115,
      "gates": 296,
@@ -1579,8 +1814,7 @@
      "gates": 312,
      "cx_count": 154,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -1611,7 +1845,13 @@
      "relation_to_source": "exact",
      "seconds": 0.84
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 112,
+     "gates": 393,
+     "cx_count": 183,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -1642,7 +1882,13 @@
      "relation_to_source": "exact",
      "seconds": 0.29
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 100,
+     "gates": 333,
+     "cx_count": 145,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -1673,6 +1919,13 @@
      "relation_to_source": "unchecked",
      "seconds": 0.22
     },
+    "tzap": {
+     "t_count": 84,
+     "gates": 294,
+     "cx_count": 154,
+     "relation_to_source": "unchecked",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 84,
      "gates": 294,
@@ -1696,8 +1949,7 @@
      "gates": 346,
      "cx_count": 168,
      "relation_to_source": "unchecked"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -1728,7 +1980,13 @@
      "relation_to_source": "exact",
      "seconds": 0.31
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 97,
+     "gates": 370,
+     "cx_count": 216,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -1759,6 +2017,13 @@
      "relation_to_source": "exact",
      "seconds": 0.43
     },
+    "tzap": {
+     "t_count": 95,
+     "gates": 315,
+     "cx_count": 139,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 95,
      "gates": 284,
@@ -1782,8 +2047,7 @@
      "gates": 358,
      "cx_count": 148,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -1814,7 +2078,13 @@
      "relation_to_source": "exact",
      "seconds": 0.26
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 74,
+     "gates": 298,
+     "cx_count": 149,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -1845,6 +2115,13 @@
      "relation_to_source": "exact",
      "seconds": 0.2
     },
+    "tzap": {
+     "t_count": 100,
+     "gates": 333,
+     "cx_count": 145,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 100,
      "gates": 294,
@@ -1868,8 +2145,7 @@
      "gates": 415,
      "cx_count": 176,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -1900,6 +2176,13 @@
      "relation_to_source": "exact",
      "seconds": 0.27
     },
+    "tzap": {
+     "t_count": 150,
+     "gates": 414,
+     "cx_count": 221,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 150,
      "gates": 403,
@@ -1923,8 +2206,7 @@
      "gates": 432,
      "cx_count": 221,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -1955,7 +2237,13 @@
      "relation_to_source": "phase",
      "seconds": 0.33
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 126,
+     "gates": 421,
+     "cx_count": 169,
+     "relation_to_source": "phase",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -1986,6 +2274,13 @@
      "relation_to_source": "exact",
      "seconds": 0.38
     },
+    "tzap": {
+     "t_count": 217,
+     "gates": 553,
+     "cx_count": 300,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 217,
      "gates": 555,
@@ -2009,8 +2304,7 @@
      "gates": 585,
      "cx_count": 300,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -2041,7 +2335,13 @@
      "relation_to_source": "exact",
      "seconds": 0.25
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 166,
+     "gates": 587,
+     "cx_count": 222,
+     "relation_to_source": "phase",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -2072,6 +2372,13 @@
      "relation_to_source": "phase",
      "seconds": 1.69
     },
+    "tzap": {
+     "t_count": 237,
+     "gates": 695,
+     "cx_count": 323,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 237,
      "gates": 636,
@@ -2095,8 +2402,7 @@
      "gates": 815,
      "cx_count": 324,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -2127,6 +2433,13 @@
      "relation_to_source": "exact",
      "seconds": 1.03
     },
+    "tzap": {
+     "t_count": 215,
+     "gates": 684,
+     "cx_count": 326,
+     "relation_to_source": "phase",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 215,
      "gates": 646,
@@ -2150,8 +2463,7 @@
      "gates": 706,
      "cx_count": 335,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -2182,6 +2494,13 @@
      "relation_to_source": "exact",
      "seconds": 0.82
     },
+    "tzap": {
+     "t_count": 264,
+     "gates": 709,
+     "cx_count": 405,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
     "nam_light": {
      "t_count": 264,
      "gates": 712,
@@ -2205,8 +2524,7 @@
      "gates": 759,
      "cx_count": 405,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -2237,6 +2555,13 @@
      "relation_to_source": "exact",
      "seconds": 0.91
     },
+    "tzap": {
+     "t_count": 351,
+     "gates": 889,
+     "cx_count": 494,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    },
     "nam_light": {
      "t_count": 351,
      "gates": 891,
@@ -2260,8 +2585,7 @@
      "gates": 951,
      "cx_count": 494,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -2292,7 +2616,13 @@
      "relation_to_source": "exact",
      "seconds": 1.53
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 234,
+     "gates": 786,
+     "cx_count": 382,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    }
    }
   },
   {
@@ -2323,6 +2653,13 @@
      "relation_to_source": "exact",
      "seconds": 1.16
     },
+    "tzap": {
+     "t_count": 410,
+     "gates": 1088,
+     "cx_count": 609,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    },
     "nam_light": {
      "t_count": 410,
      "gates": 1070,
@@ -2346,8 +2683,7 @@
      "gates": 1162,
      "cx_count": 609,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   }
  ],
@@ -2380,7 +2716,13 @@
      "relation_to_source": "exact",
      "seconds": 0.58
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 119,
+     "gates": 337,
+     "cx_count": 132,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -2411,7 +2753,13 @@
      "relation_to_source": "unchecked",
      "seconds": 0.47
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 162,
+     "gates": 422,
+     "cx_count": 193,
+     "relation_to_source": "unchecked",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -2442,7 +2790,13 @@
      "relation_to_source": "unchecked",
      "seconds": 1.51
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 172,
+     "gates": 579,
+     "cx_count": 253,
+     "relation_to_source": "unchecked",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -2473,7 +2827,13 @@
      "relation_to_source": "unchecked",
      "seconds": 5.99
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 247,
+     "gates": 705,
+     "cx_count": 276,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -2504,7 +2864,13 @@
      "relation_to_source": "exact",
      "seconds": 5.16
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 224,
+     "gates": 820,
+     "cx_count": 371,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -2535,7 +2901,13 @@
      "relation_to_source": "exact",
      "seconds": 11.24
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 256,
+     "gates": 897,
+     "cx_count": 417,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -2566,7 +2938,13 @@
      "relation_to_source": "unchecked",
      "seconds": 31.51
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 391,
+     "gates": 1119,
+     "cx_count": 438,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
    }
   },
   {
@@ -2597,7 +2975,13 @@
      "relation_to_source": "exact",
      "seconds": 44.51
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 392,
+     "gates": 1373,
+     "cx_count": 638,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    }
    }
   },
   {
@@ -2628,7 +3012,13 @@
      "relation_to_source": "unchecked",
      "seconds": 85.18
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 580,
+     "gates": 1973,
+     "cx_count": 865,
+     "relation_to_source": "unchecked",
+     "seconds": 0.08
+    }
    }
   },
   {
@@ -2659,6 +3049,13 @@
      "relation_to_source": "unchecked",
      "seconds": 15.44
     },
+    "tzap": {
+     "t_count": 1040,
+     "gates": 2703,
+     "cx_count": 1581,
+     "relation_to_source": "unchecked",
+     "seconds": 0.08
+    },
     "nam_light": {
      "t_count": 1040,
      "gates": 2707,
@@ -2682,8 +3079,7 @@
      "gates": 2931,
      "cx_count": 1581,
      "relation_to_source": "unchecked"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -2714,6 +3110,13 @@
      "relation_to_source": "exact",
      "seconds": 26.44
     },
+    "tzap": {
+     "t_count": 1011,
+     "gates": 2760,
+     "cx_count": 1303,
+     "relation_to_source": "exact",
+     "seconds": 0.09
+    },
     "nam_light": {
      "t_count": 1011,
      "gates": 2738,
@@ -2737,8 +3140,7 @@
      "gates": 3582,
      "cx_count": 1436,
      "relation_to_source": "exact"
-    },
-    "tzap": null
+    }
    }
   },
   {
@@ -2769,7 +3171,13 @@
      "relation_to_source": "unchecked",
      "seconds": 75.01
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 650,
+     "gates": 2743,
+     "cx_count": 1507,
+     "relation_to_source": "unchecked",
+     "seconds": 0.09
+    }
    }
   },
   {
@@ -2800,7 +3208,13 @@
      "relation_to_source": "phase",
      "seconds": 34.09
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 1019,
+     "gates": 3385,
+     "cx_count": 1595,
+     "relation_to_source": "exact",
+     "seconds": 0.09
+    }
    }
   },
   {
@@ -2815,7 +3229,7 @@
    "fragment": "general",
    "source": "qasmbench",
    "translated_sha256": "2a739995b79fbb701277042decfccaddaaff38302cceb7c42c47492318a52480",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 1802,
    "tools": {
     "pyzx_teleport": {
      "status": "skipped: 17077 gates is past the bound of 8000 for a 240 s PyZX run"
@@ -2823,7 +3237,13 @@
     "pyzx_full_reduce": {
      "status": "skipped: 17077 gates is past the bound of 8000 for a 240 s PyZX run"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 1802,
+     "gates": 7738,
+     "cx_count": 4337,
+     "relation_to_source": "unchecked",
+     "seconds": 0.12
+    }
    }
   },
   {
@@ -2838,7 +3258,7 @@
    "fragment": "general",
    "source": "feynman",
    "translated_sha256": "a1e9561b68e945d0222dd816f9c32a559a5b8ca014cfb1373d1e1c570887a4fa",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 4128,
    "tools": {
     "pyzx_teleport": {
      "status": "skipped: 17658 gates is past the bound of 8000 for a 240 s PyZX run"
@@ -2846,7 +3266,13 @@
     "pyzx_full_reduce": {
      "status": "skipped: 17658 gates is past the bound of 8000 for a 240 s PyZX run"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 4128,
+     "gates": 10562,
+     "cx_count": 6268,
+     "relation_to_source": "unchecked",
+     "seconds": 0.13
+    }
    }
   },
   {
@@ -2861,7 +3287,7 @@
    "fragment": "general",
    "source": "feynman",
    "translated_sha256": "d44845d347f33a022fa9771ed5cd0f79d254f129031cd3e7d15c29ed4bb82832",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 3561,
    "tools": {
     "pyzx_teleport": {
      "status": "skipped: 18220 gates is past the bound of 8000 for a 240 s PyZX run"
@@ -2869,7 +3295,13 @@
     "pyzx_full_reduce": {
      "status": "skipped: 18220 gates is past the bound of 8000 for a 240 s PyZX run"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 3561,
+     "gates": 11509,
+     "cx_count": 5949,
+     "relation_to_source": "phase",
+     "seconds": 0.14
+    }
    }
   }
  ],
@@ -2886,15 +3318,29 @@
    "fragment": "general",
    "source": "qasmbench",
    "translated_sha256": "98822edc554cda03e336035bff3271ba438aedcf0b42067150f669626dd70704",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 416,
    "tools": {
     "pyzx_teleport": {
-     "status": "not run at this size"
+     "t_count": 624,
+     "gates": 2156,
+     "cx_count": 793,
+     "relation_to_source": "unchecked",
+     "seconds": 0.74
     },
     "pyzx_full_reduce": {
-     "status": "not run at this size"
+     "t_count": 416,
+     "gates": 2616,
+     "cx_count": 1224,
+     "relation_to_source": "phase",
+     "seconds": 32.43
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 416,
+     "gates": 1522,
+     "cx_count": 689,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    }
    }
   },
   {
@@ -2909,15 +3355,25 @@
    "fragment": "general",
    "source": "generated",
    "translated_sha256": "4f4c90960b643f315cf547ab79205b4164272e58c5c7e174f57e4ba882ba5d28",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 791,
    "tools": {
     "pyzx_teleport": {
-     "status": "not run at this size"
+     "t_count": 1183,
+     "gates": 3251,
+     "cx_count": 1182,
+     "relation_to_source": "exact",
+     "seconds": 1.27
     },
     "pyzx_full_reduce": {
-     "status": "not run at this size"
+     "status": "stopped after 240 s"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 791,
+     "gates": 2269,
+     "cx_count": 888,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    }
    }
   },
   {
@@ -2932,15 +3388,25 @@
    "fragment": "general",
    "source": "generated",
    "translated_sha256": "bfa5ac3bb5b2bb36c07e83b2f233567c7312c066860f95dbacf5ff47e90cf649",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 1024,
    "tools": {
     "pyzx_teleport": {
-     "status": "not run at this size"
+     "t_count": 1536,
+     "gates": 4991,
+     "cx_count": 1921,
+     "relation_to_source": "exact",
+     "seconds": 3.74
     },
     "pyzx_full_reduce": {
-     "status": "not run at this size"
+     "status": "stopped after 240 s"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 1024,
+     "gates": 3585,
+     "cx_count": 1665,
+     "relation_to_source": "exact",
+     "seconds": 0.09
+    }
    }
   },
   {
@@ -2955,15 +3421,25 @@
    "fragment": "general",
    "source": "generated",
    "translated_sha256": "307fff94e14a1a42e2fd182eef19118ea4b8eb10eb7ca0d40e0b177c322fe1ed",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 1180,
    "tools": {
     "pyzx_teleport": {
-     "status": "not run at this size"
+     "t_count": 2352,
+     "gates": 5591,
+     "cx_count": 2352,
+     "relation_to_source": "unchecked",
+     "seconds": 4.3
     },
     "pyzx_full_reduce": {
-     "status": "not run at this size"
+     "status": "stopped after 240 s"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 1180,
+     "gates": 4023,
+     "cx_count": 1765,
+     "relation_to_source": "unchecked",
+     "seconds": 0.09
+    }
    }
   },
   {
@@ -2978,15 +3454,25 @@
    "fragment": "general",
    "source": "qasmbench",
    "translated_sha256": "9d7fb4bf9707c84ba8c03f410bc5d60326907aeb81b537b28175b242f1368739",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 1536,
    "tools": {
     "pyzx_teleport": {
-     "status": "not run at this size"
+     "t_count": 2304,
+     "gates": 7966,
+     "cx_count": 2928,
+     "relation_to_source": "unchecked",
+     "seconds": 8.23
     },
     "pyzx_full_reduce": {
-     "status": "not run at this size"
+     "status": "stopped after 240 s"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 1536,
+     "gates": 5617,
+     "cx_count": 2544,
+     "relation_to_source": "exact",
+     "seconds": 0.1
+    }
    }
   },
   {
@@ -3001,7 +3487,7 @@
    "fragment": "general",
    "source": "generated",
    "translated_sha256": "b02dc5d58ac352aba8c52b19dea91a7ca23de2fd26ee5da7493d12be2fc1363b",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 4096,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3009,7 +3495,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 4096,
+     "gates": 14337,
+     "cx_count": 6657,
+     "relation_to_source": "exact",
+     "seconds": 0.15
+    }
    }
   },
   {
@@ -3024,7 +3516,7 @@
    "fragment": "general",
    "source": "tzap",
    "translated_sha256": "e5f9705a5e5bb1a12bb6fd30e4841f15a7e2a2d3dc99b7970bfd4c6ea6e6fe81",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 12842,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3032,7 +3524,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 12842,
+     "gates": 26730,
+     "cx_count": 392,
+     "relation_to_source": "exact",
+     "seconds": 0.23
+    }
    }
   },
   {
@@ -3047,7 +3545,7 @@
    "fragment": "general",
    "source": "feynman",
    "translated_sha256": "6f7ada8c20c5f0f91452d83640aef14fdaf552b86869ba1308c63eeac1cf3392",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 16448,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3055,7 +3553,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 16448,
+     "gates": 41547,
+     "cx_count": 24765,
+     "relation_to_source": "unchecked",
+     "seconds": 0.34
+    }
    }
   },
   {
@@ -3070,7 +3574,7 @@
    "fragment": "general",
    "source": "tzap",
    "translated_sha256": "d379be058dc13a1600bedb5cd60f257bc5e698ae9e23062e779d02f9f0b343af",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 23863,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3078,7 +3582,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 23863,
+     "gates": 52833,
+     "cx_count": 5717,
+     "relation_to_source": "phase",
+     "seconds": 0.36
+    }
    }
   },
   {
@@ -3093,7 +3603,7 @@
    "fragment": "general",
    "source": "feynman",
    "translated_sha256": "9b1c3f867b99aeaf5bf21dee7084e252c24eefb9ead022ab46443ce742c5ab12",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 15921,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3101,7 +3611,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 15921,
+     "gates": 54235,
+     "cx_count": 28003,
+     "relation_to_source": "exact",
+     "seconds": 0.43
+    }
    }
   },
   {
@@ -3116,7 +3632,7 @@
    "fragment": "general",
    "source": "tzap",
    "translated_sha256": "07079dcd5791ae2a4ff73c86e3a9afef713bc95c3f56c2392c1e289ea3e38306",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 28330,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3124,7 +3640,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 28330,
+     "gates": 64569,
+     "cx_count": 8694,
+     "relation_to_source": "exact",
+     "seconds": 0.44
+    }
    }
   },
   {
@@ -3139,7 +3661,7 @@
    "fragment": "general",
    "source": "tzap",
    "translated_sha256": "a4b6dd7756280c21969e3e9d8a2c5d02e28ac4bded65d2c9065ae87a11bd2dfc",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 44183,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3147,7 +3669,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 44183,
+     "gates": 107053,
+     "cx_count": 21675,
+     "relation_to_source": "phase",
+     "seconds": 0.77
+    }
    }
   },
   {
@@ -3162,7 +3690,7 @@
    "fragment": "general",
    "source": "feynman",
    "translated_sha256": "b2a6e292e92932a7c063acd7fca0f0db6b1edb40434ef00eba80b5c894969276",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 44874,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3170,7 +3698,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 44874,
+     "gates": 149527,
+     "cx_count": 78850,
+     "relation_to_source": "phase",
+     "seconds": 0.98
+    }
    }
   },
   {
@@ -3185,7 +3719,7 @@
    "fragment": "general",
    "source": "feynman",
    "translated_sha256": "048011c8beac9f0a3c8f1ae4979476206c39c6ca1c2523271243b9336fc80f0a",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 65664,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3193,7 +3727,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 65664,
+     "gates": 165019,
+     "cx_count": 98685,
+     "relation_to_source": "unchecked",
+     "seconds": 1.21
+    }
    }
   },
   {
@@ -3208,7 +3748,7 @@
    "fragment": "general",
    "source": "tzap",
    "translated_sha256": "940175d0987533034f87f213c1f9737018c4664fa748b73d4806bc217777acd9",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 122387,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3216,7 +3756,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 122387,
+     "gates": 249902,
+     "cx_count": 380,
+     "relation_to_source": "unchecked",
+     "seconds": 1.33
+    }
    }
   },
   {
@@ -3231,7 +3777,7 @@
    "fragment": "general",
    "source": "tzap",
    "translated_sha256": "73cf1f24cf29272d1edc24d646c1b7c66e02d2e5d6dfba7e7535d91db9477274",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 56511,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3239,7 +3785,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 56511,
+     "gates": 140907,
+     "cx_count": 33673,
+     "relation_to_source": "phase",
+     "seconds": 0.93
+    }
    }
   },
   {
@@ -3254,7 +3806,7 @@
    "fragment": "general",
    "source": "qasmbench",
    "translated_sha256": "6a563ac7958423a33d1c98d39a45e315059f677b8b480da21e9255daf2ec4b67",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 39202,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3262,7 +3814,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 39202,
+     "gates": 172696,
+     "cx_count": 99106,
+     "relation_to_source": "unchecked",
+     "seconds": 1.15
+    }
    }
   },
   {
@@ -3277,7 +3835,7 @@
    "fragment": "general",
    "source": "qasmbench",
    "translated_sha256": "6e37f6f674ccdfc044d9a152acc902d2de9b9d46dfd16a19f3626f5ceb7149bf",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 51202,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3285,7 +3843,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 51202,
+     "gates": 225764,
+     "cx_count": 129663,
+     "relation_to_source": "unchecked",
+     "seconds": 1.49
+    }
    }
   },
   {
@@ -3300,7 +3864,7 @@
    "fragment": "general",
    "source": "feynman",
    "translated_sha256": "745914f34228d01bdc960467487f9038df6c44a67d46c5fb68524731b4de45ec",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 86173,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3308,7 +3872,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 86173,
+     "gates": 295803,
+     "cx_count": 153809,
+     "relation_to_source": "exact",
+     "seconds": 1.83
+    }
    }
   },
   {
@@ -3323,7 +3893,7 @@
    "fragment": "general",
    "source": "tzap",
    "translated_sha256": "1c7d887e368458eed65728b7b816b957d1bbfae4ac1a4db2c11487de5cb9d7ae",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 216729,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3331,7 +3901,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 216729,
+     "gates": 442253,
+     "cx_count": 675,
+     "relation_to_source": "unchecked",
+     "seconds": 2.34
+    }
    }
   },
   {
@@ -3346,7 +3922,7 @@
    "fragment": "general",
    "source": "tzap",
    "translated_sha256": "f6e12bbd9aa6ac3ab26fdbaedeae05638edc4ed57af07fe73baf8b29ef1d38d5",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 119052,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3354,7 +3930,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 119052,
+     "gates": 284816,
+     "cx_count": 51136,
+     "relation_to_source": "unchecked",
+     "seconds": 1.78
+    }
    }
   },
   {
@@ -3369,7 +3951,7 @@
    "fragment": "general",
    "source": "tzap",
    "translated_sha256": "f6f3a842c94e1c0ed0c726d3e49672c3b002ce2e59e8eb8cd81c8db79939fe5e",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 311069,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3377,7 +3959,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 311069,
+     "gates": 634598,
+     "cx_count": 970,
+     "relation_to_source": "unchecked",
+     "seconds": 3.3
+    }
    }
   },
   {
@@ -3392,7 +3980,7 @@
    "fragment": "general",
    "source": "tzap",
    "translated_sha256": "3c27310fa8c393f9899ee9629c5d3155066b1303d0a13e318e6d5a5b14d7df91",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 405409,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3400,7 +3988,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 405409,
+     "gates": 826943,
+     "cx_count": 1265,
+     "relation_to_source": "unchecked",
+     "seconds": 4.34
+    }
    }
   },
   {
@@ -3415,7 +4009,7 @@
    "fragment": "general",
    "source": "feynman",
    "translated_sha256": "c33e90c4fc8f01578b61d985114522cdc2ba46a4c9ef49ff7a850ebd6214ffef",
-   "best_uncertified_t_count": null,
+   "best_uncertified_t_count": 262400,
    "tools": {
     "pyzx_teleport": {
      "status": "not run at this size"
@@ -3423,7 +4017,13 @@
     "pyzx_full_reduce": {
      "status": "not run at this size"
     },
-    "tzap": null
+    "tzap": {
+     "t_count": 262400,
+     "gates": 657723,
+     "cx_count": 393981,
+     "relation_to_source": "unchecked",
+     "seconds": 4.97
+    }
    }
   }
  ]

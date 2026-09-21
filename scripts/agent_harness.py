@@ -799,7 +799,8 @@ def build_manifest(ws: Path) -> dict[str, str]:
 def find_python_env(explicit: str | None) -> Path | None:
     """A virtual environment whose Python has numpy and pyzx (`scripts/tcount_survey.py`
     imports both), or `None`. The system Python of this machine has neither."""
-    for c in (explicit, os.environ.get("CIRCUITEQ_HARNESS_PYENV"), "/tmp/circuiteq-pyzx-venv"):
+    for c in (explicit, os.environ.get("CIRCUITEQ_HARNESS_PYENV"),
+              Path.home() / ".circuiteq-harness/envs/pyzx", "/tmp/circuiteq-pyzx-venv"):
         if c and (Path(c) / "bin" / "python").exists():
             ok = subprocess.run([str(Path(c) / "bin" / "python"), "-c", "import numpy, pyzx"],
                                 capture_output=True)

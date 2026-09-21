@@ -1,0 +1,85 @@
+{
+ "name": "feynman_tof_3__tzap",
+ "qubits": 5,
+ "relation": "u",
+ "expected": "equiv",
+ "split": "held-out",
+ "family": "tof",
+ "rung": 3,
+ "source": {
+  "generator": "scripts/circuit_pairs.py",
+  "optimiser": "tzap",
+  "circuit": "feynman_tof_3",
+  "circuit_source": {
+   "source": "feynman",
+   "path": "benchmarks/qasm/tof_3.qasm",
+   "sha256": "68903280e338ac920da6177eef589267c416e23c63babd33442724e3dc2b21f1"
+  },
+  "circuit_licence": "BSD-3-Clause",
+  "twin": "tzap",
+  "twin_tool": {
+   "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+   "tzap": "tzap 0.6.1",
+   "options": "-O2 --decompose-rz --decompose-cz",
+   "seconds": 0.07
+  },
+  "tier": 1,
+  "relation_found": {
+   "method": "unitary",
+   "relation": "exact",
+   "max_abs_diff": 1.2145661566797904e-15
+  },
+  "gates": [
+   57,
+   38
+  ],
+  "t_count": [
+   21,
+   15
+  ],
+  "h_count": [
+   18,
+   8
+  ],
+  "cx_count": [
+   18,
+   15
+  ],
+  "fragment": [
+   "general",
+   "general"
+  ],
+  "diff_matched": {
+   "raw": {
+    "matched": 34,
+    "of": 57,
+    "fraction": 0.5965
+   },
+   "greedy/cancommute": {
+    "matched": 30,
+    "of": 57,
+    "fraction": 0.5263
+   }
+  },
+  "segments": {
+   "raw": {
+    "segments": 3,
+    "longest": 91
+   },
+   "greedy/cancommute": {
+    "segments": 6,
+    "longest": 85
+   }
+  }
+ },
+ "holdout_delete": [
+  "scripts/circuit_pairs.py",
+  "scripts/circuit_sources.py",
+  "scripts/peephole_pairs.py"
+ ],
+ "known_leaks": [
+  "the repository proves `tof_3` (the same three Toffolis on other wires, without the H pairs) against PyZX teleport"
+ ],
+ "original": ["H 4", "H 4", "H 4", "CX 1 4", "Tdg 4", "CX 0 4", "T 4", "CX 1 4", "Tdg 4", "CX 0 4", "T 1", "T 4", "H 4", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 4", "H 4", "H 3", "H 3", "H 3", "CX 4 3", "Tdg 3", "CX 2 3", "T 3", "CX 4 3", "Tdg 3", "CX 2 3", "T 4", "T 3", "H 3", "CX 2 4", "T 2", "Tdg 4", "CX 2 4", "H 3", "H 3", "H 4", "H 4", "H 4", "CX 1 4", "Tdg 4", "CX 0 4", "T 4", "CX 1 4", "Tdg 4", "CX 0 4", "T 1", "T 4", "H 4", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 4", "H 4"],
+ "optimized": ["H 4", "T 4", "CX 1 4", "Tdg 4", "CX 0 4", "T 4", "CX 1 4", "Tdg 4", "CX 0 4", "H 4", "H 3", "CX 4 3", "Tdg 3", "CX 2 3", "T 3", "CX 4 3", "Tdg 3", "CX 2 3", "T 4", "T 3", "CX 2 4", "T 2", "Tdg 4", "CX 2 4", "H 3", "H 4", "CX 1 4", "Tdg 4", "CX 0 4", "T 4", "CX 1 4", "Tdg 4", "H 0", "CX 1 0", "H 0", "CX 0 4", "T 4", "H 4"]
+}

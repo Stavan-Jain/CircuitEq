@@ -168,7 +168,8 @@ before relying on that switch.
   no `numpy` or `pyzx`, which the library's alignment script imports, and
   the first run spent eight of its thirteen minutes working around that.
   The harness now offers `./python` from a virtualenv that has both
-  (`--python-env`, `CIRCUITEQ_HARNESS_PYENV`, default
+  (`--python-env`, `CIRCUITEQ_HARNESS_PYENV`, else
+  `~/.circuiteq-harness/envs/pyzx`, else the old throwaway
   `/tmp/circuiteq-pyzx-venv`) and records which one on the row. It also
   offers `./qasm` (`tools/qasm.py`, an exact converter between the Lean
   lists and OpenQASM 2, standard library only) and, when TZAP is installed

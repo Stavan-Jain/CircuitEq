@@ -412,6 +412,71 @@
    }
   },
   {
+   "name": "feynman_barenco_tof_3__tzap",
+   "circuit": "feynman_barenco_tof_3",
+   "twin": "tzap",
+   "qubits": 5,
+   "tier": 1,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 1.163833717010889e-15
+   },
+   "gates": [
+    76,
+    46
+   ],
+   "t_count": [
+    28,
+    16
+   ],
+   "h_count": [
+    24,
+    8
+   ],
+   "cx_count": [
+    24,
+    19
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 22,
+     "of": 76,
+     "fraction": 0.2895
+    },
+    "greedy/cancommute": {
+     "matched": 18,
+     "of": 76,
+     "fraction": 0.2368
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 3,
+     "longest": 118
+    },
+    "greedy/cancommute": {
+     "segments": 3,
+     "longest": 118
+    }
+   }
+  },
+  {
    "name": "feynman_barenco_tof_4__nam_heavy",
    "circuit": "feynman_barenco_tof_4",
    "twin": "nam_heavy",
@@ -819,6 +884,71 @@
     "greedy/cancommute": {
      "segments": 3,
      "longest": 283
+    }
+   }
+  },
+  {
+   "name": "feynman_barenco_tof_4__tzap",
+   "circuit": "feynman_barenco_tof_4",
+   "twin": "tzap",
+   "qubits": 7,
+   "tier": 1,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 1.9527118981711954e-15
+   },
+   "gates": [
+    146,
+    87
+   ],
+   "t_count": [
+    56,
+    28
+   ],
+   "h_count": [
+    42,
+    12
+   ],
+   "cx_count": [
+    48,
+    37
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 36,
+     "of": 146,
+     "fraction": 0.2466
+    },
+    "greedy/cancommute": {
+     "matched": 24,
+     "of": 146,
+     "fraction": 0.1644
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 3,
+     "longest": 229
+    },
+    "greedy/cancommute": {
+     "segments": 3,
+     "longest": 229
     }
    }
   },
@@ -1292,6 +1422,70 @@
     "greedy/cancommute": {
      "segments": 1,
      "longest": 156
+    }
+   }
+  },
+  {
+   "name": "feynman_mod5_4__tzap",
+   "circuit": "feynman_mod5_4",
+   "twin": "tzap",
+   "qubits": 5,
+   "tier": 1,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 7.851040012244345e-16
+   },
+   "gates": [
+    79,
+    55
+   ],
+   "t_count": [
+    28,
+    16
+   ],
+   "h_count": [
+    22,
+    6
+   ],
+   "cx_count": [
+    28,
+    26
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 45,
+     "of": 79,
+     "fraction": 0.5696
+    },
+    "greedy/cancommute": {
+     "matched": 45,
+     "of": 79,
+     "fraction": 0.5696
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 6,
+     "longest": 117
+    },
+    "greedy/cancommute": {
+     "segments": 29,
+     "longest": 54
     }
    }
   },
@@ -1782,6 +1976,70 @@
    }
   },
   {
+   "name": "feynman_mod_mult_55__tzap",
+   "circuit": "feynman_mod_mult_55",
+   "twin": "tzap",
+   "qubits": 9,
+   "tier": 1,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "p",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "phase",
+    "omega_power": 5
+   },
+   "gates": [
+    147,
+    99
+   ],
+   "t_count": [
+    49,
+    35
+   ],
+   "h_count": [
+    42,
+    14
+   ],
+   "cx_count": [
+    48,
+    40
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 43,
+     "of": 147,
+     "fraction": 0.2925
+    },
+    "greedy/cancommute": {
+     "matched": 92,
+     "of": 147,
+     "fraction": 0.6259
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 7,
+     "longest": 232
+    },
+    "greedy/cancommute": {
+     "segments": 8,
+     "longest": 230
+    }
+   }
+  },
+  {
    "name": "feynman_qft_4__peephole",
    "circuit": "feynman_qft_4",
    "twin": "peephole",
@@ -1967,6 +2225,70 @@
     "greedy/cancommute": {
      "segments": 83,
      "longest": 181
+    }
+   }
+  },
+  {
+   "name": "feynman_qft_4__tzap",
+   "circuit": "feynman_qft_4",
+   "twin": "tzap",
+   "qubits": 5,
+   "tier": 1,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "p",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "phase",
+    "omega_power": 2
+   },
+   "gates": [
+    187,
+    157
+   ],
+   "t_count": [
+    69,
+    67
+   ],
+   "h_count": [
+    50,
+    42
+   ],
+   "cx_count": [
+    46,
+    46
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 129,
+     "of": 187,
+     "fraction": 0.6898
+    },
+    "greedy/cancommute": {
+     "matched": 86,
+     "of": 187,
+     "fraction": 0.4599
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 46,
+     "longest": 196
+    },
+    "greedy/cancommute": {
+     "segments": 96,
+     "longest": 45
     }
    }
   },
@@ -2444,6 +2766,70 @@
    }
   },
   {
+   "name": "feynman_tof_3__tzap",
+   "circuit": "feynman_tof_3",
+   "twin": "tzap",
+   "qubits": 5,
+   "tier": 1,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 1.2145661566797904e-15
+   },
+   "gates": [
+    57,
+    38
+   ],
+   "t_count": [
+    21,
+    15
+   ],
+   "h_count": [
+    18,
+    8
+   ],
+   "cx_count": [
+    18,
+    15
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 34,
+     "of": 57,
+     "fraction": 0.5965
+    },
+    "greedy/cancommute": {
+     "matched": 30,
+     "of": 57,
+     "fraction": 0.5263
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 3,
+     "longest": 91
+    },
+    "greedy/cancommute": {
+     "segments": 6,
+     "longest": 85
+    }
+   }
+  },
+  {
    "name": "feynman_tof_4__nam_heavy",
    "circuit": "feynman_tof_4",
    "twin": "nam_heavy",
@@ -2862,6 +3248,71 @@
     "method": "unitary",
     "relation": "exact",
     "max_abs_diff": 1.2463869542960725e-15
+   }
+  },
+  {
+   "name": "feynman_tof_4__tzap",
+   "circuit": "feynman_tof_4",
+   "twin": "tzap",
+   "qubits": 7,
+   "tier": 1,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 2.364678794297893e-15
+   },
+   "gates": [
+    95,
+    61
+   ],
+   "t_count": [
+    35,
+    23
+   ],
+   "h_count": [
+    30,
+    14
+   ],
+   "cx_count": [
+    30,
+    24
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 53,
+     "of": 95,
+     "fraction": 0.5579
+    },
+    "greedy/cancommute": {
+     "matched": 53,
+     "of": 95,
+     "fraction": 0.5579
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 3,
+     "longest": 152
+    },
+    "greedy/cancommute": {
+     "segments": 14,
+     "longest": 126
+    }
    }
   },
   {
@@ -3348,6 +3799,70 @@
    }
   },
   {
+   "name": "feynman_tof_5__tzap",
+   "circuit": "feynman_tof_5",
+   "twin": "tzap",
+   "qubits": 9,
+   "tier": 1,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.06
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 3.2087947210045605e-15
+   },
+   "gates": [
+    133,
+    84
+   ],
+   "t_count": [
+    49,
+    31
+   ],
+   "h_count": [
+    42,
+    20
+   ],
+   "cx_count": [
+    42,
+    33
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 72,
+     "of": 133,
+     "fraction": 0.5414
+    },
+    "greedy/cancommute": {
+     "matched": 72,
+     "of": 133,
+     "fraction": 0.5414
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 3,
+     "longest": 213
+    },
+    "greedy/cancommute": {
+     "segments": 18,
+     "longest": 177
+    }
+   }
+  },
+  {
    "name": "feynman_vbe_adder_3__nam_heavy",
    "circuit": "feynman_vbe_adder_3",
    "twin": "nam_heavy",
@@ -3820,6 +4335,70 @@
    }
   },
   {
+   "name": "feynman_vbe_adder_3__tzap",
+   "circuit": "feynman_vbe_adder_3",
+   "twin": "tzap",
+   "qubits": 10,
+   "tier": 1,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 4.781890557832531e-15
+   },
+   "gates": [
+    190,
+    94
+   ],
+   "t_count": [
+    70,
+    24
+   ],
+   "h_count": [
+    50,
+    10
+   ],
+   "cx_count": [
+    70,
+    47
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 45,
+     "of": 190,
+     "fraction": 0.2368
+    },
+    "greedy/cancommute": {
+     "matched": 43,
+     "of": 190,
+     "fraction": 0.2263
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 3,
+     "longest": 280
+    },
+    "greedy/cancommute": {
+     "segments": 5,
+     "longest": 274
+    }
+   }
+  },
+  {
    "name": "gen_barenco_tof_3__pyzx_full_reduce",
    "circuit": "gen_barenco_tof_3",
    "twin": "pyzx_full_reduce",
@@ -3944,6 +4523,71 @@
     "greedy/cancommute": {
      "segments": 56,
      "longest": 4
+    }
+   }
+  },
+  {
+   "name": "gen_barenco_tof_3__tzap",
+   "circuit": "gen_barenco_tof_3",
+   "twin": "tzap",
+   "qubits": 5,
+   "tier": 1,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 1.3081705291426526e-15
+   },
+   "gates": [
+    60,
+    46
+   ],
+   "t_count": [
+    28,
+    16
+   ],
+   "h_count": [
+    8,
+    8
+   ],
+   "cx_count": [
+    24,
+    19
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 35,
+     "of": 60,
+     "fraction": 0.5833
+    },
+    "greedy/cancommute": {
+     "matched": 22,
+     "of": 60,
+     "fraction": 0.3667
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 2,
+     "longest": 104
+    },
+    "greedy/cancommute": {
+     "segments": 2,
+     "longest": 104
     }
    }
   },
@@ -4076,6 +4720,71 @@
    }
   },
   {
+   "name": "gen_barenco_tof_5__tzap",
+   "circuit": "gen_barenco_tof_5",
+   "twin": "tzap",
+   "qubits": 9,
+   "tier": 1,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 3.0672150851773713e-15
+   },
+   "gates": [
+    180,
+    128
+   ],
+   "t_count": [
+    84,
+    40
+   ],
+   "h_count": [
+    24,
+    16
+   ],
+   "cx_count": [
+    72,
+    55
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 87,
+     "of": 180,
+     "fraction": 0.4833
+    },
+    "greedy/cancommute": {
+     "matched": 25,
+     "of": 180,
+     "fraction": 0.1389
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 4,
+     "longest": 302
+    },
+    "greedy/cancommute": {
+     "segments": 2,
+     "longest": 306
+    }
+   }
+  },
+  {
    "name": "gen_cuccaro_2__pyzx_full_reduce",
    "circuit": "gen_cuccaro_2",
    "twin": "pyzx_full_reduce",
@@ -4200,6 +4909,71 @@
     "greedy/cancommute": {
      "segments": 56,
      "longest": 17
+    }
+   }
+  },
+  {
+   "name": "gen_cuccaro_2__tzap",
+   "circuit": "gen_cuccaro_2",
+   "twin": "tzap",
+   "qubits": 6,
+   "tier": 1,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 9.254481309893168e-16
+   },
+   "gates": [
+    69,
+    57
+   ],
+   "t_count": [
+    28,
+    16
+   ],
+   "h_count": [
+    8,
+    8
+   ],
+   "cx_count": [
+    33,
+    27
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 48,
+     "of": 69,
+     "fraction": 0.6957
+    },
+    "greedy/cancommute": {
+     "matched": 49,
+     "of": 69,
+     "fraction": 0.7101
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 12,
+     "longest": 101
+    },
+    "greedy/cancommute": {
+     "segments": 4,
+     "longest": 119
     }
    }
   },
@@ -4393,6 +5167,70 @@
    }
   },
   {
+   "name": "gen_cuccaro_4__tzap",
+   "circuit": "gen_cuccaro_4",
+   "twin": "tzap",
+   "qubits": 10,
+   "tier": 1,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 2.2310821477347705e-15
+   },
+   "gates": [
+    137,
+    113
+   ],
+   "t_count": [
+    56,
+    32
+   ],
+   "h_count": [
+    16,
+    16
+   ],
+   "cx_count": [
+    65,
+    53
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 94,
+     "of": 137,
+     "fraction": 0.6861
+    },
+    "greedy/cancommute": {
+     "matched": 97,
+     "of": 137,
+     "fraction": 0.708
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 12,
+     "longest": 225
+    },
+    "greedy/cancommute": {
+     "segments": 4,
+     "longest": 243
+    }
+   }
+  },
+  {
    "name": "gen_tof_3__pyzx_full_reduce",
    "circuit": "gen_tof_3",
    "twin": "pyzx_full_reduce",
@@ -4521,6 +5359,71 @@
    }
   },
   {
+   "name": "gen_tof_3__tzap",
+   "circuit": "gen_tof_3",
+   "twin": "tzap",
+   "qubits": 5,
+   "tier": 1,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 7.872134766963422e-16
+   },
+   "gates": [
+    45,
+    38
+   ],
+   "t_count": [
+    21,
+    15
+   ],
+   "h_count": [
+    6,
+    8
+   ],
+   "cx_count": [
+    18,
+    15
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 35,
+     "of": 45,
+     "fraction": 0.7778
+    },
+    "greedy/cancommute": {
+     "matched": 35,
+     "of": 45,
+     "fraction": 0.7778
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 9,
+     "longest": 67
+    },
+    "greedy/cancommute": {
+     "segments": 5,
+     "longest": 75
+    }
+   }
+  },
+  {
    "name": "gen_tof_5__pyzx_full_reduce",
    "circuit": "gen_tof_5",
    "twin": "pyzx_full_reduce",
@@ -4645,6 +5548,71 @@
     "greedy/cancommute": {
      "segments": 46,
      "longest": 125
+    }
+   }
+  },
+  {
+   "name": "gen_tof_5__tzap",
+   "circuit": "gen_tof_5",
+   "twin": "tzap",
+   "qubits": 9,
+   "tier": 1,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 2.2567366555548176e-15
+   },
+   "gates": [
+    105,
+    84
+   ],
+   "t_count": [
+    49,
+    31
+   ],
+   "h_count": [
+    14,
+    20
+   ],
+   "cx_count": [
+    42,
+    33
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 75,
+     "of": 105,
+     "fraction": 0.7143
+    },
+    "greedy/cancommute": {
+     "matched": 77,
+     "of": 105,
+     "fraction": 0.7333
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 9,
+     "longest": 173
+    },
+    "greedy/cancommute": {
+     "segments": 9,
+     "longest": 173
     }
    }
   },
@@ -4838,6 +5806,70 @@
    }
   },
   {
+   "name": "qasmbench_adder_n10__tzap",
+   "circuit": "qasmbench_adder_n10",
+   "twin": "tzap",
+   "qubits": 10,
+   "tier": 1,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 2.2310821477347705e-15
+   },
+   "gates": [
+    142,
+    117
+   ],
+   "t_count": [
+    56,
+    32
+   ],
+   "h_count": [
+    16,
+    16
+   ],
+   "cx_count": [
+    65,
+    53
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 97,
+     "of": 142,
+     "fraction": 0.6831
+    },
+    "greedy/cancommute": {
+     "matched": 97,
+     "of": 142,
+     "fraction": 0.6831
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 12,
+     "longest": 225
+    },
+    "greedy/cancommute": {
+     "segments": 2,
+     "longest": 216
+    }
+   }
+  },
+  {
    "name": "qasmbench_adder_n4__pyzx_full_reduce",
    "circuit": "qasmbench_adder_n4",
    "twin": "pyzx_full_reduce",
@@ -4962,6 +5994,71 @@
     "greedy/cancommute": {
      "segments": 8,
      "longest": 33
+    }
+   }
+  },
+  {
+   "name": "qasmbench_adder_n4__tzap",
+   "circuit": "qasmbench_adder_n4",
+   "twin": "tzap",
+   "qubits": 4,
+   "tier": 1,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "phase",
+    "omega_power": 6
+   },
+   "gates": [
+    23,
+    20
+   ],
+   "t_count": [
+    8,
+    8
+   ],
+   "h_count": [
+    2,
+    2
+   ],
+   "cx_count": [
+    10,
+    8
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 5,
+     "of": 23,
+     "fraction": 0.2174
+    },
+    "greedy/cancommute": {
+     "matched": 9,
+     "of": 23,
+     "fraction": 0.3913
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 3,
+     "longest": 39
+    },
+    "greedy/cancommute": {
+     "segments": 6,
+     "longest": 26
     }
    }
   },
@@ -5094,6 +6191,71 @@
    }
   },
   {
+   "name": "qasmbench_fredkin_n3__tzap",
+   "circuit": "qasmbench_fredkin_n3",
+   "twin": "tzap",
+   "qubits": 3,
+   "tier": 1,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 0.0
+   },
+   "gates": [
+    19,
+    18
+   ],
+   "t_count": [
+    7,
+    7
+   ],
+   "h_count": [
+    2,
+    2
+   ],
+   "cx_count": [
+    8,
+    8
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 17,
+     "of": 19,
+     "fraction": 0.8947
+    },
+    "greedy/cancommute": {
+     "matched": 17,
+     "of": 19,
+     "fraction": 0.8947
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 16,
+     "longest": 7
+    },
+    "greedy/cancommute": {
+     "segments": 15,
+     "longest": 9
+    }
+   }
+  },
+  {
    "name": "qasmbench_qec_en_n5__pyzx_full_reduce",
    "circuit": "qasmbench_qec_en_n5",
    "twin": "pyzx_full_reduce",
@@ -5218,6 +6380,71 @@
     "greedy/cancommute": {
      "segments": 1,
      "longest": 42
+    }
+   }
+  },
+  {
+   "name": "qasmbench_qec_en_n5__tzap",
+   "circuit": "qasmbench_qec_en_n5",
+   "twin": "tzap",
+   "qubits": 5,
+   "tier": 1,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 5.578801654593729e-16
+   },
+   "gates": [
+    25,
+    12
+   ],
+   "t_count": [
+    1,
+    1
+   ],
+   "h_count": [
+    14,
+    2
+   ],
+   "cx_count": [
+    10,
+    9
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 7,
+     "of": 25,
+     "fraction": 0.28
+    },
+    "greedy/cancommute": {
+     "matched": 7,
+     "of": 25,
+     "fraction": 0.28
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 8,
+     "longest": 14
+    },
+    "greedy/cancommute": {
+     "segments": 2,
+     "longest": 35
     }
    }
   },
@@ -5411,6 +6638,70 @@
    }
   },
   {
+   "name": "qasmbench_sat_n7__tzap",
+   "circuit": "qasmbench_sat_n7",
+   "twin": "tzap",
+   "qubits": 7,
+   "tier": 1,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 1.3638799574051255e-15
+   },
+   "gates": [
+    180,
+    134
+   ],
+   "t_count": [
+    70,
+    46
+   ],
+   "h_count": [
+    29,
+    29
+   ],
+   "cx_count": [
+    60,
+    46
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 110,
+     "of": 180,
+     "fraction": 0.6111
+    },
+    "greedy/cancommute": {
+     "matched": 102,
+     "of": 180,
+     "fraction": 0.5667
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 22,
+     "longest": 238
+    },
+    "greedy/cancommute": {
+     "segments": 6,
+     "longest": 304
+    }
+   }
+  },
+  {
    "name": "qasmbench_simon_n6__pyzx_full_reduce",
    "circuit": "qasmbench_simon_n6",
    "twin": "pyzx_full_reduce",
@@ -5535,6 +6826,71 @@
     "greedy/cancommute": {
      "segments": 5,
      "longest": 73
+    }
+   }
+  },
+  {
+   "name": "qasmbench_simon_n6__tzap",
+   "circuit": "qasmbench_simon_n6",
+   "twin": "tzap",
+   "qubits": 6,
+   "tier": 1,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 3.5887132760403533e-16
+   },
+   "gates": [
+    44,
+    13
+   ],
+   "t_count": [
+    14,
+    0
+   ],
+   "h_count": [
+    10,
+    8
+   ],
+   "cx_count": [
+    14,
+    4
+   ],
+   "fragment": [
+    "general",
+    "Clifford"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 10,
+     "of": 44,
+     "fraction": 0.2273
+    },
+    "greedy/cancommute": {
+     "matched": 11,
+     "of": 44,
+     "fraction": 0.25
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 8,
+     "longest": 43
+    },
+    "greedy/cancommute": {
+     "segments": 3,
+     "longest": 53
     }
    }
   },
@@ -5667,6 +7023,71 @@
    }
   },
   {
+   "name": "qasmbench_teleportation_n3__tzap",
+   "circuit": "qasmbench_teleportation_n3",
+   "twin": "tzap",
+   "qubits": 3,
+   "tier": 1,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 0.0
+   },
+   "gates": [
+    8,
+    8
+   ],
+   "t_count": [
+    1,
+    1
+   ],
+   "h_count": [
+    4,
+    4
+   ],
+   "cx_count": [
+    2,
+    2
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 8,
+     "of": 8,
+     "fraction": 1.0
+    },
+    "greedy/cancommute": {
+     "matched": 8,
+     "of": 8,
+     "fraction": 1.0
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 8,
+     "longest": 2
+    },
+    "greedy/cancommute": {
+     "segments": 8,
+     "longest": 2
+    }
+   }
+  },
+  {
    "name": "qasmbench_toffoli_n3__pyzx_full_reduce",
    "circuit": "qasmbench_toffoli_n3",
    "twin": "pyzx_full_reduce",
@@ -5791,6 +7212,71 @@
     "greedy/cancommute": {
      "segments": 3,
      "longest": 34
+    }
+   }
+  },
+  {
+   "name": "qasmbench_toffoli_n3__tzap",
+   "circuit": "qasmbench_toffoli_n3",
+   "twin": "tzap",
+   "qubits": 3,
+   "tier": 1,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 2.376800645008166e-16
+   },
+   "gates": [
+    18,
+    17
+   ],
+   "t_count": [
+    7,
+    7
+   ],
+   "h_count": [
+    2,
+    2
+   ],
+   "cx_count": [
+    6,
+    6
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 13,
+     "of": 18,
+     "fraction": 0.7222
+    },
+    "greedy/cancommute": {
+     "matched": 16,
+     "of": 18,
+     "fraction": 0.8889
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 11,
+     "longest": 15
+    },
+    "greedy/cancommute": {
+     "segments": 8,
+     "longest": 21
     }
    }
   },
@@ -5984,6 +7470,70 @@
    }
   },
   {
+   "name": "qec_code_833_encode_basis__tzap",
+   "circuit": "qec_code_833_encode_basis",
+   "twin": "tzap",
+   "qubits": 8,
+   "tier": 1,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 0.0
+   },
+   "gates": [
+    52,
+    28
+   ],
+   "t_count": [
+    0,
+    0
+   ],
+   "h_count": [
+    36,
+    12
+   ],
+   "cx_count": [
+    12,
+    12
+   ],
+   "fragment": [
+    "Clifford",
+    "Clifford"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 28,
+     "of": 52,
+     "fraction": 0.5385
+    },
+    "greedy/cancommute": {
+     "matched": 16,
+     "of": 52,
+     "fraction": 0.3077
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 14,
+     "longest": 54
+    },
+    "greedy/cancommute": {
+     "segments": 3,
+     "longest": 76
+    }
+   }
+  },
+  {
    "name": "qec_steane_713_H_nf_fig4__pyzx_full_reduce",
    "circuit": "qec_steane_713_H_nf_fig4",
    "twin": "pyzx_full_reduce",
@@ -6104,6 +7654,71 @@
     "raw": {
      "segments": 1,
      "longest": 36
+    },
+    "greedy/cancommute": {
+     "segments": 18,
+     "longest": 2
+    }
+   }
+  },
+  {
+   "name": "qec_steane_713_H_nf_fig4__tzap",
+   "circuit": "qec_steane_713_H_nf_fig4",
+   "twin": "tzap",
+   "qubits": 7,
+   "tier": 1,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 0.0
+   },
+   "gates": [
+    18,
+    18
+   ],
+   "t_count": [
+    1,
+    1
+   ],
+   "h_count": [
+    5,
+    5
+   ],
+   "cx_count": [
+    11,
+    11
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 18,
+     "of": 18,
+     "fraction": 1.0
+    },
+    "greedy/cancommute": {
+     "matched": 18,
+     "of": 18,
+     "fraction": 1.0
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 18,
+     "longest": 2
     },
     "greedy/cancommute": {
      "segments": 18,
@@ -6585,6 +8200,68 @@
    }
   },
   {
+   "name": "feynman_adder_8__tzap",
+   "circuit": "feynman_adder_8",
+   "twin": "tzap",
+   "qubits": 24,
+   "tier": 2,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "p",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "1 random state(s)",
+    "relation": "phase",
+    "omega_power": 4
+   },
+   "gates": [
+    1128,
+    684
+   ],
+   "t_count": [
+    399,
+    215
+   ],
+   "h_count": [
+    308,
+    82
+   ],
+   "cx_count": [
+    409,
+    326
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 225,
+     "of": 1128,
+     "fraction": 0.1995
+    },
+    "greedy/cancommute": {
+     "matched": 423,
+     "of": 1128,
+     "fraction": 0.375
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "24 qubits and 1812 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "24 qubits and 1812 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "feynman_barenco_tof_10__nam_heavy",
    "circuit": "feynman_barenco_tof_10",
    "twin": "nam_heavy",
@@ -7057,6 +8734,70 @@
    }
   },
   {
+   "name": "feynman_barenco_tof_10__tzap",
+   "circuit": "feynman_barenco_tof_10",
+   "twin": "tzap",
+   "qubits": 19,
+   "tier": 2,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 4.81131740294414e-17
+   },
+   "gates": [
+    578,
+    333
+   ],
+   "t_count": [
+    224,
+    100
+   ],
+   "h_count": [
+    162,
+    36
+   ],
+   "cx_count": [
+    192,
+    145
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 120,
+     "of": 578,
+     "fraction": 0.2076
+    },
+    "greedy/cancommute": {
+     "matched": 30,
+     "of": 578,
+     "fraction": 0.0519
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 3,
+     "longest": 907
+    },
+    "greedy/cancommute": {
+     "segments": 3,
+     "longest": 907
+    }
+   }
+  },
+  {
    "name": "feynman_barenco_tof_5__nam_heavy",
    "circuit": "feynman_barenco_tof_5",
    "twin": "nam_heavy",
@@ -7464,6 +9205,71 @@
     "greedy/cancommute": {
      "segments": 3,
      "longest": 420
+    }
+   }
+  },
+  {
+   "name": "feynman_barenco_tof_5__tzap",
+   "circuit": "feynman_barenco_tof_5",
+   "twin": "tzap",
+   "qubits": 9,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 4.084522549977771e-15
+   },
+   "gates": [
+    218,
+    128
+   ],
+   "t_count": [
+    84,
+    40
+   ],
+   "h_count": [
+    62,
+    16
+   ],
+   "cx_count": [
+    72,
+    55
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 50,
+     "of": 218,
+     "fraction": 0.2294
+    },
+    "greedy/cancommute": {
+     "matched": 25,
+     "of": 218,
+     "fraction": 0.1147
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 3,
+     "longest": 342
+    },
+    "greedy/cancommute": {
+     "segments": 3,
+     "longest": 342
     }
    }
   },
@@ -7895,6 +9701,71 @@
    }
   },
   {
+   "name": "feynman_csla_mux_3__tzap",
+   "circuit": "feynman_csla_mux_3",
+   "twin": "tzap",
+   "qubits": 15,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 5.857742764772357e-17
+   },
+   "gates": [
+    210,
+    153
+   ],
+   "t_count": [
+    70,
+    64
+   ],
+   "h_count": [
+    60,
+    18
+   ],
+   "cx_count": [
+    80,
+    70
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 147,
+     "of": 210,
+     "fraction": 0.7
+    },
+    "greedy/cancommute": {
+     "matched": 148,
+     "of": 210,
+     "fraction": 0.7048
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 10,
+     "longest": 254
+    },
+    "greedy/cancommute": {
+     "segments": 126,
+     "longest": 54
+    }
+   }
+  },
+  {
    "name": "feynman_csum_mux_9__nam_heavy",
    "circuit": "feynman_csum_mux_9",
    "twin": "nam_heavy",
@@ -8289,6 +10160,68 @@
    }
   },
   {
+   "name": "feynman_csum_mux_9__tzap",
+   "circuit": "feynman_csum_mux_9",
+   "twin": "tzap",
+   "qubits": 30,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    532,
+    294
+   ],
+   "t_count": [
+    196,
+    84
+   ],
+   "h_count": [
+    140,
+    28
+   ],
+   "cx_count": [
+    168,
+    154
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 53,
+     "of": 532,
+     "fraction": 0.0996
+    },
+    "greedy/cancommute": {
+     "matched": 66,
+     "of": 532,
+     "fraction": 0.1241
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "30 qubits and 826 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "30 qubits and 826 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "feynman_gf2_10_mult__nam_heavy",
    "circuit": "feynman_gf2_10_mult",
    "twin": "nam_heavy",
@@ -8679,6 +10612,68 @@
     },
     "greedy/cancommute": {
      "skipped": "30 qubits and 4402 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_10_mult__tzap",
+   "circuit": "feynman_gf2_10_mult",
+   "twin": "tzap",
+   "qubits": 30,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.08
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    1747,
+    1088
+   ],
+   "t_count": [
+    700,
+    410
+   ],
+   "h_count": [
+    438,
+    38
+   ],
+   "cx_count": [
+    609,
+    609
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 491,
+     "of": 1747,
+     "fraction": 0.2811
+    },
+    "greedy/cancommute": {
+     "matched": 1055,
+     "of": 1747,
+     "fraction": 0.6039
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "30 qubits and 2835 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "30 qubits and 2835 gates are past the budget for prefix states"
     }
    }
   },
@@ -9167,6 +11162,70 @@
    }
   },
   {
+   "name": "feynman_gf2_4_mult__tzap",
+   "circuit": "feynman_gf2_4_mult",
+   "twin": "tzap",
+   "qubits": 12,
+   "tier": 2,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 1.8482976533146287e-16
+   },
+   "gates": [
+    289,
+    193
+   ],
+   "t_count": [
+    112,
+    68
+   ],
+   "h_count": [
+    78,
+    14
+   ],
+   "cx_count": [
+    99,
+    99
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 179,
+     "of": 289,
+     "fraction": 0.6194
+    },
+    "greedy/cancommute": {
+     "matched": 180,
+     "of": 289,
+     "fraction": 0.6228
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 5,
+     "longest": 472
+    },
+    "greedy/cancommute": {
+     "segments": 3,
+     "longest": 478
+    }
+   }
+  },
+  {
    "name": "feynman_gf2_5_mult__nam_heavy",
    "circuit": "feynman_gf2_5_mult",
    "twin": "nam_heavy",
@@ -9588,6 +11647,71 @@
     "method": "2 random state(s)",
     "relation": "different",
     "max_abs_diff": 0.07691620257818241
+   }
+  },
+  {
+   "name": "feynman_gf2_5_mult__tzap",
+   "circuit": "feynman_gf2_5_mult",
+   "twin": "tzap",
+   "qubits": 15,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 1.2249469494380698e-16
+   },
+   "gates": [
+    447,
+    303
+   ],
+   "t_count": [
+    175,
+    115
+   ],
+   "h_count": [
+    118,
+    18
+   ],
+   "cx_count": [
+    154,
+    154
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 284,
+     "of": 447,
+     "fraction": 0.6353
+    },
+    "greedy/cancommute": {
+     "matched": 286,
+     "of": 447,
+     "fraction": 0.6398
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 6,
+     "longest": 738
+    },
+    "greedy/cancommute": {
+     "segments": 4,
+     "longest": 744
+    }
    }
   },
   {
@@ -10016,6 +12140,71 @@
    }
   },
   {
+   "name": "feynman_gf2_6_mult__tzap",
+   "circuit": "feynman_gf2_6_mult",
+   "twin": "tzap",
+   "qubits": 18,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 6.283435673255384e-17
+   },
+   "gates": [
+    639,
+    414
+   ],
+   "t_count": [
+    252,
+    150
+   ],
+   "h_count": [
+    166,
+    22
+   ],
+   "cx_count": [
+    221,
+    221
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 393,
+     "of": 639,
+     "fraction": 0.615
+    },
+    "greedy/cancommute": {
+     "matched": 393,
+     "of": 639,
+     "fraction": 0.615
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 7,
+     "longest": 1039
+    },
+    "greedy/cancommute": {
+     "segments": 9,
+     "longest": 1007
+    }
+   }
+  },
+  {
    "name": "feynman_gf2_7_mult__nam_heavy",
    "circuit": "feynman_gf2_7_mult",
    "twin": "nam_heavy",
@@ -10427,6 +12616,69 @@
     "method": "1 random state(s)",
     "relation": "exact",
     "max_abs_diff": 3.314184547378654e-16
+   }
+  },
+  {
+   "name": "feynman_gf2_7_mult__tzap",
+   "circuit": "feynman_gf2_7_mult",
+   "twin": "tzap",
+   "qubits": 21,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "1 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 3.3062667032283514e-17
+   },
+   "gates": [
+    865,
+    553
+   ],
+   "t_count": [
+    343,
+    217
+   ],
+   "h_count": [
+    222,
+    26
+   ],
+   "cx_count": [
+    300,
+    300
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 528,
+     "of": 865,
+     "fraction": 0.6104
+    },
+    "greedy/cancommute": {
+     "matched": 528,
+     "of": 865,
+     "fraction": 0.6104
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "21 qubits and 1418 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "21 qubits and 1418 gates are past the budget for prefix states"
+    }
    }
   },
   {
@@ -10844,6 +13096,69 @@
    }
   },
   {
+   "name": "feynman_gf2_8_mult__tzap",
+   "circuit": "feynman_gf2_8_mult",
+   "twin": "tzap",
+   "qubits": 24,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "1 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 1.683867549309755e-17
+   },
+   "gates": [
+    1139,
+    709
+   ],
+   "t_count": [
+    448,
+    264
+   ],
+   "h_count": [
+    286,
+    30
+   ],
+   "cx_count": [
+    405,
+    405
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 326,
+     "of": 1139,
+     "fraction": 0.2862
+    },
+    "greedy/cancommute": {
+     "matched": 697,
+     "of": 1139,
+     "fraction": 0.6119
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "24 qubits and 1848 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "24 qubits and 1848 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "feynman_gf2_9_mult__nam_heavy",
    "circuit": "feynman_gf2_9_mult",
    "twin": "nam_heavy",
@@ -11253,6 +13568,68 @@
    }
   },
   {
+   "name": "feynman_gf2_9_mult__tzap",
+   "circuit": "feynman_gf2_9_mult",
+   "twin": "tzap",
+   "qubits": 27,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.08
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    1419,
+    889
+   ],
+   "t_count": [
+    567,
+    351
+   ],
+   "h_count": [
+    358,
+    34
+   ],
+   "cx_count": [
+    494,
+    494
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 877,
+     "of": 1419,
+     "fraction": 0.618
+    },
+    "greedy/cancommute": {
+     "matched": 877,
+     "of": 1419,
+     "fraction": 0.618
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "27 qubits and 2308 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "27 qubits and 2308 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "feynman_grover_5__peephole",
    "circuit": "feynman_grover_5",
    "twin": "peephole",
@@ -11438,6 +13815,70 @@
     "greedy/cancommute": {
      "segments": 8,
      "longest": 1733
+    }
+   }
+  },
+  {
+   "name": "feynman_grover_5__tzap",
+   "circuit": "feynman_grover_5",
+   "twin": "tzap",
+   "qubits": 9,
+   "tier": 2,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "p",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "phase",
+    "omega_power": 2
+   },
+   "gates": [
+    1023,
+    587
+   ],
+   "t_count": [
+    336,
+    166
+   ],
+   "h_count": [
+    334,
+    124
+   ],
+   "cx_count": [
+    288,
+    222
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 221,
+     "of": 1023,
+     "fraction": 0.216
+    },
+    "greedy/cancommute": {
+     "matched": 245,
+     "of": 1023,
+     "fraction": 0.2395
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 8,
+     "longest": 1016
+    },
+    "greedy/cancommute": {
+     "segments": 14,
+     "longest": 1580
     }
    }
   },
@@ -11631,6 +14072,70 @@
    }
   },
   {
+   "name": "feynman_ham15_low__tzap",
+   "circuit": "feynman_ham15_low",
+   "twin": "tzap",
+   "qubits": 17,
+   "tier": 2,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 7.217888169571747e-17
+   },
+   "gates": [
+    535,
+    370
+   ],
+   "t_count": [
+    161,
+    97
+   ],
+   "h_count": [
+    138,
+    38
+   ],
+   "cx_count": [
+    236,
+    216
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 228,
+     "of": 535,
+     "fraction": 0.4262
+    },
+    "greedy/cancommute": {
+     "matched": 301,
+     "of": 535,
+     "fraction": 0.5626
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 56,
+     "longest": 784
+    },
+    "greedy/cancommute": {
+     "segments": 101,
+     "longest": 675
+    }
+   }
+  },
+  {
    "name": "feynman_ham15_med__pyzx_full_reduce",
    "circuit": "feynman_ham15_med",
    "twin": "pyzx_full_reduce",
@@ -11755,6 +14260,71 @@
     "greedy/cancommute": {
      "segments": 26,
      "longest": 2613
+    }
+   }
+  },
+  {
+   "name": "feynman_ham15_med__tzap",
+   "circuit": "feynman_ham15_med",
+   "twin": "tzap",
+   "qubits": 17,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.08
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 2.997735681004285e-16
+   },
+   "gates": [
+    1600,
+    786
+   ],
+   "t_count": [
+    574,
+    234
+   ],
+   "h_count": [
+    492,
+    102
+   ],
+   "cx_count": [
+    534,
+    382
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 180,
+     "of": 1600,
+     "fraction": 0.1125
+    },
+    "greedy/cancommute": {
+     "matched": 270,
+     "of": 1600,
+     "fraction": 0.1688
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 40,
+     "longest": 2306
+    },
+    "greedy/cancommute": {
+     "segments": 60,
+     "longest": 2245
     }
    }
   },
@@ -11944,6 +14514,70 @@
     "greedy/cancommute": {
      "segments": 5,
      "longest": 578
+    }
+   }
+  },
+  {
+   "name": "feynman_hwb6__tzap",
+   "circuit": "feynman_hwb6",
+   "twin": "tzap",
+   "qubits": 7,
+   "tier": 2,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "unitary",
+    "relation": "exact",
+    "max_abs_diff": 3.8230031187842685e-15
+   },
+   "gates": [
+    319,
+    221
+   ],
+   "t_count": [
+    105,
+    75
+   ],
+   "h_count": [
+    90,
+    26
+   ],
+   "cx_count": [
+    116,
+    108
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 43,
+     "of": 319,
+     "fraction": 0.1348
+    },
+    "greedy/cancommute": {
+     "matched": 164,
+     "of": 319,
+     "fraction": 0.5141
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 47,
+     "longest": 169
+    },
+    "greedy/cancommute": {
+     "segments": 35,
+     "longest": 292
     }
    }
   },
@@ -12372,6 +15006,71 @@
    }
   },
   {
+   "name": "feynman_mod_red_21__tzap",
+   "circuit": "feynman_mod_red_21",
+   "twin": "tzap",
+   "qubits": 11,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 3.6323303573969987e-16
+   },
+   "gates": [
+    346,
+    214
+   ],
+   "t_count": [
+    119,
+    73
+   ],
+   "h_count": [
+    98,
+    34
+   ],
+   "cx_count": [
+    105,
+    86
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 59,
+     "of": 346,
+     "fraction": 0.1705
+    },
+    "greedy/cancommute": {
+     "matched": 175,
+     "of": 346,
+     "fraction": 0.5058
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 3,
+     "longest": 556
+    },
+    "greedy/cancommute": {
+     "segments": 9,
+     "longest": 510
+    }
+   }
+  },
+  {
    "name": "feynman_qcla_com_7__nam_heavy",
    "circuit": "feynman_qcla_com_7",
    "twin": "nam_heavy",
@@ -12789,6 +15488,69 @@
    }
   },
   {
+   "name": "feynman_qcla_com_7__tzap",
+   "circuit": "feynman_qcla_com_7",
+   "twin": "tzap",
+   "qubits": 24,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "1 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 9.760228593154884e-18
+   },
+   "gates": [
+    559,
+    315
+   ],
+   "t_count": [
+    203,
+    95
+   ],
+   "h_count": [
+    155,
+    43
+   ],
+   "cx_count": [
+    186,
+    139
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 141,
+     "of": 559,
+     "fraction": 0.2522
+    },
+    "greedy/cancommute": {
+     "matched": 221,
+     "of": 559,
+     "fraction": 0.3953
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "24 qubits and 874 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "24 qubits and 874 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "feynman_qcla_mod_7__nam_heavy",
    "circuit": "feynman_qcla_mod_7",
    "twin": "nam_heavy",
@@ -13199,6 +15961,68 @@
     ],
     "relation": "different",
     "method": "sparse simulation on 16 random basis inputs"
+   }
+  },
+  {
+   "name": "feynman_qcla_mod_7__tzap",
+   "circuit": "feynman_qcla_mod_7",
+   "twin": "tzap",
+   "qubits": 26,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    1120,
+    695
+   ],
+   "t_count": [
+    413,
+    237
+   ],
+   "h_count": [
+    318,
+    86
+   ],
+   "cx_count": [
+    382,
+    323
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 375,
+     "of": 1120,
+     "fraction": 0.3348
+    },
+    "greedy/cancommute": {
+     "matched": 528,
+     "of": 1120,
+     "fraction": 0.4714
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "26 qubits and 1815 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "26 qubits and 1815 gates are past the budget for prefix states"
+    }
    }
   },
   {
@@ -13680,6 +16504,70 @@
     "method": "2 random state(s)",
     "relation": "different",
     "max_abs_diff": 0.054915152624198584
+   }
+  },
+  {
+   "name": "feynman_rc_adder_6__tzap",
+   "circuit": "feynman_rc_adder_6",
+   "twin": "tzap",
+   "qubits": 14,
+   "tier": 2,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 8.009840277583556e-17
+   },
+   "gates": [
+    244,
+    163
+   ],
+   "t_count": [
+    77,
+    47
+   ],
+   "h_count": [
+    66,
+    30
+   ],
+   "cx_count": [
+    93,
+    75
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 146,
+     "of": 244,
+     "fraction": 0.5984
+    },
+    "greedy/cancommute": {
+     "matched": 147,
+     "of": 244,
+     "fraction": 0.6025
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 13,
+     "longest": 383
+    },
+    "greedy/cancommute": {
+     "segments": 24,
+     "longest": 350
+    }
    }
   },
   {
@@ -14171,6 +17059,70 @@
    }
   },
   {
+   "name": "feynman_tof_10__tzap",
+   "circuit": "feynman_tof_10",
+   "twin": "tzap",
+   "qubits": 19,
+   "tier": 2,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 2.6254711716607926e-17
+   },
+   "gates": [
+    323,
+    199
+   ],
+   "t_count": [
+    119,
+    71
+   ],
+   "h_count": [
+    102,
+    50
+   ],
+   "cx_count": [
+    102,
+    78
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 167,
+     "of": 323,
+     "fraction": 0.517
+    },
+    "greedy/cancommute": {
+     "matched": 167,
+     "of": 323,
+     "fraction": 0.517
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 3,
+     "longest": 518
+    },
+    "greedy/cancommute": {
+     "segments": 38,
+     "longest": 432
+    }
+   }
+  },
+  {
    "name": "gen_barenco_tof_10__pyzx_full_reduce",
    "circuit": "gen_barenco_tof_10",
    "twin": "pyzx_full_reduce",
@@ -14299,6 +17251,71 @@
    }
   },
   {
+   "name": "gen_barenco_tof_10__tzap",
+   "circuit": "gen_barenco_tof_10",
+   "twin": "tzap",
+   "qubits": 19,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 3.2676073255868265e-17
+   },
+   "gates": [
+    480,
+    333
+   ],
+   "t_count": [
+    224,
+    100
+   ],
+   "h_count": [
+    64,
+    36
+   ],
+   "cx_count": [
+    192,
+    145
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 217,
+     "of": 480,
+     "fraction": 0.4521
+    },
+    "greedy/cancommute": {
+     "matched": 30,
+     "of": 480,
+     "fraction": 0.0625
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 4,
+     "longest": 807
+    },
+    "greedy/cancommute": {
+     "segments": 2,
+     "longest": 811
+    }
+   }
+  },
+  {
    "name": "gen_cuccaro_14__pyzx_full_reduce",
    "circuit": "gen_cuccaro_14",
    "twin": "pyzx_full_reduce",
@@ -14417,6 +17434,68 @@
     },
     "greedy/cancommute": {
      "skipped": "30 qubits and 1022 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "gen_cuccaro_14__tzap",
+   "circuit": "gen_cuccaro_14",
+   "twin": "tzap",
+   "qubits": 30,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    477,
+    393
+   ],
+   "t_count": [
+    196,
+    112
+   ],
+   "h_count": [
+    56,
+    56
+   ],
+   "cx_count": [
+    225,
+    183
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 324,
+     "of": 477,
+     "fraction": 0.6792
+    },
+    "greedy/cancommute": {
+     "matched": 337,
+     "of": 477,
+     "fraction": 0.7065
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "30 qubits and 870 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "30 qubits and 870 gates are past the budget for prefix states"
     }
    }
   },
@@ -14610,6 +17689,70 @@
    }
   },
   {
+   "name": "gen_cuccaro_8__tzap",
+   "circuit": "gen_cuccaro_8",
+   "twin": "tzap",
+   "qubits": 18,
+   "tier": 2,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 2.4992212352109423e-17
+   },
+   "gates": [
+    273,
+    225
+   ],
+   "t_count": [
+    112,
+    64
+   ],
+   "h_count": [
+    32,
+    32
+   ],
+   "cx_count": [
+    129,
+    105
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 186,
+     "of": 273,
+     "fraction": 0.6813
+    },
+    "greedy/cancommute": {
+     "matched": 193,
+     "of": 273,
+     "fraction": 0.707
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 12,
+     "longest": 473
+    },
+    "greedy/cancommute": {
+     "segments": 4,
+     "longest": 491
+    }
+   }
+  },
+  {
    "name": "gen_surface_3__peephole",
    "circuit": "gen_surface_3",
    "twin": "peephole",
@@ -14799,6 +17942,70 @@
    }
   },
   {
+   "name": "gen_surface_3__tzap",
+   "circuit": "gen_surface_3",
+   "twin": "tzap",
+   "qubits": 17,
+   "tier": 2,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 7.86700562925904e-18
+   },
+   "gates": [
+    64,
+    56
+   ],
+   "t_count": [
+    0,
+    0
+   ],
+   "h_count": [
+    16,
+    8
+   ],
+   "cx_count": [
+    48,
+    48
+   ],
+   "fragment": [
+    "Clifford",
+    "Clifford"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 29,
+     "of": 64,
+     "fraction": 0.4531
+    },
+    "greedy/cancommute": {
+     "matched": 45,
+     "of": 64,
+     "fraction": 0.7031
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 7,
+     "longest": 108
+    },
+    "greedy/cancommute": {
+     "segments": 28,
+     "longest": 34
+    }
+   }
+  },
+  {
    "name": "gen_tof_8__pyzx_full_reduce",
    "circuit": "gen_tof_8",
    "twin": "pyzx_full_reduce",
@@ -14927,6 +18134,71 @@
    }
   },
   {
+   "name": "gen_tof_8__tzap",
+   "circuit": "gen_tof_8",
+   "twin": "tzap",
+   "qubits": 15,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 6.582812753581314e-17
+   },
+   "gates": [
+    195,
+    153
+   ],
+   "t_count": [
+    91,
+    55
+   ],
+   "h_count": [
+    26,
+    38
+   ],
+   "cx_count": [
+    78,
+    60
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 135,
+     "of": 195,
+     "fraction": 0.6923
+    },
+    "greedy/cancommute": {
+     "matched": 140,
+     "of": 195,
+     "fraction": 0.7179
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 9,
+     "longest": 332
+    },
+    "greedy/cancommute": {
+     "segments": 15,
+     "longest": 320
+    }
+   }
+  },
+  {
    "name": "qasmbench_adder_n28__pyzx_full_reduce",
    "circuit": "qasmbench_adder_n28",
    "twin": "pyzx_full_reduce",
@@ -15046,6 +18318,68 @@
     },
     "greedy/cancommute": {
      "skipped": "28 qubits and 920 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "qasmbench_adder_n28__tzap",
+   "circuit": "qasmbench_adder_n28",
+   "twin": "tzap",
+   "qubits": 28,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    424,
+    352
+   ],
+   "t_count": [
+    168,
+    96
+   ],
+   "h_count": [
+    48,
+    48
+   ],
+   "cx_count": [
+    195,
+    159
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 295,
+     "of": 424,
+     "fraction": 0.6958
+    },
+    "greedy/cancommute": {
+     "matched": 109,
+     "of": 424,
+     "fraction": 0.2571
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "28 qubits and 776 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "28 qubits and 776 gates are past the budget for prefix states"
     }
    }
   },
@@ -15174,6 +18508,71 @@
     "greedy/cancommute": {
      "segments": 1,
      "longest": 596
+    }
+   }
+  },
+  {
+   "name": "qasmbench_bigadder_n18__tzap",
+   "circuit": "qasmbench_bigadder_n18",
+   "twin": "tzap",
+   "qubits": 18,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 2.1051398297025362e-17
+   },
+   "gates": [
+    284,
+    233
+   ],
+   "t_count": [
+    112,
+    64
+   ],
+   "h_count": [
+    32,
+    32
+   ],
+   "cx_count": [
+    130,
+    106
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 193,
+     "of": 284,
+     "fraction": 0.6796
+    },
+    "greedy/cancommute": {
+     "matched": 192,
+     "of": 284,
+     "fraction": 0.6761
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 23,
+     "longest": 225
+    },
+    "greedy/cancommute": {
+     "segments": 17,
+     "longest": 219
     }
    }
   },
@@ -15367,6 +18766,70 @@
    }
   },
   {
+   "name": "qasmbench_multiplier_n15__tzap",
+   "circuit": "qasmbench_multiplier_n15",
+   "twin": "tzap",
+   "qubits": 15,
+   "tier": 2,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 2.126363438126899e-16
+   },
+   "gates": [
+    574,
+    298
+   ],
+   "t_count": [
+    252,
+    74
+   ],
+   "h_count": [
+    72,
+    38
+   ],
+   "cx_count": [
+    246,
+    149
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 98,
+     "of": 574,
+     "fraction": 0.1707
+    },
+    "greedy/cancommute": {
+     "matched": 142,
+     "of": 574,
+     "fraction": 0.2474
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 13,
+     "longest": 848
+    },
+    "greedy/cancommute": {
+     "segments": 3,
+     "longest": 863
+    }
+   }
+  },
+  {
    "name": "qasmbench_multiply_n13__pyzx_full_reduce",
    "circuit": "qasmbench_multiply_n13",
    "twin": "pyzx_full_reduce",
@@ -15491,6 +18954,71 @@
     "greedy/cancommute": {
      "segments": 3,
      "longest": 201
+    }
+   }
+  },
+  {
+   "name": "qasmbench_multiply_n13__tzap",
+   "circuit": "qasmbench_multiply_n13",
+   "twin": "tzap",
+   "qubits": 13,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 2.98453111774546e-17
+   },
+   "gates": [
+    98,
+    93
+   ],
+   "t_count": [
+    42,
+    32
+   ],
+   "h_count": [
+    12,
+    12
+   ],
+   "cx_count": [
+    40,
+    40
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 88,
+     "of": 98,
+     "fraction": 0.898
+    },
+    "greedy/cancommute": {
+     "matched": 88,
+     "of": 98,
+     "fraction": 0.898
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 19,
+     "longest": 155
+    },
+    "greedy/cancommute": {
+     "segments": 35,
+     "longest": 123
     }
    }
   },
@@ -15684,6 +19212,70 @@
    }
   },
   {
+   "name": "qasmbench_qram_n20__tzap",
+   "circuit": "qasmbench_qram_n20",
+   "twin": "tzap",
+   "qubits": 20,
+   "tier": 2,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 1.2428192052669952e-17
+   },
+   "gates": [
+    321,
+    261
+   ],
+   "t_count": [
+    140,
+    96
+   ],
+   "h_count": [
+    40,
+    26
+   ],
+   "cx_count": [
+    136,
+    123
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 243,
+     "of": 321,
+     "fraction": 0.757
+    },
+    "greedy/cancommute": {
+     "matched": 245,
+     "of": 321,
+     "fraction": 0.7632
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 19,
+     "longest": 546
+    },
+    "greedy/cancommute": {
+     "segments": 4,
+     "longest": 576
+    }
+   }
+  },
+  {
    "name": "qasmbench_sat_n11__pyzx_full_reduce",
    "circuit": "qasmbench_sat_n11",
    "twin": "pyzx_full_reduce",
@@ -15812,6 +19404,71 @@
    }
   },
   {
+   "name": "qasmbench_sat_n11__tzap",
+   "circuit": "qasmbench_sat_n11",
+   "twin": "tzap",
+   "qubits": 11,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "phase",
+    "omega_power": 4
+   },
+   "gates": [
+    679,
+    421
+   ],
+   "t_count": [
+    294,
+    126
+   ],
+   "h_count": [
+    99,
+    75
+   ],
+   "cx_count": [
+    252,
+    169
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 285,
+     "of": 679,
+     "fraction": 0.4197
+    },
+    "greedy/cancommute": {
+     "matched": 196,
+     "of": 679,
+     "fraction": 0.2887
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 25,
+     "longest": 1052
+    },
+    "greedy/cancommute": {
+     "segments": 5,
+     "longest": 1092
+    }
+   }
+  },
+  {
    "name": "qec_rm15_1531_transversal_Tdg__pyzx_full_reduce",
    "circuit": "qec_rm15_1531_transversal_Tdg",
    "twin": "pyzx_full_reduce",
@@ -15890,6 +19547,71 @@
     "tool": "pyzx teleport_reduce + basic_optimization (scripts/check_pyzx_benchmarks.py optimize)",
     "pyzx": "0.9.0",
     "seconds": 0.05
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 0.0
+   },
+   "gates": [
+    15,
+    15
+   ],
+   "t_count": [
+    15,
+    15
+   ],
+   "h_count": [
+    0,
+    0
+   ],
+   "cx_count": [
+    0,
+    0
+   ],
+   "fragment": [
+    "CX+diagonal",
+    "CX+diagonal"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 15,
+     "of": 15,
+     "fraction": 1.0
+    },
+    "greedy/cancommute": {
+     "matched": 15,
+     "of": 15,
+     "fraction": 1.0
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 15,
+     "longest": 2
+    },
+    "greedy/cancommute": {
+     "segments": 15,
+     "longest": 2
+    }
+   }
+  },
+  {
+   "name": "qec_rm15_1531_transversal_Tdg__tzap",
+   "circuit": "qec_rm15_1531_transversal_Tdg",
+   "twin": "tzap",
+   "qubits": 15,
+   "tier": 2,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
    },
    "relation_found": {
     "method": "2 random state(s)",
@@ -16384,6 +20106,67 @@
    }
   },
   {
+   "name": "feynman_gf2_16_mult__tzap",
+   "circuit": "feynman_gf2_16_mult",
+   "twin": "tzap",
+   "qubits": 48,
+   "tier": 3,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.08
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    4459,
+    2703
+   ],
+   "t_count": [
+    1792,
+    1040
+   ],
+   "h_count": [
+    1086,
+    62
+   ],
+   "cx_count": [
+    1581,
+    1581
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 1297,
+     "of": 4459,
+     "fraction": 0.2909
+    },
+    "greedy/cancommute": {
+     "matched": 2679,
+     "of": 4459,
+     "fraction": 0.6008
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "48 qubits and 7162 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "48 qubits and 7162 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "feynman_gf2_32_mult__pyzx_full_reduce",
    "circuit": "feynman_gf2_32_mult",
    "twin": "pyzx_full_reduce",
@@ -16409,6 +20192,64 @@
    "twin_tool": {
     "tool": "pyzx teleport_reduce + basic_optimization (scripts/check_pyzx_benchmarks.py optimize)",
     "status": "skipped: 17658 gates is past the bound of 8000 for a 240 s PyZX run"
+   }
+  },
+  {
+   "name": "feynman_gf2_32_mult__tzap",
+   "circuit": "feynman_gf2_32_mult",
+   "twin": "tzap",
+   "qubits": 96,
+   "tier": 3,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.13
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    17658,
+    10562
+   ],
+   "t_count": [
+    7168,
+    4128
+   ],
+   "h_count": [
+    4222,
+    126
+   ],
+   "cx_count": [
+    6268,
+    6268
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "17658 x 10562 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "17658 x 10562 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "96 qubits and 28220 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "96 qubits and 28220 gates are past the budget for prefix states"
+    }
    }
   },
   {
@@ -16532,6 +20373,69 @@
    }
   },
   {
+   "name": "feynman_ham15_high__tzap",
+   "circuit": "feynman_ham15_high",
+   "twin": "tzap",
+   "qubits": 20,
+   "tier": 3,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.09
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 4.971899137547995e-16
+   },
+   "gates": [
+    6712,
+    3385
+   ],
+   "t_count": [
+    2457,
+    1019
+   ],
+   "h_count": [
+    2106,
+    362
+   ],
+   "cx_count": [
+    2149,
+    1595
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 256,
+     "of": 6712,
+     "fraction": 0.0381
+    },
+    "greedy/cancommute": {
+     "matched": 1300,
+     "of": 6712,
+     "fraction": 0.1937
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "20 qubits and 10097 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "20 qubits and 10097 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "feynman_hwb8__peephole",
    "circuit": "feynman_hwb8",
    "twin": "peephole",
@@ -16614,6 +20518,66 @@
    "twin_tool": {
     "tool": "pyzx teleport_reduce + basic_optimization (scripts/check_pyzx_benchmarks.py optimize)",
     "status": "skipped: 18220 gates is past the bound of 8000 for a 240 s PyZX run"
+   }
+  },
+  {
+   "name": "feynman_hwb8__tzap",
+   "circuit": "feynman_hwb8",
+   "twin": "tzap",
+   "qubits": 12,
+   "tier": 3,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "p",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.14
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "phase",
+    "omega_power": 1
+   },
+   "gates": [
+    18220,
+    11509
+   ],
+   "t_count": [
+    5887,
+    3561
+   ],
+   "h_count": [
+    5046,
+    1256
+   ],
+   "cx_count": [
+    7129,
+    5949
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "18220 x 11509 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "18220 x 11509 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 93,
+     "longest": 29360
+    },
+    "greedy/cancommute": {
+     "segments": 54,
+     "longest": 29606
+    }
    }
   },
   {
@@ -17069,6 +21033,67 @@
    }
   },
   {
+   "name": "feynman_mod_adder_1024__tzap",
+   "circuit": "feynman_mod_adder_1024",
+   "twin": "tzap",
+   "qubits": 28,
+   "tier": 3,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.09
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    5425,
+    2760
+   ],
+   "t_count": [
+    1995,
+    1011
+   ],
+   "h_count": [
+    1710,
+    330
+   ],
+   "cx_count": [
+    1720,
+    1303
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 1666,
+     "of": 5425,
+     "fraction": 0.3071
+    },
+    "greedy/cancommute": {
+     "matched": 1514,
+     "of": 5425,
+     "fraction": 0.2791
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "28 qubits and 8185 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "28 qubits and 8185 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "feynman_qcla_adder_10__nam_heavy",
    "circuit": "feynman_qcla_adder_10",
    "twin": "nam_heavy",
@@ -17288,6 +21313,67 @@
    "status": "skipped: the published input is not this circuit: numerically unchecked (none (a basis input spreads over more than 4096 basis states))"
   },
   {
+   "name": "feynman_qcla_adder_10__tzap",
+   "circuit": "feynman_qcla_adder_10",
+   "twin": "tzap",
+   "qubits": 36,
+   "tier": 3,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    657,
+    422
+   ],
+   "t_count": [
+    238,
+    162
+   ],
+   "h_count": [
+    186,
+    58
+   ],
+   "cx_count": [
+    233,
+    193
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 240,
+     "of": 657,
+     "fraction": 0.3653
+    },
+    "greedy/cancommute": {
+     "matched": 349,
+     "of": 657,
+     "fraction": 0.5312
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "36 qubits and 1079 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "36 qubits and 1079 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "gen_barenco_tof_16__pyzx_full_reduce",
    "circuit": "gen_barenco_tof_16",
    "twin": "pyzx_full_reduce",
@@ -17406,6 +21492,68 @@
     },
     "greedy/cancommute": {
      "skipped": "31 qubits and 1643 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "gen_barenco_tof_16__tzap",
+   "circuit": "gen_barenco_tof_16",
+   "twin": "tzap",
+   "qubits": 31,
+   "tier": 3,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    840,
+    579
+   ],
+   "t_count": [
+    392,
+    172
+   ],
+   "h_count": [
+    112,
+    60
+   ],
+   "cx_count": [
+    336,
+    253
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 373,
+     "of": 840,
+     "fraction": 0.444
+    },
+    "greedy/cancommute": {
+     "matched": 36,
+     "of": 840,
+     "fraction": 0.0429
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "31 qubits and 1419 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "31 qubits and 1419 gates are past the budget for prefix states"
     }
    }
   },
@@ -17532,6 +21680,68 @@
    }
   },
   {
+   "name": "gen_barenco_tof_50__tzap",
+   "circuit": "gen_barenco_tof_50",
+   "twin": "tzap",
+   "qubits": 99,
+   "tier": 3,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.08
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    2880,
+    1973
+   ],
+   "t_count": [
+    1344,
+    580
+   ],
+   "h_count": [
+    384,
+    196
+   ],
+   "cx_count": [
+    1152,
+    865
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 1257,
+     "of": 2880,
+     "fraction": 0.4365
+    },
+    "greedy/cancommute": {
+     "matched": 70,
+     "of": 2880,
+     "fraction": 0.0243
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "99 qubits and 4853 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "99 qubits and 4853 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "gen_cuccaro_32__pyzx_full_reduce",
    "circuit": "gen_cuccaro_32",
    "twin": "pyzx_full_reduce",
@@ -17654,6 +21864,68 @@
    }
   },
   {
+   "name": "gen_cuccaro_32__tzap",
+   "circuit": "gen_cuccaro_32",
+   "twin": "tzap",
+   "qubits": 66,
+   "tier": 3,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    1089,
+    897
+   ],
+   "t_count": [
+    448,
+    256
+   ],
+   "h_count": [
+    128,
+    128
+   ],
+   "cx_count": [
+    513,
+    417
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 738,
+     "of": 1089,
+     "fraction": 0.6777
+    },
+    "greedy/cancommute": {
+     "matched": 769,
+     "of": 1089,
+     "fraction": 0.7062
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "66 qubits and 1986 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "66 qubits and 1986 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "gen_cuccaro_49__pyzx_full_reduce",
    "circuit": "gen_cuccaro_49",
    "twin": "pyzx_full_reduce",
@@ -17772,6 +22044,68 @@
     },
     "greedy/cancommute": {
      "skipped": "100 qubits and 3577 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "gen_cuccaro_49__tzap",
+   "circuit": "gen_cuccaro_49",
+   "twin": "tzap",
+   "qubits": 100,
+   "tier": 3,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.08
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    1667,
+    1373
+   ],
+   "t_count": [
+    686,
+    392
+   ],
+   "h_count": [
+    196,
+    196
+   ],
+   "cx_count": [
+    785,
+    638
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 1129,
+     "of": 1667,
+     "fraction": 0.6773
+    },
+    "greedy/cancommute": {
+     "matched": 1177,
+     "of": 1667,
+     "fraction": 0.7061
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "100 qubits and 3040 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "100 qubits and 3040 gates are past the budget for prefix states"
     }
    }
   },
@@ -17956,6 +22290,67 @@
    }
   },
   {
+   "name": "gen_surface_7__tzap",
+   "circuit": "gen_surface_7",
+   "twin": "tzap",
+   "qubits": 97,
+   "tier": 3,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    432,
+    384
+   ],
+   "t_count": [
+    0,
+    0
+   ],
+   "h_count": [
+    96,
+    48
+   ],
+   "cx_count": [
+    336,
+    336
+   ],
+   "fragment": [
+    "Clifford",
+    "Clifford"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 193,
+     "of": 432,
+     "fraction": 0.4468
+    },
+    "greedy/cancommute": {
+     "matched": 303,
+     "of": 432,
+     "fraction": 0.7014
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "97 qubits and 816 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "97 qubits and 816 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "gen_tof_16__pyzx_full_reduce",
    "circuit": "gen_tof_16",
    "twin": "pyzx_full_reduce",
@@ -18078,6 +22473,68 @@
    }
   },
   {
+   "name": "gen_tof_16__tzap",
+   "circuit": "gen_tof_16",
+   "twin": "tzap",
+   "qubits": 31,
+   "tier": 3,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    435,
+    337
+   ],
+   "t_count": [
+    203,
+    119
+   ],
+   "h_count": [
+    58,
+    86
+   ],
+   "cx_count": [
+    174,
+    132
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 295,
+     "of": 435,
+     "fraction": 0.6782
+    },
+    "greedy/cancommute": {
+     "matched": 308,
+     "of": 435,
+     "fraction": 0.708
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "31 qubits and 772 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "31 qubits and 772 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "gen_tof_32__pyzx_full_reduce",
    "circuit": "gen_tof_32",
    "twin": "pyzx_full_reduce",
@@ -18196,6 +22653,68 @@
     },
     "greedy/cancommute": {
      "skipped": "63 qubits and 1922 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "gen_tof_32__tzap",
+   "circuit": "gen_tof_32",
+   "twin": "tzap",
+   "qubits": 63,
+   "tier": 3,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    915,
+    705
+   ],
+   "t_count": [
+    427,
+    247
+   ],
+   "h_count": [
+    122,
+    182
+   ],
+   "cx_count": [
+    366,
+    276
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 615,
+     "of": 915,
+     "fraction": 0.6721
+    },
+    "greedy/cancommute": {
+     "matched": 644,
+     "of": 915,
+     "fraction": 0.7038
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "63 qubits and 1620 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "63 qubits and 1620 gates are past the budget for prefix states"
     }
    }
   },
@@ -18376,6 +22895,67 @@
     },
     "greedy/cancommute": {
      "skipped": "99 qubits and 3056 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "gen_tof_50__tzap",
+   "circuit": "gen_tof_50",
+   "twin": "tzap",
+   "qubits": 99,
+   "tier": 3,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    1455,
+    1119
+   ],
+   "t_count": [
+    679,
+    391
+   ],
+   "h_count": [
+    194,
+    290
+   ],
+   "cx_count": [
+    582,
+    438
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 975,
+     "of": 1455,
+     "fraction": 0.6701
+    },
+    "greedy/cancommute": {
+     "matched": 1022,
+     "of": 1455,
+     "fraction": 0.7024
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "99 qubits and 2574 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "99 qubits and 2574 gates are past the budget for prefix states"
     }
    }
   },
@@ -18833,6 +23413,67 @@
    }
   },
   {
+   "name": "qasmbench_adder_n64__tzap",
+   "circuit": "qasmbench_adder_n64",
+   "twin": "tzap",
+   "qubits": 64,
+   "tier": 3,
+   "in_repo": true,
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.07
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    988,
+    820
+   ],
+   "t_count": [
+    392,
+    224
+   ],
+   "h_count": [
+    112,
+    112
+   ],
+   "cx_count": [
+    455,
+    371
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 687,
+     "of": 988,
+     "fraction": 0.6953
+    },
+    "greedy/cancommute": {
+     "matched": 237,
+     "of": 988,
+     "fraction": 0.2399
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "64 qubits and 1808 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "64 qubits and 1808 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "qasmbench_multiplier_n45__pyzx_full_reduce",
    "circuit": "qasmbench_multiplier_n45",
    "twin": "pyzx_full_reduce",
@@ -18951,6 +23592,68 @@
    }
   },
   {
+   "name": "qasmbench_multiplier_n45__tzap",
+   "circuit": "qasmbench_multiplier_n45",
+   "twin": "tzap",
+   "qubits": 45,
+   "tier": 3,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.09
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    5981,
+    2743
+   ],
+   "t_count": [
+    2646,
+    650
+   ],
+   "h_count": [
+    756,
+    274
+   ],
+   "cx_count": [
+    2574,
+    1507
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 703,
+     "of": 5981,
+     "fraction": 0.1175
+    },
+    "greedy/cancommute": {
+     "matched": 904,
+     "of": 5981,
+     "fraction": 0.1511
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "45 qubits and 8724 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "45 qubits and 8724 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "qasmbench_multiplier_n75__pyzx_full_reduce",
    "circuit": "qasmbench_multiplier_n75",
    "twin": "pyzx_full_reduce",
@@ -18976,6 +23679,414 @@
    "twin_tool": {
     "tool": "pyzx teleport_reduce + basic_optimization (scripts/check_pyzx_benchmarks.py optimize)",
     "status": "skipped: 17077 gates is past the bound of 8000 for a 240 s PyZX run"
+   }
+  },
+  {
+   "name": "qasmbench_multiplier_n75__tzap",
+   "circuit": "qasmbench_multiplier_n75",
+   "twin": "tzap",
+   "qubits": 75,
+   "tier": 3,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.12
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    17077,
+    7738
+   ],
+   "t_count": [
+    7560,
+    1802
+   ],
+   "h_count": [
+    2160,
+    734
+   ],
+   "cx_count": [
+    7350,
+    4337
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "17077 x 7738 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "17077 x 7738 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "75 qubits and 24815 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "75 qubits and 24815 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_128_mult__tzap",
+   "circuit": "feynman_gf2_128_mult",
+   "twin": "tzap",
+   "qubits": 384,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 1.21
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    279419,
+    165019
+   ],
+   "t_count": [
+    114688,
+    65664
+   ],
+   "h_count": [
+    66046,
+    510
+   ],
+   "cx_count": [
+    98685,
+    98685
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "279419 x 165019 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "279419 x 165019 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "384 qubits and 444438 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "384 qubits and 444438 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_256_mult__tzap",
+   "circuit": "feynman_gf2_256_mult",
+   "twin": "tzap",
+   "qubits": 768,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 4.97
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    1115899,
+    657723
+   ],
+   "t_count": [
+    458752,
+    262400
+   ],
+   "h_count": [
+    263166,
+    1022
+   ],
+   "cx_count": [
+    393981,
+    393981
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "1115899 x 657723 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "1115899 x 657723 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "768 qubits and 1773622 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "768 qubits and 1773622 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_64_mult__tzap",
+   "circuit": "feynman_gf2_64_mult",
+   "twin": "tzap",
+   "qubits": 192,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.34
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    70075,
+    41547
+   ],
+   "t_count": [
+    28672,
+    16448
+   ],
+   "h_count": [
+    16638,
+    254
+   ],
+   "cx_count": [
+    24765,
+    24765
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "70075 x 41547 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "70075 x 41547 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "192 qubits and 111622 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "192 qubits and 111622 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "feynman_hwb10__tzap",
+   "circuit": "feynman_hwb10",
+   "twin": "tzap",
+   "qubits": 16,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.43
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 1.899376990823036e-14
+   },
+   "gates": [
+    91642,
+    54235
+   ],
+   "t_count": [
+    29939,
+    15921
+   ],
+   "h_count": [
+    25662,
+    5852
+   ],
+   "cx_count": [
+    35170,
+    28003
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "91642 x 54235 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "91642 x 54235 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "16 qubits and 145877 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "16 qubits and 145877 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "feynman_hwb11__tzap",
+   "circuit": "feynman_hwb11",
+   "twin": "tzap",
+   "qubits": 15,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.98
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "phase",
+    "omega_power": 3
+   },
+   "gates": [
+    256181,
+    149527
+   ],
+   "t_count": [
+    84196,
+    44874
+   ],
+   "h_count": [
+    72168,
+    15212
+   ],
+   "cx_count": [
+    98023,
+    78850
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "256181 x 149527 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "256181 x 149527 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "15 qubits and 405708 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "15 qubits and 405708 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "feynman_hwb12__tzap",
+   "circuit": "feynman_hwb12",
+   "twin": "tzap",
+   "qubits": 20,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 1.83
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    514412,
+    295803
+   ],
+   "t_count": [
+    171465,
+    86173
+   ],
+   "h_count": [
+    146970,
+    31920
+   ],
+   "cx_count": [
+    191803,
+    153809
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "514412 x 295803 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "514412 x 295803 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "20 qubits and 810215 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "20 qubits and 810215 gates are past the budget for prefix states"
+    }
    }
   },
   {
@@ -19046,6 +24157,68 @@
     },
     "greedy/cancommute": {
      "skipped": "199 qubits and 11471 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "gen_barenco_tof_100__tzap",
+   "circuit": "gen_barenco_tof_100",
+   "twin": "tzap",
+   "qubits": 199,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.09
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    5880,
+    4023
+   ],
+   "t_count": [
+    2744,
+    1180
+   ],
+   "h_count": [
+    784,
+    396
+   ],
+   "cx_count": [
+    2352,
+    1765
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 2557,
+     "of": 5880,
+     "fraction": 0.4349
+    },
+    "greedy/cancommute": {
+     "matched": 120,
+     "of": 5880,
+     "fraction": 0.0204
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "199 qubits and 9903 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "199 qubits and 9903 gates are past the budget for prefix states"
     }
    }
   },
@@ -19125,6 +24298,126 @@
    }
   },
   {
+   "name": "gen_cuccaro_128__tzap",
+   "circuit": "gen_cuccaro_128",
+   "twin": "tzap",
+   "qubits": 258,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.09
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    4353,
+    3585
+   ],
+   "t_count": [
+    1792,
+    1024
+   ],
+   "h_count": [
+    512,
+    512
+   ],
+   "cx_count": [
+    2049,
+    1665
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 2946,
+     "of": 4353,
+     "fraction": 0.6768
+    },
+    "greedy/cancommute": {
+     "matched": 3073,
+     "of": 4353,
+     "fraction": 0.7059
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "258 qubits and 7938 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "258 qubits and 7938 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "gen_cuccaro_512__tzap",
+   "circuit": "gen_cuccaro_512",
+   "twin": "tzap",
+   "qubits": 1026,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.15
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    17409,
+    14337
+   ],
+   "t_count": [
+    7168,
+    4096
+   ],
+   "h_count": [
+    2048,
+    2048
+   ],
+   "cx_count": [
+    8193,
+    6657
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "17409 x 14337 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "17409 x 14337 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "1026 qubits and 31746 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "1026 qubits and 31746 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "gen_tof_100__pyzx_full_reduce",
    "circuit": "gen_tof_100",
    "twin": "pyzx_full_reduce",
@@ -19196,6 +24489,68 @@
     },
     "greedy/cancommute": {
      "skipped": "199 qubits and 6206 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "gen_tof_100__tzap",
+   "circuit": "gen_tof_100",
+   "twin": "tzap",
+   "qubits": 199,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.08
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    2955,
+    2269
+   ],
+   "t_count": [
+    1379,
+    791
+   ],
+   "h_count": [
+    394,
+    590
+   ],
+   "cx_count": [
+    1182,
+    888
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 1975,
+     "of": 2955,
+     "fraction": 0.6684
+    },
+    "greedy/cancommute": {
+     "matched": 2072,
+     "of": 2955,
+     "fraction": 0.7012
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "199 qubits and 5224 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "199 qubits and 5224 gates are past the budget for prefix states"
     }
    }
   },
@@ -19323,6 +24678,68 @@
    }
   },
   {
+   "name": "qasmbench_adder_n118__tzap",
+   "circuit": "qasmbench_adder_n118",
+   "twin": "tzap",
+   "qubits": 118,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.08
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    1834,
+    1522
+   ],
+   "t_count": [
+    728,
+    416
+   ],
+   "h_count": [
+    208,
+    208
+   ],
+   "cx_count": [
+    845,
+    689
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "matched": 1275,
+     "of": 1834,
+     "fraction": 0.6952
+    },
+    "greedy/cancommute": {
+     "matched": 429,
+     "of": 1834,
+     "fraction": 0.2339
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "118 qubits and 3356 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "118 qubits and 3356 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
    "name": "qasmbench_adder_n433__pyzx_full_reduce",
    "circuit": "qasmbench_adder_n433",
    "twin": "pyzx_full_reduce",
@@ -19390,6 +24807,771 @@
     },
     "greedy/cancommute": {
      "skipped": "433 qubits and 14735 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "qasmbench_adder_n433__tzap",
+   "circuit": "qasmbench_adder_n433",
+   "twin": "tzap",
+   "qubits": 433,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.1
+   },
+   "relation_found": {
+    "relation": "exact",
+    "method": "sparse simulation on 16 random basis inputs"
+   },
+   "gates": [
+    6769,
+    5617
+   ],
+   "t_count": [
+    2688,
+    1536
+   ],
+   "h_count": [
+    768,
+    768
+   ],
+   "cx_count": [
+    3120,
+    2544
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "6769 x 5617 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "6769 x 5617 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "433 qubits and 12386 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "433 qubits and 12386 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "qasmbench_multiplier_n350__tzap",
+   "circuit": "qasmbench_multiplier_n350",
+   "twin": "tzap",
+   "qubits": 350,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 1.15
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    383844,
+    172696
+   ],
+   "t_count": [
+    170030,
+    39202
+   ],
+   "h_count": [
+    48580,
+    14908
+   ],
+   "cx_count": [
+    165200,
+    99106
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "383844 x 172696 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "383844 x 172696 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "350 qubits and 556540 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "350 qubits and 556540 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "qasmbench_multiplier_n400__tzap",
+   "circuit": "qasmbench_multiplier_n400",
+   "twin": "tzap",
+   "qubits": 400,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 1.49
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    501877,
+    225764
+   ],
+   "t_count": [
+    222320,
+    51202
+   ],
+   "h_count": [
+    63520,
+    19438
+   ],
+   "cx_count": [
+    216000,
+    129663
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "501877 x 225764 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "501877 x 225764 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "400 qubits and 727641 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "400 qubits and 727641 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "tzap_cobble_t_chebyshev__tzap",
+   "circuit": "tzap_cobble_t_chebyshev",
+   "twin": "tzap",
+   "qubits": 14,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.44
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 1.842510084224234e-14
+   },
+   "gates": [
+    112554,
+    64569
+   ],
+   "t_count": [
+    47894,
+    28330
+   ],
+   "h_count": [
+    31227,
+    25292
+   ],
+   "cx_count": [
+    20459,
+    8694
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "112554 x 64569 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "112554 x 64569 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 503,
+     "longest": 173312
+    },
+    "greedy/cancommute": {
+     "segments": 9866,
+     "longest": 100818
+    }
+   }
+  },
+  {
+   "name": "tzap_cobble_t_hamiltonian_simulation__tzap",
+   "circuit": "tzap_cobble_t_hamiltonian_simulation",
+   "twin": "tzap",
+   "qubits": 16,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.77
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "phase",
+    "omega_power": 7
+   },
+   "gates": [
+    226196,
+    107053
+   ],
+   "t_count": [
+    99219,
+    44183
+   ],
+   "h_count": [
+    52419,
+    37335
+   ],
+   "cx_count": [
+    56764,
+    21675
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "226196 x 107053 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "226196 x 107053 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "16 qubits and 333249 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "16 qubits and 333249 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "tzap_cobble_t_laplacian_filter__tzap",
+   "circuit": "tzap_cobble_t_laplacian_filter",
+   "twin": "tzap",
+   "qubits": 11,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "u",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.23
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "exact",
+    "max_abs_diff": 2.3096716820318102e-14
+   },
+   "gates": [
+    34138,
+    26730
+   ],
+   "t_count": [
+    13442,
+    12842
+   ],
+   "h_count": [
+    13042,
+    12757
+   ],
+   "cx_count": [
+    660,
+    392
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "34138 x 26730 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "34138 x 26730 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 393,
+     "longest": 57977
+    },
+    "greedy/cancommute": {
+     "segments": 1578,
+     "longest": 39756
+    }
+   }
+  },
+  {
+   "name": "tzap_cobble_t_matrix_inversion__tzap",
+   "circuit": "tzap_cobble_t_matrix_inversion",
+   "twin": "tzap",
+   "qubits": 12,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.36
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "phase",
+    "omega_power": 6
+   },
+   "gates": [
+    82861,
+    52833
+   ],
+   "t_count": [
+    34423,
+    23863
+   ],
+   "h_count": [
+    24749,
+    21672
+   ],
+   "cx_count": [
+    11985,
+    5717
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "82861 x 52833 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "82861 x 52833 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "segments": 585,
+     "longest": 130865
+    },
+    "greedy/cancommute": {
+     "segments": 8861,
+     "longest": 63358
+    }
+   }
+  },
+  {
+   "name": "tzap_cobble_t_ols_ridge__tzap",
+   "circuit": "tzap_cobble_t_ols_ridge",
+   "twin": "tzap",
+   "qubits": 22,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 1.78
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    587755,
+    284816
+   ],
+   "t_count": [
+    255692,
+    119052
+   ],
+   "h_count": [
+    140654,
+    104178
+   ],
+   "cx_count": [
+    139716,
+    51136
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "587755 x 284816 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "587755 x 284816 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "22 qubits and 872571 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "22 qubits and 872571 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "tzap_cobble_t_spectral_thresholding__tzap",
+   "circuit": "tzap_cobble_t_spectral_thresholding",
+   "twin": "tzap",
+   "qubits": 16,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "equiv",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 0.93
+   },
+   "relation_found": {
+    "method": "2 random state(s)",
+    "relation": "phase",
+    "omega_power": 3
+   },
+   "gates": [
+    309871,
+    140907
+   ],
+   "t_count": [
+    137061,
+    56511
+   ],
+   "h_count": [
+    67243,
+    45276
+   ],
+   "cx_count": [
+    84506,
+    33673
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "309871 x 140907 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "309871 x 140907 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "16 qubits and 450778 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "16 qubits and 450778 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "tzap_qft_qft_q020_d32421__tzap",
+   "circuit": "tzap_qft_qft_q020_d32421",
+   "twin": "tzap",
+   "qubits": 20,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 1.33
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    309835,
+    249902
+   ],
+   "t_count": [
+    167567,
+    122387
+   ],
+   "h_count": [
+    141858,
+    122398
+   ],
+   "cx_count": [
+    410,
+    380
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "309835 x 249902 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "309835 x 249902 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "20 qubits and 559737 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "20 qubits and 559737 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "tzap_qft_qft_q030_d50671__tzap",
+   "circuit": "tzap_qft_qft_q030_d50671",
+   "twin": "tzap",
+   "qubits": 30,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 2.34
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    549880,
+    442253
+   ],
+   "t_count": [
+    297387,
+    216729
+   ],
+   "h_count": [
+    251578,
+    216682
+   ],
+   "cx_count": [
+    915,
+    675
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "549880 x 442253 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "549880 x 442253 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "30 qubits and 992133 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "30 qubits and 992133 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "tzap_qft_qft_q040_d68921__tzap",
+   "circuit": "tzap_qft_qft_q040_d68921",
+   "twin": "tzap",
+   "qubits": 40,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 3.3
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    790125,
+    634598
+   ],
+   "t_count": [
+    427207,
+    311069
+   ],
+   "h_count": [
+    361298,
+    310962
+   ],
+   "cx_count": [
+    1620,
+    970
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "790125 x 634598 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "790125 x 634598 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "40 qubits and 1424723 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "40 qubits and 1424723 gates are past the budget for prefix states"
+    }
+   }
+  },
+  {
+   "name": "tzap_qft_qft_q050_d87171__tzap",
+   "circuit": "tzap_qft_qft_q050_d87171",
+   "twin": "tzap",
+   "qubits": 50,
+   "tier": 4,
+   "in_repo": false,
+   "why_not_in_repo": "not in the first batch; made for its T-count only",
+   "status": "ok",
+   "relation": "p",
+   "expected": "unknown",
+   "twin_tool": {
+    "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+    "tzap": "tzap 0.6.1",
+    "options": "-O2 --decompose-rz --decompose-cz",
+    "seconds": 4.34
+   },
+   "relation_found": {
+    "relation": "unchecked",
+    "method": "none (a basis input spreads over more than 4096 basis states)"
+   },
+   "gates": [
+    1030570,
+    826943
+   ],
+   "t_count": [
+    557027,
+    405409
+   ],
+   "h_count": [
+    471018,
+    405242
+   ],
+   "cx_count": [
+    2525,
+    1265
+   ],
+   "fragment": [
+    "general",
+    "general"
+   ],
+   "diff_matched": {
+    "raw": {
+     "skipped": "1030570 x 826943 gates is past the diff's budget"
+    },
+    "greedy/cancommute": {
+     "skipped": "1030570 x 826943 gates is past the diff's budget"
+    }
+   },
+   "segments": {
+    "raw": {
+     "skipped": "50 qubits and 1857513 gates are past the budget for prefix states"
+    },
+    "greedy/cancommute": {
+     "skipped": "50 qubits and 1857513 gates are past the budget for prefix states"
     }
    }
   }

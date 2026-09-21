@@ -31,12 +31,14 @@ per pair made so far.
 | `feynman_barenco_tof_3__pyzx_published` | 1 | 5 | 76 → 56 | 28 → 16 | exact | 0.55 | 0.34 | 4 | 125 | yes |
 | `feynman_barenco_tof_3__pyzx_teleport` | 1 | 5 | 76 → 62 | 28 → 24 | exact | 0.36 | 0.75 | 57 | 8 | no |
 | `feynman_barenco_tof_3__tpar` | 1 | 5 | 76 → 82 | 28 → 16 | exact | 0.07 | 0.17 | 2 | 156 | no |
+| `feynman_barenco_tof_3__tzap` | 1 | 5 | 76 → 46 | 28 → 16 | exact | 0.29 | 0.24 | 3 | 118 | no |
 | `feynman_barenco_tof_4__nam_heavy` | 1 | 7 | 146 → 72 | 56 → 28 | exact | 0.30 | 0.36 | 3 | 214 | no |
 | `feynman_barenco_tof_4__nam_light` | 1 | 7 | 146 → 78 | 56 → 28 | exact | 0.31 | 0.29 | 3 | 220 | no |
 | `feynman_barenco_tof_4__pyzx_full_reduce` | 1 | 7 | 146 → 121 | 56 → 28 | exact | 0.09 | 0.11 | 2 | 265 | no |
 | `feynman_barenco_tof_4__pyzx_published` | 1 | 7 | 146 → 105 | 56 → 28 | exact | 0.50 | 0.30 | 4 | 244 | yes |
 | `feynman_barenco_tof_4__pyzx_teleport` | 1 | 7 | 146 → 119 | 56 → 48 | exact | 0.19 | 0.76 | 110 | 6 | no |
 | `feynman_barenco_tof_4__tpar` | 1 | 7 | 146 → 141 | 56 → 28 | exact | 0.05 | 0.12 | 3 | 283 | no |
+| `feynman_barenco_tof_4__tzap` | 1 | 7 | 146 → 87 | 56 → 28 | exact | 0.25 | 0.16 | 3 | 229 | no |
 | `feynman_mod5_4__nam_heavy` | 1 | 5 | 79 → 51 | 28 → 16 | exact | 0.47 | 0.47 | 4 | 122 | no |
 | `feynman_mod5_4__nam_light` | 1 | 5 | 79 → 51 | 28 → 16 | exact | 0.43 | 0.47 | 4 | 122 | no |
 | `feynman_mod5_4__peephole` | 1 | 5 | 79 → 60 | 28 → 22 | exact | 0.72 | 0.72 | 60 | 6 | yes |
@@ -44,6 +46,7 @@ per pair made so far.
 | `feynman_mod5_4__pyzx_published` | 1 | 5 | 79 → 56 | 28 → 8 | exact | 0.33 | 0.47 | 3 | 131 | yes |
 | `feynman_mod5_4__pyzx_teleport` | 1 | 5 | 79 → 66 | 28 → 22 | exact | 0.65 | 0.68 | 3 | 141 | yes |
 | `feynman_mod5_4__tpar` | 1 | 5 | 79 → 77 | 28 → 16 | exact | 0.20 | 0.20 | 1 | 156 | no |
+| `feynman_mod5_4__tzap` | 1 | 5 | 79 → 55 | 28 → 16 | exact | 0.57 | 0.57 | 29 | 54 | yes |
 | `feynman_mod_mult_55__nam_heavy` | 1 | 9 | 147 → 91 | 49 → 35 | exact | 0.45 | 0.40 | 3 | 232 | no |
 | `feynman_mod_mult_55__nam_light` | 1 | 9 | 147 → 91 | 49 → 35 | exact | 0.43 | 0.40 | 3 | 232 | no |
 | `feynman_mod_mult_55__peephole` | 1 | 9 | 147 → 117 | 49 → 45 | exact | 0.78 | 0.78 | 117 | 4 | yes |
@@ -51,9 +54,11 @@ per pair made so far.
 | `feynman_mod_mult_55__pyzx_published` | 1 | 9 | 147 → 97 | 49 → 35 | exact | 0.26 | 0.19 | 1 | 244 | yes |
 | `feynman_mod_mult_55__pyzx_teleport` | 1 | 9 | 147 → 109 | 49 → 43 | exact | 0.27 | 0.44 | 1 | 256 | yes |
 | `feynman_mod_mult_55__tpar` | 1 | 9 | 147 → 231 | 49 → 37 | different; different on clean ancillas | 0.13 | 0.17 | 1 | 378 | no |
+| `feynman_mod_mult_55__tzap` | 1 | 9 | 147 → 99 | 49 → 35 | phase (ω^5) | 0.29 | 0.63 | 8 | 230 | yes |
 | `feynman_qft_4__peephole` | 1 | 5 | 187 → 175 | 69 → 67 | exact | 0.93 | 0.93 | 175 | 5 | yes |
 | `feynman_qft_4__pyzx_full_reduce` | 1 | 5 | 187 → 206 | 69 → 67 | exact | 0.33 | 0.57 | 2 | 391 | yes |
 | `feynman_qft_4__pyzx_teleport` | 1 | 5 | 187 → 181 | 69 → 67 | exact | 0.60 | 0.90 | 83 | 181 | yes |
+| `feynman_qft_4__tzap` | 1 | 5 | 187 → 157 | 69 → 67 | phase (ω^2) | 0.69 | 0.46 | 96 | 45 | yes |
 | `feynman_tof_3__nam_heavy` | 1 | 5 | 57 → 35 | 21 → 15 | exact | 0.44 | 0.51 | 3 | 88 | no |
 | `feynman_tof_3__nam_light` | 1 | 5 | 57 → 35 | 21 → 15 | exact | 0.47 | 0.51 | 3 | 88 | no |
 | `feynman_tof_3__peephole` | 1 | 5 | 57 → 44 | 21 → 19 | exact | 0.75 | 0.75 | 45 | 4 | yes |
@@ -61,12 +66,14 @@ per pair made so far.
 | `feynman_tof_3__pyzx_published` | 1 | 5 | 57 → 44 | 21 → 15 | exact | 0.53 | 0.53 | 8 | 86 | yes |
 | `feynman_tof_3__pyzx_teleport` | 1 | 5 | 57 → 48 | 21 → 19 | exact | 0.60 | 0.68 | 27 | 46 | yes |
 | `feynman_tof_3__tpar` | 1 | 5 | 57 → 59 | 21 → 15 | exact | 0.07 | 0.23 | 2 | 114 | no |
+| `feynman_tof_3__tzap` | 1 | 5 | 57 → 38 | 21 → 15 | exact | 0.60 | 0.53 | 6 | 85 | yes |
 | `feynman_tof_4__nam_heavy` | 1 | 7 | 95 → 55 | 35 → 23 | exact | 0.43 | 0.48 | 7 | 136 | no |
 | `feynman_tof_4__nam_light` | 1 | 7 | 95 → 55 | 35 → 23 | exact | 0.41 | 0.48 | 7 | 136 | no |
 | `feynman_tof_4__pyzx_full_reduce` | 1 | 7 | 95 → 100 | 35 → 23 | exact | 0.13 | 0.16 | 2 | 193 | no |
 | `feynman_tof_4__pyzx_published` | 1 | 7 | 95 → 71 | 35 → 23 | exact | 0.36 | 0.58 | 16 | 131 | yes |
 | `feynman_tof_4__pyzx_teleport` | 1 | 7 | 95 → 79 | 35 → 31 | exact | 0.41 | 0.76 | 68 | 12 | no |
 | `feynman_tof_4__tpar` | 1 | 7 | 95 → 102 | 35 → 23 | different; exact on clean ancillas | 0.09 | 0.12 | 1 | 197 | no |
+| `feynman_tof_4__tzap` | 1 | 7 | 95 → 61 | 35 → 23 | exact | 0.56 | 0.56 | 14 | 126 | no |
 | `feynman_tof_5__nam_heavy` | 1 | 9 | 133 → 75 | 49 → 31 | exact | 0.43 | 0.47 | 7 | 194 | no |
 | `feynman_tof_5__nam_light` | 1 | 9 | 133 → 75 | 49 → 31 | exact | 0.41 | 0.47 | 7 | 194 | no |
 | `feynman_tof_5__peephole` | 1 | 9 | 133 → 102 | 49 → 43 | exact | 0.74 | 0.74 | 103 | 4 | yes |
@@ -74,6 +81,7 @@ per pair made so far.
 | `feynman_tof_5__pyzx_published` | 1 | 9 | 133 → 98 | 49 → 31 | exact | 0.26 | 0.56 | 20 | 186 | yes |
 | `feynman_tof_5__pyzx_teleport` | 1 | 9 | 133 → 110 | 49 → 43 | exact | 0.29 | 0.75 | 94 | 12 | yes |
 | `feynman_tof_5__tpar` | 1 | 9 | 133 → 148 | 49 → 31 | different; exact on clean ancillas | 0.07 | 0.10 | 1 | 281 | no |
+| `feynman_tof_5__tzap` | 1 | 9 | 133 → 84 | 49 → 31 | exact | 0.54 | 0.54 | 18 | 177 | yes |
 | `feynman_vbe_adder_3__nam_heavy` | 1 | 10 | 190 → 89 | 70 → 24 | exact | 0.36 | 0.34 | 3 | 275 | no |
 | `feynman_vbe_adder_3__nam_light` | 1 | 10 | 190 → 89 | 70 → 24 | exact | 0.37 | 0.35 | 3 | 275 | no |
 | `feynman_vbe_adder_3__peephole` | 1 | 10 | 190 → 128 | 70 → 56 | exact | 0.18 | 0.65 | 129 | 6 | yes |
@@ -81,42 +89,59 @@ per pair made so far.
 | `feynman_vbe_adder_3__pyzx_published` | 1 | 10 | 190 → 115 | 70 → 24 | exact | 0.34 | 0.43 | 5 | 295 | yes |
 | `feynman_vbe_adder_3__pyzx_teleport` | 1 | 10 | 190 → 138 | 70 → 56 | exact | 0.08 | 0.65 | 48 | 202 | yes |
 | `feynman_vbe_adder_3__tpar` | 1 | 10 | 190 → 161 | 70 → 24 | exact | 0.12 | 0.08 | 2 | 349 | no |
+| `feynman_vbe_adder_3__tzap` | 1 | 10 | 190 → 94 | 70 → 24 | exact | 0.24 | 0.23 | 5 | 274 | yes |
 | `gen_barenco_tof_3__pyzx_full_reduce` | 1 | 5 | 60 → 75 | 28 → 16 | exact | 0.20 | 0.15 | 1 | 135 | no |
 | `gen_barenco_tof_3__pyzx_teleport` | 1 | 5 | 60 → 62 | 28 → 24 | exact | 0.43 | 0.90 | 56 | 4 | no |
+| `gen_barenco_tof_3__tzap` | 1 | 5 | 60 → 46 | 28 → 16 | exact | 0.58 | 0.37 | 2 | 104 | no |
 | `gen_barenco_tof_5__pyzx_full_reduce` | 1 | 9 | 180 → 161 | 84 → 40 | exact | 0.08 | 0.12 | 2 | 339 | no |
 | `gen_barenco_tof_5__pyzx_teleport` | 1 | 9 | 180 → 176 | 84 → 72 | exact | 0.14 | 0.88 | 162 | 5 | no |
+| `gen_barenco_tof_5__tzap` | 1 | 9 | 180 → 128 | 84 → 40 | exact | 0.48 | 0.14 | 2 | 306 | no |
 | `gen_cuccaro_2__pyzx_full_reduce` | 1 | 6 | 69 → 78 | 28 → 16 | exact | 0.14 | 0.09 | 2 | 145 | no |
 | `gen_cuccaro_2__pyzx_teleport` | 1 | 6 | 69 → 77 | 28 → 24 | exact | 0.23 | 0.86 | 56 | 17 | no |
+| `gen_cuccaro_2__tzap` | 1 | 6 | 69 → 57 | 28 → 16 | exact | 0.70 | 0.71 | 4 | 119 | no |
 | `gen_cuccaro_4__peephole` | 1 | 10 | 137 → 133 | 56 → 48 | exact | 0.94 | 0.94 | 133 | 3 | yes |
 | `gen_cuccaro_4__pyzx_full_reduce` | 1 | 10 | 137 → 190 | 56 → 32 | exact | 0.13 | 0.04 | 2 | 325 | yes |
 | `gen_cuccaro_4__pyzx_teleport` | 1 | 10 | 137 → 155 | 56 → 48 | exact | 0.12 | 0.82 | 106 | 17 | yes |
+| `gen_cuccaro_4__tzap` | 1 | 10 | 137 → 113 | 56 → 32 | exact | 0.69 | 0.71 | 4 | 243 | yes |
 | `gen_tof_3__pyzx_full_reduce` | 1 | 5 | 45 → 51 | 21 → 15 | exact | 0.27 | 0.33 | 3 | 92 | no |
 | `gen_tof_3__pyzx_teleport` | 1 | 5 | 45 → 50 | 21 → 19 | exact | 0.78 | 0.93 | 40 | 12 | no |
+| `gen_tof_3__tzap` | 1 | 5 | 45 → 38 | 21 → 15 | exact | 0.78 | 0.78 | 5 | 75 | no |
 | `gen_tof_5__pyzx_full_reduce` | 1 | 9 | 105 → 124 | 49 → 31 | exact | 0.18 | 0.17 | 1 | 229 | no |
 | `gen_tof_5__pyzx_teleport` | 1 | 9 | 105 → 116 | 49 → 43 | exact | 0.76 | 0.90 | 46 | 125 | no |
+| `gen_tof_5__tzap` | 1 | 9 | 105 → 84 | 49 → 31 | exact | 0.71 | 0.73 | 9 | 173 | no |
 | `qasmbench_adder_n10__peephole` | 1 | 10 | 142 → 138 | 56 → 48 | exact | 0.94 | 0.94 | 138 | 3 | yes |
 | `qasmbench_adder_n10__pyzx_full_reduce` | 1 | 10 | 142 → 181 | 56 → 32 | exact | 0.12 | 0.12 | 1 | 323 | yes |
 | `qasmbench_adder_n10__pyzx_teleport` | 1 | 10 | 142 → 158 | 56 → 48 | exact | 0.36 | 0.48 | 1 | 300 | yes |
+| `qasmbench_adder_n10__tzap` | 1 | 10 | 142 → 117 | 56 → 32 | exact | 0.68 | 0.68 | 2 | 216 | yes |
 | `qasmbench_adder_n4__pyzx_full_reduce` | 1 | 4 | 23 → 32 | 8 → 8 | exact | 0.22 | 0.22 | 1 | 55 | no |
 | `qasmbench_adder_n4__pyzx_teleport` | 1 | 4 | 23 → 24 | 8 → 8 | exact | 0.48 | 0.74 | 8 | 33 | no |
+| `qasmbench_adder_n4__tzap` | 1 | 4 | 23 → 20 | 8 → 8 | phase (ω^6) | 0.22 | 0.39 | 6 | 26 | no |
 | `qasmbench_fredkin_n3__pyzx_full_reduce` | 1 | 3 | 19 → 31 | 7 → 7 | exact | 0.21 | 0.37 | 1 | 50 | no |
 | `qasmbench_fredkin_n3__pyzx_teleport` | 1 | 3 | 19 → 19 | 7 → 7 | exact | 0.47 | 0.68 | 3 | 34 | no |
+| `qasmbench_fredkin_n3__tzap` | 1 | 3 | 19 → 18 | 7 → 7 | exact | 0.89 | 0.89 | 15 | 9 | no |
 | `qasmbench_qec_en_n5__pyzx_full_reduce` | 1 | 5 | 25 → 17 | 1 → 1 | exact | 0.24 | 0.24 | 1 | 42 | no |
 | `qasmbench_qec_en_n5__pyzx_teleport` | 1 | 5 | 25 → 17 | 1 → 1 | exact | 0.20 | 0.20 | 1 | 42 | no |
+| `qasmbench_qec_en_n5__tzap` | 1 | 5 | 25 → 12 | 1 → 1 | exact | 0.28 | 0.28 | 2 | 35 | no |
 | `qasmbench_sat_n7__peephole` | 1 | 7 | 180 → 170 | 70 → 62 | exact | 0.92 | 0.92 | 170 | 4 | yes |
 | `qasmbench_sat_n7__pyzx_full_reduce` | 1 | 7 | 180 → 182 | 70 → 46 | phase (ω^4) | 0.14 | 0.14 | 1 | 362 | yes |
 | `qasmbench_sat_n7__pyzx_teleport` | 1 | 7 | 180 → 167 | 70 → 62 | phase (ω^4) | 0.40 | 0.56 | 6 | 337 | yes |
+| `qasmbench_sat_n7__tzap` | 1 | 7 | 180 → 134 | 70 → 46 | exact | 0.61 | 0.57 | 6 | 304 | yes |
 | `qasmbench_simon_n6__pyzx_full_reduce` | 1 | 6 | 44 → 13 | 14 → 0 | exact | 0.11 | 0.09 | 2 | 55 | no |
 | `qasmbench_simon_n6__pyzx_teleport` | 1 | 6 | 44 → 39 | 14 → 12 | exact | 0.39 | 0.66 | 5 | 73 | no |
+| `qasmbench_simon_n6__tzap` | 1 | 6 | 44 → 13 | 14 → 0 | exact | 0.23 | 0.25 | 3 | 53 | no |
 | `qasmbench_teleportation_n3__pyzx_full_reduce` | 1 | 3 | 8 → 10 | 1 → 1 | phase (ω^7) | 0.38 | 0.50 | 3 | 14 | no |
 | `qasmbench_teleportation_n3__pyzx_teleport` | 1 | 3 | 8 → 8 | 1 → 1 | exact | 0.75 | 1.00 | 8 | 2 | no |
+| `qasmbench_teleportation_n3__tzap` | 1 | 3 | 8 → 8 | 1 → 1 | exact | 1.00 | 1.00 | 8 | 2 | no |
 | `qasmbench_toffoli_n3__pyzx_full_reduce` | 1 | 3 | 18 → 23 | 7 → 7 | exact | 0.17 | 0.22 | 1 | 41 | no |
 | `qasmbench_toffoli_n3__pyzx_teleport` | 1 | 3 | 18 → 20 | 7 → 7 | exact | 0.56 | 0.61 | 3 | 34 | no |
+| `qasmbench_toffoli_n3__tzap` | 1 | 3 | 18 → 17 | 7 → 7 | exact | 0.72 | 0.89 | 8 | 21 | no |
 | `qec_code_833_encode_basis__peephole` | 1 | 8 | 52 → 28 | 0 → 0 | exact | 0.54 | 0.31 | 3 | 76 | yes |
 | `qec_code_833_encode_basis__pyzx_full_reduce` | 1 | 8 | 52 → 20 | 0 → 0 | exact | 0.13 | 0.08 | 1 | 72 | yes |
 | `qec_code_833_encode_basis__pyzx_teleport` | 1 | 8 | 52 → 20 | 0 → 0 | exact | 0.15 | 0.08 | 1 | 72 | yes |
+| `qec_code_833_encode_basis__tzap` | 1 | 8 | 52 → 28 | 0 → 0 | exact | 0.54 | 0.31 | 3 | 76 | yes |
 | `qec_steane_713_H_nf_fig4__pyzx_full_reduce` | 1 | 7 | 18 → 39 | 1 → 1 | exact | 0.22 | 0.50 | 2 | 55 | no |
 | `qec_steane_713_H_nf_fig4__pyzx_teleport` | 1 | 7 | 18 → 18 | 1 → 1 | exact | 0.44 | 1.00 | 18 | 2 | no |
+| `qec_steane_713_H_nf_fig4__tzap` | 1 | 7 | 18 → 18 | 1 → 1 | exact | 1.00 | 1.00 | 18 | 2 | no |
 | `feynman_adder_8__nam_heavy` | 2 | 24 | 1128 → 606 | 399 → 215 | exact | 0.42 | 0.42 | — | — | no |
 | `feynman_adder_8__nam_light` | 2 | 24 | 1128 → 646 | 399 → 215 | exact | 0.44 | 0.35 | — | — | no |
 | `feynman_adder_8__peephole` | 2 | 24 | 1128 → 875 | 399 → 361 | exact | 0.41 | 0.76 | — | — | yes |
@@ -124,6 +149,7 @@ per pair made so far.
 | `feynman_adder_8__pyzx_published` | 2 | 24 | 1128 → 706 | 399 → 173 | exact | 0.08 | 0.35 | — | — | yes |
 | `feynman_adder_8__pyzx_teleport` | 2 | 24 | 1128 → 898 | 399 → 349 | exact | 0.20 | 0.61 | — | — | yes |
 | `feynman_adder_8__tpar` | 2 | 24 | 1128 → 1280 | 399 → 215 | different; different on clean ancillas | 0.02 | 0.02 | — | — | no |
+| `feynman_adder_8__tzap` | 2 | 24 | 1128 → 684 | 399 → 215 | phase (ω^4) | 0.20 | 0.38 | — | — | yes |
 | `feynman_barenco_tof_10__nam_heavy` | 2 | 19 | 578 → 264 | 224 → 100 | exact | 0.23 | 0.27 | 3 | 838 | no |
 | `feynman_barenco_tof_10__nam_light` | 2 | 19 | 578 → 294 | 224 → 100 | exact | 0.20 | 0.23 | 3 | 868 | no |
 | `feynman_barenco_tof_10__peephole` | 2 | 19 | 578 → 427 | 224 → 192 | exact | 0.41 | 0.72 | 428 | 6 | yes |
@@ -131,30 +157,35 @@ per pair made so far.
 | `feynman_barenco_tof_10__pyzx_published` | 2 | 19 | 578 → 415 | 224 → 100 | exact | 0.46 | 0.17 | 4 | 986 | yes |
 | `feynman_barenco_tof_10__pyzx_teleport` | 2 | 19 | 578 → 461 | 224 → 192 | exact | 0.05 | 0.75 | 428 | 6 | yes |
 | `feynman_barenco_tof_10__tpar` | 2 | 19 | 578 → 517 | 224 → 100 | exact | 0.05 | 0.07 | 2 | 1093 | no |
+| `feynman_barenco_tof_10__tzap` | 2 | 19 | 578 → 333 | 224 → 100 | exact | 0.21 | 0.05 | 3 | 907 | yes |
 | `feynman_barenco_tof_5__nam_heavy` | 2 | 9 | 218 → 104 | 84 → 40 | exact | 0.25 | 0.31 | 3 | 318 | no |
 | `feynman_barenco_tof_5__nam_light` | 2 | 9 | 218 → 114 | 84 → 40 | exact | 0.26 | 0.27 | 3 | 328 | no |
 | `feynman_barenco_tof_5__pyzx_full_reduce` | 2 | 9 | 218 → 184 | 84 → 40 | exact | 0.12 | 0.12 | 3 | 398 | no |
 | `feynman_barenco_tof_5__pyzx_published` | 2 | 9 | 218 → 158 | 84 → 40 | exact | 0.49 | 0.23 | 4 | 369 | yes |
 | `feynman_barenco_tof_5__pyzx_teleport` | 2 | 9 | 218 → 176 | 84 → 72 | exact | 0.13 | 0.76 | 163 | 6 | no |
 | `feynman_barenco_tof_5__tpar` | 2 | 9 | 218 → 206 | 84 → 40 | exact | 0.07 | 0.10 | 3 | 420 | no |
+| `feynman_barenco_tof_5__tzap` | 2 | 9 | 218 → 128 | 84 → 40 | exact | 0.23 | 0.11 | 3 | 342 | no |
 | `feynman_csla_mux_3__nam_heavy` | 2 | 15 | 210 → 155 | 70 → 64 | exact | 0.56 | 0.65 | 109 | 58 | no |
 | `feynman_csla_mux_3__nam_light` | 2 | 15 | 210 → 161 | 70 → 64 | exact | 0.52 | 0.63 | 74 | 80 | no |
 | `feynman_csla_mux_3__pyzx_full_reduce` | 2 | 15 | 210 → 311 | 70 → 62 | exact | 0.10 | 0.18 | 1 | 521 | no |
 | `feynman_csla_mux_3__pyzx_published` | 2 | 15 | 210 → 164 | 70 → 62 | exact | 0.36 | 0.51 | 55 | 135 | yes |
 | `feynman_csla_mux_3__pyzx_teleport` | 2 | 15 | 210 → 163 | 70 → 64 | exact | 0.42 | 0.64 | 85 | 112 | no |
 | `feynman_csla_mux_3__tpar` | 2 | 15 | 210 → 508 | 70 → 62 | different; exact on clean ancillas | 0.09 | 0.06 | 1 | 718 | no |
+| `feynman_csla_mux_3__tzap` | 2 | 15 | 210 → 153 | 70 → 64 | exact | 0.70 | 0.70 | 126 | 54 | no |
 | `feynman_csum_mux_9__nam_heavy` | 2 | 30 | 532 → 266 | 196 → 84 | unchecked | 0.31 | 0.41 | — | — | no |
 | `feynman_csum_mux_9__nam_light` | 2 | 30 | 532 → 294 | 196 → 84 | unchecked | 0.33 | 0.40 | — | — | no |
 | `feynman_csum_mux_9__pyzx_full_reduce` | 2 | 30 | 532 → 527 | 196 → 84 | unchecked | 0.06 | 0.13 | — | — | no |
 | `feynman_csum_mux_9__pyzx_published` | 2 | 30 | 532 → 346 | 196 → 84 | unchecked | 0.21 | 0.36 | — | — | yes |
 | `feynman_csum_mux_9__pyzx_teleport` | 2 | 30 | 532 → 380 | 196 → 168 | unchecked | 0.27 | 0.59 | — | — | no |
 | `feynman_csum_mux_9__tpar` | 2 | 30 | 532 → 611 | 196 → 112 | unchecked | 0.02 | 0.06 | — | — | no |
+| `feynman_csum_mux_9__tzap` | 2 | 30 | 532 → 294 | 196 → 84 | unchecked | 0.10 | 0.12 | — | — | no |
 | `feynman_gf2_10_mult__nam_heavy` | 2 | 30 | 1747 → 1070 | 700 → 410 | exact, sampled | 0.44 | 0.47 | — | — | no |
 | `feynman_gf2_10_mult__nam_light` | 2 | 30 | 1747 → 1070 | 700 → 410 | exact, sampled | 0.43 | 0.47 | — | — | no |
 | `feynman_gf2_10_mult__pyzx_full_reduce` | 2 | 30 | 1747 → 4087 | 700 → 410 | exact, sampled | 0.03 | 0.04 | — | — | no |
 | `feynman_gf2_10_mult__pyzx_published` | 2 | 30 | 1747 → 1162 | 700 → 410 | exact, sampled | 0.34 | 0.59 | — | — | yes |
 | `feynman_gf2_10_mult__pyzx_teleport` | 2 | 30 | 1747 → 1257 | 700 → 600 | exact, sampled | 0.38 | 0.70 | — | — | no |
 | `feynman_gf2_10_mult__tpar` | 2 | 30 | 1747 → 2655 | 700 → 410 | exact, sampled | 0.02 | 0.03 | — | — | no |
+| `feynman_gf2_10_mult__tzap` | 2 | 30 | 1747 → 1088 | 700 → 410 | exact, sampled | 0.28 | 0.60 | — | — | no |
 | `feynman_gf2_4_mult__nam_heavy` | 2 | 12 | 289 → 187 | 112 → 68 | exact | 0.45 | 0.49 | 3 | 472 | no |
 | `feynman_gf2_4_mult__nam_light` | 2 | 12 | 289 → 187 | 112 → 68 | exact | 0.44 | 0.49 | 3 | 472 | no |
 | `feynman_gf2_4_mult__peephole` | 2 | 12 | 289 → 213 | 112 → 96 | exact | 0.72 | 0.72 | 214 | 6 | yes |
@@ -162,65 +193,78 @@ per pair made so far.
 | `feynman_gf2_4_mult__pyzx_published` | 2 | 12 | 289 → 199 | 112 → 68 | exact | 0.41 | 0.60 | 11 | 429 | yes |
 | `feynman_gf2_4_mult__pyzx_teleport` | 2 | 12 | 289 → 213 | 112 → 96 | exact | 0.45 | 0.70 | 166 | 118 | yes |
 | `feynman_gf2_4_mult__tpar` | 2 | 12 | 289 → 419 | 112 → 68 | different; exact on clean ancillas | 0.07 | 0.05 | 1 | 708 | no |
+| `feynman_gf2_4_mult__tzap` | 2 | 12 | 289 → 193 | 112 → 68 | exact | 0.62 | 0.62 | 3 | 478 | yes |
 | `feynman_gf2_5_mult__nam_heavy` | 2 | 15 | 447 → 296 | 175 → 115 | exact | 0.55 | 0.57 | 5 | 730 | no |
 | `feynman_gf2_5_mult__nam_light` | 2 | 15 | 447 → 296 | 175 → 115 | exact | 0.54 | 0.57 | 5 | 730 | no |
 | `feynman_gf2_5_mult__pyzx_full_reduce` | 2 | 15 | 447 → 637 | 175 → 115 | exact | 0.07 | 0.05 | 2 | 1082 | no |
 | `feynman_gf2_5_mult__pyzx_published` | 2 | 15 | 447 → 312 | 175 → 115 | exact | 0.34 | 0.62 | 14 | 693 | yes |
 | `feynman_gf2_5_mult__pyzx_teleport` | 2 | 15 | 447 → 332 | 175 → 155 | exact | 0.37 | 0.71 | 245 | 212 | no |
 | `feynman_gf2_5_mult__tpar` | 2 | 15 | 447 → 682 | 175 → 111 | different; different on clean ancillas | 0.04 | 0.06 | 1 | 1129 | no |
+| `feynman_gf2_5_mult__tzap` | 2 | 15 | 447 → 303 | 175 → 115 | exact | 0.64 | 0.64 | 4 | 744 | no |
 | `feynman_gf2_6_mult__nam_heavy` | 2 | 18 | 639 → 403 | 252 → 150 | exact | 0.45 | 0.49 | 4 | 1035 | no |
 | `feynman_gf2_6_mult__nam_light` | 2 | 18 | 639 → 403 | 252 → 150 | exact | 0.45 | 0.49 | 4 | 1035 | no |
 | `feynman_gf2_6_mult__pyzx_full_reduce` | 2 | 18 | 639 → 1267 | 252 → 150 | exact | 0.05 | 0.09 | 2 | 1904 | no |
 | `feynman_gf2_6_mult__pyzx_published` | 2 | 18 | 639 → 432 | 252 → 150 | exact | 0.41 | 0.59 | 10 | 998 | yes |
 | `feynman_gf2_6_mult__pyzx_teleport` | 2 | 18 | 639 → 465 | 252 → 216 | exact | 0.45 | 0.70 | 326 | 334 | no |
 | `feynman_gf2_6_mult__tpar` | 2 | 18 | 639 → 842 | 252 → 150 | different; exact on clean ancillas | 0.03 | 0.04 | 1 | 1481 | no |
+| `feynman_gf2_6_mult__tzap` | 2 | 18 | 639 → 414 | 252 → 150 | exact | 0.61 | 0.61 | 9 | 1007 | no |
 | `feynman_gf2_7_mult__nam_heavy` | 2 | 21 | 865 → 555 | 343 → 217 | exact | 0.54 | 0.56 | — | — | no |
 | `feynman_gf2_7_mult__nam_light` | 2 | 21 | 865 → 555 | 343 → 217 | exact | 0.53 | 0.56 | — | — | no |
 | `feynman_gf2_7_mult__pyzx_full_reduce` | 2 | 21 | 865 → 1689 | 343 → 217 | exact | 0.05 | 0.03 | — | — | no |
 | `feynman_gf2_7_mult__pyzx_published` | 2 | 21 | 865 → 585 | 343 → 217 | exact | 0.41 | 0.60 | — | — | yes |
 | `feynman_gf2_7_mult__pyzx_teleport` | 2 | 21 | 865 → 627 | 343 → 301 | exact | 0.45 | 0.70 | — | — | no |
 | `feynman_gf2_7_mult__tpar` | 2 | 21 | 865 → 1245 | 343 → 217 | different; exact on clean ancillas | 0.03 | 0.03 | — | — | no |
+| `feynman_gf2_7_mult__tzap` | 2 | 21 | 865 → 553 | 343 → 217 | exact | 0.61 | 0.61 | — | — | no |
 | `feynman_gf2_8_mult__nam_heavy` | 2 | 24 | 1139 → 712 | 448 → 264 | exact | 0.45 | 0.47 | — | — | no |
 | `feynman_gf2_8_mult__nam_light` | 2 | 24 | 1139 → 712 | 448 → 264 | exact | 0.45 | 0.48 | — | — | no |
 | `feynman_gf2_8_mult__pyzx_full_reduce` | 2 | 24 | 1139 → 2651 | 448 → 264 | exact, sampled | 0.04 | 0.06 | — | — | no |
 | `feynman_gf2_8_mult__pyzx_published` | 2 | 24 | 1139 → 759 | 448 → 264 | exact | 0.40 | 0.58 | — | — | yes |
 | `feynman_gf2_8_mult__pyzx_teleport` | 2 | 24 | 1139 → 819 | 448 → 384 | exact | 0.44 | 0.69 | — | — | no |
 | `feynman_gf2_8_mult__tpar` | 2 | 24 | 1139 → 1560 | 448 → 264 | different; exact on clean ancillas | 0.02 | 0.02 | — | — | no |
+| `feynman_gf2_8_mult__tzap` | 2 | 24 | 1139 → 709 | 448 → 264 | exact | 0.29 | 0.61 | — | — | no |
 | `feynman_gf2_9_mult__nam_heavy` | 2 | 27 | 1419 → 891 | 567 → 351 | exact, sampled | 0.53 | 0.55 | — | — | no |
 | `feynman_gf2_9_mult__nam_light` | 2 | 27 | 1419 → 891 | 567 → 351 | exact, sampled | 0.53 | 0.55 | — | — | no |
 | `feynman_gf2_9_mult__pyzx_full_reduce` | 2 | 27 | 1419 → 3187 | 567 → 351 | exact, sampled | 0.04 | 0.04 | — | — | no |
 | `feynman_gf2_9_mult__pyzx_published` | 2 | 27 | 1419 → 951 | 567 → 351 | exact, sampled | 0.34 | 0.60 | — | — | yes |
 | `feynman_gf2_9_mult__pyzx_teleport` | 2 | 27 | 1419 → 1023 | 567 → 495 | exact, sampled | 0.37 | 0.70 | — | — | no |
 | `feynman_gf2_9_mult__tpar` | 2 | 27 | 1419 → 2096 | 567 → 351 | different, sampled; exact on clean ancillas | 0.02 | 0.03 | — | — | no |
+| `feynman_gf2_9_mult__tzap` | 2 | 27 | 1419 → 889 | 567 → 351 | exact, sampled | 0.62 | 0.62 | — | — | no |
 | `feynman_grover_5__peephole` | 2 | 9 | 1023 → 769 | 336 → 296 | exact | 0.30 | 0.73 | 393 | 512 | yes |
 | `feynman_grover_5__pyzx_full_reduce` | 2 | 9 | 1023 → 675 | 336 → 166 | exact | 0.01 | 0.04 | 2 | 1696 | yes |
 | `feynman_grover_5__pyzx_teleport` | 2 | 9 | 1023 → 726 | 336 → 290 | exact | 0.12 | 0.29 | 8 | 1733 | yes |
+| `feynman_grover_5__tzap` | 2 | 9 | 1023 → 587 | 336 → 166 | phase (ω^2) | 0.22 | 0.24 | 14 | 1580 | yes |
 | `feynman_ham15_low__peephole` | 2 | 17 | 535 → 427 | 161 → 147 | exact | 0.51 | 0.79 | 428 | 8 | yes |
 | `feynman_ham15_low__pyzx_full_reduce` | 2 | 17 | 535 → 603 | 161 → 97 | exact | 0.08 | 0.05 | 2 | 1136 | yes |
 | `feynman_ham15_low__pyzx_teleport` | 2 | 17 | 535 → 479 | 161 → 147 | exact | 0.08 | 0.41 | 12 | 990 | yes |
+| `feynman_ham15_low__tzap` | 2 | 17 | 535 → 370 | 161 → 97 | exact | 0.43 | 0.56 | 101 | 675 | yes |
 | `feynman_ham15_med__pyzx_full_reduce` | 2 | 17 | 1600 → 958 | 574 → 212 | exact | 0.04 | 0.03 | 2 | 2556 | no |
 | `feynman_ham15_med__pyzx_teleport` | 2 | 17 | 1600 → 1270 | 574 → 504 | exact | 0.14 | 0.56 | 26 | 2613 | no |
+| `feynman_ham15_med__tzap` | 2 | 17 | 1600 → 786 | 574 → 234 | exact | 0.11 | 0.17 | 60 | 2245 | no |
 | `feynman_hwb6__peephole` | 2 | 7 | 319 → 249 | 105 → 97 | exact | 0.69 | 0.77 | 250 | 8 | yes |
 | `feynman_hwb6__pyzx_full_reduce` | 2 | 7 | 319 → 317 | 105 → 75 | exact | 0.13 | 0.13 | 2 | 634 | yes |
 | `feynman_hwb6__pyzx_teleport` | 2 | 7 | 319 → 267 | 105 → 95 | phase (ω^4) | 0.14 | 0.25 | 5 | 578 | yes |
+| `feynman_hwb6__tzap` | 2 | 7 | 319 → 221 | 105 → 75 | exact | 0.13 | 0.51 | 35 | 292 | yes |
 | `feynman_mod_red_21__nam_heavy` | 2 | 11 | 346 → 180 | 119 → 73 | exact | 0.37 | 0.21 | 3 | 492 | no |
 | `feynman_mod_red_21__nam_light` | 2 | 11 | 346 → 184 | 119 → 73 | exact | 0.35 | 0.22 | 3 | 496 | no |
 | `feynman_mod_red_21__pyzx_full_reduce` | 2 | 11 | 346 → 315 | 119 → 73 | exact | 0.05 | 0.05 | 1 | 661 | no |
 | `feynman_mod_red_21__pyzx_published` | 2 | 11 | 346 → 254 | 119 → 73 | exact | 0.11 | 0.16 | 3 | 559 | yes |
 | `feynman_mod_red_21__pyzx_teleport` | 2 | 11 | 346 → 274 | 119 → 107 | exact | 0.36 | 0.40 | 23 | 534 | no |
 | `feynman_mod_red_21__tpar` | 2 | 11 | 346 → 433 | 119 → 73 | different; different on clean ancillas | 0.06 | 0.10 | 1 | 779 | no |
+| `feynman_mod_red_21__tzap` | 2 | 11 | 346 → 214 | 119 → 73 | exact | 0.17 | 0.51 | 9 | 510 | no |
 | `feynman_qcla_com_7__nam_heavy` | 2 | 24 | 559 → 284 | 203 → 95 | exact | 0.04 | 0.37 | — | — | no |
 | `feynman_qcla_com_7__nam_light` | 2 | 24 | 559 → 284 | 203 → 95 | exact | 0.04 | 0.37 | — | — | no |
 | `feynman_qcla_com_7__pyzx_full_reduce` | 2 | 24 | 559 → 514 | 203 → 95 | exact | 0.05 | 0.07 | — | — | no |
 | `feynman_qcla_com_7__pyzx_published` | 2 | 24 | 559 → 358 | 203 → 95 | exact | 0.22 | 0.37 | — | — | yes |
 | `feynman_qcla_com_7__pyzx_teleport` | 2 | 24 | 559 → 428 | 203 → 169 | exact | 0.29 | 0.48 | — | — | no |
 | `feynman_qcla_com_7__tpar` | 2 | 24 | 559 → 699 | 203 → 95 | different; different on clean ancillas | 0.04 | 0.03 | — | — | no |
+| `feynman_qcla_com_7__tzap` | 2 | 24 | 559 → 315 | 203 → 95 | exact | 0.25 | 0.40 | — | — | no |
 | `feynman_qcla_mod_7__nam_heavy` | 2 | 26 | 1120 → 624 | 413 → 235 | different, sampled | 0.02 | 0.32 | — | — | no |
 | `feynman_qcla_mod_7__nam_light` | 2 | 26 | 1120 → 636 | 413 → 237 | exact, sampled | 0.02 | 0.33 | — | — | no |
 | `feynman_qcla_mod_7__pyzx_full_reduce` | 2 | 26 | 1120 → 1353 | 413 → 237 | phase (ω^4), sampled | 0.07 | 0.07 | — | — | no |
 | `feynman_qcla_mod_7__pyzx_published` | 2 | 26 | 1120 → 815 | 413 → 237 | exact, sampled | 0.16 | 0.12 | — | — | yes |
 | `feynman_qcla_mod_7__pyzx_teleport` | 2 | 26 | 1120 → 903 | 413 → 351 | exact, sampled | 0.19 | 0.59 | — | — | no |
 | `feynman_qcla_mod_7__tpar` | 2 | 26 | 1120 → 1619 | 413 → 249 | different, sampled; different on clean ancillas | 0.04 | 0.06 | — | — | no |
+| `feynman_qcla_mod_7__tzap` | 2 | 26 | 1120 → 695 | 413 → 237 | exact, sampled | 0.33 | 0.47 | — | — | no |
 | `feynman_rc_adder_6__nam_heavy` | 2 | 14 | 244 → 140 | 77 → 47 | exact | 0.46 | 0.49 | 14 | 356 | no |
 | `feynman_rc_adder_6__nam_light` | 2 | 14 | 244 → 142 | 77 → 47 | exact | 0.47 | 0.50 | 14 | 358 | no |
 | `feynman_rc_adder_6__peephole` | 2 | 14 | 244 → 185 | 77 → 67 | exact | 0.74 | 0.74 | 186 | 5 | yes |
@@ -228,6 +272,7 @@ per pair made so far.
 | `feynman_rc_adder_6__pyzx_published` | 2 | 14 | 244 → 191 | 77 → 47 | exact | 0.42 | 0.48 | 5 | 426 | yes |
 | `feynman_rc_adder_6__pyzx_teleport` | 2 | 14 | 244 → 195 | 77 → 59 | exact | 0.42 | 0.55 | 31 | 367 | yes |
 | `feynman_rc_adder_6__tpar` | 2 | 14 | 244 → 334 | 77 → 63 | different; different on clean ancillas | 0.15 | 0.14 | 1 | 578 | no |
+| `feynman_rc_adder_6__tzap` | 2 | 14 | 244 → 163 | 77 → 47 | exact | 0.60 | 0.60 | 24 | 350 | yes |
 | `feynman_tof_10__nam_heavy` | 2 | 19 | 323 → 175 | 119 → 71 | exact | 0.42 | 0.44 | 7 | 484 | no |
 | `feynman_tof_10__nam_light` | 2 | 19 | 323 → 175 | 119 → 71 | exact | 0.42 | 0.44 | 7 | 484 | no |
 | `feynman_tof_10__peephole` | 2 | 19 | 323 → 247 | 119 → 103 | exact | 0.74 | 0.74 | 248 | 4 | yes |
@@ -235,34 +280,47 @@ per pair made so far.
 | `feynman_tof_10__pyzx_published` | 2 | 19 | 323 → 233 | 119 → 71 | exact | 0.11 | 0.52 | 40 | 461 | yes |
 | `feynman_tof_10__pyzx_teleport` | 2 | 19 | 323 → 265 | 119 → 103 | exact | 0.12 | 0.74 | 224 | 12 | yes |
 | `feynman_tof_10__tpar` | 2 | 19 | 323 → 361 | 119 → 71 | different; exact on clean ancillas | 0.05 | 0.05 | 1 | 684 | no |
+| `feynman_tof_10__tzap` | 2 | 19 | 323 → 199 | 119 → 71 | exact | 0.52 | 0.52 | 38 | 432 | yes |
 | `gen_barenco_tof_10__pyzx_full_reduce` | 2 | 19 | 480 → 481 | 224 → 100 | exact | 0.06 | 0.13 | 2 | 959 | no |
 | `gen_barenco_tof_10__pyzx_teleport` | 2 | 19 | 480 → 461 | 224 → 192 | exact | 0.05 | 0.87 | 427 | 5 | no |
+| `gen_barenco_tof_10__tzap` | 2 | 19 | 480 → 333 | 224 → 100 | exact | 0.45 | 0.06 | 2 | 811 | no |
 | `gen_cuccaro_14__pyzx_full_reduce` | 2 | 30 | 477 → 637 | 196 → 112 | exact, sampled | 0.14 | 0.06 | — | — | no |
 | `gen_cuccaro_14__pyzx_teleport` | 2 | 30 | 477 → 545 | 196 → 168 | exact, sampled | 0.03 | 0.80 | — | — | no |
+| `gen_cuccaro_14__tzap` | 2 | 30 | 477 → 393 | 196 → 112 | exact, sampled | 0.68 | 0.71 | — | — | no |
 | `gen_cuccaro_8__peephole` | 2 | 18 | 273 → 265 | 112 → 96 | exact | 0.94 | 0.94 | 265 | 3 | yes |
 | `gen_cuccaro_8__pyzx_full_reduce` | 2 | 18 | 273 → 358 | 112 → 64 | exact | 0.08 | 0.16 | 2 | 629 | yes |
 | `gen_cuccaro_8__pyzx_teleport` | 2 | 18 | 273 → 311 | 112 → 96 | exact | 0.06 | 0.81 | 206 | 17 | yes |
+| `gen_cuccaro_8__tzap` | 2 | 18 | 273 → 225 | 112 → 64 | exact | 0.68 | 0.71 | 4 | 491 | yes |
 | `gen_surface_3__peephole` | 2 | 17 | 64 → 56 | 0 → 0 | exact | 0.45 | 0.70 | 28 | 34 | yes |
 | `gen_surface_3__pyzx_full_reduce` | 2 | 17 | 64 → 0 | 0 → 0 | exact | 0.00 | 0.00 | 1 | 64 | yes |
 | `gen_surface_3__pyzx_teleport` | 2 | 17 | 64 → 56 | 0 → 0 | exact | 0.34 | 0.70 | 28 | 34 | yes |
+| `gen_surface_3__tzap` | 2 | 17 | 64 → 56 | 0 → 0 | exact | 0.45 | 0.70 | 28 | 34 | yes |
 | `gen_tof_8__pyzx_full_reduce` | 2 | 15 | 195 → 222 | 91 → 55 | exact | 0.11 | 0.11 | 1 | 417 | no |
 | `gen_tof_8__pyzx_teleport` | 2 | 15 | 195 → 215 | 91 → 79 | exact | 0.75 | 0.90 | 55 | 296 | no |
+| `gen_tof_8__tzap` | 2 | 15 | 195 → 153 | 91 → 55 | exact | 0.69 | 0.72 | 15 | 320 | no |
 | `qasmbench_adder_n28__pyzx_full_reduce` | 2 | 28 | 424 → 575 | 168 → 96 | phase (ω^1), sampled | 0.04 | 0.07 | — | — | no |
 | `qasmbench_adder_n28__pyzx_teleport` | 2 | 28 | 424 → 496 | 168 → 144 | exact, sampled | 0.18 | 0.46 | — | — | no |
+| `qasmbench_adder_n28__tzap` | 2 | 28 | 424 → 352 | 168 → 96 | exact, sampled | 0.70 | 0.26 | — | — | no |
 | `qasmbench_bigadder_n18__pyzx_full_reduce` | 2 | 18 | 284 → 380 | 112 → 64 | phase (ω^4) | 0.04 | 0.10 | 1 | 664 | no |
 | `qasmbench_bigadder_n18__pyzx_teleport` | 2 | 18 | 284 → 312 | 112 → 96 | exact | 0.02 | 0.52 | 1 | 596 | no |
+| `qasmbench_bigadder_n18__tzap` | 2 | 18 | 284 → 233 | 112 → 64 | exact | 0.68 | 0.68 | 17 | 219 | no |
 | `qasmbench_multiplier_n15__peephole` | 2 | 15 | 574 → 476 | 252 → 204 | exact | 0.81 | 0.81 | 476 | 7 | yes |
 | `qasmbench_multiplier_n15__pyzx_full_reduce` | 2 | 15 | 574 → 407 | 252 → 70 | exact | 0.03 | 0.04 | 1 | 981 | yes |
 | `qasmbench_multiplier_n15__pyzx_teleport` | 2 | 15 | 574 → 510 | 252 → 204 | exact | 0.19 | 0.41 | 3 | 1074 | yes |
+| `qasmbench_multiplier_n15__tzap` | 2 | 15 | 574 → 298 | 252 → 74 | exact | 0.17 | 0.25 | 3 | 863 | yes |
 | `qasmbench_multiply_n13__pyzx_full_reduce` | 2 | 13 | 98 → 168 | 42 → 32 | exact | 0.11 | 0.18 | 1 | 266 | no |
 | `qasmbench_multiply_n13__pyzx_teleport` | 2 | 13 | 98 → 107 | 42 → 36 | exact | 0.53 | 0.69 | 3 | 201 | no |
+| `qasmbench_multiply_n13__tzap` | 2 | 13 | 98 → 93 | 42 → 32 | exact | 0.90 | 0.90 | 35 | 123 | no |
 | `qasmbench_qram_n20__peephole` | 2 | 20 | 321 → 296 | 140 → 128 | exact | 0.92 | 0.92 | 296 | 10 | yes |
 | `qasmbench_qram_n20__pyzx_full_reduce` | 2 | 20 | 321 → 451 | 140 → 96 | phase (ω^4) | 0.03 | 0.07 | 3 | 768 | yes |
 | `qasmbench_qram_n20__pyzx_teleport` | 2 | 20 | 321 → 318 | 140 → 128 | phase (ω^4) | 0.38 | 0.73 | 6 | 629 | yes |
+| `qasmbench_qram_n20__tzap` | 2 | 20 | 321 → 261 | 140 → 96 | exact | 0.76 | 0.76 | 4 | 576 | yes |
 | `qasmbench_sat_n11__pyzx_full_reduce` | 2 | 11 | 679 → 521 | 294 → 126 | phase (ω^4) | 0.03 | 0.08 | 2 | 1198 | no |
 | `qasmbench_sat_n11__pyzx_teleport` | 2 | 11 | 679 → 623 | 294 → 254 | exact | 0.12 | 0.18 | 4 | 1296 | no |
+| `qasmbench_sat_n11__tzap` | 2 | 11 | 679 → 421 | 294 → 126 | phase (ω^4) | 0.42 | 0.29 | 5 | 1092 | no |
 | `qec_rm15_1531_transversal_Tdg__pyzx_full_reduce` | 2 | 15 | 15 → 15 | 15 → 15 | exact | 1.00 | 1.00 | 15 | 2 | no |
 | `qec_rm15_1531_transversal_Tdg__pyzx_teleport` | 2 | 15 | 15 → 15 | 15 → 15 | exact | 1.00 | 1.00 | 15 | 2 | no |
+| `qec_rm15_1531_transversal_Tdg__tzap` | 2 | 15 | 15 → 15 | 15 → 15 | exact | 1.00 | 1.00 | 15 | 2 | no |
 | `feynman_gf2_16_mult__nam_heavy` | 3 | 48 | 4459 → 2707 | 1792 → 1040 | unchecked | 0.44 | 0.46 | — | — | no |
 | `feynman_gf2_16_mult__nam_light` | 3 | 48 | 4459 → 2707 | 1792 → 1040 | unchecked | 0.44 | 0.47 | — | — | no |
 | `feynman_gf2_16_mult__peephole` | 3 | 48 | 4459 → 3179 | 1792 → 1536 | unchecked | 0.34 | 0.71 | — | — | yes |
@@ -270,13 +328,17 @@ per pair made so far.
 | `feynman_gf2_16_mult__pyzx_published` | 3 | 48 | 4459 → 2931 | 1792 → 1040 | unchecked | 0.38 | 0.58 | — | — | yes |
 | `feynman_gf2_16_mult__pyzx_teleport` | 3 | 48 | 4459 → 3179 | 1792 → 1536 | unchecked | 0.43 | 0.70 | — | — | yes |
 | `feynman_gf2_16_mult__tpar` | 3 | 48 | 4459 → 7714 | 1792 → 1040 | unchecked | — | — | — | — | no |
+| `feynman_gf2_16_mult__tzap` | 3 | 48 | 4459 → 2703 | 1792 → 1040 | unchecked | 0.29 | 0.60 | — | — | yes |
 | `feynman_gf2_32_mult__pyzx_full_reduce` | 3 | 96 | — | — | skipped: 17658 gates is past the bound of 8000 for a 240 s PyZX run | — | — | — | — | — |
 | `feynman_gf2_32_mult__pyzx_teleport` | 3 | 96 | — | — | skipped: 17658 gates is past the bound of 8000 for a 240 s PyZX run | — | — | — | — | — |
+| `feynman_gf2_32_mult__tzap` | 3 | 96 | 17658 → 10562 | 7168 → 4128 | unchecked | — | — | — | — | no |
 | `feynman_ham15_high__pyzx_full_reduce` | 3 | 20 | 6712 → 4243 | 2457 → 1019 | phase (ω^4) | 0.02 | 0.02 | — | — | no |
 | `feynman_ham15_high__pyzx_teleport` | 3 | 20 | 6712 → 5167 | 2457 → 2173 | exact | — | — | — | — | no |
+| `feynman_ham15_high__tzap` | 3 | 20 | 6712 → 3385 | 2457 → 1019 | exact | 0.04 | 0.19 | — | — | no |
 | `feynman_hwb8__peephole` | 3 | 12 | 18220 → 14077 | 5887 → 5437 | exact | — | — | 14075 | 10 | yes |
 | `feynman_hwb8__pyzx_full_reduce` | 3 | 12 | — | — | skipped: 18220 gates is past the bound of 8000 for a 240 s PyZX run | — | — | — | — | — |
 | `feynman_hwb8__pyzx_teleport` | 3 | 12 | — | — | skipped: 18220 gates is past the bound of 8000 for a 240 s PyZX run | — | — | — | — | — |
+| `feynman_hwb8__tzap` | 3 | 12 | 18220 → 11509 | 5887 → 3561 | phase (ω^1) | — | — | 54 | 29606 | yes |
 | `feynman_mod_adder_1024__nam_heavy` | 3 | 28 | 5425 → 2736 | 1995 → 1011 | exact, sampled | 0.09 | 0.38 | — | — | no |
 | `feynman_mod_adder_1024__nam_light` | 3 | 28 | 5425 → 2738 | 1995 → 1011 | exact, sampled | 0.08 | 0.38 | — | — | no |
 | `feynman_mod_adder_1024__peephole` | 3 | 28 | 5425 → 3859 | 1995 → 1739 | exact, sampled | 0.12 | 0.69 | — | — | yes |
@@ -284,6 +346,7 @@ per pair made so far.
 | `feynman_mod_adder_1024__pyzx_published` | 3 | 28 | 5425 → 3582 | 1995 → 1011 | exact, sampled | 0.25 | 0.17 | — | — | yes |
 | `feynman_mod_adder_1024__pyzx_teleport` | 3 | 28 | 5425 → 4189 | 1995 → 1739 | exact, sampled | 0.42 | 0.63 | — | — | yes |
 | `feynman_mod_adder_1024__tpar` | 3 | 28 | 5425 → 5183 | 1995 → 1011 | unchecked | 0.01 | 0.02 | — | — | no |
+| `feynman_mod_adder_1024__tzap` | 3 | 28 | 5425 → 2760 | 1995 → 1011 | exact, sampled | 0.31 | 0.28 | — | — | yes |
 | `feynman_qcla_adder_10__nam_heavy` | 3 | 36 | — | — | skipped: the published input is not this circuit: numerically unchecked (none (a basis input spreads over more than 4096 basis states)) | — | — | — | — | — |
 | `feynman_qcla_adder_10__nam_light` | 3 | 36 | — | — | skipped: the published input is not this circuit: numerically unchecked (none (a basis input spreads over more than 4096 basis states)) | — | — | — | — | — |
 | `feynman_qcla_adder_10__peephole` | 3 | 36 | 657 → 481 | 238 → 212 | unchecked | 0.32 | 0.72 | — | — | yes |
@@ -291,24 +354,33 @@ per pair made so far.
 | `feynman_qcla_adder_10__pyzx_published` | 3 | 36 | — | — | skipped: the published input is not this circuit: numerically unchecked (none (a basis input spreads over more than 4096 basis states)) | — | — | — | — | — |
 | `feynman_qcla_adder_10__pyzx_teleport` | 3 | 36 | 657 → 529 | 238 → 208 | unchecked | 0.33 | 0.66 | — | — | yes |
 | `feynman_qcla_adder_10__tpar` | 3 | 36 | — | — | skipped: the published input is not this circuit: numerically unchecked (none (a basis input spreads over more than 4096 basis states)) | — | — | — | — | — |
+| `feynman_qcla_adder_10__tzap` | 3 | 36 | 657 → 422 | 238 → 162 | unchecked | 0.37 | 0.53 | — | — | yes |
 | `gen_barenco_tof_16__pyzx_full_reduce` | 3 | 31 | 840 → 817 | 392 → 172 | unchecked | 0.07 | 0.03 | — | — | no |
 | `gen_barenco_tof_16__pyzx_teleport` | 3 | 31 | 840 → 803 | 392 → 336 | unchecked | 0.03 | 0.87 | — | — | no |
+| `gen_barenco_tof_16__tzap` | 3 | 31 | 840 → 579 | 392 → 172 | unchecked | 0.44 | 0.04 | — | — | no |
 | `gen_barenco_tof_50__pyzx_full_reduce` | 3 | 99 | 2880 → 2893 | 1344 → 580 | unchecked | 0.01 | 0.09 | — | — | no |
 | `gen_barenco_tof_50__pyzx_teleport` | 3 | 99 | 2880 → 2741 | 1344 → 1152 | unchecked | 0.01 | 0.87 | — | — | no |
+| `gen_barenco_tof_50__tzap` | 3 | 99 | 2880 → 1973 | 1344 → 580 | unchecked | 0.44 | 0.02 | — | — | no |
 | `gen_cuccaro_32__pyzx_full_reduce` | 3 | 66 | 1089 → 1468 | 448 → 256 | exact, sampled | 0.15 | 0.12 | — | — | no |
 | `gen_cuccaro_32__pyzx_teleport` | 3 | 66 | 1089 → 1247 | 448 → 384 | exact, sampled | 0.01 | 0.80 | — | — | no |
+| `gen_cuccaro_32__tzap` | 3 | 66 | 1089 → 897 | 448 → 256 | exact, sampled | 0.68 | 0.71 | — | — | no |
 | `gen_cuccaro_49__pyzx_full_reduce` | 3 | 100 | 1667 → 2306 | 686 → 392 | exact, sampled | 0.15 | 0.15 | — | — | no |
 | `gen_cuccaro_49__pyzx_teleport` | 3 | 100 | 1667 → 1910 | 686 → 588 | exact, sampled | 0.01 | 0.80 | — | — | no |
+| `gen_cuccaro_49__tzap` | 3 | 100 | 1667 → 1373 | 686 → 392 | exact, sampled | 0.68 | 0.71 | — | — | no |
 | `gen_surface_7__peephole` | 3 | 97 | 432 → 384 | 0 → 0 | unchecked | 0.45 | 0.70 | — | — | yes |
 | `gen_surface_7__pyzx_full_reduce` | 3 | 97 | 432 → 0 | 0 → 0 | unchecked | 0.00 | 0.00 | — | — | yes |
 | `gen_surface_7__pyzx_teleport` | 3 | 97 | 432 → 384 | 0 → 0 | unchecked | 0.29 | 0.70 | — | — | yes |
+| `gen_surface_7__tzap` | 3 | 97 | 432 → 384 | 0 → 0 | unchecked | 0.45 | 0.70 | — | — | yes |
 | `gen_tof_16__pyzx_full_reduce` | 3 | 31 | 435 → 537 | 203 → 119 | exact, sampled | 0.19 | 0.08 | — | — | no |
 | `gen_tof_16__pyzx_teleport` | 3 | 31 | 435 → 479 | 203 → 175 | exact, sampled | 0.74 | 0.90 | — | — | no |
+| `gen_tof_16__tzap` | 3 | 31 | 435 → 337 | 203 → 119 | exact, sampled | 0.68 | 0.71 | — | — | no |
 | `gen_tof_32__pyzx_full_reduce` | 3 | 63 | 915 → 1199 | 427 → 247 | unchecked | 0.12 | 0.11 | — | — | no |
 | `gen_tof_32__pyzx_teleport` | 3 | 63 | 915 → 1007 | 427 → 367 | exact, sampled | 0.74 | 0.90 | — | — | no |
+| `gen_tof_32__tzap` | 3 | 63 | 915 → 705 | 427 → 247 | exact, sampled | 0.67 | 0.70 | — | — | no |
 | `gen_tof_50__peephole` | 3 | 99 | 1455 → 1407 | 679 → 583 | exact, sampled | 0.93 | 0.93 | — | — | yes |
 | `gen_tof_50__pyzx_full_reduce` | 3 | 99 | 1455 → 1882 | 679 → 391 | unchecked | 0.04 | 0.09 | — | — | yes |
 | `gen_tof_50__pyzx_teleport` | 3 | 99 | 1455 → 1601 | 679 → 583 | exact, sampled | 0.74 | 0.90 | — | — | yes |
+| `gen_tof_50__tzap` | 3 | 99 | 1455 → 1119 | 679 → 391 | exact, sampled | 0.67 | 0.70 | — | — | yes |
 | `published_qcla_adder_10__before__nam_heavy` | 3 | 36 | 521 → 399 | 238 → 162 | unchecked | 0.54 | 0.64 | — | — | no |
 | `published_qcla_adder_10__before__nam_light` | 3 | 36 | 521 → 411 | 238 → 162 | unchecked | 0.57 | 0.67 | — | — | no |
 | `published_qcla_adder_10__before__pyzx_published` | 3 | 36 | 521 → 487 | 238 → 162 | unchecked | 0.29 | 0.67 | — | — | no |
@@ -316,7 +388,44 @@ per pair made so far.
 | `qasmbench_adder_n64__peephole` | 3 | 64 | 988 → 960 | 392 → 336 | exact, sampled | 0.94 | 0.94 | — | — | yes |
 | `qasmbench_adder_n64__pyzx_full_reduce` | 3 | 64 | 988 → 1353 | 392 → 224 | exact, sampled | 0.07 | 0.04 | — | — | yes |
 | `qasmbench_adder_n64__pyzx_teleport` | 3 | 64 | 988 → 1160 | 392 → 336 | exact, sampled | 0.12 | 0.43 | — | — | yes |
+| `qasmbench_adder_n64__tzap` | 3 | 64 | 988 → 820 | 392 → 224 | exact, sampled | 0.70 | 0.24 | — | — | yes |
 | `qasmbench_multiplier_n45__pyzx_full_reduce` | 3 | 45 | 5981 → 4711 | 2646 → 634 | unchecked | 0.01 | 0.01 | — | — | no |
 | `qasmbench_multiplier_n45__pyzx_teleport` | 3 | 45 | 5981 → 5062 | 2646 → 2124 | unchecked | — | — | — | — | no |
+| `qasmbench_multiplier_n45__tzap` | 3 | 45 | 5981 → 2743 | 2646 → 650 | unchecked | 0.12 | 0.15 | — | — | no |
 | `qasmbench_multiplier_n75__pyzx_full_reduce` | 3 | 75 | — | — | skipped: 17077 gates is past the bound of 8000 for a 240 s PyZX run | — | — | — | — | — |
 | `qasmbench_multiplier_n75__pyzx_teleport` | 3 | 75 | — | — | skipped: 17077 gates is past the bound of 8000 for a 240 s PyZX run | — | — | — | — | — |
+| `qasmbench_multiplier_n75__tzap` | 3 | 75 | 17077 → 7738 | 7560 → 1802 | unchecked | — | — | — | — | no |
+| `feynman_gf2_128_mult__tzap` | 4 | 384 | 279419 → 165019 | 114688 → 65664 | unchecked | — | — | — | — | no |
+| `feynman_gf2_256_mult__tzap` | 4 | 768 | 1115899 → 657723 | 458752 → 262400 | unchecked | — | — | — | — | no |
+| `feynman_gf2_64_mult__tzap` | 4 | 192 | 70075 → 41547 | 28672 → 16448 | unchecked | — | — | — | — | no |
+| `feynman_hwb10__tzap` | 4 | 16 | 91642 → 54235 | 29939 → 15921 | exact | — | — | — | — | no |
+| `feynman_hwb11__tzap` | 4 | 15 | 256181 → 149527 | 84196 → 44874 | phase (ω^3) | — | — | — | — | no |
+| `feynman_hwb12__tzap` | 4 | 20 | 514412 → 295803 | 171465 → 86173 | exact, sampled | — | — | — | — | no |
+| `gen_barenco_tof_100__pyzx_full_reduce` | 4 | 199 | — | — | stopped after 240 s | — | — | — | — | — |
+| `gen_barenco_tof_100__pyzx_teleport` | 4 | 199 | 5880 → 5591 | 2744 → 2352 | unchecked | — | — | — | — | no |
+| `gen_barenco_tof_100__tzap` | 4 | 199 | 5880 → 4023 | 2744 → 1180 | unchecked | 0.43 | 0.02 | — | — | no |
+| `gen_cuccaro_128__pyzx_full_reduce` | 4 | 258 | — | — | stopped after 240 s | — | — | — | — | — |
+| `gen_cuccaro_128__pyzx_teleport` | 4 | 258 | 4353 → 4991 | 1792 → 1536 | exact, sampled | 0.00 | 0.80 | — | — | no |
+| `gen_cuccaro_128__tzap` | 4 | 258 | 4353 → 3585 | 1792 → 1024 | exact, sampled | 0.68 | 0.71 | — | — | no |
+| `gen_cuccaro_512__tzap` | 4 | 1026 | 17409 → 14337 | 7168 → 4096 | exact, sampled | — | — | — | — | no |
+| `gen_tof_100__pyzx_full_reduce` | 4 | 199 | — | — | stopped after 240 s | — | — | — | — | — |
+| `gen_tof_100__pyzx_teleport` | 4 | 199 | 2955 → 3251 | 1379 → 1183 | exact, sampled | 0.73 | 0.90 | — | — | no |
+| `gen_tof_100__tzap` | 4 | 199 | 2955 → 2269 | 1379 → 791 | exact, sampled | 0.67 | 0.70 | — | — | no |
+| `qasmbench_adder_n118__pyzx_full_reduce` | 4 | 118 | 1834 → 2616 | 728 → 416 | phase (ω^4), sampled | 0.05 | 0.06 | — | — | no |
+| `qasmbench_adder_n118__pyzx_teleport` | 4 | 118 | 1834 → 2156 | 728 → 624 | unchecked | 0.10 | 0.42 | — | — | no |
+| `qasmbench_adder_n118__tzap` | 4 | 118 | 1834 → 1522 | 728 → 416 | exact, sampled | 0.70 | 0.23 | — | — | no |
+| `qasmbench_adder_n433__pyzx_full_reduce` | 4 | 433 | — | — | stopped after 240 s | — | — | — | — | — |
+| `qasmbench_adder_n433__pyzx_teleport` | 4 | 433 | 6769 → 7966 | 2688 → 2304 | unchecked | — | — | — | — | no |
+| `qasmbench_adder_n433__tzap` | 4 | 433 | 6769 → 5617 | 2688 → 1536 | exact, sampled | — | — | — | — | no |
+| `qasmbench_multiplier_n350__tzap` | 4 | 350 | 383844 → 172696 | 170030 → 39202 | unchecked | — | — | — | — | no |
+| `qasmbench_multiplier_n400__tzap` | 4 | 400 | 501877 → 225764 | 222320 → 51202 | unchecked | — | — | — | — | no |
+| `tzap_cobble_t_chebyshev__tzap` | 4 | 14 | 112554 → 64569 | 47894 → 28330 | exact | — | — | 9866 | 100818 | no |
+| `tzap_cobble_t_hamiltonian_simulation__tzap` | 4 | 16 | 226196 → 107053 | 99219 → 44183 | phase (ω^7) | — | — | — | — | no |
+| `tzap_cobble_t_laplacian_filter__tzap` | 4 | 11 | 34138 → 26730 | 13442 → 12842 | exact | — | — | 1578 | 39756 | no |
+| `tzap_cobble_t_matrix_inversion__tzap` | 4 | 12 | 82861 → 52833 | 34423 → 23863 | phase (ω^6) | — | — | 8861 | 63358 | no |
+| `tzap_cobble_t_ols_ridge__tzap` | 4 | 22 | 587755 → 284816 | 255692 → 119052 | unchecked | — | — | — | — | no |
+| `tzap_cobble_t_spectral_thresholding__tzap` | 4 | 16 | 309871 → 140907 | 137061 → 56511 | phase (ω^3) | — | — | — | — | no |
+| `tzap_qft_qft_q020_d32421__tzap` | 4 | 20 | 309835 → 249902 | 167567 → 122387 | unchecked | — | — | — | — | no |
+| `tzap_qft_qft_q030_d50671__tzap` | 4 | 30 | 549880 → 442253 | 297387 → 216729 | unchecked | — | — | — | — | no |
+| `tzap_qft_qft_q040_d68921__tzap` | 4 | 40 | 790125 → 634598 | 427207 → 311069 | unchecked | — | — | — | — | no |
+| `tzap_qft_qft_q050_d87171__tzap` | 4 | 50 | 1030570 → 826943 | 557027 → 405409 | unchecked | — | — | — | — | no |

@@ -1,0 +1,83 @@
+{
+ "name": "gen_cuccaro_4__tzap",
+ "qubits": 10,
+ "relation": "u",
+ "expected": "equiv",
+ "split": "held-out",
+ "family": "gen_cuccaro",
+ "rung": 4,
+ "source": {
+  "generator": "scripts/circuit_pairs.py",
+  "optimiser": "tzap",
+  "circuit": "gen_cuccaro_4",
+  "circuit_source": {
+   "source": "generated",
+   "path": null,
+   "sha256": null
+  },
+  "circuit_licence": "this repository's",
+  "twin": "tzap",
+  "twin_tool": {
+   "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+   "tzap": "tzap 0.6.1",
+   "options": "-O2 --decompose-rz --decompose-cz",
+   "seconds": 0.07
+  },
+  "tier": 1,
+  "relation_found": {
+   "method": "unitary",
+   "relation": "exact",
+   "max_abs_diff": 2.2310821477347705e-15
+  },
+  "gates": [
+   137,
+   113
+  ],
+  "t_count": [
+   56,
+   32
+  ],
+  "h_count": [
+   16,
+   16
+  ],
+  "cx_count": [
+   65,
+   53
+  ],
+  "fragment": [
+   "general",
+   "general"
+  ],
+  "diff_matched": {
+   "raw": {
+    "matched": 94,
+    "of": 137,
+    "fraction": 0.6861
+   },
+   "greedy/cancommute": {
+    "matched": 97,
+    "of": 137,
+    "fraction": 0.708
+   }
+  },
+  "segments": {
+   "raw": {
+    "segments": 12,
+    "longest": 225
+   },
+   "greedy/cancommute": {
+    "segments": 4,
+    "longest": 243
+   }
+  }
+ },
+ "holdout_delete": [
+  "scripts/circuit_pairs.py",
+  "scripts/circuit_sources.py",
+  "scripts/peephole_pairs.py"
+ ],
+ "known_leaks": [],
+ "original": ["CX 2 1", "CX 2 0", "H 2", "CX 1 2", "Tdg 2", "CX 0 2", "T 2", "CX 1 2", "Tdg 2", "CX 0 2", "T 1", "T 2", "H 2", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "CX 4 3", "CX 4 2", "H 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 3", "T 4", "H 4", "CX 2 3", "T 2", "Tdg 3", "CX 2 3", "CX 6 5", "CX 6 4", "H 6", "CX 5 6", "Tdg 6", "CX 4 6", "T 6", "CX 5 6", "Tdg 6", "CX 4 6", "T 5", "T 6", "H 6", "CX 4 5", "T 4", "Tdg 5", "CX 4 5", "CX 8 7", "CX 8 6", "H 8", "CX 7 8", "Tdg 8", "CX 6 8", "T 8", "CX 7 8", "Tdg 8", "CX 6 8", "T 7", "T 8", "H 8", "CX 6 7", "T 6", "Tdg 7", "CX 6 7", "CX 8 9", "H 8", "CX 7 8", "Tdg 8", "CX 6 8", "T 8", "CX 7 8", "Tdg 8", "CX 6 8", "T 7", "T 8", "H 8", "CX 6 7", "T 6", "Tdg 7", "CX 6 7", "CX 8 6", "CX 6 7", "H 6", "CX 5 6", "Tdg 6", "CX 4 6", "T 6", "CX 5 6", "Tdg 6", "CX 4 6", "T 5", "T 6", "H 6", "CX 4 5", "T 4", "Tdg 5", "CX 4 5", "CX 6 4", "CX 4 5", "H 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 3", "T 4", "H 4", "CX 2 3", "T 2", "Tdg 3", "CX 2 3", "CX 4 2", "CX 2 3", "H 2", "CX 1 2", "Tdg 2", "CX 0 2", "T 2", "CX 1 2", "Tdg 2", "CX 0 2", "T 1", "T 2", "H 2", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "CX 2 0", "CX 0 1"],
+ "optimized": ["CX 2 1", "CX 2 0", "H 2", "CX 1 2", "Tdg 2", "CX 0 2", "T 2", "CX 1 2", "Tdg 2", "CX 0 2", "T 2", "H 2", "CX 4 2", "CX 4 3", "H 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 4", "H 4", "CX 6 4", "CX 6 5", "H 6", "CX 5 6", "Tdg 6", "CX 4 6", "T 6", "CX 5 6", "Tdg 6", "CX 4 6", "T 6", "H 6", "CX 8 6", "CX 8 7", "H 8", "CX 7 8", "Tdg 8", "CX 6 8", "T 8", "CX 7 8", "Tdg 8", "CX 6 8", "T 8", "H 8", "CX 8 9", "H 8", "CX 7 8", "Tdg 8", "CX 6 8", "T 8", "CX 7 8", "Tdg 8", "CX 6 8", "S 7", "T 8", "H 8", "S 6", "CX 6 7", "Sdg 7", "CX 8 6", "CX 8 7", "H 6", "CX 5 6", "Tdg 6", "CX 4 6", "T 6", "CX 5 6", "Tdg 6", "CX 4 6", "S 5", "T 6", "H 6", "S 4", "CX 4 5", "Sdg 5", "CX 6 4", "CX 6 5", "H 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 4", "CX 3 4", "Tdg 4", "CX 2 4", "S 3", "T 4", "H 4", "S 2", "CX 2 3", "Sdg 3", "CX 4 2", "CX 4 3", "H 2", "CX 1 2", "Tdg 2", "CX 0 2", "T 2", "CX 1 2", "Tdg 2", "CX 0 2", "S 1", "T 2", "H 2", "S 0", "CX 0 1", "Sdg 1", "CX 2 0", "CX 2 1"]
+}
