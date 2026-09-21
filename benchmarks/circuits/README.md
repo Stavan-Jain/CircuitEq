@@ -440,8 +440,10 @@ output for 27 circuits. The rest are in the cache only: the Nam and T-par
 pairs, whose sources have no clear licence to redistribute, and the PyZX and
 TZAP runs on the other T-bearing circuits, made for `optimization.json`.
 
-For each pair the index records what `benchmarks/harness/notes/distance.py`
-and `optimisers.py` measure: the relation that holds numerically (full
+For each pair the index records what `describe` in `scripts/circuit_pairs.py`
+measures (`probe FILE` prints the same for one circuit and its twins, which
+is how the tables of `benchmarks/harness/notes/README.md` are reproduced
+now): the relation that holds numerically (full
 unitaries to 10 qubits, random states to 24, sixteen random basis inputs
 beyond, marked `sampled`; an untrusted oracle throughout), gate, `T`, `H` and
 `CX` counts, the share of the original's gates a diff matches, raw and after
@@ -661,8 +663,9 @@ The virtualenv Python has numpy and pyzx 0.9.0 (`uv venv --python 3.12
 ~/.circuiteq-harness/envs/pyzx`, then `uv pip install --python
 ~/.circuiteq-harness/envs/pyzx/bin/python numpy pyzx==0.9.0`); the system
 `python3` has neither. TZAP lives in the virtualenv next to it
-(`benchmarks/harness/notes/README.md`; `CIRCUITEQ_TZAP` names another
-binary). Fetching and translating need no package; the numeric checks need
+(`benchmarks/harness/notes/README.md`; `CIRCUITEQ_HARNESS_TZAP` names
+another binary, as it does for the harness). Fetching and translating need
+no package; the numeric checks need
 numpy; the PyZX twins and the PyZX parser cross-check need pyzx.
 
 ```bash

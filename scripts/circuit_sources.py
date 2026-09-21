@@ -50,8 +50,10 @@ from __future__ import annotations
 
 import argparse
 import ast
+import cmath
 import hashlib
 import json
+import math
 import os
 import random
 import re
@@ -59,6 +61,7 @@ import shutil
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from fractions import Fraction
@@ -72,6 +75,9 @@ except ImportError:  # pragma: no cover
 ROOT = Path(__file__).resolve().parents[1]
 CATALOGUE = ROOT / "benchmarks" / "circuits"
 MANIFEST = CATALOGUE / "manifest.json"
+# The optional helpers beside this file (`check_pyzx_benchmarks`, `tcount_survey`) import
+# pyzx; they are imported lazily where pyzx is present.
+sys.path.insert(0, str(ROOT / "scripts"))
 
 ALPHABET = ("H", "X", "Y", "Z", "S", "Sdg", "T", "Tdg", "CX")
 CLIFFORD = {"H", "X", "Y", "Z", "S", "Sdg", "CX"}
@@ -82,6 +88,8 @@ PHASES = {0: [], 1: ["T"], 2: ["S"], 3: ["S", "T"], 4: ["Z"], 5: ["Z", "T"], 6: 
           7: ["Tdg"]}
 INVERSE = {"H": "H", "X": "X", "Y": "Y", "Z": "Z", "S": "Sdg", "Sdg": "S", "T": "Tdg",
            "Tdg": "T"}
+# The `k` of `diag(1, ω^k)` per diagonal gate, by its lower-case QASM name.
+PHASE_OF = {"z": 4, "s": 2, "sdg": 6, "t": 1, "tdg": 7}
 
 # Tier bounds: (qubits, gates), both inclusive; tier 4 is everything beyond.
 TIERS = ((10, 200), (30, 2000), (100, 20000))
@@ -176,7 +184,7 @@ def _spec(name, source, path, fmt, family, size, note=""):
             "size": size, "note": note}
 
 
-def _clean(stem: str) -> str:
+def clean_name(stem: str) -> str:
     return re.sub(r"[^A-Za-z0-9]+", "_", stem).strip("_")
 
 
@@ -294,27 +302,27 @@ PUBLISHED_KINDS = {
 def published_spec(base: str, kind: str) -> dict:
     template, fmt, note = PUBLISHED_KINDS[kind]
     path = template.format(base=base, nam=_NAM_STEM.get(base, base))
-    return _spec(f"published_{_clean(base)}__{kind}", "pyzx_repo", path, fmt,
-                 "published_" + re.sub(r"_?\d+$", "", _clean(base)), kind, note)
+    return _spec(f"published_{clean_name(base)}__{kind}", "pyzx_repo", path, fmt,
+                 "published_" + re.sub(r"_?\d+$", "", clean_name(base)), kind, note)
 
 
 def circuit_specs() -> list[dict]:
     """Every circuit of the catalogue, in ladder order within its source."""
     specs = []
     for stem, family, size in FEYNMAN:
-        specs.append(_spec("feynman_" + _clean(stem), "feynman", f"benchmarks/qasm/{stem}.qasm",
+        specs.append(_spec("feynman_" + clean_name(stem), "feynman", f"benchmarks/qasm/{stem}.qasm",
                            "qasm2", family, size))
     for path, family, size in QASMBENCH:
         parts = path.split("/")
         stem = parts[-1]
         full = path if len(parts) == 3 else f"{path}/{stem}"
-        specs.append(_spec("qasmbench_" + _clean(parts[1]), "qasmbench", full + ".qasm", "qasm2",
-                           family, size))
+        specs.append(_spec("qasmbench_" + clean_name(parts[1]), "qasmbench", full + ".qasm",
+                           "qasm2", family, size))
     for stem, family, size in QEC:
-        specs.append(_spec("qec_" + _clean(stem), "qec", f"qec_circuits/{stem}.qasm", "qasm2",
+        specs.append(_spec("qec_" + clean_name(stem), "qec", f"qec_circuits/{stem}.qasm", "qasm2",
                            family, size))
     for path, family, size in TZAP_LARGE:
-        specs.append(_spec("tzap_" + _clean(path), "tzap", f"benchmarks/{path}.qasm", "qasm2",
+        specs.append(_spec("tzap_" + clean_name(path), "tzap", f"benchmarks/{path}.qasm", "qasm2",
                            family, size))
     for family, size in GENERATED:
         specs.append(_spec(f"gen_{family}_{size}", "generated", None, "generator",
@@ -549,7 +557,7 @@ def parse_qasm(text: str) -> dict:
 
     Returns ``qubits``, ``ops``, ``dropped`` (counts of what was left out
     without changing the unitary: barriers, ``id`` gates, terminal
-    measurements), ``registers``, ``uses_rz`` and ``notes``.
+    measurements), ``uses_rz``, ``phase_gates`` and ``notes``.
     """
     text = re.sub(r"//[^\n]*", "", text)
     if re.search(r"\bopaque\b", text):
@@ -594,10 +602,11 @@ def parse_qasm(text: str) -> dict:
             bind = dict(zip(qargs, wires))
             for stmt in body:
                 m = _APPLY.match(stmt)
+                if m is None:
+                    raise Rejected(f"{where}: cannot read `{stmt}` in the body of `{name}`")
                 if m[1] == "barrier":
                     continue
-                inner = [_angle(ast.parse(p.strip(), mode="eval"), env)
-                         for p in _split_params(m[2] or "")]
+                inner = [eval_angle(p, env) for p in _split_params(m[2] or "")]
                 try:
                     inner_wires = tuple(bind[a] for a in _split_args(m[3]))
                 except KeyError as e:
@@ -673,8 +682,7 @@ def parse_qasm(text: str) -> dict:
     if n == 0:
         raise Rejected("no quantum register")
     return {"qubits": n, "ops": ops, "dropped": {k: v for k, v in dropped.items() if v},
-            "registers": {k: list(v) for k, v in registers.items()}, "uses_rz": "rz" in uses,
-            "phase_gates": sorted(uses), "notes": notes}
+            "uses_rz": "rz" in uses, "phase_gates": sorted(uses), "notes": notes}
 
 
 # --------------------------------------------------------------------------
@@ -931,7 +939,7 @@ def apply_op(state, op: tuple) -> None:
         v[1] = a
         v[1] *= 1j
     elif low in ("z", "s", "sdg", "t", "tdg", "phase"):
-        k = op[2] if low == "phase" else {"z": 4, "s": 2, "sdg": 6, "t": 1, "tdg": 7}[low]
+        k = op[2] if low == "phase" else PHASE_OF[low]
         v[1] *= _phase(k)
     elif low == "cx":
         _swap(v, (1, 0), (1, 1))
@@ -985,7 +993,6 @@ def numeric_method(n: int, gates: int) -> str:
 
 SPARSE_SAMPLES = 16
 SPARSE_CAP = 1 << 12
-_SPARSE_PHASE = {"z": 4, "s": 2, "sdg": 6, "t": 1, "tdg": 7}
 
 
 class SupportTooLarge(Exception):
@@ -1015,8 +1022,8 @@ def sparse_run(ops: list[tuple], n: int, x: int, cap: int = SPARSE_CAP) -> dict[
             state = {k ^ m[0]: v for k, v in state.items()}
         elif name == "y":
             state = {k ^ m[0]: v * (-1j if k & m[0] else 1j) for k, v in state.items()}
-        elif name in _SPARSE_PHASE or name == "phase":
-            f = w8[(op[2] if name == "phase" else _SPARSE_PHASE[name]) % 8]
+        elif name in PHASE_OF or name == "phase":
+            f = w8[(op[2] if name == "phase" else PHASE_OF[name]) % 8]
             state = {k: v * f if k & m[0] else v for k, v in state.items()}
         elif name == "cx":
             state = {k ^ m[1] if k & m[0] else k: v for k, v in state.items()}
@@ -1052,8 +1059,7 @@ def sparse_compare(a: list[tuple], b: list[tuple], n: int, seed: int = 1,
             return {"relation": "different", "method": method}
         k0 = max(u, key=lambda k: abs(u[k]))
         ratio = v[k0] / u[k0]
-        turn = (np.angle(ratio) if np is not None else __import__("cmath").phase(ratio)) \
-            / (3.141592653589793 / 4)
+        turn = cmath.phase(ratio) / (math.pi / 4)
         if abs(abs(ratio) - 1) > 1e-9 or abs(turn - round(turn)) > 1e-7 or \
                 any(abs(u[k] * ratio - v[k]) > 1e-9 for k in u):
             return {"relation": "different", "method": method}
@@ -1186,15 +1192,36 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
+class Missing(Exception):
+    """The pinned commit has no such file (HTTP 404). Any other fetch failure is an error."""
+
+
 def download(url: str, dst: Path) -> None:
+    """Fetch `url` to `dst` through a `.part` file. `Missing` on a 404; a network failure or
+    a server error raises as itself, so it is never recorded as a rejection, and no partial
+    file is left behind."""
     dst.parent.mkdir(parents=True, exist_ok=True)
     tmp = dst.with_name(dst.name + ".part")
-    if shutil.which("curl"):
-        subprocess.run(["curl", "-sS", "-L", "--fail", "--max-time", "300", "-o", str(tmp), url],
-                       check=True)
-    else:
-        with urllib.request.urlopen(url, timeout=300) as r, tmp.open("wb") as f:
-            shutil.copyfileobj(r, f)
+    try:
+        if shutil.which("curl"):
+            p = subprocess.run(["curl", "-sS", "-L", "--fail", "--max-time", "300",
+                                "-w", "%{http_code}", "-o", str(tmp), url],
+                               capture_output=True, text=True)
+            if p.returncode == 22 and p.stdout.strip() == "404":
+                raise Missing(url)
+            if p.returncode != 0:
+                raise RuntimeError(f"curl exit {p.returncode} on {url}: {p.stderr.strip()}")
+        else:
+            try:
+                with urllib.request.urlopen(url, timeout=300) as r, tmp.open("wb") as f:
+                    shutil.copyfileobj(r, f)
+            except urllib.error.HTTPError as e:
+                if e.code == 404:
+                    raise Missing(url) from e
+                raise
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
     tmp.replace(dst)
 
 
@@ -1246,11 +1273,19 @@ def load_ops(spec: dict, hashes: dict) -> tuple[dict, dict]:
                     "licence": s["licence"]}
 
 
-def tzap_cross_check(spec: dict, gates: list[Gate], n: int, hashes: dict) -> str | None:
-    """Compare a Feynman translation with TZAP's own pre-decomposed copy, gate by gate."""
+def tzap_copy(spec: dict) -> str | None:
+    """The path, in TZAP's repository, of its pre-decomposed copy of a Feynman file; `None`
+    for every other circuit (TZAP has no copy of `qft_4`)."""
     if spec["source"] != "feynman" or spec["name"] == "feynman_qft_4":
         return None
-    path = "benchmarks/feynman/" + Path(spec["path"]).name
+    return "benchmarks/feynman/" + Path(spec["path"]).name
+
+
+def tzap_cross_check(spec: dict, gates: list[Gate], n: int, hashes: dict) -> str | None:
+    """Compare a Feynman translation with TZAP's own pre-decomposed copy, gate by gate."""
+    path = tzap_copy(spec)
+    if path is None:
+        return None
     theirs = parse_qasm(fetch_file("tzap", path, hashes, quiet=True).read_text())
     if theirs["qubits"] != n or translate(theirs["ops"]) != gates:
         raise AssertionError(f"{spec['name']}: differs from TZAP's pre-decomposed copy")
@@ -1315,7 +1350,7 @@ def build(spec: dict, hashes: dict, check: bool = True, cross: bool = True) -> t
            "translated_sha256": gates_digest(n, strings)}
     if check:
         rec["verified"] = verify(parsed["ops"], gates, n)
-        if cross and tier(n, len(gates)) <= 3 or cross and cached_tzap(spec):
+        if cross and (tier(n, len(gates)) <= 3 or cached_tzap(spec)):
             note = tzap_cross_check(spec, gates, n, hashes)
             if note:
                 rec["verified"]["cross_check"] = note
@@ -1328,8 +1363,8 @@ def build(spec: dict, hashes: dict, check: bool = True, cross: bool = True) -> t
 
 def cached_tzap(spec: dict) -> bool:
     """Whether TZAP's copy of a large Feynman file is already in the cache."""
-    return spec["source"] == "feynman" and \
-        cached_path("tzap", "benchmarks/feynman/" + Path(spec["path"]).name).exists()
+    path = tzap_copy(spec)
+    return path is not None and cached_path("tzap", path).exists()
 
 
 def circuit_json(rec: dict, strings: list[str]) -> dict:
@@ -1344,22 +1379,16 @@ def circuit_json(rec: dict, strings: list[str]) -> dict:
             "verified": rec.get("verified"), "translated_sha256": rec["translated_sha256"]}
 
 
-def to_qasm(name: str, n: int, strings: list[str]) -> str:
+def to_qasm(name: str, n: int, strings: list[str], comment: str | None = None) -> str:
     """The translated circuit as OpenQASM 2.0 in the alphabet's own gates, for tools that
     read QASM (TZAP, PyZX, Feynman). No `rz`: the convention question does not arise."""
     lines = ["OPENQASM 2.0;", 'include "qelib1.inc";',
-             f"// {name}: written by scripts/circuit_sources.py translate --qasm", f"qreg q[{n}];"]
+             comment or f"// {name}: written by scripts/circuit_sources.py translate --qasm",
+             f"qreg q[{n}];"]
     for g in strings:
         gate, *wires = g.split()
         lines.append(f"{gate.lower()} " + ",".join(f"q[{w}]" for w in wires) + ";")
     return "\n".join(lines) + "\n"
-
-
-def load_circuit(name: str, check: bool = False) -> dict:
-    """Name -> the per-circuit JSON (fetching and translating as needed)."""
-    rec, strings = build(find_spec(name), recorded_hashes(load_manifest()), check=check,
-                         cross=False)
-    return circuit_json(rec, strings)
 
 
 # --------------------------------------------------------------------------
@@ -1381,8 +1410,8 @@ def cmd_fetch(args) -> None:
         if not (args.all or args.names) and manifest_tiers.get(spec["name"], 1) > 3:
             continue
         fetch_file(spec["source"], spec["path"], hashes)
-        if spec["source"] == "feynman" and spec["name"] != "feynman_qft_4":
-            fetch_file("tzap", "benchmarks/feynman/" + Path(spec["path"]).name, hashes)
+        if tzap_copy(spec):
+            fetch_file("tzap", tzap_copy(spec), hashes)
         got += 1
     print(f"{got} circuit files present under {cache_dir() / 'files'}")
 
@@ -1391,8 +1420,9 @@ def cmd_translate(args) -> None:
     hashes = recorded_hashes(load_manifest())
     out = args.out or cache_dir() / "circuits"
     out.mkdir(parents=True, exist_ok=True)
+    tiers = {r["name"]: r["tier"] for r in load_manifest().get("circuits", [])}
     names = args.names or [s["name"] for s in circuit_specs()
-                           if load_tier(s["name"]) <= (4 if args.all else 3)]
+                           if tiers.get(s["name"], 1) <= (4 if args.all else 3)]
     for name in names:
         try:
             rec, strings = build(find_spec(name), hashes, check=not args.no_verify)
@@ -1407,13 +1437,6 @@ def cmd_translate(args) -> None:
               f"{rec.get('verified', {}).get('method', 'not verified')}")
 
 
-def load_tier(name: str) -> int:
-    for r in load_manifest().get("circuits", []):
-        if r["name"] == name:
-            return r["tier"]
-    return 1
-
-
 def cmd_catalogue(args) -> None:
     if args.table or args.readme:
         if args.readme:
@@ -1423,6 +1446,11 @@ def cmd_catalogue(args) -> None:
         return
     old = load_manifest()
     hashes = recorded_hashes(old) if not args.rehash else {}
+    try:
+        import pyzx  # noqa: F401  (the cross-check imports it; without it the notes are dropped)
+    except ImportError:
+        print("warning: pyzx is not importable, so no record will carry a `pyzx_parser` note",
+              flush=True)
     circuits, published, rejected = [], [], []
     specs = [(s, circuits) for s in circuit_specs()] + \
             [(s, published) for s in published_specs()]
@@ -1440,7 +1468,7 @@ def cmd_catalogue(args) -> None:
                              "reason": str(e)})
             print(f"{spec['name']}: REJECTED: {e}", flush=True)
             continue
-        except subprocess.CalledProcessError:
+        except Missing:
             rejected.append({"source": spec["source"], "path": spec["path"], "by": "fetch",
                              "reason": "not present at the pinned commit"})
             print(f"{spec['name']}: not present at the pinned commit", flush=True)
@@ -1498,7 +1526,7 @@ def markdown_table(manifest: dict) -> str:
     out = []
     for t in (1, 2, 3, 4):
         rows = [r for r in manifest.get("circuits", []) if r["tier"] == t]
-        rows.sort(key=lambda r: (r["qubits"] * 0 + r["gates"], r["qubits"], r["name"]))
+        rows.sort(key=lambda r: (r["gates"], r["qubits"], r["name"]))
         out += [f"### Tier {t}", "",
                 "| Name | Family | Size | Qubits | Gates | T | H | CX | Fragment | Source | "
                 "Verified |", "|---|---|---:|---:|---:|---:|---:|---:|---|---|---|"]
@@ -1771,7 +1799,6 @@ def main() -> None:
     p.add_argument("--only", nargs="*", help="name prefixes to recompute; keep the rest")
     p.add_argument("--rehash", action="store_true", help="ignore the recorded sha256 values")
     args = parser.parse_args()
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
     if args.self_test:
         self_test()
     elif args.command == "fetch":

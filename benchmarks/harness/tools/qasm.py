@@ -33,6 +33,7 @@ GATE_RE = re.compile(r"^(?:(?:H|X|Y|Z|S|Sdg|T|Tdg) \d+|CX \d+ \d+)$")
 
 
 def read_lean_def(path: Path, name: str) -> tuple[int, list[str]]:
+    """The qubit count and gate strings of `def NAME : Circuit n := [...]` in a Lean file."""
     m = re.search(rf"def {re.escape(name)} : Circuit (\d+) :=\s*\[([^\]]*)\]", path.read_text())
     if m is None:
         sys.exit(f"{path}: no `def {name} : Circuit n := [...]` with a literal list")
@@ -44,6 +45,7 @@ def read_lean_def(path: Path, name: str) -> tuple[int, list[str]]:
 
 
 def to_qasm(n: int, gates: list[str]) -> str:
+    """The gate strings as an OpenQASM 2 program on one register `q`; `Y` as `sdg; x; s`."""
     out = ["OPENQASM 2.0;", 'include "qelib1.inc";', f"qreg q[{n}];"]
     for g in gates:
         name, *w = g.split()
@@ -56,10 +58,14 @@ def to_qasm(n: int, gates: list[str]) -> str:
     return "\n".join(out) + "\n"
 
 
-def eighth_turns(text: str) -> int:
-    if not re.fullmatch(r"[\d\s.+\-*/()pie]*", text):
+def eighth_turns(text: str | None) -> int:
+    """An angle expression in `pi` as the `k` of `rz(k*pi/4)`, modulo 8."""
+    if not text or not re.fullmatch(r"[\d\s.+\-*/()pie]*", text):
         sys.exit(f"cannot read the angle `{text}`")
-    value = eval(text.replace("pi", "math.pi"), {"__builtins__": {}, "math": math})  # noqa: S307
+    try:
+        value = eval(text.replace("pi", "math.pi"), {"__builtins__": {}, "math": math})  # noqa: S307
+    except (SyntaxError, NameError, TypeError, ZeroDivisionError):
+        sys.exit(f"cannot read the angle `{text}`")
     k = value / (math.pi / 4)
     if abs(k - round(k)) > 1e-9:
         sys.exit(f"`{text}` is not a multiple of pi/4: not a Clifford+T gate")
@@ -67,6 +73,8 @@ def eighth_turns(text: str) -> int:
 
 
 def from_qasm(text: str) -> tuple[int, list[str]]:
+    """The qubit count and gate strings of an OpenQASM 2 program on one register, or exit
+    with the first statement that has no exact reading."""
     text = re.sub(r"//[^\n]*", "", text)
     n, gates = 0, []
     for stmt in (s.strip() for s in text.split(";")):
@@ -75,10 +83,18 @@ def from_qasm(text: str) -> tuple[int, list[str]]:
         if stmt.startswith("qreg"):
             if n:
                 sys.exit("more than one quantum register: flatten it first")
-            n = int(re.search(r"\[(\d+)\]", stmt)[1])
+            size = re.search(r"\[(\d+)\]", stmt)
+            if size is None:
+                sys.exit(f"cannot read the register size in `{stmt}`")
+            n = int(size[1])
             continue
         m = re.match(r"(\w+)\s*(?:\(([^)]*)\))?\s*(.*)", stmt, re.S)
-        name, arg, wires = m[1], m[2], [int(x) for x in re.findall(r"\[(\d+)\]", m[3])]
+        wires = [int(x) for x in re.findall(r"\[(\d+)\]", m[3])] if m else []
+        if m is None or len(wires) < (2 if m[1] in ("cx", "cz") else 1):
+            sys.exit(f"unsupported statement: `{stmt}` (a gate on indexed qubits was expected)")
+        if len(wires) > 1 and wires[0] == wires[1]:
+            sys.exit(f"`{stmt}`: a two-qubit gate on one wire is not a gate")
+        name, arg = m[1], m[2]
         if name == "cx":
             gates.append(f"CX {wires[0]} {wires[1]}")
         elif name == "cz":
@@ -95,6 +111,7 @@ def from_qasm(text: str) -> tuple[int, list[str]]:
 
 
 def lean_list(gates: list[str], width: int = 96) -> str:
+    """The gate strings as a Lean list literal, wrapped at `width` columns."""
     lines, cur = [], "["
     for k, g in enumerate(gates):
         piece = g + ("]" if k == len(gates) - 1 else ",")
@@ -107,14 +124,17 @@ def lean_list(gates: list[str], width: int = 96) -> str:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    """`to-qasm LEAN_FILE NAME`, `to-lean QASM_FILE [--strings]`, `count QASM_FILE`."""
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
     p = sub.add_parser("to-qasm")
     p.add_argument("lean_file", type=Path)
     p.add_argument("name", help="the name of the `def`, e.g. original")
     p = sub.add_parser("to-lean")
     p.add_argument("qasm_file", type=Path)
-    p.add_argument("--strings", action="store_true", help="one gate per line instead of a Lean list")
+    p.add_argument("--strings", action="store_true",
+                   help="one gate per line instead of a Lean list")
     p = sub.add_parser("count")
     p.add_argument("qasm_file", type=Path)
     args = parser.parse_args()
@@ -124,7 +144,8 @@ def main() -> None:
     n, gates = from_qasm(args.qasm_file.read_text())
     if args.command == "count":
         t = sum(g.split()[0] in ("T", "Tdg") for g in gates)
-        print(f"{n} qubits, {len(gates)} gates, T-count {t}, CNOT count {sum(g.startswith('CX') for g in gates)}")
+        cx = sum(g.startswith("CX") for g in gates)
+        print(f"{n} qubits, {len(gates)} gates, T-count {t}, CNOT count {cx}")
     elif args.strings:
         print("\n".join(gates))
     else:

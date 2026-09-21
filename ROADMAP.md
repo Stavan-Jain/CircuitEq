@@ -551,12 +551,15 @@ than evaluation.
 
 ### Rung 7 — Agent milestone A: reproduce, then extend
 
-**Status (18 September 2026).** Not started, and until now every alignment
-was found by a person or by the survey's diff script. A first version of
-the harness is pulled forward to the top of `QUEUE.md` (item 1), so that the
-agent is measured while the library grows rather than after Rung 6. The
-acceptance below is unchanged; the early runs are the baseline it is read
-against.
+**Status (21 September 2026).** A draft harness exists (`benchmarks/harness/`,
+`QUEUE.md` item 1, pulled forward so that the agent is measured while the
+library grows rather than after Rung 6): three runs on one held-out
+1000-gate pair on 19 September, the third proved; an optimiser harness built
+on the same pieces, not yet run; and a catalogue of 147 real circuits with
+390 measured pairs as the held-out ladder (`benchmarks/circuits/`). Before
+those runs every alignment was found by a person or by the survey's diff
+script. The acceptance below is unchanged; the early runs are the baseline
+it is read against.
 
 **Goal.** Establish that an agent can drive the library, on both proof shapes.
 

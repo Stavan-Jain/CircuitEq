@@ -9,8 +9,9 @@ how far are their outputs from what the library can prove today?
 
 ## The tools
 
-- **PyZX 0.9.0**, in the virtualenv `/tmp/circuiteq-pyzx-venv` (with numpy),
-  through `scripts/check_pyzx_benchmarks.optimize`: `teleport`
+- **PyZX 0.9.0**, in the virtualenv `~/.circuiteq-harness/envs/pyzx` (with
+  numpy; `benchmarks/circuits/README.md`, "Reproduce", has the install),
+  through `optimize` in `scripts/check_pyzx_benchmarks.py`: `teleport`
   (`teleport_reduce`, then `basic_optimization`) and `full_reduce` (with
   extraction, then `basic_optimization`).
 - **TZAP 0.6.1** (`github.com/qqq-wisc/tzap`, Apache-2.0), the PyPI wheel
@@ -76,16 +77,29 @@ Here TZAP's output is exactly equal, and at five qubits the pairs are within
 reach of the whole-register basis decide. Both are harness tasks
 (`tof_3_tzap`, `barenco_tof_3_tzap`), and both were certified through the
 harness's judge with `by decide +kernel` (restatement, the three standard
-axioms, kernel replay; 24 s and 26 s): T-count 15 and 16, against the 19 and
-24 of the promoted benchmarks. They do not cut into segments either (the
+axioms, kernel replay; 24 s and 26 s), by hand with `setup` and `./submit`
+rather than in a recorded run, so `results.jsonl` has no row for them:
+T-count 15 and 16, against the 19 and 24 of the promoted benchmarks. They do
+not cut into segments either (the
 longest segment spans most of the pair), so the same circuits at larger
 sizes need the Hadamard-variable form.
 
 ## Reproducing
 
+The scripts that first made these measurements (`optimisers.py`,
+`distance.py` and `tzap_probe.py`, once in this directory) were folded into
+`scripts/circuit_pairs.py`, whose `probe` prints the same table for one
+circuit: the twins it makes itself (the peephole pass, both PyZX pipelines,
+TZAP at `-O2`) and any ready-made twin given with `--against`. Segments are
+found through random projections of the prefix states rather than the
+states themselves, so those columns agree with the tables above up to
+chance.
+
 ```bash
+PY=~/.circuiteq-harness/envs/pyzx/bin/python
 python3 scripts/peephole_pairs.py --qubits 8 --gates 1000 --seed 1 --out pair.json
-/tmp/circuiteq-pyzx-venv/bin/python benchmarks/harness/notes/optimisers.py pair.json OUTDIR
-/tmp/circuiteq-pyzx-venv/bin/python benchmarks/harness/notes/distance.py OUTDIR   # expects pair.json there
-/tmp/circuiteq-pyzx-venv/bin/python benchmarks/harness/notes/tzap_probe.py pair.json OUTDIR/tzap
+$PY scripts/circuit_pairs.py probe pair.json                  # peephole, PyZX x2, TZAP -O2
+CIRCUITEQ_TZAP_ARGS="-Osuper --decompose-rz --decompose-cz" \
+  $PY scripts/circuit_pairs.py probe pair.json --twin tzap    # TZAP at another level
+$PY scripts/circuit_pairs.py probe pair.json --twin --against out.qasm   # a twin made elsewhere
 ```

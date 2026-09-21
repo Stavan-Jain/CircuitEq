@@ -71,7 +71,13 @@ with a summary table, and the record of which declarations a proof uses
    for every miss; a run is reproducible from commit, prompt and task;
    submissions that use `native_decide`, `sorry`, `debug.skipKernelTC` or
    an edited statement are rejected. S to M. Depends on nothing; the
-   optimiser track on item 2.
+   optimiser track on item 2. Since this was written (21 September 2026):
+   the harness, its automated judge (restatement, axioms, kernel replay;
+   the `debug.*` guard is in CI) and the optimiser track exist in
+   `benchmarks/harness/`, and the held-out ladder is the circuit
+   catalogue; the task set is the one recorded there, not the one planned
+   above. Still open: repeated runs with a summary table and the
+   declaration record ("In flight").
 
 2. **Cost functions in Lean.** The roadmap's architecture says costs are
    computed in Lean so that "this circuit has T-count 19" is a checked

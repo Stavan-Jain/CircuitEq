@@ -2,10 +2,9 @@
 
 Not in `PLAYBOOK.md` yet, on purpose. The playbook is installed as the only
 guide of an agent under test, so it may describe only what the library
-commit under test contains. The tools below exist in the uncommitted branch
-`claude/phase-composition` (worktree
-`.claude/worktrees/agent-a4015d651918f20ea`, based on origin/main `a9a80ed`;
-builds warning-free, axiom policy and one-thread kernel replay pass, checked
+commit under test contains. The tools below exist on the branch
+`claude/phase-composition`, not merged yet (based on `a9a80ed`; builds
+warning-free, axiom policy and one-thread kernel replay pass, checked
 19 September 2026). When that branch lands:
 
 1. replace the `≡ₚ` bullet of "The objects" (it says `≡ₚ` has no

@@ -197,8 +197,9 @@ Rules that follow, for anyone adding to the library:
   `teleport` (phase teleportation, skeleton-preserving, the one that gives
   alignable T-count pairs), and translates `cz` to `H; CX; H` and
   `rz(k·π/4)` to the diagonal Clifford+T gate with that matrix. A `tzap`
-  pipeline (https://github.com/qqq-wisc/tzap) is queued; TZAP reads and
-  writes the same `rz` convention as PyZX.
+  pipeline (https://github.com/qqq-wisc/tzap) for this script is queued
+  (`QUEUE.md` item 5); `scripts/circuit_pairs.py` already runs TZAP as a twin
+  kind. TZAP reads and writes the same `rz` convention as PyZX.
 - `scripts/scale_test.py` — the scale ladder (`benchmarks/scale/`): seeded
   families (`clifford`, `cnot_t` random; `ghz`, `surface`, `ccz_net`
   structured), PyZX pipelines including the peephole `basic`, `--chunk G`
@@ -208,17 +209,46 @@ Rules that follow, for anyone adding to the library:
   decide of a benchmark module; `scripts/chunks.py` is what both share.
 - `PLAYBOOK.md` — the prover's guide: what exists, what it costs, and in
   which order to try it on a concrete pair. The agent harness installs it
-  as the `CLAUDE.md` of every run, so it is all an agent under test knows
-  about the library. **When a checker, a tactic, a certificate step or a
-  block theorem lands, update its decision list in the same commit**, and
-  the commit named at its top.
-- `scripts/agent_harness.py`, `benchmarks/harness/` — the agent harness for
-  the equivalence-checking task (`benchmarks/harness/README.md`): one fixed
-  prompt (`PROMPT.md`), tasks as circuit pairs, a warm clone of a library
-  commit with the answer held out, a budget, a memory watchdog, and a judge
-  that restates the claim and checks its axioms. It refuses to run lake
-  where mathlib is not already compiled. Changing the prompt, the judge or
-  the agent configuration changes the instrument: bump `HARNESS_VERSION`.
+  as the `CLAUDE.md` of every run (`benchmarks/harness/PLAYBOOK.core.md`
+  for the `core` configuration, the modules up to `Semantics.lean`), so it
+  is all an agent under test knows about the library. **When a checker, a
+  tactic, a certificate step or a block theorem lands, update its decision
+  list in the same commit** (both playbooks if the module is in
+  `CORE_MODULES`), and the commit named at its top.
+- `scripts/agent_harness.py`, `scripts/optimizer_harness.py`,
+  `benchmarks/harness/` — the agent harnesses (`benchmarks/harness/README.md`).
+  The equivalence one: a fixed prompt (`PROMPT.md`), tasks as circuit pairs
+  under `tasks/`, a warm clone of a library commit with the answer held out,
+  a budget, a memory watchdog, and a judge that restates the claim, checks
+  its axioms and replays the solution through the kernel (`leanchecker`).
+  The optimiser one is built on the same pieces (`PROMPT.optimize.md`,
+  `opt-tasks/`, a cost measured in Lean, the best accepted submission
+  judged in a fresh clone). `tools/qasm.py` is the exact Lean-to-QASM
+  converter every run gets as `./qasm`; `notes/` holds measurements;
+  `results/` keeps each recorded run's solution, `changes.diff` and
+  `judge.json`, with a row in `results.jsonl` that a person marks
+  `reviewed` after reading the diff. Both refuse to run lake where mathlib
+  is not already compiled. Changing a prompt, the judge or the agent
+  configuration changes the instrument: bump `HARNESS_VERSION` or
+  `OPT_HARNESS_VERSION`. No Lean under `benchmarks/` is in a `lean_lib`:
+  CI never builds it, only the text guard scans it.
+- `benchmarks/circuits/`, `scripts/circuit_sources.py`,
+  `scripts/circuit_pairs.py`, `scripts/peephole_pairs.py` — the circuit
+  catalogue (`benchmarks/circuits/README.md`): 147 real Clifford+T circuits
+  (the Feynman suite, QASMBench, TZAP's corpora, QECUnitaryCircuits and
+  parametric generators) in four tiers, fetched at pinned commits into
+  `~/.circuiteq-harness/circuit-cache` and translated into the alphabet
+  exactly or refused with the reason: no rotation is approximated, every
+  translation is checked numerically with the global phase, and
+  `manifest.json` holds every hash. `circuit_pairs.py` makes twins (the
+  peephole pass, PyZX's two pipelines, TZAP, and the Nam et al., T-par and
+  PyZX outputs published for the Feynman suite), records the relation that
+  actually holds and each pair's diff and segmentation (`pairs/index.json`),
+  and writes `optimization.json`, the uncertified T-counts per circuit.
+  **The licence rule:** a pair whose twin comes from a source without a
+  clear licence (Nam et al., T-par) lives in the cache only, never in the
+  repository. `peephole_pairs.py` draws seeded random pairs equal by the
+  library's own rules. CI runs the scripts' self-tests.
 - `scripts/AxiomCheck.lean` — CI axiom policy; not in any `lean_lib`.
 - `scripts/check_debug_options.py`, `scripts/SkipKernelTCFixture.lean`,
   `scripts/check_replay_fixture.sh` — the kernel-replay policy's text guard

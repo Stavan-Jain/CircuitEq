@@ -89,13 +89,12 @@ COSTS = {
 # optimiser from ignoring size altogether (decided 19 September 2026).
 DEFAULT_COST_ORDER = ("tCount", "cxCount", "gateCount")
 
-# Where `./submit` keeps a copy of every accepted submission (never part of the manifest).
-ACCEPTED = Path(".harness") / "accepted"
-# The judge's scratch module, shared with the equivalence judge. A solution may not import it.
-JUDGE_FILE = "Harness/Judge.lean"
+# Where `./submit` keeps a copy of every accepted submission, and the judge's scratch module
+# (a solution may not import it): named by the equivalence harness, whose manifest skips both.
+ACCEPTED = Path(ah.ACCEPTED_DIR)
+JUDGE_FILE = ah.JUDGE_FILE
 COST_THEOREM = "Quantum.Circuit.Harness.Judge.cost"
 MEASURE_RE = re.compile(r"^\[(\d+), (\d+), (\d+)\]\s*$", re.M)
-IMPORT_RE = re.compile(r"^\s*(?:(?:public|private|meta)\s+)*import\s+(?:all\s+)?(\S+)", re.M)
 
 # The stub's proof of `equiv`, per relation: it must typecheck against `optimized := original`.
 STUB_PROOFS = {
@@ -542,49 +541,16 @@ def measure_cost(ws: Path, circuit: str, log: Path, timeout_s: float, limit_mb: 
     return cost, []
 
 
-def solution_files(ws: Path) -> list[str]:
-    """The files of a submission: `Solution.lean` and everything under `Solution/`."""
-    rels = ["Solution.lean"] if (ws / "Solution.lean").is_file() else []
-    if (ws / "Solution").is_dir():
-        rels += sorted(str(p.relative_to(ws)) for p in (ws / "Solution").rglob("*")
-                       if p.is_file() and "__pycache__" not in p.parts)
-    return rels
-
-
 def fingerprint(root: Path, rels: list[str]) -> dict[str, str]:
     return {rel: hashlib.sha256((root / rel).read_bytes()).hexdigest() for rel in rels}
-
-
-def foreign_imports(ws: Path, manifest: dict[str, str]) -> list[str]:
-    """Reasons to reject: a solution module importing Lean code of this workspace that is
-    neither a file that existed at the start nor under `Solution/`. Such a module is not in
-    the copy that is kept, is not replayed through the kernel (`leanchecker Solution` covers
-    the `Solution` modules), and may be the judge's own scratch module."""
-    reasons = []
-    for rel in solution_files(ws):
-        if not rel.endswith(".lean"):
-            continue
-        text = ah.strip_lean_comments((ws / rel).read_text(errors="replace"))
-        for module in IMPORT_RE.findall(text):
-            path = str(ah.module_path(module))
-            if module.split(".")[0] != "Solution" and path not in manifest and (ws / path).exists():
-                reasons.append(f"{rel}: imports `{module}`, which is neither part of the workspace "
-                               "as given nor under `Solution/`; move it under `Solution/`")
-    return reasons
 
 
 def judge_solution(ws: Path, relation: str, manifest: dict[str, str], log: Path,
                    timeout_s: float, limit_mb: int, watch: bool) -> dict:
     """The optimisation judge: the rules and the proof of `equiv` exactly as the equivalence
-    harness judges them, then the cost of `optimized`. The report is that judge's, with
-    `cost` added; `ACCEPT` means proved and measured."""
-    modified, deleted, added = ah.changed_files(ws, manifest)
-    foreign = foreign_imports(ws, manifest)
-    (ws / JUDGE_FILE).unlink(missing_ok=True)
-    if foreign:
-        return {"verdict": "REJECT", "claim": None, "axioms": None, "reasons": foreign,
-                "warnings": [], "modified": modified, "deleted": deleted, "added": added,
-                "broke_rules": True, "cost": None}
+    harness judges them (`ah.judge_workspace`: the files that changed, foreign imports, the
+    scan of new Lean, then the restatement), then the cost of `optimized`. The report is that
+    judge's, with `cost` added; `ACCEPT` means proved and measured."""
     report = ah.judge_workspace(ws, relation, ["equiv"], manifest, log, timeout_s, limit_mb, watch)
     report["cost"] = None
     if report["verdict"] == "ACCEPT":
@@ -619,7 +585,7 @@ def read_snapshots(ws: Path, order) -> list[dict]:
 def stage_snapshot(ws: Path) -> tuple[Path, dict[str, str]]:
     """Copy the submission aside before it is judged, so what is kept is what was judged."""
     stage = ws / ACCEPTED / f".pending-{uuid.uuid4().hex[:8]}"
-    files = solution_files(ws)
+    files = ah.solution_files(ws)
     for rel in files:
         (stage / "files" / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ws / rel, stage / "files" / rel)
@@ -650,19 +616,6 @@ def restore_snapshot(snapshot: Path, ws: Path) -> None:
         shutil.copytree(snapshot / "files" / "Solution", ws / "Solution")
 
 
-def read_submissions(ws: Path) -> list[dict]:
-    path = ws / ".harness" / "submissions.jsonl"
-    if not path.exists():
-        return []
-    out = []
-    for line in path.read_text().splitlines():
-        try:
-            out.append(json.loads(line))
-        except json.JSONDecodeError:
-            continue
-    return out
-
-
 def cmd_submit(args) -> None:
     """What `./submit` runs inside a workspace. Advisory: the run is scored from outside,
     from the copies this keeps."""
@@ -677,11 +630,11 @@ def cmd_submit(args) -> None:
     stage, before = stage_snapshot(ws)
     try:
         report = judge_solution(ws, run["relation"], manifest, ws / ".harness" / "submit.log",
-                                1800, run["memory_limit_mb"], watch=False)
+                                ah.JUDGE_TIMEOUT_S, run["memory_limit_mb"], watch=False)
     except BaseException:  # the harness refused, or the deadline came: leave no half copy
         shutil.rmtree(stage, ignore_errors=True)
         raise
-    if report["verdict"] == "ACCEPT" and fingerprint(ws, solution_files(ws)) != before:
+    if report["verdict"] == "ACCEPT" and fingerprint(ws, ah.solution_files(ws)) != before:
         report.update(verdict="REJECT", reasons=[
             "`Solution.lean` or a file under `Solution/` changed while it was being judged, so "
             "nothing was kept; submit again and leave them alone until it returns"])
@@ -759,18 +712,18 @@ def final_judge(root: Path, max_candidates: int = 3, judge=judge_solution) -> di
     order, original = run["cost_order"], run["original_cost"]
     snapshots = read_snapshots(ws, order)
     candidates = [c for c in snapshots if c["score"] <= score(original, order)]
-    submissions = read_submissions(ws)
+    submissions = ah.read_submissions(ws)
 
     shutil.rmtree(root / "judge", ignore_errors=True)
     # The working files as the run left them are one more candidate, judged first because
     # their cost is unknown: an improvement the deadline cut off before `./submit` finished
     # still counts if it passes. Skipped when they are the untouched stub or a kept copy.
     working = None
-    files = solution_files(ws)
+    files = ah.solution_files(ws)
     now_fp = fingerprint(ws, files)
-    kept_fps = [fingerprint(Path(c["dir"]) / "files", solution_files(Path(c["dir"]) / "files"))
+    kept_fps = [fingerprint(Path(c["dir"]) / "files", ah.solution_files(Path(c["dir"]) / "files"))
                 for c in snapshots]
-    stub_fp = fingerprint(meta / "snapshot", solution_files(meta / "snapshot"))
+    stub_fp = fingerprint(meta / "snapshot", ah.solution_files(meta / "snapshot"))
     if files and now_fp != stub_fp and now_fp not in kept_fps:
         stage = root / "judge" / "working-files"
         for rel in files:
@@ -779,7 +732,7 @@ def final_judge(root: Path, max_candidates: int = 3, judge=judge_solution) -> di
         where = root / "judge" / "working"
         fresh_workspace(root, where, manifest)
         restore_snapshot(stage, where)
-        report = judge(where, run["relation"], manifest, meta / "judge.log", 1800,
+        report = judge(where, run["relation"], manifest, meta / "judge.log", ah.JUDGE_TIMEOUT_S,
                        run["memory_limit_mb"], True)
         working = {"snapshot": "working files", "claimed_cost": None, "elapsed_s": None,
                    "verdict": report["verdict"], "cost": report["cost"],
@@ -793,7 +746,7 @@ def final_judge(root: Path, max_candidates: int = 3, judge=judge_solution) -> di
         where = root / "judge" / str(cand["k"])
         fresh_workspace(root, where, manifest)
         restore_snapshot(Path(cand["dir"]), where)
-        report = judge(where, run["relation"], manifest, meta / "judge.log", 1800,
+        report = judge(where, run["relation"], manifest, meta / "judge.log", ah.JUDGE_TIMEOUT_S,
                        run["memory_limit_mb"], True)
         attempts.append({"snapshot": cand["k"], "claimed_cost": cand["cost"],
                          "elapsed_s": cand.get("elapsed_s"), "verdict": report["verdict"],
@@ -944,7 +897,7 @@ def record_run(root: Path, timed_out: bool = False, agent_wall: float | None = N
     keep.mkdir(exist_ok=True)
     if report["best_snapshot"] is not None:
         source = root / "judge" / str(report["best_snapshot"])
-        for rel in solution_files(source):
+        for rel in ah.solution_files(source):
             (keep / rel).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source / rel, keep / rel)
     for name in ("changes.diff", "judge.json"):
@@ -989,7 +942,7 @@ def cmd_selftest(_args) -> None:
     assert MEASURE_RE.search("warning: x\n[21, 18, 45]\n").groups() == ("21", "18", "45")
     assert MEASURE_RE.search("[21, 18]\n") is None
     lean = "import A.B\n  public import C\nimport all D.E\n-- x\ndef import_ := 1"
-    assert IMPORT_RE.findall(lean) == ["A.B", "C", "D.E"]
+    assert ah.IMPORT_RE.findall(lean) == ["A.B", "C", "D.E"]
     for relation in ah.RELATIONS:
         text = render_solution({"qubits": 3, "relation": relation})
         assert "{" not in text and ah.RELATIONS[relation][1] in text, text
@@ -1019,14 +972,14 @@ def cmd_selftest(_args) -> None:
         (ws / "Solution").mkdir()
         (ws / "Solution" / "Lemmas.lean").write_text("import Harness.Task\nimport Solution.More\n")
         (ws / "Scratch.lean").write_text("-- not part of a submission\n")
-        assert solution_files(ws) == ["Solution.lean", "Solution/Lemmas.lean"]
-        assert foreign_imports(ws, manifest) == []
+        assert ah.solution_files(ws) == ["Solution.lean", "Solution/Lemmas.lean"]
+        assert ah.foreign_imports(ws, manifest) == []
         (ws / "Solution.lean").write_text("import Scratch\n-- import Harness.Judge\ncost 4 9\n")
-        foreign = foreign_imports(ws, manifest)
+        foreign = ah.foreign_imports(ws, manifest)
         assert len(foreign) == 1 and "Scratch" in foreign[0], "the commented import does not count"
         (ws / "Harness" / "Judge.lean").write_text("theorem planted : False := sorry\n")
         (ws / "Solution.lean").write_text("import Harness.Judge\ncost 4 9\n")
-        assert "Harness.Judge" in foreign_imports(ws, manifest)[0], "the judge's own module"
+        assert "Harness.Judge" in ah.foreign_imports(ws, manifest)[0], "the judge's own module"
         report = judge_solution(ws, "u", manifest, ws / "log", 1, 1, watch=False)
         assert report["verdict"] == "REJECT" and report["cost"] is None and report["broke_rules"]
         assert not (ws / "Harness" / "Judge.lean").exists(), "removed before any build"
@@ -1035,7 +988,7 @@ def cmd_selftest(_args) -> None:
             (ws / "Solution.lean").write_text(text)
             (ws / "Solution" / "Lemmas.lean").write_text(lemma or "-- lemmas\n")
             stage, files = stage_snapshot(ws)
-            assert fingerprint(ws, solution_files(ws)) == files
+            assert fingerprint(ws, ah.solution_files(ws)) == files
             return keep_snapshot(ws, stage, {"cost": cost,
                                              "elapsed_s": 60 * len(read_snapshots(ws, order))})
 
@@ -1062,7 +1015,8 @@ def cmd_selftest(_args) -> None:
             words = (where / "Solution.lean").read_text().split()
             seen.append(words)
             ok = words[:1] == ["cost"] and "broken" not in words
-            cost = {"tCount": int(words[1]), "cxCount": 0, "gateCount": int(words[2])} if ok else None
+            cost = ({"tCount": int(words[1]), "cxCount": 0, "gateCount": int(words[2])}
+                    if ok else None)
             return {"verdict": "ACCEPT" if ok else "REJECT", "claim": "equiv" if ok else None,
                     "axioms": list(ah.ALLOWED_AXIOMS) if ok else None,
                     "reasons": [] if ok else ["`lake build Solution` failed"], "warnings": [],
@@ -1071,7 +1025,8 @@ def cmd_selftest(_args) -> None:
 
         final = final_judge(root, 3, fake_judge)
         assert seen[0] == ["garbage"], "the working files at the deadline are judged first"
-        assert [w[1:3] for w in seen[1:]] == [["2", "8"], ["3", "7"]], "the next cheapest on failure"
+        assert [w[1:3] for w in seen[1:]] == [["2", "8"], ["3", "7"]], \
+            "the next cheapest on failure"
         assert final["improved"] and final["best_snapshot"] == 4 and final["best_accept_s"] == 180
         assert final["best_cost"] == {"tCount": 3, "cxCount": 0, "gateCount": 7}
         assert final["cut_off_by_limit"] == [] and len(final["reasons"]) == 2, final
@@ -1087,9 +1042,11 @@ def cmd_selftest(_args) -> None:
         seen.clear()
         final = final_judge(root, 3, fake_judge)
         assert [w[1:3] for w in seen] == [["1", "9"]] and final["best_snapshot"] == "working files"
-        assert final["best_cost"] == {"tCount": 1, "cxCount": 0, "gateCount": 9} and final["improved"]
+        assert final["best_cost"] == {"tCount": 1, "cxCount": 0, "gateCount": 9}
+        assert final["improved"]
         shutil.copyfile(ws / ACCEPTED / "4" / "files" / "Solution.lean", ws / "Solution.lean")
-        shutil.copytree(ws / ACCEPTED / "4" / "files" / "Solution", ws / "Solution", dirs_exist_ok=True)
+        shutil.copytree(ws / ACCEPTED / "4" / "files" / "Solution", ws / "Solution",
+                        dirs_exist_ok=True)
         seen.clear()
         final = final_judge(root, 3, fake_judge)
         assert final["best_snapshot"] == 4 and all(w != ["garbage"] for w in seen)

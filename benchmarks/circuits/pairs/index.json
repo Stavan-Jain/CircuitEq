@@ -20500,7 +20500,7 @@
    "twin": "pyzx_full_reduce",
    "qubits": 12,
    "tier": 3,
-   "in_repo": true,
+   "in_repo": false,
    "status": "skipped: 18220 gates is past the bound of 8000 for a 240 s PyZX run",
    "twin_tool": {
     "tool": "pyzx full_reduce + extract_circuit + basic_optimization (scripts/check_pyzx_benchmarks.py optimize)",
@@ -20513,7 +20513,7 @@
    "twin": "pyzx_teleport",
    "qubits": 12,
    "tier": 3,
-   "in_repo": true,
+   "in_repo": false,
    "status": "skipped: 18220 gates is past the bound of 8000 for a 240 s PyZX run",
    "twin_tool": {
     "tool": "pyzx teleport_reduce + basic_optimization (scripts/check_pyzx_benchmarks.py optimize)",
@@ -21239,7 +21239,7 @@
    "twin": "pyzx_published",
    "qubits": 36,
    "tier": 3,
-   "in_repo": true,
+   "in_repo": false,
    "status": "skipped: the published input is not this circuit: numerically unchecked (none (a basis input spreads over more than 4096 basis states))"
   },
   {

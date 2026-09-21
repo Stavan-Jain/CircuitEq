@@ -182,7 +182,7 @@ script's Python mirror answers the same question before Lean runs.
 ## Reproduce
 
 ```bash
-PY=/tmp/circuiteq-pyzx-venv/bin/python
+PY=~/.circuiteq-harness/envs/pyzx/bin/python
 $PY scripts/scale_test.py --family clifford --sizes 20 40 --chunk 8 \
   --workdir /tmp/scale --results benchmarks/scale/results.json
 $PY scripts/scale_test.py --family clifford --sizes 80 --chunk 4 --timeout 2400 \

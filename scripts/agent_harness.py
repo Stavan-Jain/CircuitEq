@@ -101,17 +101,23 @@ GLOBAL_REDACT = (
      "replacement": "BENCHMARKS = {}", "flags": "ms"},
 )
 
+# The judge's scratch module (a solution may not import it), where the optimisation harness
+# keeps its copies of accepted submissions, and how long one judge build or replay may take.
+JUDGE_FILE = "Harness/Judge.lean"
+ACCEPTED_DIR = ".harness/accepted"
+JUDGE_TIMEOUT_S = 1800
 # Never part of the manifest: build output, the copies the optimisation harness keeps of
 # accepted submissions, the judge's scratch file, the log `./submit` appends to.
-MANIFEST_SKIP_DIRS = (".lake", ".harness/accepted")
-MANIFEST_SKIP_FILES = ("Harness/Judge.lean", ".harness/submissions.jsonl", ".harness/run.json",
+MANIFEST_SKIP_DIRS = (".lake", ACCEPTED_DIR)
+MANIFEST_SKIP_FILES = (JUDGE_FILE, ".harness/submissions.jsonl", ".harness/run.json",
                        ".harness/submit.log", ".harness/manifest.json")
 EDITABLE = ("Solution.lean",)
 
 # Text the agent's Lean sources may not contain (comments are stripped first).
 REJECT_PATTERNS = (
     (re.compile(r"\bnative_decide\b"), "`native_decide`"),
-    (re.compile(r"\bdebug\.[A-Za-z]"), "a `debug.*` option (`debug.skipKernelTC` skips the kernel)"),
+    (re.compile(r"\bdebug\.[A-Za-z]"),
+     "a `debug.*` option (`debug.skipKernelTC` skips the kernel)"),
     (re.compile(r"\b(ofReduceBool|reduceBool|ofReduceNat|reduceNat|trustCompiler)\b"),
      "a compiler-trust primitive"),
     (re.compile(r"^\s*(private\s+|protected\s+)?axiom\b", re.M), "an `axiom` declaration"),
@@ -119,13 +125,15 @@ REJECT_PATTERNS = (
 )
 # Not rejected, but listed for the person who reads the diff.
 WARN_PATTERNS = (
-    (re.compile(r"\bset_option\s+(?!(?:Elab\.async|maxRecDepth|maxHeartbeats|trace\.|pp\.|linter\.)[\w.]*\b)"),
+    (re.compile(r"\bset_option\s+"
+                r"(?!(?:Elab\.async|maxRecDepth|maxHeartbeats|trace\.|pp\.|linter\.)[\w.]*\b)"),
      "a `set_option` other than Elab.async, maxRecDepth, maxHeartbeats, trace.*, pp.*, linter.*"),
     (re.compile(r"\bunsafe\b"), "`unsafe`"),
     (re.compile(r"\brun_cmd\b|\brun_elab\b|\brun_meta\b|#eval\b"), "code run at elaboration time"),
     (re.compile(r"\bIO\.(Process|FS)\b"), "process or file-system access from Lean"),
     (re.compile(r"\binitialize\b|\bbuiltin_initialize\b"), "`initialize`"),
-    (re.compile(r"\b(local\s+|scoped\s+)?(notation|infix|infixl|infixr|prefix|postfix|macro_rules)\b"),
+    (re.compile(r"\b(local\s+|scoped\s+)?"
+                r"(notation|infix|infixl|infixr|prefix|postfix|macro_rules)\b"),
      "new notation or macro rules"),
 )
 
@@ -532,13 +540,15 @@ def check_manifest_revs(ws: Path, packages: Path) -> None:
         have = git("rev-parse", "HEAD", cwd=d)
         if have != rev:
             raise HarnessError(f"package `{name}` is at {have[:12]}, the manifest pins {rev[:12]}; "
-                               "lake would fetch. Use a packages directory built for this manifest.")
+                               "lake would fetch. Use a packages directory built for this "
+                               "manifest.")
 
 
 def assert_lake_safe(ws: Path) -> None:
     link = ws / ".lake" / "packages"
     if not link.exists() or not compiled_mathlib(link.resolve()):
-        raise HarnessError(f"refusing to run lake in {ws}: `.lake/packages` has no compiled mathlib")
+        raise HarnessError(f"refusing to run lake in {ws}: `.lake/packages` has no compiled "
+                           "mathlib")
 
 
 def ps_snapshot() -> dict[int, tuple[int, int, str]]:
@@ -709,9 +719,11 @@ def cmd_prepare(args) -> None:
     log = base / ".harness-prepare.log"
     print(f"building the library at {commit[:12]} in {base} (minutes; log: {log})")
     t0 = time.time()
-    rc, out = run_guarded(["lake", "build"], base, log, args.timeout_min * 60, args.memory_gb * 1024)
+    rc, out = run_guarded(["lake", "build"], base, log, args.timeout_min * 60,
+                          args.memory_gb * 1024)
     if rc != 0:
-        raise HarnessError(f"`lake build` failed in the base (exit {rc}); see {log}\n" + out[-2000:])
+        raise HarnessError(f"`lake build` failed in the base (exit {rc}); see {log}\n"
+                           + out[-2000:])
     cold = time.time() - t0
     t0 = time.time()
     rc, _ = run_guarded(["lake", "build"], base, log, 600, args.memory_gb * 1024)
@@ -719,7 +731,8 @@ def cmd_prepare(args) -> None:
     if rc != 0:
         raise HarnessError(f"the second `lake build` failed; see {log}")
     marker.write_text(json.dumps({"commit": commit, "packages": str(packages), "built": now(),
-                                  "cold_build_s": round(cold), "warm_build_s": round(warm)}, indent=2))
+                                  "cold_build_s": round(cold), "warm_build_s": round(warm)},
+                                 indent=2))
     print(f"ready: cold build {cold:.0f} s, warm rebuild {warm:.0f} s")
 
 
@@ -798,9 +811,10 @@ def build_manifest(ws: Path) -> dict[str, str]:
 
 def find_python_env(explicit: str | None) -> Path | None:
     """A virtual environment whose Python has numpy and pyzx (`scripts/tcount_survey.py`
-    imports both), or `None`. The system Python of this machine has neither."""
+    imports both), or `None`: `--python-env`, else `CIRCUITEQ_HARNESS_PYENV`, else `envs/pyzx`
+    under the harness home, next to TZAP's. The system Python of this machine has neither."""
     for c in (explicit, os.environ.get("CIRCUITEQ_HARNESS_PYENV"),
-              Path.home() / ".circuiteq-harness/envs/pyzx", "/tmp/circuiteq-pyzx-venv"):
+              harness_home() / "envs" / "pyzx"):
         if c and (Path(c) / "bin" / "python").exists():
             ok = subprocess.run([str(Path(c) / "bin" / "python"), "-c", "import numpy, pyzx"],
                                 capture_output=True)
@@ -822,11 +836,12 @@ def find_tzap() -> tuple[Path | None, str | None]:
                   str(harness_home() / "envs" / "tzap" / "bin" / "tzap")):
             if c and Path(c).is_file():
                 try:
-                    ok = subprocess.run([c, "--version"], capture_output=True, text=True, timeout=30)
+                    ok = subprocess.run([c, "--version"], capture_output=True, text=True,
+                                        timeout=30)
                 except (OSError, subprocess.TimeoutExpired):
                     continue
                 if ok.returncode == 0:
-                    found = (Path(c), (ok.stdout or ok.stderr).strip().split()[-1])
+                    found = (Path(c), ((ok.stdout or ok.stderr).split() or ["?"])[-1])
                     break
         _TZAP.append(found)
     return _TZAP[0]
@@ -891,7 +906,8 @@ def setup_run(args, task: dict, customise=None) -> dict:
     commit = git("rev-parse", args.commit)
     base = base_dir(commit)
     if not (base / ".harness-base.json").exists():
-        raise HarnessError(f"no warm base for {commit[:12]}; run `prepare --commit {args.commit}` first")
+        raise HarnessError(f"no warm base for {commit[:12]}; "
+                           f"run `prepare --commit {args.commit}` first")
     run_id = new_run_id()
     root = harness_home() / "runs" / run_id
     ws, meta = root / "ws", root / "meta"
@@ -932,7 +948,8 @@ def setup_run(args, task: dict, customise=None) -> dict:
     if python_env is None:
         notes.append("no Python with numpy and pyzx found: the alignment script will not import")
     else:
-        (ws / "python").write_text(PYTHON_SH.replace("{python}", str(python_env / "bin" / "python")))
+        (ws / "python").write_text(
+            PYTHON_SH.replace("{python}", str(python_env / "bin" / "python")))
         (ws / "python").chmod(0o755)
     tzap, tzap_version = find_tzap()
     if tzap is not None:
@@ -1015,7 +1032,7 @@ def judge_workspace(ws: Path, relation: str, claims: list[str], manifest: dict[s
         report["reasons"].append("files that existed at the start were changed or deleted: "
                                  + ", ".join(sorted(protected)))
     report["reasons"] += foreign_imports(ws, manifest)
-    (ws / "Harness" / "Judge.lean").unlink(missing_ok=True)  # the judge writes its own, later
+    (ws / JUDGE_FILE).unlink(missing_ok=True)  # the judge writes its own, later
     for rel in sorted(set(added + modified)):
         if rel.endswith(".lean") and (ws / rel).exists():
             rejects, warns = scan_lean(ws / rel, rel)
@@ -1033,14 +1050,15 @@ def judge_workspace(ws: Path, relation: str, claims: list[str], manifest: dict[s
 
     name = "Quantum.Circuit.Harness.Judge.verdict"
     for claim in claims:
-        (ws / "Harness" / "Judge.lean").write_text(
+        (ws / JUDGE_FILE).write_text(
             JUDGE_LEAN.replace("{statement}", judge_statement(relation, claim))
             .replace("{claim}", claim))
-        rc, out = run_guarded(["lake", "env", "lean", "Harness/Judge.lean"], ws, log,
+        rc, out = run_guarded(["lake", "env", "lean", JUDGE_FILE], ws, log,
                               timeout_s, limit_mb, watch)
         axioms = parse_axioms(out, name)
         if rc != 0 or axioms is None:
-            report["reasons"].append(f"`{claim}`: the restatement does not typecheck:\n" + out[-1500:])
+            report["reasons"].append(f"`{claim}`: the restatement does not typecheck:\n"
+                                     + out[-1500:])
             continue
         extra = [a for a in axioms if a not in ALLOWED_AXIOMS]
         if extra:
@@ -1056,8 +1074,8 @@ def judge_workspace(ws: Path, relation: str, claims: list[str], manifest: dict[s
                               timeout_s, limit_mb, watch, env={"LEAN_NUM_THREADS": "1"})
         if rc != 0:
             why = "timed out" if rc is None else f"exit {rc}"
-            report["reasons"].append(f"`{claim}`: the kernel replay of the solution failed ({why}):\n"
-                                     + out[-1500:])
+            report["reasons"].append(f"`{claim}`: the kernel replay of the solution failed "
+                                     f"({why}):\n" + out[-1500:])
             report["broke_rules"] = rc is not None and "(kernel)" in out
             return report
         report.update(verdict="ACCEPT", claim=claim, axioms=axioms, reasons=[], replayed=True)
@@ -1073,7 +1091,8 @@ def cmd_submit(args) -> None:
     if args.claim not in CLAIMS:
         sys.exit("usage: ./submit equiv   or   ./submit not_equiv")
     report = judge_workspace(ws, run["relation"], [args.claim], manifest,
-                             ws / ".harness" / "submit.log", 1800, run["memory_limit_mb"], watch=False)
+                             ws / ".harness" / "submit.log", JUDGE_TIMEOUT_S,
+                             run["memory_limit_mb"], watch=False)
     elapsed = None
     if run.get("started"):
         elapsed = round(time.time() - run["started"])
@@ -1081,7 +1100,8 @@ def cmd_submit(args) -> None:
         f.write(json.dumps({"time": now(), "elapsed_s": elapsed, "claim": args.claim,
                             "verdict": report["verdict"]}) + "\n")
     if report["verdict"] == "ACCEPT":
-        print(f"ACCEPT: `{args.claim}` is proved on the axioms {report['axioms']}. You are done; stop.")
+        print(f"ACCEPT: `{args.claim}` is proved on the axioms {report['axioms']}. "
+              "You are done; stop.")
     else:
         print("REJECT")
         for reason in report["reasons"]:
@@ -1116,18 +1136,16 @@ def final_judge(root: Path) -> dict:
     run = json.loads((meta / "run.json").read_text())
     manifest = json.loads((meta / "manifest.json").read_text())
     claims = list(CLAIMS)
-    subs = ws / ".harness" / "submissions.jsonl"
-    submissions = []
-    if subs.exists():
-        submissions = [json.loads(ln) for ln in subs.read_text().splitlines() if ln.strip()]
-        accepted = [s["claim"] for s in submissions if s["verdict"] == "ACCEPT"]
-        if accepted and accepted[-1] in CLAIMS:
-            claims.sort(key=lambda c: c != accepted[-1])
+    submissions = read_submissions(ws)
+    accepted = [s["claim"] for s in submissions if s["verdict"] == "ACCEPT"]
+    if accepted and accepted[-1] in CLAIMS:
+        claims.sort(key=lambda c: c != accepted[-1])
     report = judge_workspace(ws, run["relation"], claims, manifest, meta / "judge.log",
-                             1800, run["memory_limit_mb"], watch=True)
+                             JUDGE_TIMEOUT_S, run["memory_limit_mb"], watch=True)
     report["submissions"] = submissions
     first = next((s for s in submissions if s["verdict"] == "ACCEPT"), None)
-    report["first_accept_s"] = first["elapsed_s"] if first and report["verdict"] == "ACCEPT" else None
+    accepted_run = first is not None and report["verdict"] == "ACCEPT"
+    report["first_accept_s"] = first["elapsed_s"] if accepted_run else None
     write_changes_diff(meta / "snapshot", ws, meta / "changes.diff")
     (meta / "judge.json").write_text(json.dumps(report, indent=2, ensure_ascii=False))
     return report
@@ -1136,9 +1154,24 @@ def final_judge(root: Path) -> dict:
 def write_changes_diff(snapshot: Path, ws: Path, out: Path) -> None:
     """What a workspace changed since its start, for a person to read before trusting a row."""
     diff = subprocess.run(["diff", "-ruN", "--exclude=.lake", "--exclude=.harness",
-                           "--exclude=Judge.lean", str(snapshot), str(ws)],
+                           "--exclude=__pycache__", "--exclude=Judge.lean", str(snapshot), str(ws)],
                           capture_output=True, text=True)
     out.write_text(diff.stdout.replace(str(Path.home()), "~"))  # these files are committed
+
+
+def read_submissions(ws: Path) -> list[dict]:
+    """What `./submit` appended to `submissions.jsonl`, skipping a line torn by the kill at
+    the deadline (the agent's whole session is stopped while `./submit` may be writing)."""
+    path = ws / ".harness" / "submissions.jsonl"
+    if not path.exists():
+        return []
+    out = []
+    for line in path.read_text().splitlines():
+        try:
+            out.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    return out
 
 
 def outcome_of(report: dict) -> str:
@@ -1158,11 +1191,13 @@ def print_report(run: dict, report: dict, root: Path) -> None:
     if report["verdict"] == "ACCEPT":
         when = report["first_accept_s"]
         print(f"  claim `{report['claim']}`, axioms {report['axioms']}, "
-              + (f"first accepted after {when} s" if when is not None else "never submitted by the agent"))
+              + (f"first accepted after {when} s" if when is not None
+                 else "never submitted by the agent"))
     for reason in report["reasons"]:
         print("  - " + reason.splitlines()[0])
     print(f"  added: {report['added'] or 'nothing'}")
-    print(f"  modified: {report['modified'] or 'nothing'}; deleted: {report['deleted'] or 'nothing'}")
+    print(f"  modified: {report['modified'] or 'nothing'}; "
+          f"deleted: {report['deleted'] or 'nothing'}")
     for w in report["warnings"]:
         print(f"  look at: {w}")
     print(f"  read the diff before trusting the verdict: {root / 'meta' / 'changes.diff'}")
@@ -1172,7 +1207,9 @@ def print_report(run: dict, report: dict, root: Path) -> None:
 # run: setup, agent, judge, record
 # --------------------------------------------------------------------------
 
-def agent_argv(config: dict, prompt: str, model: str, subagents: bool, max_usd: float | None) -> list[str]:
+def agent_argv(config: dict, prompt: str, model: str, subagents: bool,
+               max_usd: float | None) -> list[str]:
+    """The command line that runs the agent on `prompt`, from its configuration file."""
     disallowed = list(config.get("disallowed_tools", []))
     if not subagents:
         disallowed += config.get("subagent_tools", [])
@@ -1222,8 +1259,9 @@ def agent_result(transcript: Path) -> dict:
             except json.JSONDecodeError:
                 continue
             if rec.get("type") == "result":
-                result = {k: rec.get(k) for k in ("total_cost_usd", "num_turns", "duration_ms",
-                                                  "duration_api_ms", "usage", "is_error", "subtype")}
+                result = {k: rec.get(k)
+                          for k in ("total_cost_usd", "num_turns", "duration_ms",
+                                    "duration_api_ms", "usage", "is_error", "subtype")}
     return result
 
 
@@ -1249,8 +1287,11 @@ def run_agent(args, run: dict, config: dict, model: str) -> tuple[bool, float, W
     (meta / "run.json").write_text(json.dumps(run, indent=2))
     print(f"[{run['run_id']}] agent `{args.agent}` ({model}), {args.budget_min} min, "
           f"{args.memory_gb} GB per Lean process")
-    signal.signal(signal.SIGTERM, lambda *_: (meta / "harness-signals.log").open("a").write(
-        f"{now()} SIGTERM ignored while the agent runs\n"))
+    def ignore_sigterm(*_) -> None:
+        with (meta / "harness-signals.log").open("a") as f:
+            f.write(f"{now()} SIGTERM ignored while the agent runs\n")
+
+    signal.signal(signal.SIGTERM, ignore_sigterm)
     with (meta / "transcript.jsonl").open("w") as out:
         proc = subprocess.Popen(argv, cwd=ws, stdin=subprocess.DEVNULL, stdout=out,
                                 stderr=subprocess.STDOUT, start_new_session=True)
@@ -1337,7 +1378,8 @@ def record_run(root: Path, timed_out: bool = False, agent_wall: float | None = N
     for name in ("changes.diff", "judge.json"):
         shutil.copyfile(meta / name, keep / name)
     print_report(run, report, root)
-    print(f"  recorded in {results / 'results.jsonl'} (set \"reviewed\" once you have read the diff)")
+    print(f"  recorded in {results / 'results.jsonl'} "
+          '(set "reviewed" once you have read the diff)')
 
 
 def cmd_record(args) -> None:
@@ -1380,11 +1422,13 @@ def cmd_selftest(_args) -> None:
     assert all(len(ln) <= 96 for ln in text.splitlines()) and text.count("CX") == 40
     assert [" ".join(g.split()) for g in text.strip("[]").replace("\n", " ").split(",")] == gates
 
-    src = "theorem a : True := by\n  trivial -- native_decide would be wrong\n/- debug.skipKernelTC /- nested -/ -/\n"
-    assert "native_decide" not in strip_lean_comments(src) and "debug" not in strip_lean_comments(src)
+    src = ("theorem a : True := by\n  trivial -- native_decide would be wrong\n"
+           "/- debug.skipKernelTC /- nested -/ -/\n")
+    stripped = strip_lean_comments(src)
+    assert "native_decide" not in stripped and "debug" not in stripped
     name = "Quantum.Circuit.Harness.Judge.verdict"
-    assert parse_axioms(f"'{name}' depends on axioms: [propext,\n Classical.choice, Quot.sound]", name) \
-        == ["propext", "Classical.choice", "Quot.sound"]
+    axioms_out = f"'{name}' depends on axioms: [propext,\n Classical.choice, Quot.sound]"
+    assert parse_axioms(axioms_out, name) == ["propext", "Classical.choice", "Quot.sound"]
     assert parse_axioms(f"'{name}' does not depend on any axioms", name) == []
     assert parse_axioms("error: unknown constant", name) is None
     assert judge_statement("u", "not_equiv").startswith("¬ Quantum.Circuit.Equivalent ")
@@ -1393,7 +1437,8 @@ def cmd_selftest(_args) -> None:
         ws = Path(tmp) / "ws"
         (ws / "CircuitEq" / "Benchmarks").mkdir(parents=True)
         (ws / ".lake" / "build" / "lib" / "lean" / "CircuitEq" / "Benchmarks").mkdir(parents=True)
-        (ws / "CircuitEq.lean").write_text("import CircuitEq.Semantics\nimport CircuitEq.Benchmarks.Tof3\n")
+        (ws / "CircuitEq.lean").write_text(
+            "import CircuitEq.Semantics\nimport CircuitEq.Benchmarks.Tof3\n")
         (ws / "CircuitEq" / "Semantics.lean").write_text("-- semantics\n")
         (ws / "CircuitEq" / "Benchmarks" / "Tof3.lean").write_text("-- answer\n")
         olean = ws / ".lake" / "build" / "lib" / "lean" / "CircuitEq" / "Benchmarks" / "Tof3.olean"
@@ -1416,11 +1461,13 @@ def cmd_selftest(_args) -> None:
         assert added == ["Solution/Lemmas.lean"]
         report = judge_workspace(ws, "u", ["equiv"], manifest, ws / "log", 1, 1, watch=False)
         assert report["verdict"] == "REJECT" and len(report["reasons"]) == 2, report
-        assert "CircuitEq/Semantics.lean" in report["reasons"][0] and "debug" in report["reasons"][1]
+        assert "CircuitEq/Semantics.lean" in report["reasons"][0]
+        assert "debug" in report["reasons"][1]
 
         notes: list[str] = []
         (ws / "scripts").mkdir()
-        (ws / "scripts" / "certificate.py").write_text("A = 1\nBENCHMARKS = {\n  'x': 1,\n}\nB = 2\n")
+        (ws / "scripts" / "certificate.py").write_text(
+            "A = 1\nBENCHMARKS = {\n  'x': 1,\n}\nB = 2\n")
         apply_redactions(ws, GLOBAL_REDACT, notes)
         assert (ws / "scripts" / "certificate.py").read_text() == "A = 1\nBENCHMARKS = {}\nB = 2\n"
         apply_redactions(ws, GLOBAL_REDACT, notes)
@@ -1456,7 +1503,8 @@ def add_run_options(p: argparse.ArgumentParser) -> None:
 
 
 def add_agent_options(p: argparse.ArgumentParser) -> None:
-    p.add_argument("--agent", default="claude", help="a file under benchmarks/harness/agents, or `none`")
+    p.add_argument("--agent", default="claude",
+                   help="a file under benchmarks/harness/agents, or `none`")
     p.add_argument("--model")
     p.add_argument("--run-index", type=int, default=0)
     p.add_argument("--max-usd", type=float)
@@ -1465,7 +1513,8 @@ def add_agent_options(p: argparse.ArgumentParser) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("tasks").set_defaults(fn=cmd_tasks)
     sub.add_parser("selftest").set_defaults(fn=cmd_selftest)

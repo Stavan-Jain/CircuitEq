@@ -17,9 +17,13 @@ of the design is to make that agent's job mechanical where it can be
 (structural lemmas that hold for every `n` are the connectives).
 
 **Status: prototype.** Clifford+T only, one and two-qubit gates, some
-twenty worked identities, four original-versus-PyZX benchmark pairs, and
+twenty worked identities, five original-versus-PyZX benchmark pairs, and
 certified checkers for the Clifford and the CNOT-plus-diagonal fragments.
-See "Roadmap" for what is missing and `QUEUE.md` for what is next.
+Around the library: a draft agent harness that runs an AI agent on a pair
+and judges its proof (`benchmarks/harness/README.md`; `PLAYBOOK.md` is the
+prover's guide) and a catalogue of 147 real circuits with 390 measured
+optimiser pairs to run it on (`benchmarks/circuits/README.md`). See
+"Roadmap" for what is missing and `QUEUE.md` for what is next.
 
 ## What you can state and prove today
 
@@ -251,6 +255,9 @@ CircuitEq/
 ├── Examples.lean           worked identities: decided, refuted, structural, placed
 └── Benchmarks/             original-versus-PyZX proofs
 benchmarks/                 QASM fixtures and provenance for each benchmark
+benchmarks/harness/         the agent harnesses: prompts, tasks, recorded runs
+benchmarks/circuits/        the circuit catalogue: 147 circuits, 390 pairs
+PLAYBOOK.md                 the prover's guide; the CLAUDE.md of every run
 scripts/AxiomCheck.lean     CI: standard three axioms only
 scripts/check_debug_options.py     CI: text guard against debug.* options
 scripts/SkipKernelTCFixture.lean   the repro the kernel replay must reject
@@ -258,6 +265,11 @@ scripts/check_replay_fixture.sh    CI: asserts that it does
 scripts/check_pyzx_benchmarks.py   reproduce the PyZX fixtures (pyzx==0.9.0)
 scripts/certificate.py      Python mirror of the certificate language
 scripts/scale_test.py       the scale ladder; scripts/chunked_decide.py, chunks.py
+scripts/agent_harness.py    run an agent on a pair and judge its proof
+scripts/optimizer_harness.py  the optimiser track, on the same pieces
+scripts/circuit_sources.py  fetch, translate, verify the catalogue
+scripts/circuit_pairs.py    the catalogue's twins, pairs and baselines
+scripts/peephole_pairs.py   seeded random pairs, equal by the library's rules
 QUEUE.md                    the ordered list of next work
 ```
 

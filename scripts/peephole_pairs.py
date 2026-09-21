@@ -41,7 +41,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from certificate import DIAG, INVERSE, can_cancel, can_commute, cnot, fmt_instr, one  # noqa: E402
+from certificate import DIAG, can_cancel, can_commute, cnot, fmt_instr, one  # noqa: E402
 
 # Diagonal gates as multiples of pi/4, and back.
 PHASE = {"T": 1, "S": 2, "Z": 4, "Sdg": 6, "Tdg": 7}

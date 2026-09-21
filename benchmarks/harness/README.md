@@ -9,7 +9,8 @@ reason it exists.
 
 **Status.** A draft that has run end to end three times (19 September 2026)
 on `peephole_8q_1000g_s1`, 1000 gates against 752 on eight qubits, with
-`claude-fable-5-1`. The first two runs (20 minutes) ended without a
+`claude-fable-5-1`; the first attempt left no row, `results/results.jsonl`
+has the other two. The first two runs (20 minutes) ended without a
 certificate and exposed the faults listed under "What the first runs
 taught". The third (45 minutes, harness 0.4, library `a9a80ed`) was
 **proved**: `./submit equiv` accepted after 16.9 minutes, the agent stopped
@@ -129,9 +130,10 @@ The text scan is an early warning, not a defence (an option can be set from
 meta code); the replay is the defence. One gap remains in this harness: it
 judges in the agent's own workspace, so it trusts the build products under
 `.lake/` there. The optimisation harness judges in a fresh clone of the
-workspace as it was before the agent started; this one should too. What the replay does not do: it
-trusts the library and mathlib as built, and it is the same kernel again,
-not an independent checker (SafeVerify, `leanprover/comparator`: `QUEUE.md`,
+workspace as it was before the agent started; this one should too. What the
+replay does not do: it trusts the library and mathlib as built, and it is
+the same kernel again, not an independent checker (SafeVerify,
+`leanprover/comparator`: `QUEUE.md`,
 "Later"). So still read `changes.diff` before you believe a row, then set its
 `"reviewed"` field. The final report lists what to look at: any `set_option`
 outside a short harmless list, `unsafe`, `#eval`, `run_cmd`, `initialize`,
@@ -168,9 +170,8 @@ before relying on that switch.
   no `numpy` or `pyzx`, which the library's alignment script imports, and
   the first run spent eight of its thirteen minutes working around that.
   The harness now offers `./python` from a virtualenv that has both
-  (`--python-env`, `CIRCUITEQ_HARNESS_PYENV`, else
-  `~/.circuiteq-harness/envs/pyzx`, else the old throwaway
-  `/tmp/circuiteq-pyzx-venv`) and records which one on the row. It also
+  (`--python-env`, `CIRCUITEQ_HARNESS_PYENV`, else `envs/pyzx` under the
+  harness home, next to TZAP's) and records which one on the row. It also
   offers `./qasm` (`tools/qasm.py`, an exact converter between the Lean
   lists and OpenQASM 2, standard library only) and, when TZAP is installed
   (`CIRCUITEQ_HARNESS_TZAP`, default `~/.circuiteq-harness/envs/tzap`, see
@@ -190,18 +191,24 @@ before relying on that switch.
 
 ## Tasks
 
-`tasks/<name>/task.json` and `tasks/<name>/Task.lean`. Eight came first:
-the five promoted pairs and a gate-deleted mutant of three of them (deleting
-one gate of an equivalent pair always breaks it, under all three relations,
-since no gate of the alphabet is a scalar). `expected` is for analysis only;
-the judge never reads it.
+`tasks/<name>/task.json` and `tasks/<name>/Task.lean`: 21 tasks, ten for
+development and eleven held out. `expected` is for analysis only; the judge
+never reads it.
+
+The **development tasks** are the five promoted pairs, a gate-deleted mutant
+of three of them (deleting one gate of an equivalent pair always breaks it,
+under all three relations, since no gate of the alphabet is a scalar) and
+TZAP's output on `tof_3` and `barenco_tof_3` (`notes/README.md`). Their
+proofs are in this repository and its history, and each `task.json` lists
+the leaks the hold-out cannot remove (`known_leaks`); they are for debugging
+the harness and the playbook.
 
 ```bash
 python3 scripts/agent_harness.py import-benchmark Tof3 --name tof_3 --family tof --rung 3
 python3 scripts/agent_harness.py import-benchmark Tof3 --name tof_3 --mutant 1
 ```
 
-A first held-out pair, of the size the promoted benchmarks do not reach:
+The **held-out tasks** appear nowhere in the repository. One is synthetic:
 
 ```bash
 python3 scripts/peephole_pairs.py --qubits 8 --gates 1000 --seed 1 --out pair.json
@@ -214,24 +221,23 @@ library's commutation and cancellation rules plus one-wire phase fusions, so
 the pair is equal by construction and keeps its skeleton, like phase-folding
 output. `peephole_8q_1000g_s1` is 1000 gates against 752 on eight qubits, out
 of reach of a brute-force basis decide. The generator is held out of the run.
-
-The other eight are **development tasks**: their proofs are in this repository and
-its history, and each `task.json` lists the leaks the hold-out cannot remove
-(`known_leaks`). They are for debugging the harness and the playbook. The
-measurement needs a held-out ladder of pairs that appear nowhere in the
-repository, drawn from parametrised families (`tof_k`, `cuccaro_k`,
-`barenco_tof_k`, seeded random circuits, TZAP on the Feynman suite) with
-the largest rung solved as the metric, because a fixed set saturates. The
-QASM-to-Lean translation for that is `lean_instructions` in
-`scripts/check_pyzx_benchmarks.py`; an importer from QASM is the next piece.
+The other ten come from the circuit catalogue (`benchmarks/circuits/`,
+`scripts/circuit_pairs.py handful`): real circuits from the Feynman suite
+and QASMBench with twins made by PyZX, by the peephole pass or published by
+other people, one or two per tier, up to 99 qubits and 18 220 gates. The
+catalogue is the held-out ladder the measurement needs, drawn from
+parametrised families with the largest rung solved as the metric, because a
+fixed set saturates; its importer from QASM is exact or refuses
+(`scripts/circuit_sources.py`).
 
 ## Not built yet
 
 - Isolation of the agent (a separate account or a container), and judging
   the best accepted submission instead of the final state (above).
-- The held-out ladder and the QASM importer (above).
-- The baselines: the alignment script alone, one-line checker calls, QCEC
-  and Feynman on the same pairs.
+- The baselines for the equivalence task: the alignment script alone,
+  one-line checker calls, QCEC and Feynman on the same pairs. (The
+  optimisation task has its uncertified baselines in
+  `benchmarks/circuits/optimization.json`.)
 - Repeated runs and a summary table over `results.jsonl` (three runs per
   cell at least; one run says little).
 - Which library declarations an accepted proof uses (the roadmap's flywheel
@@ -351,10 +357,11 @@ once more as a last candidate, first because their cost is unknown, unless
 they are the untouched stub or one of the kept copies: an improvement whose
 `./submit` the deadline cut off still counts if it passes (tested with Lean:
 an improvement never submitted was scored). The final judge trusts none of
-this: the kept copies are candidates. It takes them cheapest first (the claimed cost only orders
-them; copies that cost more than the original are skipped), puts each into a
-fresh clone of `pristine/`, the workspace as it was before the agent started,
-checked against the manifest, and judges it in full there. Nothing the agent
+this: the kept copies are candidates. It takes them cheapest first (the
+claimed cost only orders them; copies that cost more than the original are
+skipped), puts each into a fresh clone of `pristine/`, the workspace as it
+was before the agent started, checked against the manifest, and judges it in
+full there. Nothing the agent
 left in its build directory or outside `Solution.lean` and `Solution/` can
 reach that clone; the price is that the solution is built again from source.
 The first candidate that passes is the result; after
@@ -388,9 +395,10 @@ The three real starter tasks (`tof_3`, `barenco_tof_3`,
 proof still counts, by `Equivalent.toUpToPhase`. What an agent can prove
 depends on the library commit: at `a9a80ed` `≡ₚ` has no composition lemmas,
 so a phase-only result is provable only by a whole-register decide on a few
-qubits; with the branch `claude/phase-composition` (`≡ₚ[k]`, windows and
-certificates up to phase, the Clifford phase gadget) it is provable piece by
-piece. `tiny_3q` stays on `≡ᵤ` and `tiny_2q_phase` tests `"p"`.
+qubits; with the phase-composition work that is not merged yet (`≡ₚ[k]`,
+windows and certificates up to phase, the Clifford phase gadget;
+`notes/pending-playbook-phase.md`) it is provable piece by piece. `tiny_3q`
+stays on `≡ᵤ` and `tiny_2q_phase` tests `"p"`.
 
 ## Tasks
 
@@ -477,11 +485,10 @@ choice among candidates with a stand-in for Lean.
 - Everything the equivalence harness lacks: isolation above all. The
   pristine clone and the kept copies sit beside the workspace under the same
   user account.
-- The `core` configuration. `--config core` is passed through to the shared
-  setup, which fails at `a9a80ed` for both harnesses: `CORE_MODULES` in
-  `agent_harness.py` lacks `Chunk`, which `Semantics.lean` now imports.
-  Whether `Chunk` belongs in `core` is a decision about the hypothesis, so it
-  is left as found.
+- The `core` configuration is untested. `--config core` strips the run copy
+  to `CORE_MODULES` of `agent_harness.py` (`Zeta8`, `Bits`, `Gates`,
+  `Dyadic`, `Chunk`, `Semantics`; `Chunk` because `Semantics.lean` imports
+  it) with `PLAYBOOK.core.md`, and no run has used it yet.
 - Depth as a cost (it needs a definition in Lean that the kernel evaluates
   cheaply), and any cost that is not a count.
 - A playbook section on optimising: which oracles exist and how to call them.

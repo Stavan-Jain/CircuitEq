@@ -21,8 +21,8 @@ Four kinds of twin:
   paired with the catalogue's copy of the same circuit after checking that the
   published input is that circuit, gate for gate.
 
-For every pair the script records what an agent is up against, the way
-``benchmarks/harness/notes/distance.py`` and ``optimisers.py`` do: the
+For every pair the script records what an agent is up against, the way the
+first measurements in ``benchmarks/harness/notes/README.md`` did: the
 relation that actually holds (exact, up to a power of ``omega``, or neither;
 numerically, so untrusted), gate, ``T``, ``H`` and ``CX`` counts, the share
 of the original's gates that a diff matches in the raw order and after both
@@ -88,13 +88,17 @@ def in_repo(circuit: str, kind: str) -> tuple[bool, str]:
 
 TWIN_TIMEOUT_S = 240       # each twin is made in a child process under this limit
 PYZX_MAX_GATES = 8000      # hwb8 (18 220 gates) did not finish either pipeline in 200 s
-# TZAP is the wheel `tzap==0.6.1` in its own virtualenv (`benchmarks/harness/notes/README.md`);
-# `CIRCUITEQ_TZAP` names another binary. `-O2` is the documented level (`-Osuper` was a hundred
-# times slower for the same T-count there); `rz` and `cz` in its output are decomposed, so it
-# is read back in the alphabet. About a second per million gates.
-TZAP = Path(os.environ.get("CIRCUITEQ_TZAP",
-                           "~/.circuiteq-harness/envs/tzap/bin/tzap")).expanduser()
-TZAP_ARGS = ("-O2", "--decompose-rz", "--decompose-cz")
+# TZAP is the wheel `tzap==0.6.1` in the virtualenv `envs/tzap` under the harness home
+# (`benchmarks/harness/notes/README.md`); `CIRCUITEQ_HARNESS_TZAP` names another binary, as it
+# does for the harness. `-O2` is the documented level (`-Osuper` was a hundred times slower for
+# the same T-count there); `rz` and `cz` in its output are decomposed, so it is read back in the
+# alphabet. `CIRCUITEQ_TZAP_ARGS` replaces the options, for `probe` at another level. About a
+# second per million gates.
+HARNESS_HOME = Path(os.environ.get("CIRCUITEQ_HARNESS_HOME", "~/.circuiteq-harness")).expanduser()
+TZAP = Path(os.environ.get("CIRCUITEQ_HARNESS_TZAP",
+                           HARNESS_HOME / "envs" / "tzap" / "bin" / "tzap"))
+TZAP_ARGS = tuple(os.environ.get("CIRCUITEQ_TZAP_ARGS",
+                                 "-O2 --decompose-rz --decompose-cz").split())
 DIFF_MAX_CELLS = 3e7       # len(a) * len(b) for difflib
 SEGMENT_MAX_QUBITS = 20
 SEGMENT_WORK = 2e10        # (len(a) + len(b)) * 2^n * probes
@@ -162,6 +166,8 @@ HANDFUL = [
 # --------------------------------------------------------------------------
 
 def peephole_twin(strings: list[str]) -> tuple[list[str], dict]:
+    """The library's own peephole pass (`scripts/peephole_pairs.py`) on the gate strings;
+    exact by construction."""
     from certificate import cnot, fmt_instr, one
     import peephole_pairs
     circuit = [cnot(*w) if name == "CX" else one(name, w[0])
@@ -174,7 +180,6 @@ def to_pyzx(strings: list[str], n: int):
     """The gate strings as a PyZX circuit; ``Y = S X Sdg`` exactly."""
     import pyzx as zx
     from fractions import Fraction
-    quarter = {"T": 1, "S": 2, "Z": 4, "Sdg": 6, "Tdg": 7}
     c = zx.Circuit(n)
     for name, w in cs.parse_gates(strings):
         if name == "CX":
@@ -188,11 +193,13 @@ def to_pyzx(strings: list[str], n: int):
             c.add_gate("NOT", w[0])
             c.add_gate("ZPhase", w[0], phase=Fraction(2, 4))
         else:
-            c.add_gate("ZPhase", w[0], phase=Fraction(quarter[name], 4))
+            c.add_gate("ZPhase", w[0], phase=Fraction(cs.PHASE_OF[name.lower()], 4))
     return c
 
 
 def pyzx_twin(strings: list[str], n: int, pipeline: str) -> tuple[list[str], dict]:
+    """One of the two PyZX pipelines of `scripts/check_pyzx_benchmarks.py` (`teleport`,
+    `full_reduce`) on the gate strings."""
     import pyzx as zx
     import check_pyzx_benchmarks as cpb
     out = cpb.optimize(to_pyzx(strings, n), pipeline)
@@ -315,12 +322,15 @@ def published_base(name: str) -> str | None:
     """`feynman_gf2_4_mult` or `published_gf2_4_mult__before` -> `gf2^4_mult`, when that base
     has published outputs."""
     for base in cs.PUBLISHED_BASES:
-        if name in ("feynman_" + cs._clean(base), f"published_{cs._clean(base)}__before"):
+        if name in ("feynman_" + cs.clean_name(base), f"published_{cs.clean_name(base)}__before"):
             return base
     return None
 
 
 def same_as_published_input(name: str, base: str, hashes: dict) -> tuple[bool, str]:
+    """Whether the input the published outputs were made from is the catalogue's circuit
+    `name`: by the normal form of the native operations, else numerically. The verdict and
+    how it was reached."""
     ours, _ = cs.load_ops(cs.find_spec(name), hashes)
     theirs, _ = cs.load_ops(cs.published_spec(base, "before"), hashes)
     if ours["qubits"] != theirs["qubits"]:
@@ -346,25 +356,29 @@ def wire_type(g: tuple, w: int) -> str:
 
 
 def can_commute(a: tuple, b: tuple) -> bool:
+    """Whether two gates commute under `Instr.CanCommute`. The self-test's oracle against
+    `tcount_survey.can_commute`; `canonical_order` works from the runs of `wire_type` directly."""
     return all(wire_type(a, w) == wire_type(b, w) for w in a[1] if w in b[1])
 
 
-def canonical_order(gates: list[tuple], wire_type=None) -> list[int]:
+def canonical_order(gates: list[tuple], typ=None) -> list[int]:
     """``tcount_survey.canonical_order(gates, "greedy/cancommute")``, in near-linear time.
 
     On one wire the gates fall into runs of one type, and everything in an
     earlier run precedes everything in a later one; edges from the previous
     run alone have the same transitive closure as all non-commuting pairs, and
-    a priority topological sort depends only on the closure.
+    a priority topological sort depends only on the closure. `typ` is how a
+    gate acts on one of its wires: `wire_type` for the alphabet's gates,
+    `op_wire_type` for native operations.
     """
-    wire_type = wire_type or globals()["wire_type"]
+    typ = typ or wire_type
     n = len(gates)
     indeg, succs = [0] * n, [[] for _ in range(n)]
     runs: dict[int, list] = {}  # wire -> [type, current run, previous run]
     for j, g in enumerate(gates):
         preds = set()
         for w in g[1]:
-            t, run = wire_type(g, w), runs.get(w)
+            t, run = typ(g, w), runs.get(w)
             if run is None:
                 runs[w] = [t, [j], []]
             elif run[0] == t:
@@ -391,10 +405,12 @@ def canonical_order(gates: list[tuple], wire_type=None) -> list[int]:
 
 
 def ordered(gates: list[tuple], how: str) -> list[tuple]:
+    """The gates as they are (`raw`) or in the canonical order under `Instr.CanCommute`."""
     return gates if how == "raw" else [gates[i] for i in canonical_order(gates)]
 
 
 def diff_matched(a: list[tuple], b: list[tuple]) -> dict:
+    """How many of `a`'s gates a `difflib` alignment with `b` matches, within the budget."""
     if len(a) * len(b) > DIFF_MAX_CELLS:
         return {"skipped": f"{len(a)} x {len(b)} gates is past the diff's budget"}
     sm = difflib.SequenceMatcher(None, [cs.show(g) for g in a], [cs.show(g) for g in b],
@@ -417,7 +433,8 @@ def signatures(gates: list[tuple], state, probes):
 
 
 def segments(a: list[tuple], b: list[tuple], n: int) -> dict:
-    """The greedy chain of `distance.py`: cut where the prefix states agree up to a phase."""
+    """The greedy chain of cut points where the two prefix states agree up to a phase, and
+    the longest stretch between two of them (`benchmarks/harness/notes/README.md`)."""
     if n > SEGMENT_MAX_QUBITS or (len(a) + len(b)) * 2 ** n * PROBES > SEGMENT_WORK:
         return {"skipped": f"{n} qubits and {len(a) + len(b)} gates are past the budget for "
                            "prefix states"}
@@ -440,6 +457,8 @@ def segments(a: list[tuple], b: list[tuple], n: int) -> dict:
 
 
 def describe(original: list[str], twin: list[str], n: int) -> dict:
+    """What an agent is up against on a pair: the relation that holds numerically, the
+    counts, the diff fraction and the segmentation, each in the raw and the canonical order."""
     a, b = cs.parse_gates(original), cs.parse_gates(twin)
     meta = {"relation_found": cs.compare_lists(a, b, n),
             **{k: [cs.counts(a)[k], cs.counts(b)[k]]
@@ -452,11 +471,24 @@ def describe(original: list[str], twin: list[str], n: int) -> dict:
     return meta
 
 
+def holds_text(rel: dict) -> str:
+    """The relation a pair was found to hold, as the tables print it."""
+    holds = rel["relation"] + (f" (ω^{rel['omega_power']})" if "omega_power" in rel else "")
+    return holds + (", sampled" if rel["method"].startswith("sparse") else "")
+
+
+def fraction_text(d: dict) -> str:
+    """A diff's matched fraction, or `—` where the diff was skipped."""
+    return f"{d['fraction']:.2f}" if "fraction" in d else "—"
+
+
 # --------------------------------------------------------------------------
 # Pairs
 # --------------------------------------------------------------------------
 
 def known_leaks(circuit: str) -> list[str]:
+    """Where the repository already proves something about this circuit, for the task's
+    `known_leaks`: a held-out task must not be solvable by copying."""
     leaks = {
         "feynman_tof_3": "the repository proves `tof_3` (the same three Toffolis on other "
                          "wires, without the H pairs) against PyZX teleport",
@@ -478,6 +510,7 @@ def make_pair(circuit: str, kind: str, hashes: dict) -> dict:
             "tier": rec["tier"], "in_repo": in_repo(circuit, kind)[0]}
     if not base["in_repo"]:
         base["why_not_in_repo"] = in_repo(circuit, kind)[1]
+    zero: list[int] = []  # the ancillas a published `.qc` input marks as starting in |0>
     if kind in OWN_TWINS:
         twin, tool = own_twin(kind, original, n)
         if twin is None:
@@ -495,7 +528,7 @@ def make_pair(circuit: str, kind: str, hashes: dict) -> dict:
         spec = cs.published_spec(pub, PUBLISHED_TWINS[kind])
         try:
             prec, twin = cs.build(spec, hashes, check=False, cross=False)
-        except (cs.Rejected, subprocess.CalledProcessError) as e:
+        except (cs.Rejected, cs.Missing) as e:
             return {**base, "status": f"skipped: {e}"}
         s = cs.SOURCES["pyzx_repo"]
         tool = {"tool": spec["note"], "url": s["url"], "commit": s["commit"],
@@ -534,6 +567,8 @@ def summary(result: dict) -> dict:
     """The index row of a pair: everything but the gate lists."""
     row = {k: result[k] for k in ("name", "circuit", "twin", "qubits", "tier", "in_repo",
                                   "why_not_in_repo", "status") if k in result}
+    if result["status"] != "ok":
+        row["in_repo"] = False  # nothing was written anywhere
     if result["status"] == "ok":
         p = result["pair"]
         row.update(relation=p["relation"], expected=p["expected"],
@@ -547,6 +582,8 @@ def summary(result: dict) -> dict:
 
 
 def write_pair(result: dict, out: Path | None = None) -> Path | None:
+    """Write the pair JSON, gate lists on lines of their own, to `out`, else to `pairs/` or
+    the cache as `in_repo` says; `None` when no pair was made."""
     if result["status"] != "ok":
         return None
     d = out or (PAIRS if result["in_repo"] else cs.cache_dir() / "pairs")
@@ -562,10 +599,12 @@ def write_pair(result: dict, out: Path | None = None) -> Path | None:
 
 
 def load_index() -> dict:
+    """`pairs/index.json`, or an empty index."""
     return json.loads(INDEX.read_text()) if INDEX.exists() else {"pairs": []}
 
 
 def save_index(index: dict) -> None:
+    """Write `pairs/index.json`, its rows sorted by tier, circuit and twin."""
     PAIRS.mkdir(parents=True, exist_ok=True)
     index["pairs"].sort(key=lambda r: (r["tier"], r["circuit"], r["twin"]))
     index["generated_by"] = "scripts/circuit_pairs.py batch"
@@ -577,6 +616,8 @@ def save_index(index: dict) -> None:
 
 
 def cmd_make(args) -> None:
+    """`make CIRCUIT... --twin KIND...`: the named pairs, into the repository or the cache and
+    the index, or into `--out` alone."""
     hashes = cs.recorded_hashes(cs.load_manifest())
     index = load_index()
     for circuit in args.circuits:
@@ -593,11 +634,14 @@ def cmd_make(args) -> None:
 
 
 def cmd_batch(args) -> None:
+    """`batch`: the first batch's pairs and the published outputs, resuming where the index
+    stopped; `--tcounts` adds the other T-bearing circuits, `--twin` restricts the kinds."""
     hashes = cs.recorded_hashes(cs.load_manifest())
     index = load_index()
     done = {r["name"] for r in index["pairs"]} if not args.force else set()
     jobs = [(c, k) for c in BATCH for k in OWN_TWINS]
-    jobs += [("feynman_" + cs._clean(b), k) for b in cs.PUBLISHED_BASES for k in PUBLISHED_TWINS]
+    jobs += [("feynman_" + cs.clean_name(b), k)
+             for b in cs.PUBLISHED_BASES for k in PUBLISHED_TWINS]
     if args.tcounts:  # every other T-bearing circuit, smallest first: TZAP at any size, PyZX
         rest = sorted((r for r in cs.load_manifest()["circuits"]  # where it can run
                        if r["t_count"] and r["name"] not in BATCH), key=lambda r: r["gates"])
@@ -745,6 +789,51 @@ def cmd_handful(args) -> None:
             print(" ".join(cmd))
 
 
+def read_gates(path: Path, n: int) -> list[str]:
+    """Gate strings from a pair or circuit JSON (`optimized`, else `gates`) or from OpenQASM
+    in the alphabet (what TZAP or `translate --qasm` writes), on `n` qubits."""
+    if path.suffix == ".qasm":
+        parsed = cs.parse_qasm(path.read_text())
+        if parsed["qubits"] != n:
+            raise SystemExit(f"{path}: {parsed['qubits']} qubits, the original has {n}")
+        return [cs.show(g) for g in cs.translate(parsed["ops"])]
+    data = json.loads(path.read_text())
+    return data.get("optimized") or data["gates"]
+
+
+def cmd_probe(args) -> None:
+    """Twins of one circuit file, measured as the batch measures its pairs (what the scripts
+    once under `benchmarks/harness/notes/` did). FILE is a pair JSON (`qubits`, `original`;
+    an `optimized` in it is measured too) or a circuit JSON (`qubits`, `gates`); `--against`
+    adds ready-made twins, gate-list JSON or OpenQASM; `--out` keeps each twin as a pair."""
+    data = json.loads(Path(args.file).read_text())
+    n, original = data["qubits"], data.get("original") or data["gates"]
+    rows = [("as given", data["optimized"], {})] if "optimized" in data else []
+    rows += [(Path(p).name, read_gates(Path(p), n), {}) for p in args.against or []]
+    for kind in args.twin:
+        twin, tool = own_twin(kind, original, n)
+        rows.append((kind, twin, tool))
+    c = cs.counts(cs.parse_gates(original))
+    print(f"original: {n} qubits, {c['gates']} gates, T {c['t_count']}, CX {c['cx_count']}\n")
+    print("| Twin | Gates | T | CX | Holds | Diff raw | Diff canonical | Segments | Longest | "
+          "Seconds |\n|---|---:|---:|---:|---|---:|---:|---:|---:|---:|")
+    for label, twin, tool in rows:
+        if twin is None:
+            print(f"| {label} | — | — | — | {tool.get('status', '—')} | — | — | — | — | — |")
+            continue
+        m = describe(original, twin, n)
+        d, seg = m["diff_matched"], m["segments"]["greedy/cancommute"]
+        print(f"| {label} | {m['gates'][1]} | {m['t_count'][1]} | {m['cx_count'][1]} | "
+              f"{holds_text(m['relation_found'])} | {fraction_text(d['raw'])} | "
+              f"{fraction_text(d['greedy/cancommute'])} | {seg.get('segments', '—')} | "
+              f"{seg.get('longest', '—')} | {tool.get('seconds', '—')} |")
+        if args.out:
+            args.out.mkdir(parents=True, exist_ok=True)
+            stem = "".join(ch if ch.isalnum() or ch in "._-" else "_" for ch in label)
+            (args.out / f"{stem}.json").write_text(json.dumps(
+                {"qubits": n, "original": original, "optimized": twin, "twin_tool": tool, **m}))
+
+
 PAIRS_README = """\
 # Pairs made from the circuit catalogue
 
@@ -775,6 +864,7 @@ per pair made so far.
 
 
 def table_rows(rows: list[dict]) -> list[str]:
+    """The index rows as the Markdown table of `pairs/README.md`."""
     out = ["| Pair | Tier | Qubits | Gates | T | Holds | Diff raw | Diff canonical | Segments | "
            "Longest | In repo |", "|---|---:|---:|---:|---:|---|---:|---:|---:|---:|---|"]
     for r in rows:
@@ -782,24 +872,21 @@ def table_rows(rows: list[dict]) -> list[str]:
             out.append(f"| `{r['name']}` | {r['tier']} | {r['qubits']} | — | — | "
                        f"{r['status']} | — | — | — | — | — |")
             continue
-        rel = r["relation_found"]
-        holds = rel["relation"] + (f" (ω^{rel['omega_power']})" if "omega_power" in rel else "")
-        if rel["method"].startswith("sparse"):
-            holds += ", sampled"
+        holds = holds_text(r["relation_found"])
         clean = r.get("relation_on_clean_ancillas")
         if clean:
             holds += f"; {clean['relation']} on clean ancillas"
         d, seg = r["diff_matched"], r["segments"]["greedy/cancommute"]
-        frac = lambda x: f"{x['fraction']:.2f}" if "fraction" in x else "—"  # noqa: E731
         out.append(f"| `{r['name']}` | {r['tier']} | {r['qubits']} | {r['gates'][0]} → "
                    f"{r['gates'][1]} | {r['t_count'][0]} → {r['t_count'][1]} | {holds} | "
-                   f"{frac(d['raw'])} | {frac(d['greedy/cancommute'])} | "
+                   f"{fraction_text(d['raw'])} | {fraction_text(d['greedy/cancommute'])} | "
                    f"{seg.get('segments', '—')} | {seg.get('longest', '—')} | "
                    f"{'yes' if r['in_repo'] else 'no'} |")
     return out
 
 
 def cmd_table(args) -> None:
+    """`table`: print the pairs table, or `--write` it into `pairs/README.md`."""
     rows = load_index()["pairs"]
     if args.only:
         rows = [r for r in rows if any(r["name"].startswith(p) for p in args.only)]
@@ -816,6 +903,8 @@ def cmd_table(args) -> None:
 # --------------------------------------------------------------------------
 
 def self_test() -> None:
+    """Checks that need no network: the canonical order against the survey's, the twins and
+    their measurement on random circuits, the normal form of published inputs."""
     rng = random.Random(3)
     names = ["H", "X", "Y", "Z", "S", "Sdg", "T", "Tdg"]
 
@@ -860,7 +949,8 @@ def self_test() -> None:
     assert meta["relation_found"]["relation"] == "exact"
     assert meta["segments"]["raw"]["segments"] > 1
     assert meta["diff_matched"]["raw"]["of"] == 200
-    # the same segmentation as distance.py computes from whole prefix states
+    # the same segmentation as a reference that keeps whole prefix states (the notes' first
+    # measurement did), without the random projections
     a, b = cs.parse_gates(strings), cs.parse_gates(twin)
     psi = cs.random_states(5, 1, 1)
 
@@ -904,6 +994,7 @@ def self_test() -> None:
 
 
 def main() -> None:
+    """The command line; `_twin KIND SRC DST` is the child process `own_twin` starts."""
     if len(sys.argv) > 1 and sys.argv[1] == "_twin":
         twin_worker(*sys.argv[2:5])
         return
@@ -934,6 +1025,12 @@ def main() -> None:
     p.add_argument("--only", nargs="*", help="pair-name prefixes")
     p = sub.add_parser("handful", help="print the import-pair commands of the harness tasks")
     p.add_argument("--run", action="store_true", help="run them")
+    p = sub.add_parser("probe", help="twins of one circuit file, measured like the batch's pairs")
+    p.add_argument("file", help="a pair JSON (qubits, original) or a circuit JSON (qubits, gates)")
+    p.add_argument("--twin", nargs="*", default=list(OWN_TWINS), choices=list(OWN_TWINS),
+                   help="the twins to make (default: all four)")
+    p.add_argument("--against", nargs="*", help="ready-made twins: gate-list JSON or OpenQASM")
+    p.add_argument("--out", type=Path, help="write each twin as a pair JSON here")
     args = parser.parse_args()
     if args.self_test:
         self_test()
@@ -947,6 +1044,8 @@ def main() -> None:
         cmd_table(args)
     elif args.command == "handful":
         cmd_handful(args)
+    elif args.command == "probe":
+        cmd_probe(args)
     else:
         parser.print_help()
 
