@@ -100,7 +100,7 @@ adversarial cases — random circuits, or a circuit re-synthesised from its
 unitary matrix so that no rewrite path survives — have no such relation, and
 they are not real-world inputs.
 
-Three mechanisms, and the proof shapes they become in this library:
+Four mechanisms, and the proof shapes they become in this library:
 
 - **Aligned windows.** Local optimisation changes circuits locally, so the two
   circuits split into aligned windows, each pair equivalent as a small
@@ -119,6 +119,18 @@ Three mechanisms, and the proof shapes they become in this library:
   CNOT-plus-diagonal fragment with a canonical phase-polynomial form. An agent
   can reason in that form across the Hadamard boundaries, case by case, where
   a fixed reduction system stalls. The normaliser of Rung 8 is the tool.
+- **The pair as one circuit.** `c₁ ≡ᵤ c₂` exactly when `c₁` followed by
+  `inverse c₂` is the identity, and that circuit has a path sum: the phase
+  polynomial with one fresh variable per Hadamard. Rewrite rules that
+  eliminate Hadamard variables (Amy's, the ones Feynman's verifier uses)
+  reduce it to the identity when the pair is equal; on an unequal pair,
+  one amplitude of what is left is a refutation witness, cheap when few
+  variables remain. This needs no alignment at all, so it is the mechanism
+  for the pairs the other three cannot hold: CNOT re-synthesis, window
+  superoptimisation, re-extraction. An untrusted search finds the rewrites
+  and the kernel replays them (`QUEUE.md`, item 4). The rules are complete
+  for Clifford circuits only, so where they stall the agent cuts the pair
+  and uses the mechanisms above on the pieces.
 
 ## Two products, one architecture
 
@@ -130,6 +142,11 @@ agent searches for different things in each.
   found", recorded. The agent's search is for a *derivation between two
   fixed endpoints* that nobody handed it: an optimiser produced the second
   circuit and discarded the path. This is the S benchmark of the ladder.
+  The agent is the checker, and it is told nothing but the two circuits:
+  not the optimiser, its settings or its path. The library is its
+  toolbox, so every tool in it has to work from the pair alone, and an
+  alignment is a structure the agent finds by looking, never one it may
+  assume.
 - **The optimiser.** Input: one circuit. Output: a cheaper circuit and a
   kernel-checked proof that it is equivalent. The agent's search is for a
   *cheaper endpoint*, and since it chooses every step, the derivation is
@@ -216,8 +233,9 @@ Where the infrastructure stands against that problem statement
   S against QCEC, PyZX and Feynman, with gate-deleted mutants refuted
   alongside. A benchmark "of increasing complexity" therefore means
   optimiser pairs of increasing size and structural distance (reordering,
-  then phase teleportation and TZAP, then `full_reduce` and Qiskit at
-  level 3), not random pairs.
+  then phase teleportation and TZAP at `-O1`, then TZAP at `-O2`,
+  `full_reduce` and Qiskit at level 3), not random pairs. The distance is
+  for choosing tasks; the agent is never told it.
 
 ### The architecture both share
 
@@ -241,7 +259,8 @@ Where the infrastructure stands against that problem statement
    dozen qubits. Each verifies a tool's *answer*, never its algorithm, so a
    new optimiser costs nothing to support and nobody reads its source. ZX
    rewriting itself resists this, since a ZX derivation lives on diagrams;
-   its output is caught by the fragment checkers and residuals instead.
+   its output is caught by the fragment checkers, residuals and the path
+   sum of the pair instead.
 5. **Representations built for the checkers.** Gates and blocks carry their
    wire sets as `Nat` bitmasks, so a commutation test is one `land`.
    Circuits are hierarchical, named blocks and templates parametric in `n`
@@ -273,13 +292,22 @@ gates in under a minute), is sound only with probability `1 − m²·2⁻¹²⁸
 and validates its output by matrix comparison up to six qubits and by
 Feynman's path-sum verifier on some larger circuits: no certificate. Its
 symbolic variant is exactly the analysis `CircuitEq/PhasePoly.lean`
-certifies, and its output keeps the CX/H/X skeleton (it only deletes
-rotations, edits angles and cancels `XX`/`HH` pairs), so a TZAP pair is
-alignable by construction. The optimiser's oracle-guided mode is therefore
-concrete: run TZAP in milliseconds, certify in the kernel with the
-phase-polynomial checker extended by Hadamard variables (`QUEUE.md`,
-item 4), and never rely on the `2⁻¹²⁸`. The Feynman and Cobble suites it
-is evaluated on are the T-heavy benchmark family Rung 3 asks for.
+certifies. The paper's TZAP only folds phases, so its output keeps the
+CX/H/X skeleton; the released TZAP 0.6.1 does that only at `-O1`
+(`CancelGates`, then `PhaseFoldRand`). `-O2` and `-O3` add `CnotMin`,
+which re-synthesises CNOT-dihedral blocks, and `SuperOpt`, which replaces
+3-qubit windows from a table, and those rewrite the skeleton. On the
+catalogue's 99 TZAP circuits `-O1` keeps the skeleton on 89 (the rest are
+the synthesised-rotation circuits, where `CancelGates` also turns
+`H S H` into `S† H S†` and `H Z H` into `X`) and `-O2` on 18; the T-count
+is the same at both levels on 83 and lower at `-O2` on the other 16
+(`benchmarks/circuits/README.md`, "Which TZAP level keeps the skeleton").
+So a TZAP pair is alignable only if it was made at `-O1`, and the checking
+agent is not told which level made it. The optimiser's oracle-guided mode
+is still concrete: run TZAP in milliseconds, certify in the kernel with
+the path sum of the pair (`QUEUE.md`, item 4), which needs no alignment,
+and never rely on the `2⁻¹²⁸`. The Feynman and Cobble suites it is
+evaluated on are the T-heavy benchmark family Rung 3 asks for.
 
 **Parametric proofs are not displaced.** A theorem for all `n` is an
 ordinary Lean statement about a circuit family, proved by induction with
@@ -455,14 +483,15 @@ test of the working hypothesis above. Everything here is stated with `≡ᵤ` an
   first; Clifford once Rung 4 lands), proved preserved step by step.
 - **The optimiser-output benchmark.** For each of the 19 QECUnitaryCircuits
   origins, and for adders and QFTs at `n = 8` to `64`: the output of PyZX
-  `full_reduce` plus extraction, of a T-count optimiser (TZAP first, whose
-  phase-folding output keeps the gate skeleton and is alignable by
-  construction, then quizx or Feynman), and of Qiskit at optimisation
-  level 3. These pairs are structurally different and T-heavy, which is
-  where decision-diagram tools degrade. TZAP's own benchmark inputs, the
-  Feynman suite (`gf2^k_mult`, `mod_adder`, `barenco_tof`, `hwb`, …) and
-  the Cobble suite, are the natural T-heavy sources at the sizes the kernel
-  reaches.
+  `full_reduce` plus extraction, of a T-count optimiser (TZAP first, at
+  `-O1`, where its output mostly keeps the gate skeleton, and at `-O2`,
+  where CNOT re-synthesis removes it; then quizx or Feynman), and of
+  Qiskit at optimisation level 3. These pairs are structurally different
+  and T-heavy, which is where decision-diagram tools degrade. TZAP's own
+  benchmark inputs, the Feynman suite (`gf2^k_mult`, `mod_adder`,
+  `barenco_tof`, `hwb`, …) and the Cobble suite, are the natural T-heavy
+  sources at the sizes the kernel reaches. The level, like the tool, is
+  recorded with the pair and never shown to the agent.
 - **Agent in the loop.** The alignment or invariant is proposed by an agent
   (or, as a baseline, by a heuristic script); Lean checks it. Record success
   rate, time and tokens, and the pairs where no decomposition was found.

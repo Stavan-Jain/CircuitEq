@@ -15,7 +15,12 @@ architecture"):
 1. **An AI + Lean equivalence checker.** Given two circuits, an agent finds
    the structure (an alignment of windows, cut points with residuals, a
    template instance) and Lean checks it. The agent searches for a
-   derivation between fixed endpoints that an optimiser discarded.
+   derivation between fixed endpoints that an optimiser discarded. The
+   agent *is* the checker, and it gets the two circuits and nothing else:
+   not which tool made the pair, at which setting, or by what path. So no
+   proof method may assume that a pair lines up; an alignment is something
+   the agent may find by looking, and the toolbox must also reach pairs
+   that have none.
 2. **An AI + Lean optimiser**, longer term. Given one circuit, the agent
    finds a cheaper one by certified rewrite steps and the proof is the
    trace. Soundness is by construction; only quality depends on the agent.
@@ -29,9 +34,12 @@ Rules that follow, for anyone adding to the library:
 - Verify answers, not algorithms. A new optimiser is supported by a
   certified normal form or checker for the fragment it works in, never by
   formalising its source. External tools are untrusted oracles: TZAP
-  (linear-time phase folding, probabilistically sound, no certificate; its
-  output keeps the gate skeleton, so its pairs align by construction),
-  PyZX, Feynman, Qiskit.
+  (linear-time phase folding, probabilistically sound, no certificate),
+  PyZX, Feynman, Qiskit. Do not build on what a tool's output looks like:
+  TZAP 0.6.1 keeps the CX/H/X skeleton only at `-O1`, and even there not
+  always, while `-O2`, the level of the catalogue's `tzap` twins, rewrites
+  it (`benchmarks/circuits/README.md`, "Which TZAP level keeps the
+  skeleton").
 - New proof techniques land as *step kinds in a certificate language* with
   a certified replay interpreter behind them, so the agent emits data and
   the kernel's cost is linear in the trace. `CircuitEq/Certificate.lean` is
@@ -172,8 +180,9 @@ Rules that follow, for anyone adding to the library:
   copied by every gate that changes it (`QUEUE.md` item 8). A proof is
   `(phasePolyChecker n).sound _ _ (by decide +kernel)`, a refutation
   `phasePolyRefutes_sound (by decide +kernel)`; bare `decide` times out at about
-  a hundred gates. The extension with Hadamard variables that certifies TZAP
-  output across `H` gates is `QUEUE.md` item 4.
+  a hundred gates. The extension with Hadamard variables (a path sum), which
+  proves a pair by reducing one circuit followed by the other's `inverse` to the
+  identity and so needs no alignment, is `QUEUE.md` item 4.
 - `CircuitEq/Tableau.lean` — the Clifford tableau checker: `Pauli` strings
   (x-mask, z-mask, phase in `Fin 4`, denoting `i^p · Z^z · X^x`), the gate
   update rules with pointwise soundness (`Pauli.conjH_sound`, …,
@@ -303,7 +312,8 @@ Rules that follow, for anyone adding to the library:
   `rz(k·π/4)` to the diagonal Clifford+T gate with that matrix. A `tzap`
   pipeline (https://github.com/qqq-wisc/tzap) for this script is queued
   (`QUEUE.md` item 5); `scripts/circuit_pairs.py` already runs TZAP as a twin
-  kind. TZAP reads and writes the same `rz` convention as PyZX.
+  kind, at `-O2`, whose output keeps the skeleton on 18 of its 99 pairs.
+  TZAP reads and writes the same `rz` convention as PyZX.
 - `scripts/scale_test.py` — the scale ladder (`benchmarks/scale/`): seeded
   families (`clifford`, `cnot_t` random; `ghz`, `surface`, `ccz_net`
   structured), PyZX pipelines including the peephole `basic`, `--chunk G`
@@ -318,7 +328,11 @@ Rules that follow, for anyone adding to the library:
   is all an agent under test knows about the library. **When a checker, a
   tactic, a certificate step or a block theorem lands, update its decision
   list in the same commit** (both playbooks if the module is in
-  `CORE_MODULES`), and the commit named at its top.
+  `CORE_MODULES`), and the commit named at its top. Phrase its advice by
+  what an agent can see in the two circuits (they line up, they differ by
+  a phase, one is Clifford), never by the tool that made them, which the
+  agent is not told (`QUEUE.md` item 1: today's entries 5 and 8 still name
+  tools).
 - `scripts/agent_harness.py`, `scripts/optimizer_harness.py`,
   `benchmarks/harness/` — the agent harnesses (`benchmarks/harness/README.md`).
   The equivalence one: a fixed prompt (`PROMPT.md`), tasks as circuit pairs
