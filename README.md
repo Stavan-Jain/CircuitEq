@@ -300,6 +300,8 @@ CircuitEqTest/              the checkers' regression tests
 benchmarks/                 QASM fixtures and provenance for each benchmark
 benchmarks/harness/         the agent harnesses: prompts, tasks, recorded runs
 benchmarks/circuits/        the circuit catalogue: 147 circuits, 390 pairs
+docs/tool-survey.md         published checkers and optimisers: where each stops
+docs/milestones.md          milestones for the checker, and the candidates
 PLAYBOOK.md                 the prover's guide; the CLAUDE.md of every run
 scripts/AxiomCheck.lean     CI: standard three axioms only
 scripts/check_debug_options.py     CI: text guard against debug.* options
@@ -352,6 +354,9 @@ measured runs of the agent harnesses, cost functions in Lean, replay memory and
 phase polynomials with Hadamard variables (`QUEUE.md`); a conformance-checked
 OpenQASM generator and the bridge to ℂ; then the first parametric templates,
 ripple-carry adders and multi-controlled gates for every `n`.
+[`docs/milestones.md`](docs/milestones.md) says which pairs count as milestones
+on the way: realistic circuits with a named application that no published
+checker proves under the benchmark protocol, with our kernel-checked proof.
 
 ## Trust
 

@@ -285,6 +285,26 @@ agent has to handle, and item 4 is the tool planned for them.
     this is the first form of the template step of item 6. S. Depends on
     nothing.
 
+15. **The S protocol run.** `ROADMAP.md`'s benchmark protocol and
+    `docs/milestones.md` need one column the catalogue does not have: for
+    each pair, whether QCEC, PyZX, quizx and Feynman prove it within one
+    hour and 16 GB. Reuse the driver of `scripts/hard_pair.py ladder`
+    (timeout, memory watchdog, the harness env `envs/qcec`) on catalogue
+    pairs: add a `checkers` sub-command to `scripts/circuit_pairs.py` that
+    records, per pair and tool, the verdict (proved, refuted, inconclusive,
+    timeout, memory, not run), the time and the tool version into
+    `pairs/index.json`, and a `--table` that prints the crossover table
+    for `docs/milestones.md`. First run: QCEC (default portfolio and the DD
+    checker alone) on `gf2^k_mult` against a TZAP `-O1` twin
+    (`CIRCUITEQ_TZAP_ARGS="-O1 --decompose-rz --decompose-cz"`, which
+    keeps the skeleton) and against the teleport twin, `k` from 4 to 64,
+    then `mod_adder_1024`, `ham15_high` and the Cobble circuits. Feynman
+    (`feynver`) is a Haskell build; until it is installed its cell reads
+    "not run", never "failed". Acceptance: the fork of
+    `docs/milestones.md` ("The experiment that orders the ladder") is
+    answered by data in the index, and the candidate table's prediction
+    column is replaced by measured verdicts. S to M. Depends on nothing.
+
 ## Later
 
 - A stronger judge for the agent harness. It now restates the theorem in a

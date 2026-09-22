@@ -735,6 +735,12 @@ timeout, and time. Report honestly that on compilation-flow pairs, where the
 two circuits are structurally close, decision-diagram tools will beat kernel
 checking at every `n`; the advantage there is T, not S.
 
+The milestone list this protocol produces, with the criteria that admit a
+pair (realistic, with a named application, made by an optimiser people run,
+and past every protocol tool at proving), the candidates drawn from the
+catalogue and the first run that orders them, is `docs/milestones.md`; the
+run itself is `QUEUE.md`, item 15.
+
 ## Cross-cutting tracks
 
 - **Performance.** Reflection, packed `Nat`, no `Finset.sum` in anything the
