@@ -157,37 +157,6 @@ theorem slice_denote (f : Fin m ↪ Fin n) (x : Fin (2 ^ n)) (c : Circuit m) (ψ
   | nil => rfl
   | cons g c ih => simpa [rename, slice_apply] using ih ((g.rename f).apply ψ)
 
-/-- Any proved identity can be placed on arbitrary distinct wires. -/
-theorem Equivalent.rename {a b : Circuit m} (h : a ≡ᵤ b) (f : Fin m ↪ Fin n) :
-    rename f a ≡ᵤ rename f b := by
-  intro ψ
-  funext x
-  have hs := h (slice f x ψ)
-  rw [← slice_denote f x a ψ, ← slice_denote f x b ψ] at hs
-  have hx := congrFun hs (restrictBits f x)
-  simpa [slice] using hx
-
-/-- Transfer an identity on `k` qubits to its placement on `k` wires of a
-larger register, with the placed circuits given up to definitional
-unfolding. This is the form the window tactic produces: `h` is decided on
-`k` qubits, and the two equations are `rfl`. -/
-theorem Equivalent.of_rename {k : ℕ} (f : Fin k ↪ Fin n) {a' b' : Circuit k}
-    {a b : Circuit n} (h : a' ≡ᵤ b') (ha : Quantum.Circuit.rename f a' = a)
-    (hb : Quantum.Circuit.rename f b' = b) : a ≡ᵤ b := by
-  subst ha hb
-  exact h.rename f
-
-/-- Equivalence on selected wires is equivalent to the smaller problem. -/
-theorem rename_equivalent_iff (f : Fin m ↪ Fin n) (a b : Circuit m) :
-    rename f a ≡ᵤ rename f b ↔ a ≡ᵤ b := by
-  refine ⟨?_, fun h => h.rename f⟩
-  intro h ψ
-  have hψ : slice f 0 (fun x => ψ (restrictBits f x)) = ψ := by
-    funext y
-    simp [slice]
-  have hs := congrArg (slice f 0) (h (fun x => ψ (restrictBits f x)))
-  rwa [slice_denote, slice_denote, hψ] at hs
-
 /-! ### Locality up to a scalar
 
 The slicing argument does not care what relates the two small circuits: if
@@ -222,6 +191,27 @@ lemma denote_eq_smul_of_rename {a b : Circuit m} {s : Zeta8} (f : Fin m ↪ Fin 
   have hs := congrArg (slice f 0) (h (fun x => ψ (restrictBits f x)))
   rwa [slice_smul, slice_denote, slice_denote, hψ] at hs
 
+/-- Any proved identity can be placed on arbitrary distinct wires. -/
+theorem Equivalent.rename {a b : Circuit m} (h : a ≡ᵤ b) (f : Fin m ↪ Fin n) :
+    rename f a ≡ᵤ rename f b := fun ψ => by
+  simpa using denote_rename_eq_smul (s := 1) (fun ψ => by simp [h ψ]) f ψ
+
+/-- Transfer an identity on `k` qubits to its placement on `k` wires of a
+larger register, with the placed circuits given up to definitional
+unfolding: `h` is decided on `k` qubits, and the two equations are `rfl`,
+which is how a hand-written proof places a small identity. -/
+theorem Equivalent.of_rename {k : ℕ} (f : Fin k ↪ Fin n) {a' b' : Circuit k}
+    {a b : Circuit n} (h : a' ≡ᵤ b') (ha : Quantum.Circuit.rename f a' = a)
+    (hb : Quantum.Circuit.rename f b' = b) : a ≡ᵤ b := by
+  subst ha hb
+  exact h.rename f
+
+/-- Equivalence on selected wires is equivalent to the smaller problem. -/
+theorem rename_equivalent_iff (f : Fin m ↪ Fin n) (a b : Circuit m) :
+    rename f a ≡ᵤ rename f b ↔ a ≡ᵤ b :=
+  ⟨fun h ψ => by simpa using denote_eq_smul_of_rename (s := 1) f (fun ψ => by simp [h ψ]) ψ,
+    fun h => h.rename f⟩
+
 /-- Any identity with a named phase can be placed on arbitrary distinct
 wires, and keeps its phase. -/
 theorem EquivalentWithPhase.rename {k : Fin 8} {a b : Circuit m} (h : a ≡ₚ[k] b)
@@ -248,7 +238,7 @@ theorem rename_equivalentWithPhase_iff (f : Fin m ↪ Fin n) (k : Fin 8) (a b : 
 wires. -/
 theorem EquivalentUpToPhase.rename {a b : Circuit m} (h : a ≡ₚ b) (f : Fin m ↪ Fin n) :
     rename f a ≡ₚ rename f b := by
-  obtain ⟨k, (hk : a ≡ₚ[k] b)⟩ := h
+  obtain ⟨k, hk⟩ := h
   exact ⟨k, hk.rename f⟩
 
 /-- Transfer an identity up to a global phase on `m` qubits to its placement

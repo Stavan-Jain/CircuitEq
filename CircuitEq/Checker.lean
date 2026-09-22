@@ -14,8 +14,8 @@ part of the contract, and `false` means "not decided", never
 "inequivalent". Every certified normal form or decision procedure (the
 phase-polynomial normaliser, the Clifford tableau, the small-window
 evaluator) is packaged as one of these, so that the certificate language
-can invoke any of them as a step and its replay theorem needs nothing
-beyond `Checker.sound`.
+can invoke any of them as a step and its replay theorems need nothing
+beyond `Checker.sound` (and `PhaseFinder.sound`, for replay up to phase).
 
 Rules for a module that provides a checker:
 
@@ -29,7 +29,9 @@ Rules for a module that provides a checker:
   well-founded recursion;
 * export one `Checker n` (or `PhaseChecker n`, `PhaseFinder n`,
   `ScalarChecker n`), the normal form if there is one as a `NormalForm n`,
-  and treat everything else as implementation.
+  and treat everything else as implementation, under the checker's own
+  namespace. A complete checker may also export a refuter, a `Bool` whose
+  `true` proves `¬ a ≡ᵤ b`, as `CircuitEq.PhasePoly.Complete` does.
 
 `Checker.orElse` combines checkers, and `NormalForm.toChecker` turns a
 normal form into the checker that compares both sides' forms.
@@ -68,14 +70,6 @@ structure ScalarChecker (n : ℕ) where
   /-- A `true` answer is a proof of equivalence up to a unit scalar. -/
   sound : ∀ a b, check a b = true → a ≡ₛ b
 
-/-- An exact checker is a phase checker. -/
-def Checker.toPhase (C : Checker n) : PhaseChecker n :=
-  ⟨C.check, fun a b h => (C.sound a b h).toUpToPhase⟩
-
-/-- A phase checker is a scalar checker. -/
-def PhaseChecker.toScalar (C : PhaseChecker n) : ScalarChecker n :=
-  ⟨C.check, fun a b h => (C.sound a b h).toUpToScalar⟩
-
 /-- Try the first checker, then the second. -/
 def Checker.orElse (C D : Checker n) : Checker n where
   check a b := C.check a b || D.check a b
@@ -103,13 +97,6 @@ def PhaseChecker.orElse (C D : PhaseChecker n) : PhaseChecker n where
     by_cases hc : C.check a b = true
     · exact C.sound a b hc
     · exact D.sound a b (by simpa [hc] using h)
-
-/-- The small-window oracle up to a global phase: decide on the
-computational basis, under each of the eight phases. Same cost and same
-place as `evalChecker`. -/
-def evalPhaseChecker (n : ℕ) : PhaseChecker n where
-  check a b := decide (a ≡ₚ b)
-  sound _ _ h := of_decide_eq_true h
 
 /-! ### Phase finders
 
@@ -167,6 +154,11 @@ exponential in `n`, like `evalChecker`'s. -/
 def evalPhaseFinder (n : ℕ) : PhaseFinder n where
   find := findPhase
   sound _ _ _ h := findPhase_sound h
+
+/-- The small-window oracle up to a global phase: the basis decision under
+each of the eight phases, as a phase checker. Same cost and same place as
+`evalChecker`. -/
+def evalPhaseChecker (n : ℕ) : PhaseChecker n := (evalPhaseFinder n).toChecker
 
 /-- A certified normal form for a fragment: `nf` is `none` outside the
 fragment, and equal forms are equivalent circuits. An optimiser

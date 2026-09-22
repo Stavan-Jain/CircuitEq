@@ -14,7 +14,7 @@ Every matrix entry of a Clifford+T circuit lies in `ℤ[1/√2, i]`, which sits
 inside the cyclotomic field `ℚ(ζ₈) = ℚ(i, √2)`. Mathlib's `ℂ` is
 noncomputable, so it cannot be the coefficient type of anything the kernel
 has to evaluate. This file provides a **computable** model of ℚ(ζ₈) instead,
-so that gate identities close by `decide`.
+so that gate identities close by `decide +kernel`.
 
 An element is stored by its coordinates `a + b·ω + c·ω² + d·ω³` in the power
 basis of `ω = ζ₈ = e^{iπ/4}`, with `ω⁴ = -1`. Equality is decided

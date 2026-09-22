@@ -209,17 +209,16 @@ sixteen 4-vector declarations peak at 3.6 GB instead of 2.6 GB, and a
 retention limits certificate replay (`QUEUE.md`, item 3), where the lever
 is a compact encoding of the instruction list.
 
-Two intermediate designs were measured on the way: the same dyadic
-arithmetic through the materialised list evaluator (`evalListD`, kept as
-the reference form) with the generic per-entry product (`applyOneD`) took
-0.66 s on the three-qubit window and could not do seven qubits either,
-because reading amplitude `x` of a list costs `x` steps and the kernel
-retains every intermediate term (`O(4^k)` per gate, so memory runs out
-before time does); the per-gate shuffles and the memoised closures with
-forced reads bring it to 0.1 s. Depth is now linear: eighteen Hadamards on
-one qubit decide in 42 ms, where the unforced closures did not finish in a
-minute. Memory is the limit before time: the kernel's `whnf` cache retains
-everything evaluated during one declaration.
+Two intermediate designs were measured on the way: the same dyadic arithmetic
+through the materialised list evaluator (`evalListD`, kept as the reference
+form) with a generic per-entry product (`applyOneD`, since removed) took 0.66 s
+on the three-qubit window and could not do seven qubits either, because reading
+amplitude `x` of a list costs `x` steps and the kernel retains every
+intermediate term (`O(4^k)` per gate, so memory runs out before time does); the
+per-gate shuffles and the memoised closures with forced reads bring it to 0.1 s.
+Depth is now linear: eighteen Hadamards on one qubit decide in 42 ms, where the
+unforced closures did not finish in a minute. Memory is the limit before time:
+the kernel's `whnf` cache retains everything evaluated during one declaration.
 
 ## Where each tool stands
 

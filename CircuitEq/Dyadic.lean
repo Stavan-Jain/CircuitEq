@@ -37,22 +37,21 @@ with `ω⁴ = -1`. The operations never divide:
 The representation is not canonical (`⟨2, 0, 0, 0, 2⟩` and `⟨1, 0, 0, 0, 0⟩`
 both denote `1`), and nothing here relies on it being so: `eqv` is exact
 because multiplication by `√2` is injective, which is what `eqv_iff` proves.
-`reduce` divides out `√2` while the coordinates allow it and is available to
-keep numbers small; the evaluator does not need it, since the kernel's
-integer arithmetic is GMP and a few hundred bits cost nothing.
+Nothing divides out common factors of `√2` either: the kernel's integer
+arithmetic is GMP, and a few hundred bits cost nothing.
 
 ## Gate actions
 
-`Gate1.matD` and `applyOneD` mirror `Gate1.mat` and `applyOne` entry for
-entry, a product per matrix entry. Every entry of a Clifford+T gate is `0`
-or a unit monomial `±ω^j`, over `√2` for `H`, so the evaluator runs the
-specialised `Gate1.applyD` instead: a diagonal gate is a coordinate shuffle
-(`mulω`, `mulI`, …) on the amplitudes with the bit set, `X` and `Y` are the
-flip with a shuffle, and `H` is one `add` and an exponent bump, with no
-`Dyadic8` product anywhere. `Gate1.applyN` and `applyCNOTN` are the same
-actions on `ℕ`-indexed states (definitionally, up to unfolding `VecN.at`),
-which is what lets the kernel memoise the closure evaluator of
-`CircuitEq.Decide` (see the section docstring below).
+Every entry of a Clifford+T gate is `0` or a unit monomial `±ω^j`, over `√2` for
+`H`, so multiplying an amplitude by an entry is a signed coordinate shuffle, and
+the evaluator runs `Gate1.applyD`, one case per gate, instead of a product per
+matrix entry: a diagonal gate is a coordinate shuffle (`mulω`, `mulI`, …) on the
+amplitudes with the bit set, `X` and `Y` are the flip with a shuffle, and `H` is
+one `add` and an exponent bump, with no `Dyadic8` product anywhere.
+`Gate1.applyN` and `applyCNOTN` are the same actions on `ℕ`-indexed states
+(definitionally, up to unfolding `VecN.at`), which is what lets the kernel
+memoise the closure evaluator of `CircuitEq.Decide` (see the section docstring
+below).
 
 ## Trust
 
@@ -131,10 +130,6 @@ def ωPow : ℕ → Dyadic8
   | 0 => one
   | k + 1 => mul (ωPow k) ω
 
-/-- Multiplication by `√2 = ω - ω³`, as the signed shuffle of the numerator
-`(a, b, c, d) ↦ (b - d, a + c, b + d, c - a)`; the exponent is unchanged. -/
-def sqrt2Mul (x : Dyadic8) : Dyadic8 := ⟨x.b - x.d, x.a + x.c, x.b + x.d, x.c - x.a, x.k⟩
-
 /-- The same value with the exponent raised by one: multiply the numerator
 by `√2` and the denominator by `√2`. -/
 def raise (x : Dyadic8) : Dyadic8 := ⟨x.b - x.d, x.a + x.c, x.b + x.d, x.c - x.a, x.k + 1⟩
@@ -175,37 +170,12 @@ def eqvAligned (x y : Dyadic8) : Bool :=
 Exact even though the representation is not canonical (`eqv_iff`). -/
 def eqv (x y : Dyadic8) : Bool := eqvAligned (raiseN x (y.k - x.k)) (raiseN y (x.k - y.k))
 
-/-- One reduction step: if the numerator is divisible by `√2` (which holds
-iff `a ≡ c` and `b ≡ d` mod 2) and the exponent is positive, divide both.
-`none` when no step applies. -/
-def reduceStep (x : Dyadic8) : Option Dyadic8 :=
-  match x.k with
-  | 0 => none
-  | k + 1 =>
-    if (x.a + x.c) % 2 = 0 && (x.b + x.d) % 2 = 0 then
-      some ⟨(x.b - x.d) / 2, (x.a + x.c) / 2, (x.b + x.d) / 2, (x.c - x.a) / 2, k⟩
-    else none
-
-/-- Reduce as far as `fuel` steps allow. -/
-def reduceAux : ℕ → Dyadic8 → Dyadic8
-  | 0, x => x
-  | j + 1, x =>
-    match reduceStep x with
-    | some y => reduceAux j y
-    | none => x
-
-/-- Divide out `√2` while the numerator allows it. The exponent can drop at
-most `k` times, so `k` is enough fuel. Optional: `eqv` does not rely on it. -/
-def reduce (x : Dyadic8) : Dyadic8 := reduceAux x.k x
-
 /-! ### Exponents and numerators of the operations -/
 
 /-- `neg` keeps the exponent. -/
 @[simp] lemma k_neg (x : Dyadic8) : (neg x).k = x.k := rfl
 /-- `mul` adds the exponents. -/
 @[simp] lemma k_mul (x y : Dyadic8) : (mul x y).k = x.k + y.k := rfl
-/-- `sqrt2Mul` keeps the exponent. -/
-@[simp] lemma k_sqrt2Mul (x : Dyadic8) : (sqrt2Mul x).k = x.k := rfl
 /-- `raise` bumps the exponent. -/
 @[simp] lemma k_raise (x : Dyadic8) : (raise x).k = x.k + 1 := rfl
 /-- `mulω` keeps the exponent. -/
@@ -233,10 +203,6 @@ lemma num_neg (x : Dyadic8) : num (neg x) = -num x := by ext <;> simp [num, neg]
 /-- The numerator of `mul` is the `Zeta8` product of the numerators. -/
 lemma num_mul (x y : Dyadic8) : num (mul x y) = num x * num y := by
   ext <;> simp [num, mul]
-
-/-- The numerator of `sqrt2Mul`: the shuffle is multiplication by `√2`. -/
-lemma num_sqrt2Mul (x : Dyadic8) : num (sqrt2Mul x) = Zeta8.sqrt2 * num x := by
-  ext <;> simp [num, sqrt2Mul, Zeta8.sqrt2] <;> ring
 
 /-- The numerator of `raise`: the shuffle is multiplication by `√2`. -/
 lemma num_raise (x : Dyadic8) : num (raise x) = Zeta8.sqrt2 * num x := by
@@ -284,10 +250,6 @@ lemma toZeta8_neg (x : Dyadic8) : toZeta8 (neg x) = -toZeta8 x := by
 lemma toZeta8_mul (x y : Dyadic8) : toZeta8 (mul x y) = toZeta8 x * toZeta8 y := by
   simp only [toZeta8, num_mul, k_mul, pow_add]
   ring
-
-/-- `sqrt2Mul` means multiplication by `√2`. -/
-lemma toZeta8_sqrt2Mul (x : Dyadic8) : toZeta8 (sqrt2Mul x) = Zeta8.sqrt2 * toZeta8 x := by
-  simp only [toZeta8, num_sqrt2Mul, k_sqrt2Mul, mul_assoc]
 
 /-- Raising the exponent does not change the value: `√2 / √2 = 1`. -/
 lemma toZeta8_raise (x : Dyadic8) : toZeta8 (raise x) = toZeta8 x := by
@@ -339,39 +301,6 @@ lemma toZeta8_ωPow (k : ℕ) : toZeta8 (ωPow k) = Zeta8.ω ^ k := by
   | zero => simp [ωPow]
   | succ k ih => rw [ωPow, pow_succ, ← ih, ← toZeta8_ω]; exact toZeta8_mul _ _
 
-/-- A reduction step preserves the value: the new element, raised once, is
-the old one coordinate by coordinate. -/
-lemma toZeta8_of_reduceStep {x y : Dyadic8} (h : reduceStep x = some y) :
-    toZeta8 y = toZeta8 x := by
-  unfold reduceStep at h
-  split at h
-  · exact absurd h (by simp)
-  · rename_i k _
-    split at h
-    · rename_i hmod
-      simp only [Bool.and_eq_true, decide_eq_true_eq] at hmod
-      obtain ⟨hac, hbd⟩ := hmod
-      obtain rfl := Option.some.inj h
-      have hx :
-          raise ⟨(x.b - x.d) / 2, (x.a + x.c) / 2, (x.b + x.d) / 2, (x.c - x.a) / 2, k⟩ = x := by
-        ext <;> simp only [raise] <;> omega
-      exact (toZeta8_raise _).symm.trans (congrArg toZeta8 hx)
-    · exact absurd h (by simp)
-
-/-- Reduction steps preserve the value. -/
-lemma toZeta8_reduceAux (j : ℕ) (x : Dyadic8) : toZeta8 (reduceAux j x) = toZeta8 x := by
-  induction j generalizing x with
-  | zero => rfl
-  | succ j ih =>
-    unfold reduceAux
-    split
-    · rename_i y hy
-      rw [ih, toZeta8_of_reduceStep hy]
-    · rfl
-
-/-- `reduce` preserves the value. -/
-lemma toZeta8_reduce (x : Dyadic8) : toZeta8 (reduce x) = toZeta8 x := toZeta8_reduceAux _ _
-
 /-! ### Equality -/
 
 /-- On aligned elements, numerator equality is value equality: `√2 ^ k` is a
@@ -402,58 +331,14 @@ namespace Circuit
 
 open Dyadic8
 
-/-- A single-qubit matrix with dyadic entries. -/
-abbrev Mat1D := Bool → Bool → Dyadic8
-
-/-- The `ℚ(ζ₈)` matrix of a dyadic matrix. -/
-def Mat1D.toMat (G : Mat1D) : Mat1 := Matrix.of fun r c => toZeta8 (G r c)
-
-/-- Entries of `Mat1D.toMat`. -/
-@[simp] lemma Mat1D.toMat_apply (G : Mat1D) (r c : Bool) : G.toMat r c = toZeta8 (G r c) := rfl
-
-namespace Gate1
-
-/-- The dyadic matrix of each gate: `Gate1.mat` with `1/√2` as
-`⟨1, 0, 0, 0, 1⟩`, `i` as `⟨0, 0, 1, 0, 0⟩` and `-ω³` as `⟨0, 0, 0, -1, 0⟩`. -/
-def matD : Gate1 → Mat1D
-  | H => fun r c => if r && c then ⟨-1, 0, 0, 0, 1⟩ else ⟨1, 0, 0, 0, 1⟩
-  | X => fun r c => if r = c then zero else one
-  | Y => fun r c => if r = c then zero else if r then ⟨0, 0, 1, 0, 0⟩ else ⟨0, 0, -1, 0, 0⟩
-  | Z => fun r c => if r = c then (if r then ⟨-1, 0, 0, 0, 0⟩ else one) else zero
-  | S => fun r c => if r = c then (if r then ⟨0, 0, 1, 0, 0⟩ else one) else zero
-  | Sdg => fun r c => if r = c then (if r then ⟨0, 0, -1, 0, 0⟩ else one) else zero
-  | T => fun r c => if r = c then (if r then ω else one) else zero
-  | Tdg => fun r c => if r = c then (if r then ⟨0, 0, 0, -1, 0⟩ else one) else zero
-
-/-- The dyadic matrices mean the `ℚ(ζ₈)` ones, entry by entry. -/
-lemma toZeta8_matD (g : Gate1) (r c : Bool) : toZeta8 (g.matD r c) = g.mat r c := by
-  cases g <;> cases r <;> cases c <;> decide +kernel
-
-/-- The dyadic matrices mean the `ℚ(ζ₈)` ones. -/
-lemma toMat_matD (g : Gate1) : g.matD.toMat = g.mat :=
-  Matrix.ext fun r c => toZeta8_matD g r c
-
-end Gate1
-
 /-- Amplitude vectors with dyadic entries. -/
 abbrev VecD (n : ℕ) := Fin (2 ^ n) → Dyadic8
 
 variable {n : ℕ}
 
-/-- `applyOne` on dyadic states: the new amplitude at `x` mixes the old ones
-at `x` and at `x` with bit `i` flipped, weighted by row `bit i x` of `G`. -/
-def applyOneD (G : Mat1D) (i : Fin n) (ψ : VecD n) : VecD n :=
-  fun x => add (mul (G (bit i x) (bit i x)) (ψ x)) (mul (G (bit i x) (!bit i x)) (ψ (flipBit i x)))
-
 /-- `applyCNOT` on dyadic states: a permutation of amplitudes, no arithmetic. -/
 def applyCNOTD (c t : Fin n) (ψ : VecD n) : VecD n :=
   fun x => if bit c x then ψ (flipBit t x) else ψ x
-
-/-- `applyOneD` means `applyOne`. -/
-lemma toZeta8_comp_applyOneD (G : Mat1D) (i : Fin n) (ψ : VecD n) :
-    toZeta8 ∘ applyOneD G i ψ = applyOne G.toMat i (toZeta8 ∘ ψ) := by
-  funext x
-  simp [applyOneD, applyOne, toZeta8_add, toZeta8_mul]
 
 /-- `applyCNOTD` means `applyCNOT`. -/
 lemma toZeta8_comp_applyCNOTD (c t : Fin n) (ψ : VecD n) :
@@ -464,14 +349,13 @@ lemma toZeta8_comp_applyCNOTD (c t : Fin n) (ψ : VecD n) :
 
 /-! ### The gate actions the evaluator runs
 
-`applyOneD` with `Gate1.matD` is the general form, a product per matrix
-entry. Every entry of a Clifford+T gate is `0` or a unit monomial `±ω^j`,
-over `√2` for `H`, so multiplying an amplitude by an entry is a signed
-coordinate shuffle and the zero entries need not be touched at all.
-`Gate1.applyD` is that specialisation, one case per gate: a diagonal gate
-is a shuffle on the amplitudes with the bit set, `X` and `Y` are the flip
-with a shuffle, and `H` is one `add` and an exponent bump. It is proved
-against `applyOne g.mat` directly. -/
+Every entry of a Clifford+T gate is `0` or a unit monomial `±ω^j`, over `√2` for
+`H`, so multiplying an amplitude by an entry is a signed coordinate shuffle and
+the zero entries need not be touched at all. `Gate1.applyD` is that
+specialisation of `applyOne`, one case per gate: a diagonal gate is a shuffle on
+the amplitudes with the bit set, `X` and `Y` are the flip with a shuffle, and
+`H` is one `add` and an exponent bump. It is proved against `applyOne g.mat`
+directly. -/
 
 namespace Gate1
 

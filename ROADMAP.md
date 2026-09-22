@@ -428,20 +428,20 @@ test of the working hypothesis above. Everything here is stated with `≡ᵤ` an
   their restrictions on `k` qubits. Gate placement is `rename f` for an
   embedding `f : Fin k ↪ Fin n`; this is what makes a window cost `2^k`
   instead of `2^n`.
-- **The window pattern.** Given an alignment — a matching of windows between
-  the two circuits, plus the commutations needed to make them adjacent — a
-  tactic or macro discharges the whole equivalence by congruence, moving
-  lemmas, and one small `decide` per window. The alignment is *input*; the
-  tactic only checks it. ✅ (September 2026.) `circuit_windows` in
-  `CircuitEq/Tactic.lean` takes the alignment as a list of windows, decides
-  each on its own wires (`Equivalent.of_rename`, cost `2^k`), and checks
-  every move (`pull_cons`); `circuit_simp` is the same engine without
-  windows. The block theorems of `CircuitEq/Layers.lean` closed the first
-  two QECUnitaryCircuits-versus-PyZX pairs, and `circuit_windows` closed
-  `tof_3` against PyZX phase teleportation (T-count 21 → 19) with four
-  windows on at most three wires (`CircuitEq/Benchmarks/`). Re-synthesised
-  output (`full_reduce`, T-count 15 on the same input) has no alignment;
-  that is the residual pattern's job.
+- **The window pattern.** Given an alignment — a matching of windows between the
+  two circuits, plus the commutations needed to make them adjacent — a tactic or
+  macro discharges the whole equivalence by congruence, moving lemmas, and one
+  small `decide` per window. The alignment is *input*; the tactic only checks
+  it. ✅ (September 2026.) `circuit_windows` in `CircuitEq/Tactic.lean` takes the
+  alignment as a list of windows, decides each on its own wires (cost `2^k`),
+  and checks every move (then by `Equivalent.of_rename` and `pull_cons`; since
+  `a163ea5` as the `window` and move steps of one replayed certificate);
+  `circuit_simp` is the same engine without windows. The block theorems of
+  `CircuitEq/Layers.lean` closed the first two QECUnitaryCircuits-versus-PyZX
+  pairs, and `circuit_windows` closed `tof_3` against PyZX phase teleportation
+  (T-count 21 → 19) with four windows on at most three wires
+  (`CircuitEq/Benchmarks/`). Re-synthesised output (`full_reduce`, T-count 15 on
+  the same input) has no alignment; that is the residual pattern's job.
 - **The certificate language and replay interpreter.** ✅ (16 September
   2026, `CircuitEq/Certificate.lean`.) `Step` (`swap`, `moveLeft`,
   `moveRight` across a block with disjoint bitmask support, `cancel`,

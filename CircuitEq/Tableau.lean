@@ -169,10 +169,6 @@ def xorMask (x : ℕ) (w : Fin (2 ^ n)) : Fin (2 ^ n) :=
 @[simp] lemma val_xorMask (x : ℕ) (w : Fin (2 ^ n)) :
     (xorMask x w).val = (w.val ^^^ x) % 2 ^ n := rfl
 
-lemma testBit_xorMask (x : ℕ) (w : Fin (2 ^ n)) (i : ℕ) :
-    (xorMask x w).val.testBit i = (decide (i < n) && (w.val.testBit i ^^ x.testBit i)) := by
-  simp [Nat.testBit_mod_two_pow, Nat.testBit_xor]
-
 @[simp] lemma xorMask_zero (w : Fin (2 ^ n)) : xorMask 0 w = w := by
   ext
   simp [Nat.mod_eq_of_lt w.isLt]

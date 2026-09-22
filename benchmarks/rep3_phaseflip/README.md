@@ -19,14 +19,14 @@ PyZX:     CX 0 1; H 1; CX 0 2; H 2; H 0
 
 ## Proof and checks
 
-`CircuitEq/Benchmarks/Rep3PhaseFlip.lean` contains:
+`CircuitEq/Benchmarks/Rep3PhaseFlip.lean` contains the two circuits and:
 
 - `original_equiv_optimized`: equality on **every input vector**, with no
   global-phase correction, proved by `circuit_simp`. The tactic pulls each
   gate of the PyZX order through the gates on other wires it must pass;
-  every move is a decided commutation check.
-- `reorder`: the same fact for any three distinct qubits in any register,
-  from the commutation lemmas directly.
+  every move is a decided commutation check. On any three distinct qubits
+  of any register the same fact is
+  `original_equiv_optimized.rename (wires₃ hab hac hbc)`.
 
 The module is imported by `CircuitEq.lean`, so normal builds and the CI axiom
 audit include these declarations. No new evaluator, axioms, or

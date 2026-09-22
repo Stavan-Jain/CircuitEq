@@ -71,9 +71,9 @@ Rules that follow, for anyone adding to the library:
   a `√2` exponent, `add` / `mul` / `eqv` by exponent alignment, `toZeta8`
   with a `toZeta8_*` lemma per operation and `eqv_iff`. The per-gate
   actions `Gate1.applyD` (on `Fin`, proved against `applyOne g.mat`) and
-  `Gate1.applyN` / `applyCNOTN` (on `ℕ`, definitionally the same; what
-  `evalFn` composes), plus the generic `Gate1.matD` / `applyOneD` mirror of
-  `applyOne`. A computational device only: `denote` stays over `Zeta8`.
+  `Gate1.applyN` / `applyCNOTN` (on `ℕ`, the same up to unfolding
+  `VecN.at`; what `evalFn` composes). A computational device only: `denote`
+  stays over `Zeta8`.
 - `CircuitEq/Chunk.lean` — chunked kernel evaluation: `AllBelow P k`
   (`P y = true` for every `y < k`), `AllBelow.zero`, `AllBelow.add` (extend
   by a range `(List.range' lo len).all P = true`, itself one
@@ -133,12 +133,11 @@ Rules that follow, for anyone adding to the library:
   A checker module imports only
   `Decide`, `Structural`, `Support` and `Checker`, writes `check` as
   kernel-friendly `Bool` code, and exports exactly one checker.
-- `CircuitEq/Support.lean` — wire sets as `Nat` bitmasks, the one encoding
-  every checker and the certificate language use: `Instr.support`,
-  `support`, `masksDisjoint`, `support_testBit`,
-  `not_touches_of_disjoint`; `Rewriting.lean` adds
-  `Instr.CanCommute.of_disjoint` and `gate_block_comm_of_disjoint`. Do not
-  invent a second encoding of wire sets.
+- `CircuitEq/Support.lean` — wire sets as `Nat` bitmasks, the one encoding every
+  checker and the certificate language use: `Instr.support`, `support`,
+  `masksDisjoint`, `support_testBit`, `not_touches_of_disjoint`;
+  `Rewriting.lean` adds `gate_block_comm_of_disjoint`. Do not invent a second
+  encoding of wire sets.
 - `CircuitEq/Lanes.lean` — the bit-plane arithmetic under the phase
   polynomial, nothing in it about circuits: `Lanes` (residues modulo 8 on
   many lanes as three `Nat` planes; `add`, `addOn`, `addOnz`, `lane`,
@@ -206,15 +205,16 @@ Rules that follow, for anyone adding to the library:
   pair that is equal only up to a phase to an exact one at no `T`-cost.
 - `CircuitEq/Rewriting.lean` — rewriting on instruction lists:
   `Equivalent.in_context` (and `EquivalentWithPhase.in_context`,
-  `EquivalentUpToPhase.in_context`: a window's phase is the phase of the
-  whole), the decidable checks `Instr.CanCommute` /
-  `Instr.CanCancel` with their `sound` lemmas, `gate_block_comm`,
-  `blocks_comm`, `perm_equivalent`, `pull_cons`, `cancel_window`.
-  `CanCommute` licenses: equal gates, disjoint wires, two diagonal gates on
-  one wire, a diagonal gate on a CNOT control, `X` on a CNOT target, CNOTs
-  whose controls avoid each other's targets. Extend it there (with a
-  `sound` case) when a benchmark needs a new local commutation; the
-  tactics pick it up automatically.
+  `EquivalentUpToPhase.in_context`: a window's phase is the phase of the whole),
+  the decidable checks `Instr.CanCommute` / `Instr.CanCancel` with their `sound`
+  lemmas, `gate_block_comm`, `blocks_comm`, `perm_equivalent`. The certificate
+  language replaced the proof-term helpers the tactics once assembled
+  (`pull_cons`, `cancel_window`); a move or a cancellation in a hand-written
+  proof is a step of `circuit_replay` or a `circuit_simp` call. `CanCommute`
+  licenses: equal gates, disjoint wires, two diagonal gates on one wire, a
+  diagonal gate on a CNOT control, `X` on a CNOT target, CNOTs whose controls
+  avoid each other's targets. Extend it there (with a `sound` case) when a
+  benchmark needs a new local commutation; the tactics pick it up automatically.
 - `CircuitEq/Layers.lean` — `cnotNetwork`, `swapEndpoints`, `hOn` (a layer
   indexed by a `Finset`), `hOn_symmDiff`, `cnotNetwork_layer`, and the
   benchmark-facing `layer_cnotNetwork_hLayer`.
@@ -226,21 +226,22 @@ Rules that follow, for anyone adding to the library:
   on the window's own wires); `replay_sound`; the closing form
   `replay_sound Cs steps (by decide +kernel)` and the macro
   `circuit_replay Cs steps`. Generic in the table: it imports no checker, and no
-  checker module imports it. A new proof technique is a new step kind here with
-  its case in `replayStep_sound`; the kernel evaluates `replay` once per proof.
-  The same `Step`s replay up to a global phase:
-  `replayPhase Fs steps c : Option (Fin 8 × Circuit n)` reads a `window` against
-  a `PhaseTable` of `PhaseFinder`s (`windowPhase`), places it syntactically
-  (`placeFront`) and adds the exponent found to an accumulator; every other step
-  is the exact rewrite.
+  checker module imports it. A new proof technique is a new step kind here: an
+  exact rewrite is a case of `exactStep` and `exactStep_sound`, which the exact
+  and the phase readings share, and a step that consults a checker needs its own
+  case in `replayStep` and `replayStepPhase`, as `window` has. The kernel
+  evaluates `replay` once per proof. The same `Step`s replay up to a global
+  phase: `replayPhase Fs steps c : Option (Fin 8 × Circuit n)` reads a `window`
+  against a `PhaseTable` of `PhaseFinder`s (`windowPhase`), places it
+  syntactically (`placeFront`) and adds the exponent found to an accumulator;
+  every other step is the exact rewrite.
   `replayPhase_sound : replayPhase Fs steps c = some (k, c') → c ≡ₚ[k] c'`, so
   the kernel computes the phase of the whole pair; `replayUpToPhase` /
   `replayUpToPhase_sound` forget it and conclude `c ≡ₚ c'`; the macro
   `circuit_replay_phase Fs steps`, which closes either goal. `rewriteAt_rel` is
-  `rewriteAt_sound` for any relation that `cons` preserves, and a new step kind
-  needs its case in `replayStepPhase_sound` too. The phase replay costs about
-  1.2 times the exact one (`benchmarks/scale/README.md`, "Where each tool
-  stands"). Measure with `set_option Elab.async false`: with asynchronous
+  `rewriteAt_sound` for any relation that `cons` preserves. The phase replay
+  costs about 1.2 times the exact one (`benchmarks/scale/README.md`, "Where each
+  tool stands"). Measure with `set_option Elab.async false`: with asynchronous
   elaboration the kernel checks of neighbouring declarations overlap and the
   profiler's figures grow with position in the file. The scalar replay for `≡ₛ`
   (so that the tableau can justify a window) is still open (`QUEUE.md` item 13).
@@ -444,17 +445,16 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
 - **Circuits are lists in time order.** `denote [g₁, g₂] ψ = U₂ (U₁ ψ)`;
   fusion lemmas therefore have the *later* gate as the left matrix factor
   (`fuse : B.mat * A.mat = C.mat → [one A i, one B i] ≡ᵤ [one C i]`).
-- **Benchmark proofs are `calc` chains on lists.** Name the block
-  decomposition (`layer`, `cnotNetwork`, `hLayer`, a `def edges`), equate
-  the circuit to it by `rfl`, apply the block theorem, and finish with
-  `circuit_simp`. Do not unfold `denote` and rewrite with `applyOne_comm`
-  gate by gate; that is what `CircuitEq/Rewriting.lean` exists to avoid.
-  `perm_equivalent` needs *every* pair in the block to commute; when only
-  the moved gates need to, use `circuit_simp` or `pull_cons`. When the
-  optimiser rewrote a few local regions, hand them to `circuit_windows` as
-  `(before, after)` pairs rather than writing `in_context`, `rename` and
-  `decide +kernel` by hand; a window's decide costs `2 ^ k` for its `k`
-  wires, not `2 ^ n`.
+- **Benchmark proofs are `calc` chains on lists.** Name the block decomposition
+  (`layer`, `cnotNetwork`, `hLayer`, a `def edges`), equate the circuit to it by
+  `rfl`, apply the block theorem, and finish with `circuit_simp`. Do not unfold
+  `denote` and rewrite with `applyOne_comm` gate by gate; that is what
+  `CircuitEq/Rewriting.lean` exists to avoid. `perm_equivalent` needs *every*
+  pair in the block to commute; when only the moved gates need to, use
+  `circuit_simp`. When the optimiser rewrote a few local regions, hand them to
+  `circuit_windows` as `(before, after)` pairs rather than writing `in_context`,
+  `rename` and `decide +kernel` by hand; a window's decide costs `2 ^ k` for its
+  `k` wires, not `2 ^ n`.
 - **A pair that is equal only up to a global phase is stated on `≡ₚ`**, and
   proved with the same tools: `circuit_windows` on the `≡ₚ` goal, `calc`
   chains that mix `≡ᵤ` and `≡ₚ` steps, `append` and `in_context` for

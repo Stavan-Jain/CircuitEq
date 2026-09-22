@@ -103,8 +103,8 @@ not commute), and structural results for every `n` (`H²` cancels on any qubit,
 [`benchmarks/rep3_phaseflip/`](benchmarks/rep3_phaseflip/README.md) adds an
 original-versus-PyZX pair from QECUnitaryCircuits: the three-qubit
 phase-flip repetition encoder, whose five gates PyZX only reorders. The pair
-closes by `circuit_simp` in one line; `reorder` is the same fact for any
-three distinct wires of any register.
+closes by `circuit_simp` in one line, and `rename` places it on any three
+distinct wires of any register.
 
 [`benchmarks/steane_plus/`](benchmarks/steane_plus/README.md) proves a larger
 pair: PyZX reduces the seven-qubit Steane logical plus-state encoder from
@@ -213,12 +213,12 @@ applies next.
   `Equivalent.in_context` replaces an equivalent window inside any prefix and
   suffix; `Instr.CanCommute` and `Instr.CanCancel` are decidable syntactic
   checks whose `sound` lemmas produce the semantic swap or cancellation
-  (`CanCommute` knows disjoint wires, diagonal gates on one wire, a
-  diagonal gate on a CNOT control, `X` on a CNOT target, and CNOTs whose
-  controls avoid each other's targets);
-  `gate_block_comm`, `blocks_comm`, `perm_equivalent`, `pull_cons` and
-  `cancel_window` move gates and blocks. A benchmark proof never mentions
-  `denote` or an amplitude vector.
+  (`CanCommute` knows disjoint wires, diagonal gates on one wire, a diagonal
+  gate on a CNOT control, `X` on a CNOT target, and CNOTs whose controls avoid
+  each other's targets); `gate_block_comm`, `blocks_comm` and `perm_equivalent`
+  move gates and blocks, and the certificate steps (`moveLeft`, `swap`,
+  `cancel`) do the same by replay. A benchmark proof never mentions `denote` or
+  an amplitude vector.
 - **Layers and networks are first-class.** `layer_cnotNetwork_hLayer` moves
   a Hadamard layer through a whole CNOT network in one step, reversing every
   CNOT and cancelling against the seed layer, for every `n`; `hOn_symmDiff`
