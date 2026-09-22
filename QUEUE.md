@@ -120,21 +120,10 @@ agent has to handle, and item 4 is the tool planned for them.
    the equivalence), and `scripts/check_pyzx_benchmarks.py` cross-checks
    them against PyZX's own count. S. Depends on nothing.
 
-3. **Replay memory.** `cuccaro_4`'s certificate (155 gates, 8 windows)
-   is killed at 4.6 GB while the same windows pass on `cuccaro_3`, and a
-   128-gate move-only replay peaks at 1.9 GB: the kernel's `whnf` cache
-   retains every intermediate instruction list for the whole declaration.
-   The two other victims of that retention are done (see "Done": the
-   chunked basis decide and the chunked tableau, `CircuitEq/Chunk.lean`);
-   replay is what is left. Levers, in order: a compact `Nat` (or `String`)
-   encoding of the instruction list decoded by the kernel (the canonical
-   phase polynomial showed what this buys: packing the row table into one
-   `Nat` took a CNOT from about 1.5 MB of retained `List.set` terms to a
-   shift and an xor); chunked replay, one theorem per segment of the
-   trace composed by `Equivalent.trans`, in a file with
-   `set_option Elab.async false`; cursor-based steps (item 6).
-   Acceptance: `cuccaro_4` / teleport checks under 2 GB. M. Depends on
-   nothing.
+3. *(done, `490820f`; see "Done")* **Replay memory.** The original
+   `cuccaro_4` alignment checks below 2 GB with bounded exact replay and
+   separately cached window proofs. Compact storage and cursor-based
+   traversal remain useful follow-ups under item 6.
 
 4. **Path sums of the pair (phase polynomials with Hadamard variables).**
    The tool for pairs that do not line up (`ROADMAP.md`, "The pair as one
@@ -316,6 +305,16 @@ agent has to handle, and item 4 is the tool planned for them.
 
 ## Done
 
+- `490820f` Replay memory: exact `circuit_simp` / `circuit_windows`
+  traces use kernel declarations of at most eight steps, with literal
+  checkpoints and `Equivalent.trans`. Window proofs are checked separately
+  (symbolic phase polynomials or chunked basis evaluation) and reused through
+  `Checker.ofProof` / `CheckerTable.cache`. The unchanged `cuccaro_4`
+  eight-window alignment is promoted and checks under 2 GB; a synthetic
+  2048-gate / 128-move trace also certifies. Reproduction and measurements:
+  `benchmarks/cuccaro_4/README.md`, `benchmarks/scale/README.md`. Phase
+  replay and direct `circuit_replay` macros remain single-declaration;
+  packing and cursor steps still address traversal time and proof size.
 - `83cc1d7` Composition up to
   a global phase, because PyZX and TZAP preserve a circuit only up to one.
   `EquivalentWithPhase` (`a ≡ₚ[k] b`, `k : Fin 8`) under `≡ₚ`, with the
