@@ -86,7 +86,7 @@ GHZ on 2 million qubits but Grover on only 16 [20].
 | Quarl [38] | 6 h per circuit plus a GPU; 35.2% total reduction against 31.0% for Queso | Partitioning misses optimisations that cross partitions |
 | GUOQ / Wisq [39] | 1 h, up to 36 qubits; best two-qubit results at that scale (28% on IBM hardware). With resynthesis turned off, TZAP's 3-hour runs saw essentially no reduction above 10k gates [52] | Resynthesis limited to 3 qubits; random search |
 | Quasar (e-graphs) [42], Qsymb [43] | Quasar's own suite (median 232 gates) takes 12.2 h in total, and it ran out of 64 GB on 95 of TZAP's 135 circuits [52]. Qsymb: up to 17k gates in 60 min | E-graphs grow in memory |
-| PyZX `full_reduce` [14, 13], QuiZX [17] | PyZX timed out at 1 h on `gf2^64_mult` (70k gates) [51]; QuiZX timed out on 26 of 135 and its extraction crashed on 3 of 6 Cobble circuits [51, 52]. In this repository's catalogue `full_reduce` was stopped at 240 s on four tier-4 circuits below 8k gates | Extraction is #P-hard in general and inflates the CNOT count [32] |
+| PyZX `full_reduce` [14, 13], QuiZX [17] | PyZX timed out at 1 h on `gf2^64_mult` (70k gates) [51]; QuiZX timed out on 26 of 135 and its extraction crashed on 3 of 6 Cobble circuits [51, 52]. In this repository's catalogue `full_reduce` does not finish past a few thousand gates (`benchmarks/circuits/README.md`) | Extraction is #P-hard in general and inflates the CNOT count [32] |
 | Feynman `feynopt` [21] | 30.7 min on `gf2^64_mult`; timed out on 52 of 135 [51, 52] | Symbolic parities grow heavier as H and CX interleave more densely |
 | T-par [48] | 26.5 h on GF(2⁶⁴) | O(g³) |
 | TODD, FastTODD, TOHPE [49, 50] | TODD took 11.4 h on `adder_8` (24 qubits plus 71 ancillas); FastTODD and TOHPE hit the 24 h cap on the 640-qubit DEFAULT cipher; exact Reed–Muller decoding stops at n ≤ 6 | One ancilla per Hadamard gadget, so n + h qubits |
@@ -146,10 +146,9 @@ and `gf2^256_mult` every competitor fails while TZAP takes 0.06 to 0.25 s.
 opaque to phase folding; windows are at most 3 qubits and the table is
 incomplete; windows whose exact coefficients overflow the table's integer
 width are skipped; Feynman leads on rotation count by 1.5 percentage points at
-the median. In this repository's catalogue TZAP matched the best T-count on 64
-of 74 circuits, and PyZX `full_reduce` did better on 6 (`mod5_4` 8 against 16,
-`adder_8` 173 against 215, `ham15_med` 212 against 234, `csla_mux_3`,
-`multiplier_n15`, `multiplier_n45`).
+the median. In this repository's catalogue TZAP matches the best T-count on
+most circuits, and PyZX `full_reduce` beats it on a few, among them `mod5_4`
+and `adder_8` (`benchmarks/circuits/README.md`, `optimization.json`).
 
 **How correctness is assured.** The Rust binary gives no certificate. A
 separate Lean 4 port (34 files, no `sorry`) proves each deterministic pass
@@ -160,10 +159,9 @@ generator, not the independent uniform draws the bound assumes. Validation is
 matrix comparison up to 6 qubits, Feynman's path-sum verifier on most feasible
 Feynman-suite circuits, and QCEC on the smallest files only.
 
-**Skeleton.** Measured on TZAP 0.6.1 with a network of five `ccx` gates:
-`-O1` kept the 30 CNOTs of the five Toffoli decompositions, `-O2` and `-O3`
-rewrote them (25 CNOTs). The catalogue finds that `-O2` output keeps the
-CX/H/X skeleton on 18 of its 99 pairs (`CLAUDE.md`).
+**Skeleton.** TZAP 0.6.1 keeps the CX/H/X skeleton only at `-O1`, and even
+there not always; at `-O2` and `-O3` CnotMin and SuperOpt rewrite it
+(`benchmarks/circuits/README.md`, "Which TZAP level keeps the skeleton").
 
 **Metrics.** T-count (rotation count), total and two-qubit gate counts,
 runtime; P1 explains the competitors' slowdown by *parity weight* and
@@ -232,13 +230,13 @@ runtime; P1 explains the competitors' slowdown by *parity weight* and
 
 ## 6. Where CircuitEq sits
 
-From `benchmarks/scale/README.md`:
+The measurements are in `benchmarks/scale/README.md`; the conclusions:
 
-| Checker | Measured cost |
+| Checker | Cost |
 |---|---|
-| Tableau (`Tableau.lean`) | `2n · gates` steps, about 0.2 to 0.3 ms per generator and gate |
-| Phase polynomial (`PhasePoly.lean`) | Linear in gates: 10,200 gates on 300 wires in 10.1 s of kernel time at 5.26 GB; what grows is the `C(n,3)`-bit triple plane |
-| Basis decide | `gates · 4ⁿ` steps of about 150 µs and 40 KB; the seven-qubit Steane pair in 78 s at 1.98 GB when chunked; eight qubits take minutes, ten over an hour |
+| Tableau (`Tableau.lean`) | `2n · gates` steps, independent of structure; chunked past a few thousand gates. Clifford circuits only |
+| Phase polynomial (`PhasePoly.lean`) | Linear in the gate count, never `2ⁿ`: seconds for thousands of gates on hundreds of wires; what grows is the `C(n,3)`-bit triple plane. The CNOT-plus-diagonal fragment only |
+| Basis decide | `gates · 4ⁿ` memoised steps, bound by memory: seven qubits need chunked evaluation, eight take minutes and ten over an hour |
 
 The hardest axis for exact symbolic checkers is path variables. That is
 `QUEUE.md`'s phase polynomials with Hadamard variables, which Feynman handles
