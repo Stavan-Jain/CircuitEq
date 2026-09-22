@@ -9,7 +9,9 @@ import CircuitEq.Decide
 import CircuitEq.Checker
 import CircuitEq.Structural
 import CircuitEq.Support
+import CircuitEq.Lanes
 import CircuitEq.PhasePoly
+import CircuitEq.PhasePoly.Complete
 import CircuitEq.Tableau
 import CircuitEq.Rewriting
 import CircuitEq.Layers

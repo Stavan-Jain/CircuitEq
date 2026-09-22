@@ -3,7 +3,7 @@ Copyright (c) 2026 Stavan Jain. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stavan Jain
 -/
-import CircuitEq.PhasePoly
+import CircuitEq.PhasePoly.Complete
 
 /-!
 # Tests of the phase-polynomial checker

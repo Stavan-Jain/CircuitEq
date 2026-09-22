@@ -133,22 +133,22 @@ qubits); the combinatorial indexing keeps it at `C(n,3)`. Peeling set bits
 with `Nat.log2` was slower than testing each index, because the kernel does
 not accelerate `log2`.
 
-**Structured CNOT+T circuits found the next cost, and it was the loop, not
-the arithmetic.** A network of CCZ gadgets has parities of weight at most
-three, so its phase gates should be nearly free. The first run said
-otherwise: 40 s and 6.8 GB at 100 wires, 15 ms and 1.9 MB per phase gate,
-because each gate ran two loops over all hundred wire indices and the
-kernel retains about 10 KB per iteration. `sparseFold` visits only the set
-bits with operations the kernel does accelerate (the lowest set bit is
-`gcd m 2^W`; its index is a word-parallel population count of its
-predecessor, whose correctness on the 1024 powers of two is one finite
-check), a population count picks between it and the index loop, and the
-same specification covers both, so no proof downstream moved. That took the
-100-wire rung to 7 s at 2.8 GB and, because a random circuit's parities are
-sparse early on, the dense 80-qubit rung from 3.9 s to 1.9 s. The 200- and
-300-wire networks, 6800 and 10200 gates, certify in 5.9 s and 10.1 s of
-kernel time. What grows now is the triple plane itself, 164 KB at 200 wires
-and copied by every gate that changes it, which is the 5.3 GB at 300 wires.
+**Structured CNOT+T circuits found the next cost, and it was the loop, not the
+arithmetic.** A network of CCZ gadgets has parities of weight at most three, so
+its phase gates should be nearly free. The first run said otherwise: 40 s and
+6.8 GB at 100 wires, 15 ms and 1.9 MB per phase gate, because each gate ran two
+loops over all hundred wire indices and the kernel retains about 10 KB per
+iteration. `Lanes.sparseFold` visits only the set bits with operations the
+kernel does accelerate (the lowest set bit is `gcd m 2^W`; its index is a
+word-parallel population count of its predecessor, whose correctness on the 1024
+powers of two is one finite check), a population count picks between it and the
+index loop, and the same specification covers both, so no proof downstream
+moved. That took the 100-wire rung to 7 s at 2.8 GB and, because a random
+circuit's parities are sparse early on, the dense 80-qubit rung from 3.9 s to
+1.9 s. The 200- and 300-wire networks, 6800 and 10200 gates, certify in 5.9 s
+and 10.1 s of kernel time. What grows now is the triple plane itself, 164 KB at
+200 wires and copied by every gate that changes it, which is the 5.3 GB at 300
+wires.
 
 One attempted saving is recorded because it failed instructively. The
 kernel allocates a fresh literal even for `x ^^^ 0`, so returning an

@@ -181,15 +181,15 @@ with a summary table, and the record of which declarations a proof uses
 
 9. **A column-packed tableau.** The tableau walks the circuit once per
    generator, `2n · gates` steps at 0.2 to 0.3 ms each: 7 minutes for the
-   80-qubit random rung (`benchmarks/scale/`). Keep the whole tableau as
-   two `Nat` bit matrices (bit `2n·j + g` for wire `j`, generator `g`) and
-   two phase planes, so a gate is a few shifts and xors on all generators
-   at once and the cost is `gates`: an estimated factor of sixty at 80
-   qubits, and no chunking. Soundness by decoding: the row `g` of the
-   packed state after a gate is `Gate1.conj` of the row before, so the
-   final state gives `ConjAgree` and `equivalentUpToScalar_of_conjAgree`
-   applies unchanged. Acceptance: the 80-qubit rung in seconds, 500
-   structured qubits. M. Depends on nothing.
+   80-qubit random rung (`benchmarks/scale/`). Keep the whole tableau as two
+   `Nat` bit matrices (bit `2n·j + g` for wire `j`, generator `g`) and two phase
+   planes, so a gate is a few shifts and xors on all generators at once and the
+   cost is `gates`: an estimated factor of sixty at 80 qubits, and no chunking.
+   Soundness by decoding: the row `g` of the packed state after a gate is
+   `Gate1.conj` of the row before, so the final state gives `Tableau.ConjAgree`
+   and `Tableau.equivalentUpToScalar_of_conjAgree` applies unchanged.
+   Acceptance: the 80-qubit rung in seconds, 500 structured qubits. M. Depends
+   on nothing.
 
 9a. **The 19-origin Clifford run.** Every QECUnitaryCircuits origin against
    its PyZX `full_reduce` twin by the tableau checker (`≡ₛ`), the

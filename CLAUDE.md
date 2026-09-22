@@ -139,48 +139,60 @@ Rules that follow, for anyone adding to the library:
   `not_touches_of_disjoint`; `Rewriting.lean` adds
   `Instr.CanCommute.of_disjoint` and `gate_block_comm_of_disjoint`. Do not
   invent a second encoding of wire sets.
+- `CircuitEq/Lanes.lean` — the bit-plane arithmetic under the phase
+  polynomial, nothing in it about circuits: `Lanes` (residues modulo 8 on
+  many lanes as three `Nat` planes; `add`, `addOn`, `addOnz`, `lane`,
+  `ext_of_lane`) and, all under `Lanes.`, the combinatorial numbering of
+  pairs and triples (`tri`, `tet`) and the masks of the pairs and triples
+  inside a parity (`pairMask`, `tripMask`, by `maskFold` over `bitFold` or
+  `sparseFold`, with `popCount`, `lowBit`, `idx`).
 - `CircuitEq/PhasePoly.lean` — the phase-polynomial canonical form for the
-  CNOT-plus-diagonal fragment (`CX` and `Z, S, Sdg, T, Tdg`): `PhasePoly`
-  is the `𝔽₂`-linear part as `rows`, one `Nat` holding `n` bitmasks of
-  `n` bits (`row n R i`), and the phase function as its multilinear
-  polynomial over `ℤ/8`, which has degree at most three and is unique:
-  `deg1`, `deg2`, `deg3 : Lanes`, three bit planes each, the coefficient
-  of `yᵢ` in lane `i`, of `yᵢ yⱼ` in lane `tri j + i` and of `yᵢ yⱼ yₗ`
-  in lane `tet l + tri j + i` (`C(j,2)`, `C(l,3)`: the planes are exactly
-  `C(n,2)` and `C(n,3)` bits). A CNOT is a shift and an xor; a phase gate
-  of phase `k` on a parity `m` adds `k`, `−2k`, `4k` on the lanes of the
-  wires, pairs and triples of `m` (`Lanes.addOn`, a ripple-carry adder on
-  planes; `pairMask`, `tripMask`, one shift-and-or per set bit by
-  `maskFold`, which visits only the set bits of a sparse parity, lowest
-  bit by `gcd`, index by a population count checked on 1024 powers of two,
-  and tests every index of a dense one; `Lanes.addOnz` skips a plane with
-  nothing to add). `nf`, `phasePolyNormalForm n`, `phasePolyChecker n`,
-  and `phasePolyRefutes n a b`, whose `true` proves `¬ a ≡ᵤ b`
-  (`PhasePoly.complete`: equal unitaries give equal forms), so within the
-  fragment `check` is a decision procedure (`phasePolyChecker_check_iff`).
-  Cost is linear in the gate count and never `2 ^ n`: the scale test's
-  random CNOT+T pairs on 20, 40 and 80 wires (200, 400, 800 gates) certify
-  in 0.2, 0.6 and 1.9 s of kernel time at 1.9, 2.0 and 2.5 GB, and CCZ
-  networks of 3400, 6800 and 10200 gates on 100, 200 and 300 wires in 2.8,
-  5.9 and 10.1 s at 2.7, 3.8 and 5.3 GB; what grows is the `C(n,3)`-bit
-  triple plane, copied by every gate that changes it (`QUEUE.md` item 8).
-  A proof is `(phasePolyChecker n).sound _ _ (by decide +kernel)`, a
-  refutation `phasePolyRefutes_sound (by decide +kernel)`; bare `decide`
-  times out at about a hundred gates. The extension with Hadamard
-  variables that certifies TZAP output across `H` gates is `QUEUE.md`
-  item 4.
+  CNOT-plus-diagonal fragment (`CX` and `Z, S, Sdg, T, Tdg`): `PhasePoly` is the
+  `𝔽₂`-linear part as `rows`, one `Nat` holding `n` bitmasks of `n` bits
+  (`row n R i`), and the phase function as its multilinear polynomial over
+  `ℤ/8`, which has degree at most three and is unique: `deg1`, `deg2`,
+  `deg3 : Lanes`, three bit planes each, the coefficient of `yᵢ` in lane `i`, of
+  `yᵢ yⱼ` in lane `tri j + i` and of `yᵢ yⱼ yₗ` in lane `tet l + tri j + i`
+  (`C(j,2)`, `C(l,3)`: the planes are exactly `C(n,2)` and `C(n,3)` bits). A
+  CNOT is a shift and an xor; a phase gate of phase `k` on a parity `m` adds
+  `k`, `−2k`, `4k` on the lanes of the wires, pairs and triples of `m`
+  (`Lanes.addOn`, a ripple-carry adder on planes; `Lanes.pairMask`,
+  `Lanes.tripMask`, one shift-and-or per set bit by `Lanes.maskFold`, which
+  visits only the set bits of a sparse parity, lowest bit by `gcd`, index by a
+  population count checked on 1024 powers of two, and tests every index of a
+  dense one; `Lanes.addOnz` skips a plane with nothing to add). `nf`,
+  `phasePolyNormalForm n`, `phasePolyChecker n`.
+  `CircuitEq/PhasePoly/Complete.lean` has `PhasePoly.complete` (equal unitaries
+  give equal forms) and so `phasePolyRefutes n a b`, whose `true` proves
+  `¬ a ≡ᵤ b`, and `phasePolyChecker_check_iff`: within the fragment `check` is a
+  decision procedure. Cost is linear in the gate count and never `2 ^ n`: the
+  scale test's random CNOT+T pairs on 20, 40 and 80 wires (200, 400, 800 gates)
+  certify in 0.2, 0.6 and 1.9 s of kernel time at 1.9, 2.0 and 2.5 GB, and CCZ
+  networks of 3400, 6800 and 10200 gates on 100, 200 and 300 wires in 2.8, 5.9
+  and 10.1 s at 2.7, 3.8 and 5.3 GB; what grows is the `C(n,3)`-bit triple
+  plane, copied by every gate that changes it (`QUEUE.md` item 8). A proof is
+  `(phasePolyChecker n).sound _ _ (by decide +kernel)`, a refutation
+  `phasePolyRefutes_sound (by decide +kernel)`; bare `decide` times out at about
+  a hundred gates. The extension with Hadamard variables that certifies TZAP
+  output across `H` gates is `QUEUE.md` item 4.
 - `CircuitEq/Tableau.lean` — the Clifford tableau checker: `Pauli` strings
   (x-mask, z-mask, phase in `Fin 4`, denoting `i^p · Z^z · X^x`), the
   gate update rules with pointwise soundness (`conjH_sound`, …,
-  `conjCX_sound`), `conj` / `tableau` (images of the `2n` generators,
-  `none` outside the fragment or for `CX c c`), `tableauCheck`,
-  `tableau_sound` (equal tableaux give `≡ₛ`, the normal-form shape) and
-  the export `tableauChecker n : ScalarChecker n`; `witness` names the
-  first disagreeing generator. The soundness argument is stated on
-  `ConjAgree a b` (every generator has the same image), so the chunked
-  form shares it: `genAt n g` numbers the `2n` generators on `ℕ`,
-  `tableauCheckGen a b g` checks one, and `tableau_sound_of_allBelow`
-  turns `AllBelow (tableauCheckGen a b) (2 * n)` into `a ≡ₛ b`.
+  `conjCX_sound`), `Tableau.conj` / `tableau` (images of the `2n`
+  generators, `none` outside the fragment or for `CX c c`),
+  `tableauCheck`, `tableau_sound` (equal tableaux give `≡ₛ`, the
+  normal-form shape) and the export `tableauChecker n : ScalarChecker n`;
+  `Tableau.witness` names the first disagreeing generator. The soundness
+  argument is stated on `Tableau.ConjAgree a b` (every generator has the
+  same image), so the chunked form shares it: `Tableau.genAt n g` numbers
+  the `2n` generators on `ℕ`, `tableauCheckGen a b g` checks one, and
+  `tableau_sound_of_allBelow` turns `AllBelow (tableauCheckGen a b) (2 * n)`
+  into `a ≡ₛ b`. The API (`Pauli`, `tableau`, `tableauCheck`,
+  `tableauChecker`, `tableauCheckGen` and the soundness theorems) is at
+  the top of `Quantum.Circuit`; the helpers (`Tableau.phaseVal`, `sign`,
+  `xorMask`, `generators`, `mapOpt`, the commutant argument) are under
+  `Tableau.`, as the phase polynomial's are under `PhasePoly.` and
+  `Lanes.`, so that checker internals do not crowd the library's namespace.
   Structure-independent, `O(n)` bit operations per gate, no `Zeta8`
   arithmetic in the kernel: the 15-qubit Reed–Muller pair decides in
   about 0.3 s; about 0.2 ms of kernel time per generator and gate, so

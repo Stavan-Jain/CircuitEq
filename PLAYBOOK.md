@@ -153,21 +153,21 @@ Look at the two gate sets first, then take the first entry that applies.
    names the phase `ω ^ k`, `k < 8`; find `k` on one basis vector first.
 2. **Only `CX` and `Z S Sdg T Tdg` on both sides.**
    `(phasePolyChecker n).sound _ _ (by decide +kernel) : a ≡ᵤ b`
-   (`CircuitEq/PhasePoly.lean`). The form is canonical, so on this fragment
-   a failed check means the pair is inequivalent, and
-   `phasePolyRefutes_sound (by decide +kernel) : ¬ a ≡ᵤ b` proves that. `H`,
-   `X` and `Y` end the fragment.
+   (`CircuitEq/PhasePoly.lean`). The form is canonical, so on this fragment a
+   failed check means the pair is inequivalent, and
+   `phasePolyRefutes_sound (by decide +kernel) : ¬ a ≡ᵤ b` proves that
+   (`CircuitEq/PhasePoly/Complete.lean`). `H`, `X` and `Y` end the fragment.
 3. **Only Clifford gates, `H X Y Z S Sdg CX`.**
    `(tableauChecker n).sound _ _ (by decide +kernel) : a ≡ₛ b`
-   (`CircuitEq/Tableau.lean`). It certifies `≡ₛ` and nothing stronger. Past
-   a few thousand gates, or about 30 qubits, chunk it: `tableauCheckGen a b
-   g` checks generator `g` of the `2n`, and `tableau_sound_of_allBelow`
-   turns `AllBelow (tableauCheckGen a b) (2 * n)` into `a ≡ₛ b`, with the
-   ranges proved as in entry 1 (four to sixteen generators per theorem).
-   The tableau is sound and not proved complete: `tableauCheck a b = false`
-   or a failing generator is not a refutation, though `witness a b`
-   names the first Pauli generator whose images differ, which tells you
-   where to look. For exact `≡ᵤ` of a Clifford pair use the entries below.
+   (`CircuitEq/Tableau.lean`). It certifies `≡ₛ` and nothing stronger. Past a
+   few thousand gates, or about 30 qubits, chunk it: `tableauCheckGen a b g`
+   checks generator `g` of the `2n`, and `tableau_sound_of_allBelow` turns
+   `AllBelow (tableauCheckGen a b) (2 * n)` into `a ≡ₛ b`, with the ranges
+   proved as in entry 1 (four to sixteen generators per theorem). The tableau is
+   sound and not proved complete: `tableauCheck a b = false` or a failing
+   generator is not a refutation, though `Tableau.witness a b` names the first
+   Pauli generator whose images differ, which tells you where to look. For exact
+   `≡ᵤ` of a Clifford pair use the entries below.
 4. **The same gates reordered, or pairs that cancel.** `by circuit_simp`. It
    cancels adjacent-after-commuting inverse pairs and then pulls each gate
    of `b` to the front of what is left of `a`, checking every move.
@@ -352,8 +352,9 @@ proved one index range per declaration), `Semantics` (`Instr`, `Circuit`,
 `Relations` (their algebra and `calc`), `Decide` (the basis reduction, the
 evaluators, the `Decidable` instances, `checkEquivAt`, `findPhase`), `Checker`
 (the `check` + `sound` contract, `PhaseFinder`), `Structural` (fusion,
-commutation, layers, `phaseGadget`), `Support` (wire sets as bitmasks),
-`PhasePoly`, `Tableau`, `Rewriting`, `Layers`, `Embedding` (`rename`, the
+commutation, layers, `phaseGadget`), `Support` (wire sets as bitmasks), `Lanes`
+(the bit planes under the phase polynomial), `PhasePoly`, `PhasePoly.Complete`
+(the refuter), `Tableau`, `Rewriting`, `Layers`, `Embedding` (`rename`, the
 locality theorem), `Certificate` (`Step`, `replay`, `replay_sound`,
 `circuit_replay`; `replayPhase_sound`, `circuit_replay_phase`), `Defaults` (the
 checker tables `defaultCheckers`, `defaultPhaseFinders`), `Tactic`, `Examples`

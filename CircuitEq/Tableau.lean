@@ -98,6 +98,8 @@ structure Pauli where
   phase : Fin 4
   deriving DecidableEq, Repr
 
+namespace Tableau
+
 /-- `i ^ p`, the scalar of a phase. -/
 def phaseVal (p : Fin 4) : Zeta8 := I ^ p.val
 
@@ -200,6 +202,10 @@ lemma xorMask_flipBit (x : ℕ) (j : Fin n) (w : Fin (2 ^ n)) :
 /-- A single wire as a mask is a bit flip. -/
 lemma xorMask_two_pow (j : Fin n) (w : Fin (2 ^ n)) : xorMask (2 ^ j.val) w = flipBit j w := by
   simpa using xorMask_xor_two_pow 0 j w
+
+end Tableau
+
+open Tableau
 
 /-- The operator a Pauli string denotes: `i ^ p · Z^z · X^x`, pointwise. -/
 def Pauli.op (P : Pauli) (ψ : Vec n) : Vec n :=
@@ -356,6 +362,8 @@ theorem Instr.conj_sound {g : Instr n} {P Q : Pauli} (h : g.conj P = some Q) (ψ
 
 /-! ### The tableau -/
 
+namespace Tableau
+
 /-- Conjugate a Pauli string by a whole circuit, gate by gate; `none` if any
 gate is outside the fragment. -/
 def conj : Circuit n → Pauli → Option Pauli
@@ -397,11 +405,15 @@ theorem conj_proper {c : Circuit n} {P Q : Pauli} (h : conj c P = some Q) :
         simp [Instr.conj, hab] at hg
       · exact ih h a b hm
 
+end Tableau
+
 /-- The generator `X_j`. -/
 def Pauli.xGen (j : Fin n) : Pauli := ⟨2 ^ j.val, 0, 0⟩
 
 /-- The generator `Z_j`. -/
 def Pauli.zGen (j : Fin n) : Pauli := ⟨0, 2 ^ j.val, 0⟩
+
+namespace Tableau
 
 /-- The `2n` generators of the Pauli group: `X_0, …, X_{n-1}, Z_0, …,
 Z_{n-1}`. -/
@@ -442,6 +454,8 @@ lemma mapOpt_eq_some {α β : Type*} {f g : α → Option β} {l : List α} {r :
     · exact ⟨_, hfa, hga⟩
     · exact ih hfl hgl a' ha'
 
+end Tableau
+
 /-- The tableau of a circuit: the images of the `2n` generators under
 conjugation by it, or `none` if the circuit leaves the Clifford fragment. -/
 def tableau (c : Circuit n) : Option (List Pauli) := mapOpt (conj c) (generators n)
@@ -461,6 +475,8 @@ theorem tableau_proper {b : Circuit n} {T : List Pauli} (hb : tableau b = some T
 
 /-! ### The commutant of the Pauli group is the scalars -/
 
+namespace Tableau
+
 /-- `Z_j` acts on `|w⟩` by the sign of bit `j`. -/
 lemma zGen_op (j : Fin n) (ψ : Vec n) (w : Fin (2 ^ n)) :
     (Pauli.zGen j).op ψ w = (if bit j w then -1 else 1) * ψ w := by
@@ -471,23 +487,9 @@ lemma xGen_op (j : Fin n) (ψ : Vec n) (w : Fin (2 ^ n)) :
     (Pauli.xGen j).op ψ w = ψ (flipBit j w) := by
   simp [Pauli.op, Pauli.xGen, xorMask_two_pow]
 
-/-- Distinct basis indices differ in some bit. -/
-lemma exists_bit_ne {w y : Fin (2 ^ n)} (h : w ≠ y) : ∃ j : Fin n, bit j w ≠ bit j y := by
-  by_contra hc
-  apply h
-  apply Fin.ext
-  apply Nat.eq_of_testBit_eq
-  intro i
-  by_cases hi : i < n
-  · by_contra hne
-    exact hc ⟨⟨i, hi⟩, hne⟩
-  · have hn : 2 ^ n ≤ 2 ^ i := Nat.pow_le_pow_right two_pos (not_lt.1 hi)
-    rw [Nat.testBit_lt_two_pow (lt_of_lt_of_le w.isLt hn),
-      Nat.testBit_lt_two_pow (lt_of_lt_of_le y.isLt hn)]
-
 /-- A function on basis indices invariant under every bit flip is constant:
 clear the set bits one at a time. -/
-lemma eq_zero_of_flipBit_invariant {α : Type*} (f : Fin (2 ^ n) → α)
+lemma eq_of_flipBit_invariant {α : Type*} (f : Fin (2 ^ n) → α)
     (hf : ∀ j y, f (flipBit j y) = f y) (y : Fin (2 ^ n)) : f y = f ⟨0, Nat.two_pow_pos n⟩ := by
   obtain ⟨v, hv⟩ := y
   induction v using Nat.strong_induction_on with
@@ -517,10 +519,6 @@ lemma zeta8_eq_zero_of_add_self {v : Zeta8} (h : v + v = 0) : v = 0 := by
     Zeta8.zero_c, Zeta8.zero_d] at h ⊢
   obtain ⟨h1, h2, h3, h4⟩ := h
   exact ⟨by linarith, by linarith, by linarith, by linarith⟩
-
-/-- A flip sends `v` to `y` iff it sends `y` to `v`. -/
-lemma flipBit_eq_iff (j : Fin n) (v y : Fin (2 ^ n)) : flipBit j v = y ↔ v = flipBit j y :=
-  ⟨fun h => by rw [← h, flipBit_flipBit_self], fun h => by rw [h, flipBit_flipBit_self]⟩
 
 /-- A linear operator commuting with every `X_j` and `Z_j` is a scalar: the
 `Z_j` make it diagonal in the computational basis, the `X_j` make the
@@ -569,12 +567,16 @@ theorem eq_smul_of_comm_generators (W : Vec n →ₗ[Zeta8] Vec n)
   have hW : W = lam ⟨0, Nat.two_pow_pos n⟩ • LinearMap.id := by
     apply LinearMap.ext_basis
     intro y
-    rw [hdiag y, eq_zero_of_flipBit_invariant lam hflip y]
+    rw [hdiag y, eq_of_flipBit_invariant lam hflip y]
     rfl
   rw [hW]
   rfl
 
+end Tableau
+
 /-! ### Soundness of the checker -/
+
+namespace Tableau
 
 /-- The two circuits send every generator to the same Pauli string. -/
 def ConjAgree (a b : Circuit n) : Prop :=
@@ -620,6 +622,8 @@ theorem equivalentUpToScalar_of_conjAgree {a b : Circuit n} (key : ConjAgree a b
     simpa [basis] using this
   exact ⟨lam, ⟨⟨lam, mu, hunit, (mul_comm mu lam).trans hunit⟩, rfl⟩, hab⟩
 
+end Tableau
+
 /-- Equal tableaux certify equivalence up to a unit scalar: the shape of
 `NormalForm.sound`, for `≡ₛ`. -/
 theorem tableau_sound {a b : Circuit n} {T : List Pauli} (ha : tableau a = some T)
@@ -649,15 +653,21 @@ the check on one generator, numbered on `ℕ` by `genAt`; a file proves it
 on ranges of generators, one declaration per range, and
 `tableau_sound_of_allBelow` assembles them (`CircuitEq.Chunk`). -/
 
+namespace Tableau
+
 /-- Generator number `g` of the `2n`, on `ℕ` so that a chunked check can
 range over it: `X_g` for `g < n`, `Z_{g − n}` from `n` on. -/
 def genAt (n g : ℕ) : Pauli := if g < n then ⟨2 ^ g, 0, 0⟩ else ⟨0, 2 ^ (g - n), 0⟩
+
+end Tableau
 
 /-- The tableau check on one generator: both images exist and agree. -/
 def tableauCheckGen (a b : Circuit n) (g : ℕ) : Bool :=
   match conj a (genAt n g), conj b (genAt n g) with
   | some P, some Q => decide (P = Q)
   | _, _ => false
+
+namespace Tableau
 
 /-- A passed generator check names the common image. -/
 lemma exists_of_tableauCheckGen {a b : Circuit n} {g : ℕ} (h : tableauCheckGen a b g = true) :
@@ -666,6 +676,8 @@ lemma exists_of_tableauCheckGen {a b : Circuit n} {g : ℕ} (h : tableauCheckGen
   split at h
   · next P Q ha hb => exact ⟨P, ha, by rw [hb, of_decide_eq_true h]⟩
   · exact absurd h Bool.false_ne_true
+
+end Tableau
 
 /-- The chunked tableau check: `tableauCheckGen` on all `2n` generators,
 proved a range at a time, gives `≡ₛ`. -/
@@ -691,9 +703,13 @@ theorem tableau_sound_of_allBelow {a b : Circuit n}
   · obtain ⟨Q, -, hQb⟩ := h0 x
     exact proper ⟨Q, hQb⟩ x t hm
 
+namespace Tableau
+
 /-- The first generator whose images under the two circuits differ, for
 diagnosing a `false`; `none` when every generator agrees. -/
 def witness (a b : Circuit n) : Option Pauli :=
   (generators n).find? fun P => decide (conj a P ≠ conj b P)
+
+end Tableau
 
 end Quantum.Circuit

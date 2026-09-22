@@ -288,7 +288,9 @@ CircuitEq/
 ├── Checker.lean            the checker contract: check + sound, normal forms, PhaseFinder
 ├── Structural.lean         the parametric toolkit: fusion, commutation, layers, phaseGadget
 ├── Support.lean            wire sets as Nat bitmasks
+├── Lanes.lean              bit planes: residues mod 8 on many lanes, pair and triple masks
 ├── PhasePoly.lean          phase-polynomial normal form, CNOT + diagonal
+├── PhasePoly/Complete.lean the form is canonical; the refuter
 ├── Tableau.lean            Clifford tableau checker, soundness to ≡ₛ
 ├── Rewriting.lean          rewriting in context, checked swaps and cancellations
 ├── Layers.lean             Hadamard-layer algebra, CNOT-network conjugation

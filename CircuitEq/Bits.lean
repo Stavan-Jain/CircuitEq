@@ -15,7 +15,9 @@ bit and flipping a bit — together with the handful of rewrite lemmas that
 make gates on disjoint qubits commute:
 
 - `bit_flipBit_self`, `bit_flipBit_of_ne` — how `bit` sees a flip;
-- `flipBit_flipBit_self`, `flipBit_comm` — flips are involutions and commute.
+- `flipBit_flipBit_self`, `flipBit_comm` — flips are involutions and commute;
+- `flipBit_eq_iff`, `eq_of_bit_eq`, `exists_bit_ne` — solving a flip, and
+  indices are determined by their bits.
 
 Everything is phrased through `Nat.testBit` and `Nat.xor`, which the kernel
 evaluates with GMP-accelerated arithmetic, so `decide` on concrete indices
@@ -59,5 +61,27 @@ lemma flipBit_comm (i j : Fin n) (x : Fin (2 ^ n)) :
   ext
   simp only [val_flipBit]
   rw [Nat.xor_assoc, Nat.xor_assoc, Nat.xor_comm (2 ^ j.val)]
+
+/-- `flipBit` is an involution, as an equation solver. -/
+lemma flipBit_eq_iff {n : ℕ} {i : Fin n} {x y : Fin (2 ^ n)} :
+    flipBit i x = y ↔ x = flipBit i y :=
+  ⟨fun h => by rw [← h, flipBit_flipBit_self], fun h => by rw [h, flipBit_flipBit_self]⟩
+
+/-- Two basis indices with the same bits are equal. -/
+lemma eq_of_bit_eq {n : ℕ} {x x' : Fin (2 ^ n)} (h : ∀ i : Fin n, bit i x = bit i x') :
+    x = x' := by
+  apply Fin.ext
+  apply Nat.eq_of_testBit_eq
+  intro j
+  by_cases hj : j < n
+  · exact h ⟨j, hj⟩
+  · have hn : 2 ^ n ≤ 2 ^ j := Nat.pow_le_pow_right Nat.two_pos (Nat.le_of_not_lt hj)
+    rw [Nat.testBit_lt_two_pow (lt_of_lt_of_le x.isLt hn),
+      Nat.testBit_lt_two_pow (lt_of_lt_of_le x'.isLt hn)]
+
+/-- Distinct basis indices differ in some bit. -/
+lemma exists_bit_ne {n : ℕ} {x y : Fin (2 ^ n)} (h : x ≠ y) : ∃ i : Fin n, bit i x ≠ bit i y := by
+  by_contra hc
+  exact h (eq_of_bit_eq fun i => by_contra fun hne => hc ⟨i, hne⟩)
 
 end Quantum.Circuit
