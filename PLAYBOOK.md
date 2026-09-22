@@ -8,10 +8,12 @@ every `full` run, so it is the agent's only description of the library. It is
 versioned with the library: when a checker, a tactic, a certificate step or
 a block theorem lands, update the decision list below in the same commit.
 
-Last brought in line with the library at `83cc1d7` (22 September 2026:
-composition up to a global phase, `≡ₚ[k]`, certificates and windows up to
-phase, the phase gadget; on top of chunked kernel evaluation, the sparse
-phase-polynomial fold and the kernel replay in the trust policy).
+Last brought in line with the library at `f47972b` (22 September 2026: the
+module split, `Semantics` / `Relations` / `Decide`, `Lanes` and
+`PhasePoly.Complete`, `Defaults`, the tableau's helpers under `Tableau.`; on
+top of composition up to a global phase, `≡ₚ[k]`, certificates and windows
+up to phase, the phase gadget, chunked kernel evaluation and the kernel
+replay in the trust policy).
 
 ## The objects
 
