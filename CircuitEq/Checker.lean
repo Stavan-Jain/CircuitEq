@@ -79,6 +79,15 @@ def Checker.orElse (C D : Checker n) : Checker n where
     · exact C.sound a b hc
     · exact D.sound a b (by simpa [hc] using h)
 
+/-- A proved window as a checker: replay compares the two lists without
+reevaluating the proof's leaf computation. The proof may itself be chunked. -/
+def Checker.ofProof (a b : Circuit n) (hab : a ≡ᵤ b) : Checker n where
+  check c d := decide (c = a) && decide (d = b)
+  sound c d h := by
+    have he : c = a ∧ d = b := by simpa using h
+    rcases he with ⟨rfl, rfl⟩
+    exact hab
+
 /-- Syntactic equality: the trivial checker. -/
 def syntacticChecker (n : ℕ) : Checker n where
   check a b := decide (a = b)

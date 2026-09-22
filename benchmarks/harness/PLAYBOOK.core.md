@@ -61,6 +61,9 @@ a small pair.
 - Do not `decide` through `denote` itself; its closures defeat the kernel's
   cache and the cost becomes exponential in depth.
 
+The full library's bounded certificate replay is not available in this
+semantics-only configuration; the `AllBelow` basis chunking above is.
+
 Beyond what a `decide` reaches you need an argument: commute and cancel gates
 with the lemmas of `Gates.lean`, cut the circuits and compose the pieces, or
 build a representation that does not pay `2^n` and prove it sound.

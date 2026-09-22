@@ -6,6 +6,7 @@ Authors: Stavan Jain
 import CircuitEq.Examples
 import CircuitEqTest.PhasePoly
 import CircuitEqTest.Tableau
+import CircuitEqTest.Replay
 
 /-!
 # The examples and the tests

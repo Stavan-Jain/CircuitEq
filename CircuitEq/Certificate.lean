@@ -66,7 +66,10 @@ theorem foo : c₁ ≡ᵤ c₂ := replay_sound defaultCheckers steps (by decide 
 
 or the macro `circuit_replay defaultCheckers steps`. The tactics of
 `CircuitEq.Tactic` search for a trace in meta code and close the goal this
-way, so their kernel cost is that of one `replay`.
+way. Long exact traces are split into bounded replay declarations and
+composed by `Equivalent.trans`; the tactic caches separately checked
+windows with `Checker.ofProof` and `CheckerTable.cache`. The manual macro
+still runs the trace in one declaration.
 
 ## Up to a global phase
 
@@ -103,6 +106,13 @@ variable {n : ℕ}
 /-- A checker table: for each register size `k`, the checkers a `window`
 step may name by index. -/
 abbrev CheckerTable := (k : ℕ) → List (Checker k)
+
+/-- Prepend a proved window to the row for its own register size. Other
+rows are unchanged. This lets a bounded replay reuse a separately checked
+window through the ordinary checker contract. -/
+def CheckerTable.cache (Cs : CheckerTable) {m : ℕ} (a b : Circuit m)
+    (hab : a ≡ᵤ b) : CheckerTable := fun k =>
+  if h : m = k then (h ▸ Checker.ofProof a b hab) :: Cs k else Cs k
 
 /-- One certificate step. Positions index the instruction list; see the
 module docstring for what licenses each step. -/
