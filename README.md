@@ -17,7 +17,7 @@ of the design is to make that agent's job mechanical where it can be
 (structural lemmas that hold for every `n` are the connectives).
 
 **Status: prototype.** Clifford+T only, one and two-qubit gates, some
-forty worked identities, five original-versus-PyZX benchmark pairs, and
+forty worked identities, six original-versus-PyZX benchmark pairs, and
 certified checkers for the Clifford and the CNOT-plus-diagonal fragments.
 Around the library: draft agent harnesses that run an AI agent on a pair,
 or on one circuit to optimise, and judge its proof
@@ -134,6 +134,12 @@ three-controlled Toffoli, T-count 28 to 24 under phase teleportation, six
 one-wire windows emitted by the survey's diff-based search and checked by
 `circuit_windows` with no refinement.
 
+[`benchmarks/cuccaro_4/`](benchmarks/cuccaro_4/README.md) promotes the
+survey's previously memory-bound four-bit Cuccaro adder. The same eight
+windows now check through bounded replay and separately cached window
+proofs. This removes a verification bottleneck for long alignments; it
+does not find an alignment or avoid the exponential cost of wide windows.
+
 [`benchmarks/scale/`](benchmarks/scale/README.md) pushes the checkers up
 ladders of random and structured circuits, and is where every measurement of
 the library's kernel cost is recorded. The phase-polynomial checker
@@ -153,7 +159,8 @@ roadmap's working hypothesis: eleven T-heavy circuits (Toffoli chains, Barenco's
 Toffoli, `mod5_4`, Cuccaro adders, seeded random circuits) against both PyZX
 pipelines, aligned by script. Phase-teleportation output aligns by windows on
 the structured circuits (seven pairs kernel-checked on the dyadic evaluator, one
-memory-bound), re-synthesised output never does except as a whole-register
+previously memory-bound and now promoted as `Cuccaro4`), re-synthesised
+output never does except as a whole-register
 decide, three random pairs are equal only up to a global phase (the window
 pattern has since learned `≡ₚ`, but these three have no alignment, so they stay
 whole-register decides of `≡ₚ`), and every wide window is CNOT-plus-diagonal
@@ -230,7 +237,8 @@ applies next.
   checker from a table) with a kernel-friendly interpreter `replay` and one
   theorem `replay_sound`. A proof is
   `replay_sound Cs steps (by decide +kernel)`: the kernel evaluates `replay`
-  once, cost linear in the trace. The same steps replay up to a global phase:
+  once, walking the circuit prefix at each step. The same steps replay up
+  to a global phase:
   under `replayPhase` a window names a phase finder instead of a checker, the
   interpreter adds the windows' exponents up, and `replayPhase_sound` concludes
   `c₁ ≡ₚ[k] c₂` with `k` computed by the kernel, at little more than the cost of
@@ -240,7 +248,10 @@ applies next.
   pairs and aligns two concrete lists; `circuit_windows` takes an alignment
   as input, a list of windows `(aᵢ, bᵢ)` on the full register in the order
   they occur, and checks every other move as a commutation. Both search in
-  meta, emit a `List Step`, and close the goal with a single `replay_sound`.
+  meta and emit a `List Step`. Long exact traces are checked in bounded
+  segments by `replay_sound` and composed by `Equivalent.trans`; windows
+  are checked separately and cached through the certified checker table.
+  `set_option circuit.replayChunkSize 0` selects the original single replay.
   Neither searches for alignments: a move the checks do not license, or a
   false window, is an error naming the gate or the window. On a goal
   `c₁ ≡ₚ c₂` or `c₁ ≡ₚ[k] c₂` they do the same through `replayPhase`, and

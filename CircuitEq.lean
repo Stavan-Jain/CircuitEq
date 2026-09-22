@@ -24,6 +24,7 @@ import CircuitEq.Benchmarks.SteanePlus
 import CircuitEq.Benchmarks.Tof3
 import CircuitEq.Benchmarks.RM15Zero
 import CircuitEq.Benchmarks.BarencoTof3
+import CircuitEq.Benchmarks.Cuccaro4
 
 /-!
 # CircuitEq

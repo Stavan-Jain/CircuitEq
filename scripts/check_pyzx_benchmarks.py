@@ -26,6 +26,7 @@ BENCHMARKS = {
     "tof_3": ("Tof3", "teleport"),
     "rm15_zero": ("RM15Zero", "full_reduce"),
     "barenco_tof_3": ("BarencoTof3", "teleport"),
+    "cuccaro_4": ("Cuccaro4", "teleport"),
 }
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))

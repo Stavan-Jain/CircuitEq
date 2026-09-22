@@ -270,8 +270,13 @@ Rules that follow, for anyone adding to the library:
   decided on its own wires by the checker table, every other move is a
   checked commutation, windows are consumed in the listed order). Both
   search in meta code and emit a `List (Step n)` closed by `replay_sound`,
-  so the kernel evaluates `replay` once; moves found on the right-hand
-  circuit are inverted into the same trace. Both read lists by `whnf`, so
+  split into separate kernel declarations on long exact traces (default
+  `circuit.replayChunkSize = 8`, 0 disables chunking), and composed by
+  `Equivalent.trans`. Windows are checked separately, symbolically or one
+  basis vector per declaration, and cached with `Checker.ofProof` and
+  `CheckerTable.cache`. Phase replay remains a single declaration. Moves
+  found on the right-hand circuit are inverted into the same trace. Both
+  read lists by `whnf`, so
   `layer`, `cnotNetwork`, `hLayer` and named circuit `def`s are fine as
   inputs. Neither searches for an alignment. Both accept a goal
   `a ≡ₚ b` or `a ≡ₚ[k] b` as well: the search and the trace are the same,

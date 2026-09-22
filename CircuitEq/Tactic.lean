@@ -12,9 +12,10 @@ Both tactics prove goals `c₁ ≡ᵤ c₂`, `c₁ ≡ₚ c₂` and `c₁ ≡ₚ
 concrete instruction lists (`circuit_simp`, whose moves are all exact,
 takes `≡ₚ[0]` rather than an arbitrary `k`) by searching, in meta code, for
 a certificate (`CircuitEq.Certificate`): a list of `Step`s whose replay
-turns `c₁` into `c₂`. An exact goal is closed by one application of
-`replay_sound` to a kernel evaluation of `replay`, so the proof term is
-constant-size and the kernel's work is one check per step. No state vector
+turns `c₁` into `c₂`. An exact goal is closed by bounded segments of
+`replay_sound`, composed by `Equivalent.trans`. Each segment has literal
+checkpoints and its own kernel declaration, so retained intermediate lists
+are released between segments. No state vector
 is ever evaluated on the full register: windows are decided on their own
 wires by the checker table `defaultCheckers` (`CircuitEq.Defaults`).
 
@@ -57,6 +58,21 @@ refutes on its own wires. `set_option trace.circuit.certificate true`
 prints the certificate a tactic found, in the syntax `circuit_replay`
 accepts, so a proof can be kept as data or compared with an external
 search's output.
+
+Exact traces longer than `circuit.replayChunkSize` (default 8) are split
+at that many steps. Set the option to 0 for the original single replay.
+The chunked path proves windows separately: phase-polynomial checks stay
+symbolic, and other windows check one basis vector per kernel declaration.
+`Checker.ofProof` and `CheckerTable.cache` let replay reuse these proofs by
+syntactic comparison, without changing `Step` or its soundness theorem.
+Both checkpoints and cache indices are untrusted proposals checked by the
+ordinary replay. Phase goals still use the original single replay.
+
+This bounds reduction-cache retention, not total proof size: checkpoints
+cost one circuit per segment, and list-based replay still walks each
+prefix. Compact circuit storage and cursor steps remain useful follow-ups.
+Measurements and reproduction: `benchmarks/cuccaro_4/README.md` and
+`benchmarks/scale/README.md`, "Bounded certificate replay".
 -/
 
 namespace Quantum.Circuit.Tactic
@@ -64,6 +80,12 @@ namespace Quantum.Circuit.Tactic
 open Lean Meta Elab Tactic
 
 initialize registerTraceClass `circuit.certificate
+
+/-- Maximum exact steps per kernel replay declaration; zero keeps one replay. -/
+register_option circuit.replayChunkSize : Nat := {
+  defValue := 8
+  descr := "maximum exact certificate steps per kernel check (0 disables chunking)"
+}
 
 /-! ### Reading circuits -/
 
@@ -153,6 +175,7 @@ private inductive MStep where
   | cancel (i : Nat) (a b : Expr)
   | insert (i : Nat) (a b : Expr)
   | window (i : Nat) (wires a b : Expr) (k : Nat) (wireNums : List Nat) (aData bData : List MInstr)
+  deriving Inhabited
 
 /-- The `Step n` expression of a meta step. -/
 private def MStep.toExpr (n : Expr) : MStep → Expr
@@ -430,11 +453,12 @@ private def proveBy (p : Expr) (tac : TSyntax `tactic) : TacticM Expr := do
 goal that a proof of it yields: `replay … = some b` with `replay_sound`,
 `replayUpToPhase … = some b` with `replayUpToPhase_sound`, or
 `replayPhase … = some (k, b)` with `replayPhase_sound`. -/
-private def replayProp (kind : GoalKind) (n stepsE a b : Expr) :
+private def replayProp (kind : GoalKind) (n stepsE a b : Expr)
+    (checkers : Expr := mkConst ``defaultCheckers) :
     MetaM (Expr × (Expr → Expr)) := do
   match kind with
   | .exact =>
-    let table := mkConst ``defaultCheckers
+    let table := checkers
     let prop ← mkEq (mkApp4 (mkConst ``replay) n table stepsE a) (← mkAppM ``Option.some #[b])
     return (prop, fun h => mkAppN (mkConst ``replay_sound) #[n, table, stepsE, a, b, h])
   | .upToPhase =>
@@ -447,6 +471,95 @@ private def replayProp (kind : GoalKind) (n stepsE a b : Expr) :
     let prop ← mkEq (mkApp4 (mkConst ``replayPhase) n table stepsE a)
       (← mkAppM ``Option.some #[← mkAppM ``Prod.mk #[k, b]])
     return (prop, fun h => mkAppN (mkConst ``replayPhase_sound) #[n, table, stepsE, k, a, b, h])
+
+/-- Compute a proposed checkpoint in meta code, without trusting it. Each
+segment is independently checked by `replay_sound` against these endpoints. -/
+private def checkpointStep (n : Expr) (cur : Array Gate) (s : MStep) : MetaM (Array Gate) := do
+  match s with
+  | .swap i => return (cur.set! i cur[i + 1]!).set! (i + 1) cur[i]!
+  | .moveLeft i d =>
+    let j := i - d
+    return cur.extract 0 j ++ #[cur[i]!] ++ cur.extract j i ++ cur.extract (i + 1) cur.size
+  | .moveRight i d =>
+    return cur.extract 0 i ++ cur.extract (i + 1) (i + d + 1) ++ #[cur[i]!] ++
+      cur.extract (i + d + 1) cur.size
+  | .cancel i _ _ => return cur.extract 0 i ++ cur.extract (i + 2) cur.size
+  | .insert i a b =>
+    return cur.extract 0 i ++ #[← readGate a, ← readGate b] ++ cur.extract i cur.size
+  | .window i wires a b _ _ _ _ =>
+    let ws := (← readList wires).toArray
+    let small ← readCircuit b
+    let placed ← small.mapM fun g => do
+      let e ← match g.instr with
+        | .one gn j => pure <| mkApp3 (mkConst ``Instr.one) n (mkConst gn) ws[j]!
+        | .cnot c t => pure <| mkApp3 (mkConst ``Instr.cnot) n ws[c]! ws[t]!
+      readGate e
+    let len := (← readList a).length
+    return cur.extract 0 i ++ placed ++ cur.extract (i + len) cur.size
+
+/-- Check one window by a symbolic form, or by one basis vector per
+kernel declaration. The final proof refers only to the checked lemmas. -/
+private def proveWindow (m : Nat) (a b : Expr) : TacticM Expr := do
+  let checker := mkApp (mkConst ``phasePolyChecker) (mkNatLit m)
+  let check ← mkAppM ``Checker.check #[checker, a, b]
+  let prop ← mkEq check (mkConst ``Bool.true)
+  if let some h ← observing? (proveBy prop (← `(tactic| decide +kernel))) then
+    return ← mkAppM ``Checker.sound #[checker, a, b, h]
+  let pred ← mkAppM ``checkEquivAt #[a, b]
+  let mut all ← mkAppM ``AllBelow.zero #[pred]
+  for j in [:2 ^ m] do
+    let range ← mkAppM ``List.range' #[mkNatLit j, mkNatLit 1, mkNatLit 1]
+    let check ← mkAppM ``List.all #[range, pred]
+    let h ← proveBy (← mkEq check (mkConst ``Bool.true)) (← `(tactic| decide +kernel))
+    all ← mkAppM ``AllBelow.add #[all, h]
+  let proof ← mkAppM ``equivalent_of_allBelow #[all]
+  let name ← withOptions (Elab.async.set · false) do
+    mkAuxLemma [] (← inferType proof) proof
+  return mkConst name
+
+/-- Cache each window's proof in its checker-table row and retag its step.
+Only the checker comparison runs during replay; all semantic work was
+already checked in separate declarations by `proveWindow`. -/
+private def cacheWindows (steps : Array MStep) : TacticM (Expr × Array MStep) := do
+  let mut table := mkConst ``defaultCheckers
+  let mut tagged := steps
+  for j in [:steps.size] do
+    let i := steps.size - 1 - j
+    if let .window pos wires a b _ nums ad bd := steps[i]! then
+      let m := nums.length
+      let h ← proveWindow m a b
+      table ← mkAppM ``CheckerTable.cache #[table, a, b, h]
+      -- A newly prepended checker shifts all later windows of this width.
+      for k in [i + 1:steps.size] do
+        if let .window p ws x y idx ns xs ys := tagged[k]! then
+          if ns.length == m then
+            tagged := tagged.set! k (.window p ws x y (idx + 1) ns xs ys)
+      tagged := tagged.set! i (.window pos wires a b 0 nums ad bd)
+  return (table, tagged)
+
+/-- Replay bounded segments in separate kernel declarations, then compose
+semantic equivalences. Checkpoints are literal circuits, never unevaluated
+calls to a previous replay, so no segment rechecks the preceding trace. -/
+private def proveChunked (n a b : Expr) (steps : Array MStep)
+    (chunkSize : Nat) : TacticM Expr := do
+  let (table, steps) ← cacheWindows steps
+  let mut cur ← readCircuit a
+  let mut start := a
+  let mut proof ← mkAppM ``Equivalent.refl #[a]
+  for j in [:(steps.size + chunkSize - 1) / chunkSize] do
+    let lo := j * chunkSize
+    let hi := min (lo + chunkSize) steps.size
+    let segment := steps.extract lo hi
+    for s in segment do
+      cur ← checkpointStep n cur s
+    let finish ← if hi == steps.size then pure b
+      else mkListLit (mkApp (mkConst ``Instr) n) (cur.toList.map (·.e))
+    let stepsE ← mkListLit (mkApp (mkConst ``Step) n) (segment.toList.map (·.toExpr n))
+    let (prop, close) ← replayProp .exact n stepsE start finish table
+    let h ← proveBy prop (← `(tactic| decide +kernel))
+    proof ← mkAppM ``Equivalent.trans #[proof, close h]
+    start := finish
+  return proof
 
 /-- Assemble the trace and close the goal by the soundness theorem of the
 goal's relation applied to a kernel evaluation of the replay. If the kernel
@@ -462,8 +575,16 @@ private def closeByReplay (kind : GoalKind) (n a b : Expr) (st : State) (ws : Ar
   trace[circuit.certificate] "[{MessageData.joinSep (steps.toList.map MStep.format) ", "}]"
   let stepsE ← mkListLit (mkApp (mkConst ``Step) n) (steps.toList.map (·.toExpr n))
   let (prop, close) ← replayProp kind n stepsE a b
-  let h ←
-    try proveBy prop (← `(tactic| decide +kernel))
+  let chunkSize := circuit.replayChunkSize.get (← getOptions)
+  let proof ←
+    try
+      if let .exact := kind then
+        if chunkSize > 0 && steps.size > chunkSize then
+          proveChunked n a b steps chunkSize
+        else
+          pure <| close (← proveBy prop (← `(tactic| decide +kernel)))
+      else
+        pure <| close (← proveBy prop (← `(tactic| decide +kernel)))
     catch e =>
       let upTo := if kind.isPhase then " up to a global phase" else ""
       for w in ws do
@@ -488,7 +609,7 @@ private def closeByReplay (kind : GoalKind) (n a b : Expr) (st : State) (ws : Ar
                 ω ^ {k}: the goal that holds is c₁ ≡ₚ[{j}] c₂"
       throwError "the certificate was not accepted by the replay:{indentExpr stepsE}\n\
         {e.toMessageData}"
-  (← getMainGoal).assign (close h)
+  (← getMainGoal).assign proof
   replaceMainGoal []
 
 /-! ### The tactics -/

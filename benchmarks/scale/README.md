@@ -240,7 +240,49 @@ thread.
 | Phase polynomial | `≡ᵤ`, and `¬ ≡ᵤ` | 0.2 ms per CNOT; about 1 ms per phase gate on a sparse parity, up to 10 ms on a dense 80-wire one | 80 random qubits, 800 gates in 1.9 s; 300 structured qubits, 10200 gates in 10 s at 5.3 GB; no chunking needed |
 | Tableau, chunked | `≡ₛ` | 0.2 to 0.3 ms per generator and gate | 80 random qubits (8261 gates) in 7 min; 241 structured qubits (2120 gates) in under 3 min |
 | Basis decide, chunked | `≡ᵤ`, `≡ₚ` | 0.6 s and 165 MB per basis vector at 7 qubits, 32 gates | 7 qubits in 78 s; `gates · 4^n` scaling puts 8 qubits at minutes, 10 at hours |
-| Certificate replay | `≡ᵤ`, `≡ₚ[k]`, `≡ₚ` | 20 to 30 µs per list cell a move walks (50 moves on 64 gates: 0.1 s; 100 on 128: 0.5 s), plus each window's checker; up to phase about 1.2 times that (`tof_3`'s 62-step trace: 0.19 s against 0.16 s; 128 one-wire phase windows: 0.7 s against 0.4 s), measured 16 and 19 September | about 150 gates, bound by replay memory (`QUEUE.md`, item 3) |
+| Certificate replay | `≡ᵤ`, `≡ₚ[k]`, `≡ₚ` | 20 to 30 µs per list cell a move walks (50 moves on 64 gates: 0.1 s; 100 on 128: 0.5 s), plus each window's checker; up to phase about 1.2 times that (`tof_3`'s 62-step trace: 0.19 s against 0.16 s; 128 one-wire phase windows: 0.7 s against 0.4 s), measured 16 and 19 September | bounded exact replay reaches 2048 gates / 128 moves; see below. Phase replay remains unchunked |
+
+## Bounded certificate replay (22 September 2026)
+
+`circuit_simp` and `circuit_windows` now split long exact certificates into
+kernel declarations of at most eight steps. Literal checkpoints prevent
+later segments from unfolding earlier replay. Window proofs are cached in
+the checker table: symbolic windows use the phase-polynomial checker;
+other windows use one basis vector per declaration. The original
+`cuccaro_4` acceptance test and its measurements are recorded once in
+[`../cuccaro_4/README.md`](../cuccaro_4/README.md).
+
+The synthetic ladder below isolates replay from the window oracle. A
+circuit has one H on each of `gates` distinct wires; its target moves the
+last `moves` gates to the front, preserving their order. There are exactly
+`moves` `moveLeft` steps and no cancellation or window. Apple M4, pinned
+Lean v4.30.0-rc2, warm imports, one Lean process at a time, asynchronous
+elaboration off. Times include loading and tactic search; memory is peak
+RSS **in GiB**, including imports, as reported by `scripts/chunks.py`.
+
+| Gates / wires | Moves | Steps per chunk | Wall time | Peak RSS | Result |
+|---:|---:|---:|---:|---:|---|
+| 128 | 64 | 8 | 2.7 s | 1.84 GiB | proved |
+| 512 | 128 | 8 | 5.9 s | 1.93 GiB | proved |
+| 1024 | 128 | 8 | 11.6 s | 2.06 GiB | proved |
+| 2048 | 128 | 8 | 23.5 s | 2.30 GiB | proved |
+
+```bash
+python3 scripts/replay_scale.py --gates 128 512 1024 --moves 128 \
+  --workdir /tmp/replay-scale
+python3 scripts/replay_scale.py --gates 2048 --moves 128 \
+  --workdir /tmp/replay-scale-2048
+```
+
+Use `--chunk 0` to compare with a single replay, or a smaller positive
+chunk to trade additional checkpoints for less retained reduction work.
+This is evidence that known alignments can be checked at thousands of
+gates, not a test of finding equivalences between unrelated circuits.
+List traversal still costs `O(steps × gates)`; checkpoint terms occupy
+`O(chunks × gates)`. A large individual move still walks its block.
+Packing circuits or using a cursor remains useful for time and total
+proof size. Phase goals and the direct `circuit_replay` macros retain the
+single-declaration path; the option affects the exact search tactics.
 
 ## Reproduce
 

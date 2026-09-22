@@ -124,11 +124,16 @@ Every leaf of a proof here is a kernel evaluation of a `Bool`: a checker's
   gates. In chunks: 40 qubits and 2346 gates in 39 s, 80 qubits and 8261
   gates in 7 minutes at 4 GB, structured circuits on 200 qubits in seconds.
 - **Certificates.** `circuit_simp` and `circuit_windows` search in meta code
-  and hand the kernel one list of steps to replay; the cost is linear in the
-  steps, plus each window on its own wires. A 155-gate certificate has been
-  seen to run past 4 GB, so long alignments are split too. Replayed up to a
-  phase, the same certificate costs about 1.2 times the exact one (`tof_3`:
-  0.19 s against 0.16 s).
+  and hand the kernel a trace. Exact traces are checked in separate chunks
+  of eight steps by default (`circuit.replayChunkSize`, 0 disables it),
+  composed by `Equivalent.trans`. Window proofs are cached, with basis
+  windows themselves checked one vector per declaration. The original
+  Cuccaro four-bit alignment now checks under 2 GB; a synthetic 2048-gate,
+  128-move trace checks in 23.5 s at 2.30 GiB. These are verified alignments,
+  not an ability to find a relation between arbitrary circuits. Prefix
+  traversal and checkpoint storage still grow with circuit length. Phase
+  goals and direct `circuit_replay` calls retain single-declaration replay.
+  See `benchmarks/scale/README.md` and `benchmarks/cuccaro_4/README.md`.
 
 ## Decision list for a concrete pair
 
