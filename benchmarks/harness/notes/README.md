@@ -57,7 +57,10 @@ peephole pair. "Longest" counts the gates of both sides.
   pairs into an exact one against `optimized ++ phaseGadget k i` at no
   T-cost.
 - TZAP at its lightest level is the next rung after our peephole pass: it
-  keeps the skeleton (570 of 1000 gates match), but its merges act on
+  keeps most of the skeleton (570 of 1000 gates match; not all of it,
+  since `CancelGates` also rewrites `H S H` and `H Z H` on this circuit's
+  one-wire runs, `benchmarks/circuits/README.md`, "Which TZAP level keeps
+  the skeleton"; `-O2` and above re-synthesise CNOTs), but its merges act on
   parities across CNOTs, so the pair cuts into 118 segments of which five
   hold 673 of the 1000 original gates (69, 81, 126, 140 and 257 gates).
   Those need phase-polynomial reasoning across Hadamards (`QUEUE.md`, the
