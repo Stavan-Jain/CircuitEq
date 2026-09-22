@@ -33,19 +33,15 @@ pair (no gate of the alphabet is a scalar).
 from __future__ import annotations
 
 import argparse
-import cmath
 import json
-import math
 import random
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from certificate import DIAG, can_cancel, can_commute, cnot, fmt_instr, one  # noqa: E402
-
-# Diagonal gates as multiples of pi/4, and back.
-PHASE = {"T": 1, "S": 2, "Z": 4, "Sdg": 6, "Tdg": 7}
-GATE_OF_PHASE = {v: k for k, v in PHASE.items()}
+# Diagonal gates as multiples of pi/4, and back; the gate matrices.
+from alphabet import GATE_OF_PHASE, MATRICES, PHASE_OF_GATE as PHASE  # noqa: E402
 
 # How often each gate is drawn. CNOTs and Hadamards keep the circuit from being
 # a product of one-wire circuits; the rest of the alphabet is all present.
@@ -107,13 +103,6 @@ def peephole(circuit: list[tuple]) -> tuple[list[tuple], int]:
 
 
 # A floating-point state-vector simulator, only to check the generator.
-R = 1 / math.sqrt(2)
-MATRICES = {
-    "H": ((R, R), (R, -R)), "X": ((0, 1), (1, 0)), "Y": ((0, -1j), (1j, 0)),
-    "Z": ((1, 0), (0, -1)), "S": ((1, 0), (0, 1j)), "Sdg": ((1, 0), (0, -1j)),
-    "T": ((1, 0), (0, cmath.exp(1j * math.pi / 4))),
-    "Tdg": ((1, 0), (0, cmath.exp(-1j * math.pi / 4))),
-}
 
 
 def apply(circuit: list[tuple], psi: list[complex]) -> list[complex]:

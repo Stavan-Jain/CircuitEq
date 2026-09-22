@@ -14,6 +14,7 @@ phase, to the diagonal Clifford+T gates with that matrix.
 import argparse
 from pathlib import Path
 import re
+import sys
 
 import pyzx as zx
 from pyzx.circuit.gates import CNOT, CZ, HAD, NOT, ZPhase
@@ -27,9 +28,8 @@ BENCHMARKS = {
     "barenco_tof_3": ("BarencoTof3", "teleport"),
 }
 
-PHASES = {
-    0: [], 1: ["T"], 2: ["S"], 3: ["S", "T"], 4: ["Z"], 5: ["Z", "T"], 6: ["Sdg"], 7: ["Tdg"],
-}
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from alphabet import PHASES  # noqa: E402  (`diag(1, ω^k)` as gates, PyZX's `rz` convention)
 
 
 def optimize(original: zx.Circuit, pipeline: str) -> zx.Circuit:

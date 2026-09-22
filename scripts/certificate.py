@@ -37,13 +37,13 @@ from dataclasses import dataclass
 from fractions import Fraction
 from pathlib import Path
 import re
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from alphabet import DIAG, GATES, INVERSE  # noqa: E402, F401  (re-exported to importers)
 
 # ---------------------------------------------------------------------------
 # Instructions: ("one", gate, i) or ("cnot", c, t), mirroring `Instr`.
-
-GATES = ("H", "X", "Y", "Z", "S", "Sdg", "T", "Tdg")
-DIAG = {"Z", "S", "Sdg", "T", "Tdg"}
-INVERSE = {"H": "H", "X": "X", "Y": "Y", "Z": "Z", "S": "Sdg", "Sdg": "S", "T": "Tdg", "Tdg": "T"}
 
 Instr = tuple
 

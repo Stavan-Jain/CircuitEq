@@ -355,6 +355,13 @@ Rules that follow, for anyone adding to the library:
   repository. `peephole_pairs.py` draws seeded random pairs equal by the
   library's own rules. CI runs the self-tests of `circuit_sources.py`,
   `circuit_pairs.py` and both harnesses.
+- `scripts/alphabet.py` — the gate alphabet once for every script: `GATES`,
+  `DIAG`, the fragments, `INVERSE`, `PHASE_OF_GATE` / `PHASES` (`diag(1,
+  ω^k)` as gates), the QASM names and the matrices. Standard library only;
+  `--self-test` (CI) checks it against `Gate1` and `Gate1.phase?` in the Lean
+  sources and against the copy `benchmarks/harness/tools/qasm.py` keeps
+  (that file is installed alone in a run workspace). A script that needs a
+  gate table imports it from here.
 - `scripts/certificate.py` — the Python mirror of the certificate language
   (`replay`, `replay_phase`, `align`, `fmt_certificate`), so a search
   outside Lean emits traces `replay` accepts; `--phase` certifies up to a
