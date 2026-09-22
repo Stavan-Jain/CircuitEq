@@ -330,6 +330,14 @@ Rules that follow, for anyone adding to the library:
   QCEC and numpy checks on a ladder of sizes under a timeout and a memory
   watchdog (the harness env `envs/qcec`); CI runs its self-test. The pair is
   a target for the checker, not a regression test: nothing proves it yet.
+- `docs/milestones.md` — what counts as a milestone for the equivalence
+  checker: a realistic pair with a named application, made by an optimiser
+  people run, that no published checker proves under the benchmark protocol
+  (one hour, 16 GB, verdicts measured, not cited), with a kernel-checked
+  proof here. It gives the criteria, the candidate table drawn from the
+  catalogue with the tools' failure predicted from `docs/tool-survey.md`,
+  and the first protocol run that orders the ladder (`QUEUE.md`, item 15).
+  When a protocol run or a proof moves a candidate, update its row.
 - `PLAYBOOK.md` — the prover's guide: what exists, what it costs, and in
   which order to try it on a concrete pair. The agent harness installs it
   as the `CLAUDE.md` of every run (`benchmarks/harness/PLAYBOOK.core.md`
