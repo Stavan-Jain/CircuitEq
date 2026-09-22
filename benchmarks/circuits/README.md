@@ -522,9 +522,67 @@ pairs.
   any circuit, the QASM round trip included, and 34 s on all 99 (the
   1 115 899 gates of `gf2^256_mult` in 1.5 s); the batch's seven minutes went
   into measuring the pairs in Python. Its `-O2` keeps less of the skeleton
-  than phase teleportation does (the medians above), so these pairs, too,
-  need the Hadamard-variable form (`QUEUE.md`, item 4) or cut points that
-  hold up to a residual.
+  than phase teleportation does (the medians above, and the next section),
+  so these pairs, too, need the path sum of the pair (`QUEUE.md`, item 4)
+  or cut points that hold up to a residual.
+
+### Which TZAP level keeps the skeleton
+
+Measured on 22 September 2026 with TZAP 0.6.1 on the 99 circuits that have a
+`tzap` twin, each at `-O1` and at `-O2`, with `--decompose-rz --decompose-cz`.
+The *skeleton* of a gate list is its `CX`, `H` and `X` gates in time order
+(`Y` counts as `X`). A pass that only deletes, merges or re-angles diagonal
+gates and cancels self-inverse pairs keeps it up to cancellation. Two tests on
+the skeletons alone: the output's skeleton is a subsequence of the input's
+(every `CX`, `H` and `X` of the output is one of the input's, in order), and,
+up to 60 000 gates, the two skeletons are equal once equal self-inverse gates
+that commute into contact under `Instr.CanCommute` are cancelled, compared in
+the canonical order of `scripts/circuit_pairs.py`. A level keeps the skeleton
+of a circuit when both hold. (The comparison was a throwaway script; the
+passes and counts below reproduce with `tzap` itself.)
+
+| TZAP | Passes | Keeps the skeleton | T-count |
+|---|---|---:|---|
+| `-O1` | `CancelGates`, `PhaseFoldRand` | 89 of 99 | that of `-O2` on 83 |
+| `-O2`, `-O3` | and `CnotMin`, `SuperOpt` | 18 of 99 | below `-O1` on 16, never above |
+| `--passes PhaseFoldRand` | `PhaseFoldRand` | 99 of 99 | above `-O1` on 58 |
+
+- `-O1` is byte for byte `--passes CancelGates,PhaseFoldRand` (on `tof_5`,
+  `barenco_tof_4` and `cuccaro_4`). `-O2` and `-O3` gave the same output on
+  those three, and `--passes CancelGates,PhaseFoldRand,CnotMin,SuperOpt`
+  reproduces it on two of them (on `cuccaro_4` `SuperOpt` picks other
+  windows). `CnotMin` re-synthesises CNOT-dihedral blocks and `SuperOpt`
+  replaces 3-qubit windows from a table: `tof_5` keeps its 42 `CX` at `-O1`
+  and comes back with 33 at `-O2`, and `H 0; H 1; CX 0 1; H 0; H 1` comes
+  back from `-O2` as `CX 1 0`.
+- The ten circuits `-O1` does not keep are exactly TZAP's own
+  synthesised-rotation circuits (the six `cobble_t` ones and the four QFTs),
+  and the change is `CancelGates`' alone: on the four checked, the skeleton
+  of the `-O1` output is list for list that of `CancelGates` run alone.
+  Besides cancelling `HH`, `XX` and `CX` pairs, `CancelGates` reduces
+  Hadamards: `H S H` becomes `S† H S†`, `H S† H` becomes `S H S`, `H Z H`
+  becomes `X` and `H X H` becomes `Z`. Those need a Clifford diagonal alone
+  between two Hadamards on a wire, which long one-wire sequences have and
+  Toffoli-built circuits do not. The random 1000-gate pair of
+  `benchmarks/harness/notes/README.md` has them too, and `-O1` does not keep
+  its skeleton either.
+- `CancelGates` runs once, before folding, so a pair that folding brings
+  together stays: `CX 0 1; T 1; Tdg 1; CX 0 1` comes back from `-O1` as
+  `CX 0 1; CX 0 1`.
+- `-O2` has the lower T-count on `ham15_med` (234 against 242),
+  `ham15_high`, `hwb8` to `hwb12` and the ten synthesised circuits; on the
+  other 83 the two levels agree. Phase folding alone keeps every skeleton
+  but loses T-count wherever Hadamard pairs have to cancel before phases can
+  merge (`barenco_tof_10`: 160 against 100).
+
+So the `tzap` twins here, made at `-O2`, are mostly pairs that do not line up,
+and they are kept that way on purpose: the checking agent is not told how a
+pair was made, and pairs that do not line up are what it has to handle
+(`QUEUE.md`, item 4). Three of the harness tasks are such pairs (`tof_3_tzap`,
+`barenco_tof_3_tzap`, `feynman_vbe_adder_3__pyzx_published`). A
+skeleton-keeping twin of any circuit is
+`CIRCUITEQ_TZAP_ARGS="-O1 --decompose-rz --decompose-cz"` with `probe --twin
+tzap`.
 
 ### The handful imported as harness tasks
 

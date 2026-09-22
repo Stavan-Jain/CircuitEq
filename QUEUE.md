@@ -25,8 +25,12 @@ tiers with an exact-or-refuse QASM importer, 390 pairs with the relation
 that actually holds (ten imported as held-out tasks), and
 `optimization.json` with what PyZX, TZAP, Nam et al. and T-par reach on
 every T-bearing circuit. Still open before item 1 is "done": repeated runs
-with a summary table, and the record of which declarations a proof uses
-(`benchmarks/harness/README.md`).
+with a summary table, the record of which declarations a proof uses
+(`benchmarks/harness/README.md`), and closing the channels through which a
+run can learn how its pair was made (item 1). The catalogue's `tzap` twins
+are made at `-O2` and mostly do not line up (18 of 99 keep the skeleton,
+22 September); they stay that way on purpose, as the kind of pair the
+agent has to handle, and item 4 is the tool planned for them.
 
 ## Next
 
@@ -78,7 +82,28 @@ with a summary table, and the record of which declarations a proof uses
    `benchmarks/harness/`, and the held-out ladder is the circuit
    catalogue; the task set is the one recorded there, not the one planned
    above. Still open: repeated runs with a summary table and the
-   declaration record ("In flight").
+   declaration record ("In flight"), and a blind harness. The agent is the
+   checker and must learn nothing about a pair but its two circuits. The
+   workspace already drops the task's name and metadata, `benchmarks/`,
+   the design documents and the history, but three channels remain.
+   (a) The run is offered `./tzap`, and PyZX in `./python`, and rerunning
+   the tool that made a twin on `original` reproduces `optimized` (TZAP's
+   output was the same on every run measured), so the producer and its
+   level can be recovered by experiment. (b) The playbook, the run's
+   `CLAUDE.md`, sorts its advice by producer (entry 5, "phase folding,
+   phase teleportation, peephole passes"; entry 8, "PyZX and TZAP drop
+   scalars"). (c) Each tool's output has a style of its own: gate order,
+   how rotations and `CZ` come back decomposed. Levers: held-out tasks are
+   never made by a tool the run is offered (or the run is offered none);
+   both circuits of every task are put into one canonical order of
+   commuting gates before the agent sees them, which keeps the relation
+   and blurs (c), though a diff after the agent's own reordering still
+   matches; the playbook is phrased by what the agent can see in the pair.
+   Acceptance: the harness self-test fails when a held-out task's
+   `optimized` is reproduced, up to the order of commuting gates, by a tool
+   the run is offered at any of its levels; no playbook entry names a
+   tool. Changing what the prompt offers changes the instrument: bump
+   `HARNESS_VERSION`.
 
 2. **Cost functions in Lean.** The roadmap's architecture says costs are
    computed in Lean so that "this circuit has T-count 19" is a checked
@@ -113,29 +138,54 @@ with a summary table, and the record of which declarations a proof uses
    Acceptance: `cuccaro_4` / teleport checks under 2 GB. M. Depends on
    nothing.
 
-4. **Phase polynomials with Hadamard variables (path-sum form).** Extend
-   `PhasePoly` so that an `H` on a wire introduces a fresh variable (bit
-   `n + j` of the masks) instead of ending the fragment: the linear part
-   ranges over initial and Hadamard variables, the phase polynomial too,
-   and the semantic invariant becomes a superposition over Hadamard
-   outcomes with the `(−1)^{p·h}/√2` factor of `applyOne H`. Then prove
-   the theorem that certifies phase-folding output directly: two circuits
-   with the same CX/H/X skeleton and the same phase map are `≡ᵤ` (no
-   canonical form needed). This is what TZAP (arXiv 2605.13929, phase
-   folding in linear time with a randomised parity analysis, no
-   certificate) and Feynman's affine analysis compute; it is also Rung 8's
-   normaliser and Rung 3's latent-algebra tool. Acceptance: `tof_3` against
-   its TZAP output certified in one check; a Feynman-suite circuit of a
-   few thousand gates certified in minutes of kernel time. M. Depends on
-   nothing.
+4. **Path sums of the pair (phase polynomials with Hadamard variables).**
+   The tool for pairs that do not line up (`ROADMAP.md`, "The pair as one
+   circuit"), which is most real optimiser output: TZAP's `-O2` twins keep
+   the CX/H/X skeleton on 18 of the catalogue's 99 circuits
+   (`benchmarks/circuits/README.md`, "Which TZAP level keeps the
+   skeleton"), and at the median a diff matches under half of the gates
+   of the published Nam et al. and PyZX outputs and under a tenth of
+   `full_reduce`'s. The agent is not told which kind of pair it holds, so
+   this cannot be a tool for one producer. Represent `a ++ inverse b` as a path sum: extend `PhasePoly`
+   so that an `H` on a wire introduces a fresh variable instead of ending
+   the fragment; the linear part ranges over input and Hadamard variables,
+   the phase polynomial too, and the semantic invariant becomes a
+   superposition over Hadamard outcomes with the `(−1)^{p·h}/√2` factor of
+   `applyOne H`. The dense planes of `PhasePoly` do not survive this (the
+   triple plane would be `C(n + h, 3)` bits for `h` Hadamards), so the
+   phase polynomial becomes a sparse list of monomials. Then, as step kinds
+   of the certificate language with their cases in `replayStep_sound`:
+   Amy's reduction rules (drop a variable that does not occur; the `HH`
+   rule, which sums out a variable that occurs only as `(−1)^{y·Q}` and
+   substitutes for a variable of `Q`; the `ω` rule), each proved to
+   preserve the denotation, and a closing check that
+   the reduced sum is the identity, or `ω ^ k` times it for `≡ₚ[k]`. The
+   search for the rewrites is untrusted: a Python mirror beside
+   `scripts/certificate.py`, or Feynman's verifier as an oracle, emits the
+   trace. Two things fall out. The theorem for aligned pairs (same CX/H/X
+   skeleton and same phase map give `≡ᵤ`) is the case where the reduction
+   is trivial, a fast path. And on an unequal pair, one amplitude of the
+   reduced sum, a sum over the variables left, differs from the identity's:
+   a refutation witness, as a step kind of item 11. The representation is
+   the one TZAP (arXiv 2605.13929) and Feynman's affine analysis compute,
+   and it is Rung 8's normaliser and Rung 3's latent-algebra tool. Acceptance, all
+   on pairs that do not line up: `tof_3` against its `-O2` TZAP output
+   (harness task `tof_3_tzap`) by one replay; the published pair
+   `feynman_vbe_adder_3__pyzx_published` (10 qubits) and a TZAP `-O2`
+   pair of a few thousand gates in minutes of kernel time; `tof_3_mut1`
+   and one mutant past a basis decide refuted by a witness. M to L.
+   Depends on nothing; the refutation half on item 11.
 
 5. **TZAP as a pipeline.** Build `tzap` from
    https://github.com/qqq-wisc/tzap, add a `tzap` pipeline to
    `scripts/check_pyzx_benchmarks.py` and the survey script, and add pairs
    from the Feynman suite (`gf2^k_mult`, `mod_adder`, `barenco_tof`,
-   `hwb`) at the sizes the kernel reaches. TZAP output keeps the skeleton
-   (it only deletes rotations, edits angles, and cancels `XX`/`HH`
-   pairs), so its pairs are alignable by construction. Acceptance: the
+   `hwb`) at the sizes the kernel reaches. Record the level with every
+   pair: at `-O1` TZAP's output keeps the skeleton up to cancelled pairs
+   and `CancelGates`' one-wire Hadamard reductions (`H S H` to
+   `S† H S†`, `H Z H` to `X`), at `-O2` and `-O3` it does not
+   (`benchmarks/circuits/README.md`, "Which TZAP level keeps the
+   skeleton"), and an agent is told neither. Acceptance: the
    fixture script reproduces TZAP output byte for byte and the Lean lists
    match. S for the script; certification beyond `H`-free regions depends
    on item 4. Partly done on 21 September 2026 in `benchmarks/circuits/`:
@@ -163,8 +213,11 @@ with a summary table, and the record of which declarations a proof uses
    Hadamard, so `tof_3`, `tof_4`, `tof_5`, the adders and `mod5_4` become
    proofs with no basis decide wider than one wire, and the recurring
    library gap (`[CX 4 3, CZ 3 4] ≡ᵤ [Sdg 3, CX 4 3, S 4, S 3]`, a `CZ`
-   through a control-only block) is a phase-polynomial identity. S.
-   Depends on item 5 for `tzap`; nothing else.
+   through a control-only block) is a phase-polynomial identity. Cutting
+   at Hadamards needs the two circuits' Hadamards to correspond, which
+   holds for phase teleportation and TZAP at `-O1`, not for the
+   catalogue's `-O2` twins; those are item 4's. S. Depends on item 5 for
+   `tzap`; nothing else.
 
 8. **Phase-polynomial follow-ups.** The affine `X` extension (a constant
    bit per row); `ofNF` resynthesis with `nf (ofNF x) = some x`, which
