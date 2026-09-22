@@ -17,7 +17,8 @@
     "redact": []
   },
   "known_leaks": [
-    "the pair is a promoted benchmark of this repository, so a model may have seen its proof; removed from the run copy: its module, README.md, benchmarks/, and the window table of scripts/certificate.py"
+    "the pair is a promoted benchmark of this repository, so a model may have seen its proof; removed from the run copy: its module, README.md, benchmarks/, and the window table of scripts/certificate.py",
+    "PLAYBOOK.md's cost model and decision entry 3 name the 15-qubit tableau check among the measurements, which says the Clifford tableau decides a pair of this size"
   ],
   "gates": [
     32,

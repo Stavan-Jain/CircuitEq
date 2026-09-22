@@ -39,10 +39,10 @@ three, so that a difference can be attributed.
   exist for the agent, so update it in the commit that adds the tool.
 - **The model** (a pinned id, `claude-fable-5-1` by default, not an alias).
 
-Two configurations of the library: `full`, and `core`, which strips the run
-copy down to the semantics and its decision procedures (`CORE_MODULES`,
-up to `Decide.lean`) and uses
-`PLAYBOOK.core.md`. Their difference is the project's hypothesis.
+Two configurations of the library: `full`, and `core`, which strips the run copy
+down to the semantics and its decision procedures (`CORE_MODULES`, up to
+`Decide.lean`) and uses `PLAYBOOK.core.md`. Their difference is the project's
+hypothesis.
 
 ## Running it
 
@@ -78,11 +78,16 @@ build mathlib.
 
 ## One run, step by step
 
-1. Clone the base. Delete what gives answers away: `README.md`,
-   `ROADMAP.md`, `QUEUE.md`, `CLAUDE.md` (replaced by the playbook),
-   `.github/`, `benchmarks/`, the task's own module under
-   `CircuitEq/Benchmarks/` with its import and its build products, the window
-   table in `scripts/certificate.py`, and the task's own redactions.
+1. Clone the base. Delete what gives answers away (`GLOBAL_DELETE`):
+   `README.md`, `ROADMAP.md`, `QUEUE.md`, `CLAUDE.md` (replaced by the
+   playbook), `.github/`, `benchmarks/`, and the checkers' regression tests
+   `CircuitEqTest/` with their build products, `CircuitEqTest.lean` trimmed
+   to the imports that survive. Then the task's hold-out: its modules under
+   `CircuitEq/Benchmarks/` with their imports and build products, the files
+   it lists under `delete` (the catalogue's scripts, for a catalogue task),
+   and its redactions. Every run also redacts the window table in
+   `scripts/certificate.py`. The `core` configuration drops, besides, every
+   module outside `CORE_MODULES` (`Examples` included) and `scripts/`.
 2. Write the harness's files: `Harness/Task.lean` (the two circuits),
    `Solution.lean` (the claim as `equiv`, its negation as `not_equiv`, both
    `sorry`), `TASK.md` (the prompt), `CLAUDE.md` (the playbook), `./submit`,
@@ -128,18 +133,17 @@ build mathlib.
 The outcome is `proved`, `refuted`, `no_certificate`, or `invalid` (a rule
 was broken). `first_accept_s` is when `./submit` first said ACCEPT.
 
-The text scan is an early warning, not a defence (an option can be set from
-meta code); the replay is the defence. One gap remains in this harness: it
-judges in the agent's own workspace, so it trusts the build products under
-`.lake/` there. The optimisation harness judges in a fresh clone of the
-workspace as it was before the agent started; this one should too. What the
-replay does not do: it trusts the library and mathlib as built, and it is
-the same kernel again, not an independent checker (SafeVerify,
-`leanprover/comparator`: `QUEUE.md`,
-"Later"). So still read `changes.diff` before you believe a row, then set its
-`"reviewed"` field. The final report lists what to look at: any `set_option`
-outside a short harmless list, `unsafe`, `#eval`, `run_cmd`, `initialize`,
-file or process access from Lean, and new notation.
+The text scan is an early warning, not a defence (an option can be set from meta
+code); the replay is the defence. One gap remains in this harness: it judges in
+the agent's own workspace, so it trusts the build products under `.lake/` there.
+The optimisation harness judges in a fresh clone of the workspace as it was
+before the agent started; this one should too. What the replay does not do: it
+trusts the library and mathlib as built, and it is the same kernel again, not an
+independent checker (SafeVerify, `leanprover/comparator`: `QUEUE.md`, "Later").
+So still read `changes.diff` before you believe a row, then set its `"reviewed"`
+field. The final report lists what to look at: any `set_option` outside a short
+harmless list, `unsafe`, `#eval`, `run_cmd`, `initialize`, file or process
+access from Lean, and new notation.
 
 ## What the agent can touch
 
@@ -431,22 +435,26 @@ baselines, redactions, known leaks).
 | `barenco_tof_3` | 5 | 60 | 28 | PyZX teleport 24, proved in the repository; PyZX `full_reduce` 16; TZAP 16 |
 | `peephole_8q_1000g_s1` | 8 | 1000 | 257 | our peephole pass 127, proved by an agent in equivalence run `20260919-171348-e58dbd`; PyZX teleport 109 and `full_reduce` 101, both only up to a global phase |
 
-Hold-out works as in the equivalence harness. For a task made from a
-promoted benchmark, the optimised twin is in the repository: its module goes
-with its build products, and `benchmarks/`, the README and the window table
-of `scripts/certificate.py` go for every run. Checked on a `tof_3` workspace
-by searching for pieces of the twin: two more leaks were found and closed.
+Hold-out works as in the equivalence harness. For a task made from a promoted
+benchmark, the optimised twin is in the repository: its module goes with its
+build products, and `benchmarks/`, the README and the window table of
+`scripts/certificate.py` go for every run. Checked on a `tof_3` workspace by
+searching for pieces of the twin: two more leaks were found and closed.
 `CircuitEq/Benchmarks/BarencoTof3.lean` is the same Toffoli decomposition
 through the same PyZX pipeline, twin and proof included, so each of the two
 Toffoli tasks holds out both modules; and the self-test of
-`scripts/tcount_survey.py` carries the four windows of the `tof_3` proof,
-which a task-level redaction removes. The checkers' regression tests, which
-restate sub-blocks of `tof_3` and copies of the `rep3` and Steane pairs,
-live in `CircuitEqTest/`, which every run copy loses (`GLOBAL_DELETE`;
-`CircuitEqTest.lean` then imports only `CircuitEq.Examples`). What stays is
-in `known_leaks`: the fact that a model may have seen these pairs. They are development
-tasks. `peephole_8q_1000g_s1` is held out: its twin and the proof an agent
-found for it are under `benchmarks/`, which no run sees.
+`scripts/tcount_survey.py` carries the four windows of the `tof_3` proof, which
+a task-level redaction removes; the equivalence tasks on the two Toffoli
+circuits hold out the same (they did not until 22 September). The checkers'
+regression tests, which restate sub-blocks of `tof_3` and copies of the `rep3`
+and Steane pairs, live in `CircuitEqTest/`, which every run copy loses with its
+compiled modules (`GLOBAL_DELETE`, `drop_build_tree`; before 22 September the
+`.olean` files stayed, importable). `CircuitEqTest.lean` then imports only
+`CircuitEq.Examples`, or nothing in `core`. What stays is in `known_leaks`: the
+fact that a model may have seen these pairs, and the playbook's own worked
+examples where they come close. They are development tasks.
+`peephole_8q_1000g_s1` is held out: its twin and the proof an agent found for it
+are under `benchmarks/`, which no run sees.
 
 ## What was tested
 

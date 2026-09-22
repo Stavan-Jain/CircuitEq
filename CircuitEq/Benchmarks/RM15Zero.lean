@@ -13,15 +13,14 @@ QECUnitaryCircuits commit `3d96b5fe14a393f8eeefe02f45e5d23916b85a4d`,
 `full_reduce`. See `benchmarks/rm15_zero/` for the input, output, and
 reproduction steps.
 
-The original has 32 gates (4 Hadamards, 28 CNOTs); PyZX re-synthesises it
-into 28 (4 Hadamards, 24 CNOTs) with a different CNOT network, so neither
-a window alignment nor a block template applies. Both circuits are
-Clifford, so the tableau checker of `CircuitEq.Tableau` decides the pair
-regardless of structure: `tableauCheck` compares the images of the 30 Pauli
-generators, about 0.3 s of kernel time, and `tableauChecker.sound` turns
-the `true` into `≡ₛ`, equivalence up to a unit scalar, which is what a
-tableau certifies.
--/
+The original has 32 gates (4 Hadamards, 28 CNOTs); PyZX re-synthesises it into
+28 (4 Hadamards, 24 CNOTs) with a different CNOT network, so neither a window
+alignment nor a block template applies. Both circuits are Clifford, so the
+tableau checker of `CircuitEq.Tableau` decides the pair regardless of structure:
+`tableauCheck` compares the images of the 30 Pauli generators (the kernel time
+is in `benchmarks/rm15_zero/README.md`), and `tableauChecker.sound` turns the
+`true` into `≡ₛ`, equivalence up to a unit scalar, which is what a tableau
+certifies. -/
 
 namespace Quantum.Circuit.Benchmarks.RM15Zero
 

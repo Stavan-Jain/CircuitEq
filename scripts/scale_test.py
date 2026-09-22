@@ -45,6 +45,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import check_pyzx_benchmarks as cpb  # noqa: E402
+from alphabet import CLIFFORD, CX_DIAGONAL  # noqa: E402
 from chunks import CHUNK_HEADER, chunk_theorems, run_lean  # noqa: E402
 
 import pyzx as zx  # noqa: E402
@@ -54,8 +55,9 @@ from fractions import Fraction  # noqa: E402
 TABLEAU_FAMILIES = {"clifford", "ghz", "surface"}
 DEFAULT_PIPELINE = {"clifford": "full_reduce", "ghz": "full_reduce", "surface": "full_reduce",
                     "cnot_t": "teleport", "ccz_net": "teleport"}
-CLIFFORD_GATES = {"H", "X", "Y", "Z", "S", "Sdg", "CX"}
-PHASE_POLY_GATES = {"CX", "Z", "S", "Sdg", "T", "Tdg"}
+# The fragments of the two checkers, from the shared alphabet.
+CLIFFORD_GATES = CLIFFORD
+PHASE_POLY_GATES = CX_DIAGONAL
 
 
 def surface_stabilizers(d: int) -> list[tuple[str, list[int]]]:

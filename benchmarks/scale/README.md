@@ -119,8 +119,8 @@ one shift-and-or per set bit of the parity. Its soundness proof was redone
 and a completeness theorem added (`PhasePoly.complete`: equal unitaries
 give equal forms), so the exported `phasePolyRefutes` turns a `false` into
 a proof of `¬ a ≡ᵤ b`; the mutant rows above are those theorems. The
-three relations are now tests in the module (`Z_parity`, `seven_S`,
-`fifteen_T`).
+three relations are now regression tests (`Z_parity`, `seven_S`,
+`fifteen_T` in `CircuitEqTest/PhasePoly.lean`).
 
 Profiling the rerun changed the representation twice more, and the numbers
 are worth keeping. With the rows as a `List ℕ`, each CNOT's `List.set` and
@@ -219,6 +219,19 @@ per-gate shuffles and the memoised closures with forced reads bring it to 0.1 s.
 Depth is now linear: eighteen Hadamards on one qubit decide in 42 ms, where the
 unforced closures did not finish in a minute. Memory is the limit before time:
 the kernel's `whnf` cache retains everything evaluated during one declaration.
+
+## The kernel replay (18, 19 and 22 September 2026)
+
+`LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq CircuitEqTest`, the CI step
+that replays every built declaration through the kernel. On the M4, 18 and 19
+September, for the library alone (23 modules, 2119 declarations): one thread 22
+to 28 s, 0.33 to 0.41 GB peak footprint (1.7 to 1.8 GB resident, almost all of
+it the mapped mathlib `.olean` files); two threads 16 s and 2.1 GB; the default
+ten threads were killed by the OS after 4 minutes at a 26 GB footprint. On
+GitHub's `ubuntu-latest` runner the one-thread replay was a 25 to 39 s step in a
+2 to 3 minute job, and the replay-fixture check 2 s. On 22 September, after the
+module split, both libraries (31 modules): 28 s and 1.8 GB resident on one
+thread.
 
 ## Where each tool stands
 

@@ -12,12 +12,20 @@
   },
   "holdout": {
     "modules": [
-      "CircuitEq.Benchmarks.Tof3"
+      "CircuitEq.Benchmarks.Tof3",
+      "CircuitEq.Benchmarks.BarencoTof3"
     ],
-    "redact": []
+    "redact": [
+      {
+        "file": "scripts/tcount_survey.py",
+        "pattern": "^    hand = \\[.*?^    al = ",
+        "replacement": "    hand = []  # held out\n    al = ",
+        "flags": "ms"
+      }
+    ]
   },
   "known_leaks": [
-    "the pair is a promoted benchmark of this repository, so a model may have seen its proof; removed from the run copy: its module, README.md, benchmarks/, and the window table of scripts/certificate.py",
+    "the pair is a promoted benchmark of this repository, so a model may have seen its proof; removed from the run copy: its module and the other Toffoli benchmark's (the same decomposition through the same pipeline), README.md, benchmarks/, the window table of scripts/certificate.py and the tof_3 windows in scripts/tcount_survey.py's self-test",
     "CircuitEqTest/PhasePoly.lean keeps three test theorems about sub-blocks of this circuit (`tof3_merge`, `tof3_controls`, `tof3_core`); the harness removes CircuitEqTest/ from every run copy (on a base from before that library existed they sit in CircuitEq/PhasePoly.lean, unredacted)"
   ],
   "mutation": {

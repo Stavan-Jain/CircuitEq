@@ -644,10 +644,11 @@ def W(left: str, right: str) -> tuple[list[Instr], list[Instr]]:
 
 
 # Module name, windows in order, and whether to cancel inverse pairs first
-# (`circuit_simp`). `steane_plus` is absent: its Lean proof applies the block
-# theorem `layer_cnotNetwork_hLayer` before aligning, which is not a
-# certificate step yet.
+# (`circuit_simp`). The agent harness replaces the whole table by `{}` in a run's
+# workspace, so everything about a benchmark's proof goes inside it.
 BENCHMARKS = {
+    # `steane_plus` is absent: its Lean proof applies a block theorem before
+    # aligning, which is not a certificate step yet.
     "tof_3": ("Tof3", [
         W("T 0, T 0", "S 0"),
         W("H 3, CX 1 3", "H 3, CX 1 3, H 3, H 3"),

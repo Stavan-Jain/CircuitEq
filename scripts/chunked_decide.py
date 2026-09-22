@@ -2,9 +2,10 @@
 
 ``decide +kernel`` on ``original ≡ᵤ optimized`` evaluates all ``2 ^ n`` basis
 vectors in one declaration and the kernel keeps every memoised amplitude
-until it ends, which kills the seven-qubit ``SteanePlus`` pair at 6.9 GB.
-This script emits the same decision as one theorem per range of basis
-vectors (``checkEquivAt``, ``CircuitEq/Semantics.lean``), assembled by
+until it ends, which runs the seven-qubit ``SteanePlus`` pair out of memory
+(``benchmarks/scale/README.md``, "The basis evaluator"). This script emits
+the same decision as one theorem per range of basis vectors
+(``checkEquivAt``, ``CircuitEq/Decide.lean``), assembled by
 ``equivalent_of_allBelow``, runs it, and reports time and peak memory.
 
 Usage::

@@ -8,11 +8,11 @@ import CircuitEq.Semantics
 /-!
 # The algebra of the equivalence relations
 
-`≡ᵤ`, `≡ₚ[k]`, `≡ₚ` and `≡ₛ` (`CircuitEq.Semantics`) compose the same way:
-`refl`, `symm`, `trans`, `append`, `cons`. In the named form the exponents
-add, in `Fin 8` and hence modulo eight, and reversing a relation negates the
-exponent. `Trans` instances let one `calc` mix `≡ᵤ`, `≡ₚ[k]` and `≡ₚ` steps
-in any order.
+`≡ᵤ`, `≡ₚ[k]` and `≡ₚ` (`CircuitEq.Semantics`) compose the same way: `refl`,
+`symm`, `trans`, `append`, `cons`; `≡ₛ` has `refl`, `symm`, `trans` and `append`
+(its `cons` is `QUEUE.md` item 13). In the named form the exponents add, in
+`Fin 8` and hence modulo eight, and reversing a relation negates the exponent.
+`Trans` instances let one `calc` mix `≡ᵤ`, `≡ₚ[k]` and `≡ₚ` steps in any order.
 -/
 
 namespace Quantum.Circuit

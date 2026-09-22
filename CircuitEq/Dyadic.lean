@@ -56,8 +56,7 @@ below).
 ## Trust
 
 `toZeta8` is the meaning, and `Zeta8` remains the coefficient field of
-`denote` and `≡ᵤ`. Every operation comes with its `toZeta8_*` lemma, the
-dyadic gate matrices are checked against `Gate1.mat` entry by entry, and
+`denote` and `≡ᵤ`. Every operation comes with its `toZeta8_*` lemma, and
 every gate action has a correspondence lemma with `applyOne` or
 `applyCNOT`. `CircuitEq/Decide.lean` builds the evaluators on top and
 routes the `Decidable` instances through them, so the kernel never sees a
@@ -70,8 +69,8 @@ steps for the `Int` constructors; a `Zeta8` product is sixteen `Rat`
 products and twelve `Rat` sums, each with a gcd normalisation. A `mul` here
 is sixteen integer products and twelve sums; the specialised gate actions
 need at most four integer sums (`H`) or none at all (a diagonal gate is a
-shuffle with at most one negation). Measurements are in CLAUDE.md,
-"Kernel-cost notes".
+shuffle with at most one negation). The measurements are in
+`benchmarks/scale/README.md`, "The basis evaluator".
 -/
 
 namespace Quantum

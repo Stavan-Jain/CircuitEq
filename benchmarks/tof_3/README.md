@@ -97,9 +97,10 @@ resulting circuit pair under the existing semantics.
 The module is imported by `CircuitEq.lean` and covered by the normal build
 and axiom audit. No additional axioms or `native_decide` are used.
 
-A direct `lake env lean CircuitEq/Benchmarks/Tof3.lean` check takes about
-5 seconds wall time with cached dependencies. About 3 of them are the kernel
-deciding the three-qubit window, and the alignment itself is well under a
-second. Before the materialised evaluator (`evalList` in `Semantics.lean`)
-the same file took 12 seconds; the difference is that window's `2^depth`
+A direct `lake env lean CircuitEq/Benchmarks/Tof3.lean` check is now
+dominated by loading the imports: the three-qubit window, which took most of
+the file's time under the rational list evaluator, decides in a fraction of
+a second on the dyadic closure evaluator of `CircuitEq/Decide.lean`. The
+figures, before and after, are in `benchmarks/scale/README.md`, "The basis
+evaluator". Before any materialised evaluator the window cost `2^depth`
 re-reads of the input under the closure-based `denote`.

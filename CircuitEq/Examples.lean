@@ -85,9 +85,10 @@ theorem cx_ladder : ([CX 0 1, CX 1 2, CX 0 1, CX 1 2] : Circuit 3) ≡ᵤ [CX 0 
 The same decision, one declaration per range of basis vectors
 (`CircuitEq.Chunk`), so the kernel's memory is that of one range. It buys
 nothing at three qubits; at seven it is the difference between finishing
-under 2 GB and being killed at 7 GB (`scripts/chunked_decide.py`, which
-emits such files, with `set_option Elab.async false` so that the memory of
-one declaration is returned before the next starts). -/
+and running out of memory (measured in `benchmarks/scale/README.md`;
+`scripts/chunked_decide.py` emits such files, with
+`set_option Elab.async false` so that the memory of one declaration is
+returned before the next starts). -/
 
 /-- The ladder identity on the basis vectors `|0⟩, …, |3⟩`. -/
 theorem cx_ladder_lo :

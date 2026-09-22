@@ -16,13 +16,21 @@
   },
   "holdout": {
     "modules": [
-      "CircuitEq.Benchmarks.BarencoTof3"
+      "CircuitEq.Benchmarks.BarencoTof3",
+      "CircuitEq.Benchmarks.Tof3"
     ],
-    "redact": [],
+    "redact": [
+      {
+        "file": "scripts/tcount_survey.py",
+        "pattern": "^    hand = \\[.*?^    al = ",
+        "replacement": "    hand = []  # held out\n    al = ",
+        "flags": "ms"
+      }
+    ],
     "delete": []
   },
   "known_leaks": [
-    "the original is the promoted benchmark CircuitEq/Benchmarks/BarencoTof3.lean, whose PyZX twin and proof are in the repository; the TZAP twin is not"
+    "the original is the promoted benchmark CircuitEq/Benchmarks/BarencoTof3.lean, whose PyZX twin and proof are in the repository; the TZAP twin is not; both Toffoli benchmark modules and the tof_3 windows in scripts/tcount_survey.py's self-test are removed from the run copy"
   ],
   "gates": [
     60,

@@ -18,7 +18,8 @@
   },
   "known_leaks": [
     "the pair is a promoted benchmark of this repository, so a model may have seen its proof; removed from the run copy: its module, README.md, benchmarks/, and the window table of scripts/certificate.py",
-    "CircuitEqTest/Tableau.lean proves a copy of the pair up to a scalar; the harness removes CircuitEqTest/ from every run copy (on a base from before that library existed the copy sits in CircuitEq/Tableau.lean, unredacted)"
+    "CircuitEqTest/Tableau.lean proves a copy of the pair up to a scalar; the harness removes CircuitEqTest/ from every run copy (on a base from before that library existed the copy sits in CircuitEq/Tableau.lean, unredacted)",
+    "PLAYBOOK.md, decision entry 6, teaches the block-theorem pattern this pair's proof uses (`layer_cnotNetwork_hLayer` on a Hadamard layer through a CNOT network), with its call written out"
   ],
   "gates": [
     19,

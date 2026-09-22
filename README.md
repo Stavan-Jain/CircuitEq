@@ -86,7 +86,7 @@ theorem two_windows_phase_exact :
 theorem gadgets_merge :
     ([CX 0 1, T 1, CX 0 1, CX 0 1, T 1, CX 0 1] : Circuit 2) ≡ᵤ [CX 0 1, S 1, CX 0 1] :=
   (phasePolyChecker 2).sound _ _ (by decide +kernel)
-theorem rm15 : original ≡ₛ optimized :=   -- 15 qubits, re-synthesised CNOT network, ~0.3 s
+theorem rm15 : original ≡ₛ optimized :=   -- 15 qubits, re-synthesised CNOT network
   (tableauChecker 15).sound _ _ (by decide +kernel)
 ```
 
@@ -175,15 +175,15 @@ applies next.
   output amplitude reads two inputs, so the kernel pays `O(1)` per entry, and
   the structural lemmas — disjoint gates commute, same-qubit gates fuse — are
   pointwise `ring` identities after four bit lemmas.
-- **Equivalence reduces to the basis.** `c₁ ≡ᵤ c₂` is `∀ ψ, denote c₁ ψ =
-  denote c₂ ψ`. Every instruction is linear, so `LinearMap.pi_ext` reduces
-  this to the `2 ^ n` basis vectors, which gives a `Decidable` instance.
-  `≡ₚ` additionally ranges over the eight powers of `ω`. The instance
-  evaluates with a closure evaluator over `Dyadic8` (`Dyadic.lean`), the
-  gcd-free ring `ℤ[ω, 1/√2]`, proved equal to `denote`, so the kernel never
-  sees a rational and a decide is linear in depth (thirty times faster than
-  the rational evaluator on a three-qubit window; the history is in
-  `benchmarks/scale/README.md`, "The basis evaluator").
+- **Equivalence reduces to the basis.** `c₁ ≡ᵤ c₂` is
+  `∀ ψ, denote c₁ ψ = denote c₂ ψ`. Every instruction is linear, so
+  `LinearMap.pi_ext` reduces this to the `2 ^ n` basis vectors, which gives a
+  `Decidable` instance. `≡ₚ` additionally ranges over the eight powers of `ω`.
+  The instance evaluates with a closure evaluator (`evalFn`, `Decide.lean`) over
+  `Dyadic8` (`Dyadic.lean`), the gcd-free ring `ℤ[ω, 1/√2]`, proved equal to
+  `denote`, so the kernel never sees a rational and a decide is linear in depth
+  (thirty times faster than the rational evaluator on a three-qubit window; the
+  history is in `benchmarks/scale/README.md`, "The basis evaluator").
 - **A global phase composes.** Optimisers preserve a circuit only up to a
   global phase (PyZX drops the scalar at extraction), and the phase shows
   up inside a window, so `≡ₚ` has everything `≡ᵤ` has: `refl`, `symm`,
@@ -225,18 +225,17 @@ applies next.
   is the algebra of partial Hadamard layers (`hOn S ++ hOn T ≡ᵤ hOn (S ∆ T)`);
   `cnotNetwork_perm` reorders a network with disjoint controls and targets.
 - **Certificates, not proof terms.** `Certificate.lean` is a data type of
-  rewrite steps (`swap`, `moveLeft`/`moveRight` across a block with a
-  disjoint bitmask support, `cancel`/`insert`, `window` on named wires
-  justified by a checker from a table) with a kernel-friendly interpreter
-  `replay` and one theorem `replay_sound`. A proof is
-  `replay_sound Cs steps (by decide +kernel)`: the kernel evaluates
-  `replay` once, cost linear in the trace. The same steps replay up to a
-  global phase: under `replayPhase` a window names a phase finder instead
-  of a checker, the interpreter adds the windows' exponents up, and
-  `replayPhase_sound` concludes `c₁ ≡ₚ[k] c₂` with `k` computed by the
-  kernel, at 1.2 times the cost of the exact replay on `tof_3`'s trace.
-  `scripts/certificate.py` mirrors both interpreters in Python so external
-  tools can emit traces.
+  rewrite steps (`swap`, `moveLeft`/`moveRight` across a block with a disjoint
+  bitmask support, `cancel`/`insert`, `window` on named wires justified by a
+  checker from a table) with a kernel-friendly interpreter `replay` and one
+  theorem `replay_sound`. A proof is
+  `replay_sound Cs steps (by decide +kernel)`: the kernel evaluates `replay`
+  once, cost linear in the trace. The same steps replay up to a global phase:
+  under `replayPhase` a window names a phase finder instead of a checker, the
+  interpreter adds the windows' exponents up, and `replayPhase_sound` concludes
+  `c₁ ≡ₚ[k] c₂` with `k` computed by the kernel, at little more than the cost of
+  the exact replay (`benchmarks/scale/README.md`). `scripts/certificate.py`
+  mirrors both interpreters in Python so external tools can emit traces.
 - **The tactics emit certificates.** `circuit_simp` cancels checked inverse
   pairs and aligns two concrete lists; `circuit_windows` takes an alignment
   as input, a list of windows `(aᵢ, bᵢ)` on the full register in the order
@@ -248,18 +247,18 @@ applies next.
   each window may hold only up to a phase of its own; a wrong `k` is an
   error naming the right one.
 - **Fragment checkers decide windows symbolically.** `PhasePoly.lean` is a
-  certified canonical form for CNOT-plus-diagonal circuits (an
-  `𝔽₂`-linear part as packed row bitmasks, the phase function as its
-  multilinear polynomial over `ℤ/8`, degree at most three, as `Nat` bit
-  planes): linear in gates, independent of `2 ^ n`, complete on its
-  fragment (equal unitaries give equal forms, so `phasePolyRefutes`
-  proves inequivalence), and the deterministic counterpart of what
-  T-count optimisers such as TZAP compute. `Tableau.lean` conjugates the
-  `2n` Pauli generators through a Clifford circuit with `O(n)` bit
-  operations per gate and certifies `≡ₛ`, equality up to a unit scalar,
-  by the commutant argument on state vectors. Both export the `Checker`
-  contract of `Checker.lean`, and the default certificate table tries the
-  phase polynomial before the basis evaluator.
+  certified canonical form for CNOT-plus-diagonal circuits (an `𝔽₂`-linear part
+  as packed row bitmasks, the phase function as its multilinear polynomial over
+  `ℤ/8`, degree at most three, as `Nat` bit planes, `Lanes.lean`): linear in
+  gates, independent of `2 ^ n`, complete on its fragment (equal unitaries give
+  equal forms, so `phasePolyRefutes` proves inequivalence; both in
+  `PhasePoly/Complete.lean`), and the deterministic counterpart of what T-count
+  optimisers such as TZAP compute. `Tableau.lean` conjugates the `2n` Pauli
+  generators through a Clifford circuit with `O(n)` bit operations per gate and
+  certifies `≡ₛ`, equality up to a unit scalar, by the commutant argument on
+  state vectors. Both export the `Checker` contract of `Checker.lean`, and the
+  default certificate table tries the phase polynomial before the basis
+  evaluator.
 - **The locality theorem.** `rename f c` places an `m`-qubit circuit on the
   wires `f : Fin m ↪ Fin n`; `rename_equivalent_iff` says
   `rename f a ≡ᵤ rename f b ↔ a ≡ᵤ b`. So a `decide +kernel` on `m` qubits,
@@ -295,7 +294,7 @@ CircuitEq/
 ├── Defaults.lean           the checker tables the tactics use
 ├── Tactic.lean             circuit_simp, circuit_windows (emit certificates; ≡ᵤ, ≡ₚ, ≡ₚ[k])
 ├── Embedding.lean          the locality theorem: circuits on selected wires
-├── Examples.lean           worked identities: decided, refuted, structural, placed
+├── Examples.lean           worked identities (built through CircuitEqTest.lean)
 └── Benchmarks/             original-versus-PyZX proofs
 CircuitEqTest/              the checkers' regression tests
 benchmarks/                 QASM fixtures and provenance for each benchmark
@@ -307,7 +306,9 @@ scripts/check_debug_options.py     CI: text guard against debug.* options
 scripts/SkipKernelTCFixture.lean   the repro the kernel replay must reject
 scripts/check_replay_fixture.sh    CI: asserts that it does
 scripts/check_pyzx_benchmarks.py   reproduce the PyZX fixtures (pyzx==0.9.0)
+scripts/alphabet.py         the gate alphabet every script imports; checked against Gate1
 scripts/certificate.py      Python mirror of the certificate language
+scripts/tcount_survey.py    the T-count survey and its alignment search
 scripts/scale_test.py       the scale ladder; scripts/chunked_decide.py, chunks.py
 scripts/agent_harness.py    run an agent on a pair and judge its proof
 scripts/optimizer_harness.py  the optimiser track, on the same pieces
@@ -323,7 +324,7 @@ QUEUE.md                    the ordered list of next work
 lake exe cache get   # mathlib oleans (one-time, several GB)
 lake build
 lake env lean scripts/AxiomCheck.lean
-LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq   # kernel replay, see "Trust"
+LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq CircuitEqTest   # kernel replay, see "Trust"
 ```
 
 If [QECLean](https://github.com/Stavan-Jain/QECLean) is checked out as a
@@ -355,9 +356,10 @@ ripple-carry adders and multi-controlled gates for every `n`.
 ## Trust
 
 Every declaration must depend on exactly `[propext, Classical.choice,
-Quot.sound]`. `scripts/AxiomCheck.lean` walks the whole library and fails CI
-otherwise. `native_decide` is banned; `sorry` is for WIP branches only. Check a
-single result with `#print axioms Quantum.Circuit.Examples.hh_cnot_hh`.
+Quot.sound]`. `scripts/AxiomCheck.lean` walks the library and its examples and
+tests and fails CI otherwise. `native_decide` is banned; `sorry` is for WIP
+branches only. Check a single result with `#print axioms` after importing its
+module, `CircuitEq.Examples` for `Quantum.Circuit.Examples.hh_cnot_hh`.
 
 The axiom check is half of the policy, because it cannot see a declaration
 that never reached the kernel. `set_option debug.skipKernelTC true` makes
@@ -369,7 +371,7 @@ through the kernel, in a process where no option or meta code of the library
 runs:
 
 ```bash
-LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq   # about 30 s, 0.4 GB
+LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq CircuitEqTest
 ```
 
 `leanchecker` is the former lean4checker; it ships inside the toolchain

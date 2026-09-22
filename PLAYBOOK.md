@@ -1,10 +1,11 @@
 # PLAYBOOK — deciding a circuit pair with CircuitEq
 
 The prover's guide to this library: what exists, what it costs, and in which
-order to try it on a concrete pair. `CLAUDE.md` is for people who extend the
-library; this file is for whoever has two circuits and wants a proof. The
-agent harness (`scripts/agent_harness.py`) installs it as the `CLAUDE.md` of
-every `full` run, so it is the agent's only description of the library. It is
+order to try it on a concrete pair. The repository's own `CLAUDE.md`, not in
+a run's workspace, is for people who extend the library; this file is for
+whoever has two circuits and wants a proof. The agent harness
+(`scripts/agent_harness.py`) installs it as the `CLAUDE.md` of every `full`
+run, so it is the agent's only description of the library. It is
 versioned with the library: when a checker, a tactic, a certificate step or
 a block theorem lands, update the decision list below in the same commit.
 
@@ -79,8 +80,10 @@ by the repository's CI, and you can check both yourself.
 
 ## The cost model
 
-The figures below are copied from the repository's measurement record
-(`benchmarks/scale/README.md`, not in a run's workspace), Apple M4, 16 GB.
+The figures below are copied from the repository's measurement records
+(`benchmarks/scale/README.md`, `benchmarks/survey/README.md` and the
+benchmarks' own READMEs, none of them in a run's workspace), Apple M4,
+16 GB.
 
 Every leaf of a proof here is a kernel evaluation of a `Bool`: a checker's
 `check`, or the `Decidable` instance of `≡ᵤ` or `≡ₚ`, closed by
@@ -107,9 +110,8 @@ Every leaf of a proof here is a kernel evaluation of a `Bool`: a checker's
   basis decide, tableau ranges, or one `circuit_windows` lemma per segment of
   a long pair. Without it the memory of one declaration is not returned
   before the next starts, and the file's peak is the sum, not the maximum
-  (sixteen declarations peaked at 3.6 GB with asynchronous elaboration
-  on, 2.6 GB with it off). Splitting
-  into several modules bounds it further.
+  (sixteen declarations peaked at 3.6 GB with asynchronous elaboration on,
+  2.6 GB with it off). Splitting into several modules bounds it further.
 - **Loading the imports costs 1.7 s and 1.8 GB** before any proof runs, so
   that much of a memory limit is already spent.
 - **The symbolic checkers never build anything of size `2^n`.** The phase
@@ -257,11 +259,11 @@ Look at the two gate sets first, then take the first entry that applies.
      compose with `append`. The exponents add: `seg₁.append seg₂ : … ≡ₚ[j +
      k] …` closes a goal stated with the numeral, and `.cast (by decide)`
      restates an exponent.
-   - For an exact statement,
-     `(equivalentWithPhase_iff_phaseGadget k i _ _).1 h : a ≡ᵤ b ++ phaseGadget k i`.
-     The gadget is Clifford-only (T-count 0, `(SH)³ = ω·I`) and commutes
-     with everything (`phaseGadget_comm`), so a phase-only pair becomes an
-     exact one at no `T`-cost.
+   - For an exact statement, `(equivalentWithPhase_iff_phaseGadget k i _ _).1 h`
+     has the type `a ≡ᵤ b ++ phaseGadget k i`. The gadget is Clifford-only
+     (T-count 0, `(SH)³ = ω·I`) and commutes with everything
+     (`phaseGadget_comm`), so a phase-only pair becomes an exact one at no
+     `T`-cost.
    - A certificate found by `set_option trace.circuit.certificate true`
      replays up to phase with `circuit_replay_phase defaultPhaseFinders
      steps` (`replayPhase_sound`, `replayUpToPhase_sound`).
@@ -315,10 +317,18 @@ cheap one.
 - `set_option trace.circuit.certificate true in` before a theorem prints
   the certificate a tactic found, in the syntax `circuit_replay` accepts.
 - `scripts/certificate.py` is a pure-Python mirror of the certificate
-  language (`align`, `replay`, `fmt_certificate`, and
-  `replay_phase(default_phase_finders(…), steps, c)`, which returns the
-  phase with the result), for searching outside Lean. Its command line
-  covers only the repository's own benchmarks; import it for your pair.
+  language, for searching outside Lean. Import it: its command line reads a
+  table of the repository's benchmarks, which a run's copy does not have.
+
+  ```python
+  import sys; sys.path.insert(0, "scripts")
+  from certificate import align, replay_phase, default_phase_finders, fmt_certificate
+  from certificate import parse_lean_circuit as P
+  a, b = P("T 0, Z 1, X 1, H 3"), P("T 0, X 1, Z 1, H 3")
+  steps = align(a, b, [(P("Z 1, X 1"), P("X 1, Z 1"))])   # the windows, in order
+  print(replay_phase(default_phase_finders, steps, a))    # (4, …): a = ω⁴ · b
+  print(fmt_certificate(steps))                           # for `circuit_replay_phase`
+  ```
 - `scripts/chunks.py` (no dependencies) writes a chunked check:
 
   ```python
@@ -340,8 +350,8 @@ cheap one.
   ```python
   import sys; sys.path.insert(0, "scripts")
   import tcount_survey as ts
-  xs = ts.parse(["H 0", "CX 0 1", "T 1"])      # gate strings as in the Lean lists
-  ys = ts.parse(["CX 0 1", "H 0", "T 1"])
+  xs = ts.parse(["T 0", "T 0", "CX 0 1", "H 1"])   # gate strings as in the Lean lists
+  ys = ts.parse(["CX 0 1", "S 0", "H 1"])
   print(ts.compare(ts.unitary(xs, 2), ts.unitary(ys, 2)))   # untrusted oracle
   al, attempts, which = ts.best_alignment(xs, ys)
   print(ts.lean_windows(al) if al else attempts)            # windows for `circuit_windows`
@@ -362,9 +372,12 @@ commutation, layers, `phaseGadget`), `Support` (wire sets as bitmasks), `Lanes`
 (the refuter), `Tableau`, `Rewriting`, `Layers`, `Embedding` (`rename`, the
 locality theorem), `Certificate` (`Step`, `replay`, `replay_sound`,
 `circuit_replay`; `replayPhase_sound`, `circuit_replay_phase`), `Defaults` (the
-checker tables `defaultCheckers`, `defaultPhaseFinders`), `Tactic`, `Examples`
-(worked identities, the quickest way to see each tool used), and `Benchmarks/`
-(whole pairs proved with the patterns above).
+checker tables `defaultCheckers`, `defaultPhaseFinders`), `Tactic`, and
+`Benchmarks/` (whole pairs proved with the patterns above). `CircuitEq.lean`
+imports all of them. `CircuitEq/Examples.lean` is not imported by it: worked
+identities (decided and refuted pairs, `≡ₚ[k]`, placements by `rename`, windows,
+certificates written out, the phase gadget), for reading, or for use after
+`import CircuitEq.Examples`.
 
 ## Conventions that bite
 

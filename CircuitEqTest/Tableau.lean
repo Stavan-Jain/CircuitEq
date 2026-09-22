@@ -54,8 +54,8 @@ theorem tableau_H_CX : tableau ([H 0, CX 0 1] : Circuit 2) =
   decide +kernel
 
 /-- The three-qubit phase-flip repetition encoder of
-`CircuitEq.Benchmarks.Rep3PhaseFlip` (copied here, since a checker module
-cannot import the benchmark modules). -/
+`CircuitEq.Benchmarks.Rep3PhaseFlip` (copied here, so that the tests do not
+depend on a benchmark module the harness holds out). -/
 def rep3Original : Circuit 3 := [CX 0 1, CX 0 2, H 0, H 1, H 2]
 
 /-- Its PyZX output. -/

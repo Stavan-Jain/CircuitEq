@@ -93,14 +93,15 @@ Rules that follow, for anyone adding to the library:
   starts. Consumers: `equivalent_of_allBelow`,
   `equivalentUpToPhase_of_allBelow`, `equivalentWithPhase_of_allBelow`,
   `tableau_sound_of_allBelow`.
-- `CircuitEq/Semantics.lean` — the trusted core, and nothing else:
-  `Instr`, `Circuit n := List (Instr n)`, the readable constructors,
-  `denote` with `denote_cons` / `_append` / `_add` / `_smul`, and the four
-  relations: `Equivalent` (`≡ᵤ`), `EquivalentWithPhase k` (`a ≡ₚ[k] b`,
-  `k : Fin 8`: `a` is `ω ^ k` times `b`), `EquivalentUpToPhase` (`≡ₚ`,
-  defined as `∃ k, a ≡ₚ[k] b`) and `EquivalentUpToScalar` (`≡ₛ`, up to a
-  unit of `Zeta8`; what a tableau certifies). A trust review reads this
-  file; keep proofs out of it.
+- `CircuitEq/Semantics.lean` — the trusted core with the gate semantics it
+  builds on (`Gate1.mat`, `applyOne`, `applyCNOT`, `bit`, `flipBit`, the field),
+  and nothing else: `Instr`, `Circuit n := List (Instr n)`, the readable
+  constructors, `denote` with `denote_cons` / `_append` / `_add` / `_smul`, and
+  the four relations: `Equivalent` (`≡ᵤ`), `EquivalentWithPhase k` (`a ≡ₚ[k] b`,
+  `k : Fin 8`: `a` is `ω ^ k` times `b`), `EquivalentUpToPhase` (`≡ₚ`, defined
+  as `∃ k, a ≡ₚ[k] b`) and `EquivalentUpToScalar` (`≡ₛ`, up to a unit of
+  `Zeta8`; what a tableau certifies). A trust review reads this file; keep
+  proofs out of it.
 - `CircuitEq/Relations.lean` — the algebra of the relations. `≡ᵤ`:
   `@[refl]`, `@[symm]`, `@[trans]`, `append`, `cons`, `toWithPhase`,
   `toUpToPhase`, `toUpToScalar`. `EquivalentWithPhase.refl` (phase `0`),
@@ -128,19 +129,20 @@ Rules that follow, for anyone adding to the library:
   `decide +kernel` names a window's phase and refutes a wrong one) and
   `≡ₚ`.
 - `CircuitEq/Checker.lean` — the checker contract: `Checker n` is
-  `check : Circuit n → Circuit n → Bool` plus `sound : check a b = true →
-  a ≡ᵤ b` (`PhaseChecker`, `ScalarChecker` for `≡ₚ`, `≡ₛ`); `NormalForm n`
-  with `toChecker`; `Checker.orElse`; `syntacticChecker`; `evalChecker`
-  (the basis decide as a checker). Up to phase there are two contracts: a
-  `PhaseChecker` answers `Bool` and proves `a ≡ₚ b` (`evalPhaseChecker`,
-  `PhaseChecker.orElse`), a `PhaseFinder` answers `find a b : Option (Fin
-  8)` and proves `a ≡ₚ[k] b`, which is what a certificate needs, because
-  the phases of its windows have to be added up: `evalPhaseFinder` (the
-  basis evaluator by `findPhase`), `Checker.toFinder` (an exact checker
-  finds `0` or nothing), `PhaseFinder.orElse`, `PhaseFinder.toChecker`.
-  A checker module imports only
-  `Decide`, `Structural`, `Support` and `Checker`, writes `check` as
-  kernel-friendly `Bool` code, and exports exactly one checker.
+  `check : Circuit n → Circuit n → Bool` plus
+  `sound : check a b = true → a ≡ᵤ b` (`PhaseChecker`, `ScalarChecker` for `≡ₚ`,
+  `≡ₛ`); `NormalForm n` with `toChecker`; `Checker.orElse`; `syntacticChecker`;
+  `evalChecker` (the basis decide as a checker). Up to phase there are two
+  contracts: a `PhaseChecker` answers `Bool` and proves `a ≡ₚ b`
+  (`evalPhaseChecker`, `PhaseChecker.orElse`), a `PhaseFinder` answers
+  `find a b : Option (Fin 8)` and proves `a ≡ₚ[k] b`, which is what a
+  certificate needs, because the phases of its windows have to be added up:
+  `evalPhaseFinder` (the basis evaluator by `findPhase`), `Checker.toFinder` (an
+  exact checker finds `0` or nothing), `PhaseFinder.orElse`,
+  `PhaseFinder.toChecker`. A checker module imports only `Decide`, `Structural`,
+  `Support`, `Checker` and its own helper modules (`PhasePoly` imports `Lanes`),
+  writes `check` as kernel-friendly `Bool` code, and exports exactly one checker
+  (and possibly a refuter).
 - `CircuitEq/Support.lean` — wire sets as `Nat` bitmasks, the one encoding every
   checker and the certificate language use: `Instr.support`, `support`,
   `masksDisjoint`, `support_testBit`, `not_touches_of_disjoint`;
@@ -183,11 +185,11 @@ Rules that follow, for anyone adding to the library:
   identity and so needs no alignment, is `QUEUE.md` item 4.
 - `CircuitEq/Tableau.lean` — the Clifford tableau checker: `Pauli` strings
   (x-mask, z-mask, phase in `Fin 4`, denoting `i^p · Z^z · X^x`), the gate
-  update rules with pointwise soundness (`conjH_sound`, …, `conjCX_sound`),
-  `Tableau.conj` / `tableau` (images of the `2n` generators, `none` outside the
-  fragment or for `CX c c`), `tableauCheck`, `tableau_sound` (equal tableaux
-  give `≡ₛ`, the normal-form shape) and the export
-  `tableauChecker n : ScalarChecker n`; `Tableau.witness` names the first
+  update rules with pointwise soundness (`Pauli.conjH_sound`, …,
+  `Pauli.conjCX_sound`), `Tableau.conj` / `tableau` (images of the `2n`
+  generators, `none` outside the fragment or for `CX c c`), `tableauCheck`,
+  `tableau_sound` (equal tableaux give `≡ₛ`, the normal-form shape) and the
+  export `tableauChecker n : ScalarChecker n`; `Tableau.witness` names the first
   disagreeing generator. The soundness argument is stated on
   `Tableau.ConjAgree a b` (every generator has the same image), so the chunked
   form shares it: `Tableau.genAt n g` numbers the `2n` generators on `ℕ`,
@@ -238,12 +240,13 @@ Rules that follow, for anyone adding to the library:
   checker module imports it. A new proof technique is a new step kind here: an
   exact rewrite is a case of `exactStep` and `exactStep_sound`, which the exact
   and the phase readings share, and a step that consults a checker needs its own
-  case in `replayStep` and `replayStepPhase`, as `window` has. The kernel
-  evaluates `replay` once per proof. The same `Step`s replay up to a global
-  phase: `replayPhase Fs steps c : Option (Fin 8 × Circuit n)` reads a `window`
-  against a `PhaseTable` of `PhaseFinder`s (`windowPhase`), places it
-  syntactically (`placeFront`) and adds the exponent found to an accumulator;
-  every other step is the exact rewrite.
+  case in `replayStep` and `replayStepPhase` and in their `_sound` theorems, as
+  `window` has. The kernel evaluates `replay` once per proof. The same `Step`s
+  replay up to a global phase:
+  `replayPhase Fs steps c : Option (Fin 8 × Circuit n)` reads a `window` against
+  a `PhaseTable` of `PhaseFinder`s (`windowPhase`), places it syntactically
+  (`placeFront`) and adds the exponent found to an accumulator; every other step
+  is the exact rewrite.
   `replayPhase_sound : replayPhase Fs steps c = some (k, c') → c ≡ₚ[k] c'`, so
   the kernel computes the phase of the whole pair; `replayUpToPhase` /
   `replayUpToPhase_sound` forget it and conclude `c ≡ₚ c'`; the macro
@@ -288,11 +291,11 @@ Rules that follow, for anyone adding to the library:
   / `of_rename` / `rename_equivalentWithPhase_iff` (the phase is kept),
   `EquivalentUpToPhase.rename` / `of_rename` /
   `rename_equivalentUpToPhase_iff`, and `EquivalentUpToScalar.rename`.
-- `CircuitEq/Examples.lean` — worked identities; add new showcase results
-  here, new general lemmas to `Structural.lean`, `Rewriting.lean` or
-  `Layers.lean`. Built through `CircuitEqTest.lean`, not the umbrella; the
-  agent harness keeps it in a run's workspace, as the playbook's quickest
-  way to see each tool used.
+- `CircuitEq/Examples.lean` — worked identities; add new showcase results here,
+  new general lemmas to `Structural.lean`, `Rewriting.lean` or `Layers.lean`.
+  Built through `CircuitEqTest.lean`, not the umbrella; the agent harness keeps
+  it in a `full` run's workspace, as the playbook's quickest way to see each
+  tool used (a `core` run keeps only the core modules).
 - `CircuitEqTest/PhasePoly.lean`, `CircuitEqTest/Tableau.lean` — the
   checkers' regression tests (completeness cases, fragment boundaries,
   refutations, chunked forms). Several restate parts of benchmark answers,
@@ -394,17 +397,21 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
 
 ## Conventions
 
-- **Measurements are recorded once.** A kernel time, a memory peak or a
-  scale limit goes, dated and with the command that reproduces it, into
-  `benchmarks/scale/README.md` (the checkers, the evaluator, replay) or the
-  benchmark's own `benchmarks/<name>/README.md`. Every other living document,
-  this file, `README.md`, the Lean docstrings, states the conclusion (linear
-  in gates, bounded by memory at seven qubits) and links there. Two
-  exceptions: `PLAYBOOK.md` and `benchmarks/harness/PLAYBOOK.core.md` are
-  all an agent under test sees, so they carry the numbers they need; when
-  the scale README changes, update them in the same commit. `QUEUE.md`
-  "Done" entries and the dated status paragraphs of `ROADMAP.md` are records
-  of their date and are not rewritten.
+- **Measurements are recorded once.** A kernel time, a memory peak or a scale
+  limit goes, dated and with the command that reproduces it, into
+  `benchmarks/scale/README.md` (the checkers, the evaluator, replay, the kernel
+  replay) or the benchmark's own `benchmarks/<name>/README.md`. Every other
+  living document, this file, `README.md`, the Lean docstrings, states the
+  conclusion (linear in gates, bounded by memory at seven qubits) and links
+  there. A rule of thumb may quote the magnitude it rests on (a structural step
+  costs about 150 µs, a `List.set` retains about 1.5 MB) when the record has the
+  measurement; a result (this pair decides in so many seconds) is never
+  restated. `QUEUE.md` items may cite the figures that motivate them. Two
+  exceptions: `PLAYBOOK.md` and `benchmarks/harness/PLAYBOOK.core.md` are all an
+  agent under test sees, so they carry the numbers they need; when the scale
+  README changes, update them in the same commit. `QUEUE.md` "Done" entries and
+  the dated status paragraphs of `ROADMAP.md` are records of their date and are
+  not rewritten.
 - **Lemmas** `snake_case`, **definitions** `camelCase`, `theorem` for
   results, `lemma` for stepping stones. Docstrings on every declaration.
 - **`decide +kernel`, never bare `decide`, for anything touching `Zeta8`.**
@@ -422,26 +429,26 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
   declaration without sending it to the kernel. `decide +kernel` leaves its
   whole check to the kernel, so under the option a false leaf proof elaborates
   without an error and the axiom check reports it clean: it depends on no axioms
-  at all (verified on this toolchain, 18 September 2026: `2 + 2 = 5`, and `[H 0]
-  ≡ᵤ [X 0]` inside a library module, with `lake build` and `AxiomCheck` both
-  green). So CI also replays every declaration of the built `.olean` files
-  through the kernel, `LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq
-  CircuitEqTest`, in a process where no option or meta code of the library runs.
-  `leanchecker` is the former lean4checker, shipped inside the toolchain since
-  v4.28 (the separate repository is deprecated and has no tag for this
-  toolchain), so it always matches `lean-toolchain`.
-  `scripts/check_replay_fixture.sh` asserts on every CI run that the replay
-  rejects the repro kept in `scripts/SkipKernelTCFixture.lean`.
-  `scripts/check_debug_options.py` is a text guard for the obvious spellings in
-  the Lean sources and `lakefile.toml`; it is an early warning and is not sound,
-  because an option can be set from meta code under a name no search recognises
-  (a variant that assembles the name from string pieces passes the guard and the
-  axiom check, and the replay rejects it). The replay is the defence. It
-  re-checks this library's modules against their imports as delivered: mathlib
-  and core are trusted as the cache provides them, and it is the same kernel
-  again, not an independent checker. Never set a `debug.*` option in the
-  library, in `scripts/` or in `lakefile.toml`; a proof that needs one is not a
-  proof.
+  at all (verified on this toolchain, 18 September 2026: `2 + 2 = 5`, and
+  `[H 0] ≡ᵤ [X 0]` inside a library module, with `lake build` and `AxiomCheck`
+  both green). So CI also replays every declaration of the built `.olean` files
+  through the kernel,
+  `LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq CircuitEqTest`, in a
+  process where no option or meta code of the library runs. `leanchecker` is the
+  former lean4checker, shipped inside the toolchain since v4.28 (the separate
+  repository is deprecated and has no tag for this toolchain), so it always
+  matches `lean-toolchain`. `scripts/check_replay_fixture.sh` asserts on every
+  CI run that the replay rejects the repro kept in
+  `scripts/SkipKernelTCFixture.lean`. `scripts/check_debug_options.py` is a text
+  guard for the obvious spellings in the Lean sources and `lakefile.toml`; it is
+  an early warning and is not sound, because an option can be set from meta code
+  under a name no search recognises (a variant that assembles the name from
+  string pieces passes the guard and the axiom check, and the replay rejects
+  it). The replay is the defence. It re-checks this library's modules against
+  their imports as delivered: mathlib and core are trusted as the cache provides
+  them, and it is the same kernel again, not an independent checker. Never set a
+  `debug.*` option in the library, in `CircuitEqTest/`, in `scripts/` or in
+  `lakefile.toml`; a proof that needs one is not a proof.
 - **No `set_option linter.* false`.** Fix the warning or leave it visible.
   The build is currently warning-free; keep it that way.
 - **Docstring prose wraps at 80 columns**, code at 100 (the `longLine`
@@ -493,22 +500,17 @@ Always `lake build` before claiming a fix works; the error output prints the
 residual goal under each failure.
 
 **The kernel replay runs on one thread.** (Not the certificate `replay` of
-`Certificate.lean`: this is `leanchecker` over the `.olean` files.) It
-replays modules in parallel, and every replay beyond the first loads a
-private copy of the mathlib imports. Measured on the M4 (18 and 19
-September 2026; 23 modules, 2119 declarations): one thread 22 to 28 s,
-0.33 to 0.41 GB peak footprint (1.7 to 1.8 GB resident, almost all of it
-the mapped mathlib `.olean` files); two threads 16 s and 2.1 GB; the
-default ten threads were killed by the OS after 4 minutes at a 26 GB
-footprint. On GitHub's `ubuntu-latest` runner the one-thread replay is a
-25 to 39 s step in a 2 to 3 minute job, and the fixture check 2 s. It is a CI
-step of its own, not lean-action's `leanchecker` input, because the thread
-cap would sit on that whole step and slow the build too; `-v` makes the
-log list the modules replayed. Never run it without `LEAN_NUM_THREADS=1`,
-and count it as a lake process for the rule below. It replays whatever
-`.olean` files are under `.lake/build`, so delete the build products of a
-module you remove (`lake build` does not) or the replay keeps checking the
-stale file.
+`Certificate.lean`: this is `leanchecker` over the `.olean` files.) It replays
+modules in parallel, and every replay beyond the first loads a private copy of
+the mathlib imports, about 2 GB each: one thread takes under a minute and well
+under 2 GB, the default thread count does not fit in 16 GB (measured in
+`benchmarks/scale/README.md`, "The kernel replay"). It is a CI step of its own,
+not lean-action's `leanchecker` input, because the thread cap would sit on that
+whole step and slow the build too; `-v` makes the log list the modules replayed.
+Never run it without `LEAN_NUM_THREADS=1`, and count it as a lake process for
+the rule below. It replays whatever `.olean` files are under `.lake/build`, so
+delete the build products of a module you remove (`lake build` does not) or the
+replay keeps checking the stale file.
 
 **Sharing mathlib with QECLean.** This project pins the same mathlib commit
 as the sibling repo `../QECLean`. `.lake/packages` may be a symlink to
