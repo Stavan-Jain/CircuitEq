@@ -16,7 +16,7 @@
 #      from the kernel, not from a missing file or a bad search path.
 #
 # The third assertion is the one that matters: it shows that the replay CI runs
-# over the library (`lake env leanchecker CircuitEq`) would reject the same
+# over the library (`lake env leanchecker CircuitEq CircuitEqTest`) would reject the same
 # declaration in a library module. The fixture is not part of any `lean_lib`;
 # its `.olean` goes to a temporary directory and nothing is left behind.
 set -euo pipefail

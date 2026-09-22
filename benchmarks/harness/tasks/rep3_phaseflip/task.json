@@ -14,18 +14,11 @@
     "modules": [
       "CircuitEq.Benchmarks.Rep3PhaseFlip"
     ],
-    "redact": [
-      {
-        "file": "CircuitEq/Tableau.lean",
-        "pattern": "^/-- The three-qubit phase-flip repetition encoder of\\n.*?(?=^end Tableau\\.Tests)",
-        "replacement": "",
-        "flags": "ms"
-      }
-    ]
+    "redact": []
   },
   "known_leaks": [
     "the pair is a promoted benchmark of this repository, so a model may have seen its proof; removed from the run copy: its module, README.md, benchmarks/, and the window table of scripts/certificate.py",
-    "CircuitEq/Tableau.lean proves a copy of the pair up to a scalar (redacted in the run copy, at the price of rebuilding that module during setup)"
+    "CircuitEqTest/Tableau.lean proves a copy of the pair up to a scalar; the harness removes CircuitEqTest/ from every run copy (on a base from before that library existed the copy sits in CircuitEq/Tableau.lean, unredacted)"
   ],
   "gates": [
     5,

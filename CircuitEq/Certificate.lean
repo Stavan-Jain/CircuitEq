@@ -7,7 +7,6 @@ import CircuitEq.Rewriting
 import CircuitEq.Embedding
 import CircuitEq.Checker
 import CircuitEq.Support
-import CircuitEq.PhasePoly
 
 /-!
 # The certificate language and its replay interpreter
@@ -46,12 +45,11 @@ Positions are indices into the instruction list, in time order.
   depends on `wires.length`, never on `n`.
 
 A checker table `Cs : CheckerTable` gives, for each register size, the
-checkers a window may name by index. `defaultCheckers` has, at index `0`, the
-phase-polynomial checker with the basis evaluator `evalChecker` as its
-fallback, and `syntacticChecker` at index `1`;
-every certified checker written against `CircuitEq.Checker` can be added to
-a table, and `replay_sound` holds for every table because each checker
-carries its own proof.
+checkers a window may name by index. Every certified checker written
+against `CircuitEq.Checker` can be added to a table, and `replay_sound`
+holds for every table because each checker carries its own proof. This
+file imports no checker; the tables the tactics use, `defaultCheckers` and
+`defaultPhaseFinders`, are in `CircuitEq.Defaults`.
 
 ## Replay
 
@@ -78,8 +76,9 @@ the exponent `q` with `a ≡ₚ[q] b` on the window's wires, the interpreter
 adds the exponents up in `Fin 8`, and the result is `some (k, c₂)`.
 `replayPhase_sound` concludes `c₁ ≡ₚ[k] c₂`, `replayUpToPhase_sound`
 forgets `k`, and `circuit_replay_phase defaultPhaseFinders steps` closes
-either goal. `replay` and `replay_sound` are untouched. See the section
-"Replay up to a global phase" below.
+either goal. The step data is the same for all three relations; only the
+reading of `window` differs. See the section "Replay up to a global phase"
+below.
 
 `Step` and `replay` are meant to be mirrored outside Lean, so that a search
 can run the same interpreter fast and hand Lean only the data
@@ -88,16 +87,14 @@ is a bug in the mirror, never a soundness problem.
 
 ## Kernel cost
 
-A step costs one pass over the prefix before its position plus one over
-the block it crosses, at roughly 20–30 µs per list cell in the kernel
-(structural recursion unfolds through `brecOn`), so a trace of `s` moves on
-a circuit of `m` gates costs `O(s · m)`: about 0.1 s for 50 moves on 64
-gates and 0.5 s for 100 moves on 128 gates, measured. Windows cost their
-checker, `2 ^ k` for the evaluator on `k` wires, and dominate real
-benchmarks. The next lever for long circuits is a `Nat` encoding of the
-instruction list, on which a move is a handful of GMP-accelerated
-bit operations instead of a walk.
--/
+A step costs one pass over the prefix before its position plus one over the
+block it crosses, at roughly 20–30 µs per list cell in the kernel (structural
+recursion unfolds through `brecOn`), so a trace of `s` moves on a circuit of `m`
+gates costs `O(s · m)` (measured in `benchmarks/scale/README.md`, "Where each
+tool stands"). Windows cost their checker, `2 ^ k` for the evaluator on `k`
+wires, and dominate real benchmarks. The next lever for long circuits is a `Nat`
+encoding of the instruction list, on which a move is a handful of
+GMP-accelerated bit operations instead of a walk. -/
 
 namespace Quantum.Circuit
 
@@ -351,11 +348,11 @@ lemma crossRight_sound {d : ℕ} {c c' : Circuit n} (h : crossRight d c = some c
     · exact absurd h (by simp)
   · exact absurd h (by simp)
 
-/-- The `k`-th checker of a table row. -/
-def nthChecker {k : ℕ} : List (Checker k) → ℕ → Option (Checker k)
+/-- The `k`-th entry of a table row, a checker or a phase finder. -/
+def nthEntry {α : Type} : List α → ℕ → Option α
   | [], _ => none
   | C :: _, 0 => some C
-  | _ :: Cs, j + 1 => nthChecker Cs j
+  | _ :: Cs, j + 1 => nthEntry Cs j
 
 /-- `window`: replace the placed `a` in front by the placed `b` when
 `wires` has no duplicate and checker `k` accepts `(a, b)`. -/
@@ -363,7 +360,7 @@ def windowFront (Cs : CheckerTable) (wires : List (Fin n)) (a b : Circuit wires.
     (k : ℕ) (rest : Circuit n) : Option (Circuit n) :=
   if h : wires.Nodup then
     if rest.take a.length = rename (wiresOf wires h) a then
-      match nthChecker (Cs wires.length) k with
+      match nthEntry (Cs wires.length) k with
       | some C =>
         if C.check a b then some (rename (wiresOf wires h) b ++ rest.drop a.length) else none
       | none => none
@@ -394,27 +391,42 @@ lemma windowFront_sound {Cs : CheckerTable} {wires : List (Fin n)}
 
 /-! ### Replay -/
 
-/-- Run one step; `none` if it is not licensed. `moveLeft i d` walks to
-position `i - d` and crosses `min d i` gates; every other step walks to
+/-- Run one step that is not a `window`: the exact rewrites, which every
+reading of a certificate shares. `none` if the step is not licensed, and
+for a `window`, which each reading interprets itself. `moveLeft i d` walks
+to position `i - d` and crosses `min d i` gates; every other step walks to
 its position. -/
-def replayStep (Cs : CheckerTable) (c : Circuit n) : Step n → Option (Circuit n)
+def exactStep (c : Circuit n) : Step n → Option (Circuit n)
   | .swap i => rewriteAt swapFront i c
   | .moveLeft i d => rewriteAt (crossLeft (i - (i - d))) (i - d) c
   | .moveRight i d => rewriteAt (crossRight d) i c
   | .cancel i => rewriteAt cancelFront i c
   | .insert i a b => rewriteAt (insertFront a b) i c
-  | .window i wires a b k => rewriteAt (windowFront Cs wires a b k) i c
+  | .window .. => none
 
-/-- Every licensed step preserves equivalence. -/
-theorem replayStep_sound {Cs : CheckerTable} {c c' : Circuit n} {s : Step n}
-    (h : replayStep Cs c s = some c') : c ≡ᵤ c' := by
+/-- Every licensed exact step preserves equivalence. -/
+theorem exactStep_sound {c c' : Circuit n} {s : Step n}
+    (h : exactStep c s = some c') : c ≡ᵤ c' := by
   cases s with
   | swap i => exact rewriteAt_sound (fun h => swapFront_sound h) h
   | moveLeft i d => exact rewriteAt_sound (fun h => crossLeft_sound h) h
   | moveRight i d => exact rewriteAt_sound (fun h => crossRight_sound h) h
   | cancel i => exact rewriteAt_sound (fun h => cancelFront_sound h) h
   | insert i a b => exact rewriteAt_sound (fun h => insertFront_sound h) h
-  | window i wires a b k => exact rewriteAt_sound (fun h => windowFront_sound h) h
+  | window i wires a b k => exact absurd h (by simp [exactStep])
+
+/-- Run one step; `none` if it is not licensed. A `window` is decided by
+checker `k` of the table; every other step is `exactStep`. -/
+def replayStep (Cs : CheckerTable) (c : Circuit n) : Step n → Option (Circuit n)
+  | .window i wires a b k => rewriteAt (windowFront Cs wires a b k) i c
+  | s => exactStep c s
+
+/-- Every licensed step preserves equivalence. -/
+theorem replayStep_sound {Cs : CheckerTable} {c c' : Circuit n} {s : Step n}
+    (h : replayStep Cs c s = some c') : c ≡ᵤ c' := by
+  cases s
+  case window i wires a b k => exact rewriteAt_sound (fun h => windowFront_sound h) h
+  all_goals exact exactStep_sound (by simpa only [replayStep] using h)
 
 /-- Run a certificate; `none` as soon as a step is not licensed. -/
 def replay (Cs : CheckerTable) : List (Step n) → Circuit n → Option (Circuit n)
@@ -452,9 +464,8 @@ window's phase (`EquivalentWithPhase.rename`) and so do the gates around it
 (`EquivalentWithPhase.cons`, `append_right`), so the sum of the window
 phases is the phase of the whole: `replayPhase_sound` concludes
 `c ≡ₚ[k] c'` with `k` computed by the kernel, and `replayUpToPhase_sound`
-forgets it and concludes `c ≡ₚ c'`. Neither `replay` nor `replay_sound`
-changes, and a certificate for `≡ᵤ` replays here with phase `0` under a
-table of `Checker.toFinder`s.
+forgets it and concludes `c ≡ₚ c'`. A certificate for `≡ᵤ` replays here
+with phase `0` under a table of `Checker.toFinder`s.
 
 The phase travels as an accumulator so that the interpreter stays a loop,
 and it is matched out of each step's result rather than projected: a step
@@ -467,16 +478,10 @@ step may name by index when a certificate is replayed up to a global
 phase. -/
 abbrev PhaseTable := (k : ℕ) → List (PhaseFinder k)
 
-/-- The `k`-th finder of a table row. -/
-def nthFinder {k : ℕ} : List (PhaseFinder k) → ℕ → Option (PhaseFinder k)
-  | [], _ => none
-  | F :: _, 0 => some F
-  | _ :: Fs, j + 1 => nthFinder Fs j
-
 /-- The phase of a window on its own wires: what finder number `k` of the
 table's row for that register finds. -/
 def windowPhase (Fs : PhaseTable) {m : ℕ} (a b : Circuit m) (k : ℕ) : Option (Fin 8) :=
-  match nthFinder (Fs m) k with
+  match nthEntry (Fs m) k with
   | some F => F.find a b
   | none => none
 
@@ -520,15 +525,10 @@ lemma placeFront_sound {wires : List (Fin n)} {a b : Circuit wires.length} {q : 
 /-- Run one step up to a global phase, from the phase `p` accumulated so
 far: `none` if the step is not licensed, otherwise the new phase and the
 rewritten circuit. A `window` is placed syntactically and adds the phase
-its finder names; every other step is the rewrite `replayStep` performs,
-and hands `p` back untouched. -/
+its finder names; every other step is `exactStep` and hands `p` back
+untouched. -/
 def replayStepPhase (Fs : PhaseTable) (p : Fin 8) (c : Circuit n) :
     Step n → Option (Fin 8 × Circuit n)
-  | .swap i => (rewriteAt swapFront i c).map (Prod.mk p)
-  | .moveLeft i d => (rewriteAt (crossLeft (i - (i - d))) (i - d) c).map (Prod.mk p)
-  | .moveRight i d => (rewriteAt (crossRight d) i c).map (Prod.mk p)
-  | .cancel i => (rewriteAt cancelFront i c).map (Prod.mk p)
-  | .insert i a b => (rewriteAt (insertFront a b) i c).map (Prod.mk p)
   | .window i wires a b k =>
     match rewriteAt (placeFront wires a b) i c with
     | some c' =>
@@ -536,15 +536,16 @@ def replayStepPhase (Fs : PhaseTable) (p : Fin 8) (c : Circuit n) :
       | some q => some (p + q, c')
       | none => none
     | none => none
+  | s => (exactStep c s).map (Prod.mk p)
 
-/-- An exact rewrite, read as a step up to phase, keeps the accumulated
+/-- An exact step, read as a step up to phase, keeps the accumulated
 phase. -/
-lemma exactStep_sound {o : Option (Circuit n)} {p q : Fin 8} {c₀ c c' : Circuit n}
-    (ho : ∀ {c₁ : Circuit n}, o = some c₁ → c ≡ᵤ c₁) (h₀ : c₀ ≡ₚ[p] c)
-    (h : o.map (Prod.mk p) = some (q, c')) : c₀ ≡ₚ[q] c' := by
+lemma exactStep_phase_sound {s : Step n} {p q : Fin 8} {c₀ c c' : Circuit n}
+    (h₀ : c₀ ≡ₚ[p] c) (h : (exactStep c s).map (Prod.mk p) = some (q, c')) :
+    c₀ ≡ₚ[q] c' := by
   obtain ⟨c₁, hc₁, heq⟩ := Option.map_eq_some_iff.1 h
   cases heq
-  exact h₀.trans_equivalent (ho hc₁)
+  exact h₀.trans_equivalent (exactStep_sound hc₁)
 
 /-- Every licensed step extends an equivalence with a named phase: if `c₀`
 is `ω ^ p` times `c`, and the step takes `(p, c)` to `(q, c')`, then `c₀`
@@ -552,13 +553,8 @@ is `ω ^ q` times `c'`. -/
 theorem replayStepPhase_sound {Fs : PhaseTable} {p q : Fin 8} {c₀ c c' : Circuit n}
     {s : Step n} (h₀ : c₀ ≡ₚ[p] c) (h : replayStepPhase Fs p c s = some (q, c')) :
     c₀ ≡ₚ[q] c' := by
-  cases s with
-  | swap i => exact exactStep_sound (rewriteAt_sound fun h => swapFront_sound h) h₀ h
-  | moveLeft i d => exact exactStep_sound (rewriteAt_sound fun h => crossLeft_sound h) h₀ h
-  | moveRight i d => exact exactStep_sound (rewriteAt_sound fun h => crossRight_sound h) h₀ h
-  | cancel i => exact exactStep_sound (rewriteAt_sound fun h => cancelFront_sound h) h₀ h
-  | insert i a b => exact exactStep_sound (rewriteAt_sound fun h => insertFront_sound h) h₀ h
-  | window i wires a b k =>
+  cases s
+  case window i wires a b k =>
     rw [replayStepPhase] at h
     split at h
     · next c₁ hc₁ =>
@@ -570,6 +566,7 @@ theorem replayStepPhase_sound {Fs : PhaseTable} {p q : Fin 8} {c₀ c c' : Circu
           (fun h => placeFront_sound (windowPhase_sound hr) h) hc₁)
       · exact absurd h (by simp)
     · exact absurd h (by simp)
+  all_goals exact exactStep_phase_sound h₀ (by simpa only [replayStepPhase] using h)
 
 /-- Run a certificate up to a global phase, from the phase `p` accumulated
 so far; `none` as soon as a step is not licensed. -/
@@ -629,27 +626,7 @@ theorem replayUpToPhase_sound (Fs : PhaseTable) (steps : List (Step n)) {c c' : 
     exact (replayPhase_sound Fs steps (k := r.1) hr).toUpToPhase
   · exact absurd h (by simp)
 
-/-! ### The default table and the closing form -/
-
-/-- The default checker table. Index `0` tries the phase-polynomial
-checker first (linear in the window's gates, for CNOT-plus-diagonal
-windows of any width) and falls back to the basis evaluator (cost `2 ^ k`
-for a window on `k` wires); `||` is lazy in the kernel, so the evaluator
-runs only when the symbolic check declines. Index `1` is syntactic
-equality. The tableau checker certifies `≡ₛ`, not `≡ᵤ`, and needs a
-scalar variant of `replay` before it can join a table. -/
-def defaultCheckers : CheckerTable := fun k =>
-  [(phasePolyChecker k).orElse (evalChecker k), syntacticChecker k]
-
-/-- The default phase table, index for index the phase form of
-`defaultCheckers`. Index `0` tries the phase-polynomial checker first, which
-answers only for windows that are exactly equal (phase `0`), and falls back
-to the basis evaluator with the phase named (`evalPhaseFinder`, cost `2 ^ k`
-for a window on `k` wires), which is where a window that holds only up to
-phase is decided. Index `1` is syntactic equality. The tableau checker
-certifies `≡ₛ` and does not name a phase, so it cannot join this table. -/
-def defaultPhaseFinders : PhaseTable := fun k =>
-  [(phasePolyChecker k).toFinder.orElse (evalPhaseFinder k), (syntacticChecker k).toFinder]
+/-! ### The closing forms -/
 
 /-- Close a goal `c₁ ≡ᵤ c₂` by replaying a certificate:
 `circuit_replay Cs steps` is `replay_sound Cs steps (by decide +kernel)`,

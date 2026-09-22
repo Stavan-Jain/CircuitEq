@@ -8,10 +8,12 @@ every `full` run, so it is the agent's only description of the library. It is
 versioned with the library: when a checker, a tactic, a certificate step or
 a block theorem lands, update the decision list below in the same commit.
 
-Last brought in line with the library at `83cc1d7` (22 September 2026:
-composition up to a global phase, `≡ₚ[k]`, certificates and windows up to
-phase, the phase gadget; on top of chunked kernel evaluation, the sparse
-phase-polynomial fold and the kernel replay in the trust policy).
+Last brought in line with the library at `f47972b` (22 September 2026: the
+module split, `Semantics` / `Relations` / `Decide`, `Lanes` and
+`PhasePoly.Complete`, `Defaults`, the tableau's helpers under `Tableau.`; on
+top of composition up to a global phase, `≡ₚ[k]`, certificates and windows
+up to phase, the phase gadget, chunked kernel evaluation and the kernel
+replay in the trust policy).
 
 ## The objects
 
@@ -23,7 +25,8 @@ phase-polynomial fold and the kernel replay in the trust policy).
   `Circuit 5`, `[H 0, CX 0 1, T 1]` and the notation below resolve. Ascribe
   one side of a literal equivalence, `([H 0, H 0] : Circuit 1) ≡ᵤ []`: the
   qubit count is not inferable from the list.
-- Four relations, in `CircuitEq/Semantics.lean`:
+- Four relations, defined in `CircuitEq/Semantics.lean`, with their algebra
+  in `CircuitEq/Relations.lean`:
   - `a ≡ᵤ b` (`Equivalent`): `∀ ψ, denote a ψ = denote b ψ`. It has
     `refl`, `symm`, `trans`, `append`, `cons`, and `calc` works.
   - `a ≡ₚ b` (`EquivalentUpToPhase`): equal up to a power of `ω = e^{iπ/4}`.
@@ -75,6 +78,9 @@ by the repository's CI, and you can check both yourself.
   spellings; it is an early warning, the replay is the defence.
 
 ## The cost model
+
+The figures below are copied from the repository's measurement record
+(`benchmarks/scale/README.md`, not in a run's workspace), Apple M4, 16 GB.
 
 Every leaf of a proof here is a kernel evaluation of a `Bool`: a checker's
 `check`, or the `Decidable` instance of `≡ᵤ` or `≡ₚ`, closed by
@@ -152,21 +158,21 @@ Look at the two gate sets first, then take the first entry that applies.
    names the phase `ω ^ k`, `k < 8`; find `k` on one basis vector first.
 2. **Only `CX` and `Z S Sdg T Tdg` on both sides.**
    `(phasePolyChecker n).sound _ _ (by decide +kernel) : a ≡ᵤ b`
-   (`CircuitEq/PhasePoly.lean`). The form is canonical, so on this fragment
-   a failed check means the pair is inequivalent, and
-   `phasePolyRefutes_sound (by decide +kernel) : ¬ a ≡ᵤ b` proves that. `H`,
-   `X` and `Y` end the fragment.
+   (`CircuitEq/PhasePoly.lean`). The form is canonical, so on this fragment a
+   failed check means the pair is inequivalent, and
+   `phasePolyRefutes_sound (by decide +kernel) : ¬ a ≡ᵤ b` proves that
+   (`CircuitEq/PhasePoly/Complete.lean`). `H`, `X` and `Y` end the fragment.
 3. **Only Clifford gates, `H X Y Z S Sdg CX`.**
    `(tableauChecker n).sound _ _ (by decide +kernel) : a ≡ₛ b`
-   (`CircuitEq/Tableau.lean`). It certifies `≡ₛ` and nothing stronger. Past
-   a few thousand gates, or about 30 qubits, chunk it: `tableauCheckGen a b
-   g` checks generator `g` of the `2n`, and `tableau_sound_of_allBelow`
-   turns `AllBelow (tableauCheckGen a b) (2 * n)` into `a ≡ₛ b`, with the
-   ranges proved as in entry 1 (four to sixteen generators per theorem).
-   The tableau is sound and not proved complete: `tableauCheck a b = false`
-   or a failing generator is not a refutation, though `witness a b`
-   names the first Pauli generator whose images differ, which tells you
-   where to look. For exact `≡ᵤ` of a Clifford pair use the entries below.
+   (`CircuitEq/Tableau.lean`). It certifies `≡ₛ` and nothing stronger. Past a
+   few thousand gates, or about 30 qubits, chunk it: `tableauCheckGen a b g`
+   checks generator `g` of the `2n`, and `tableau_sound_of_allBelow` turns
+   `AllBelow (tableauCheckGen a b) (2 * n)` into `a ≡ₛ b`, with the ranges
+   proved as in entry 1 (four to sixteen generators per theorem). The tableau is
+   sound and not proved complete: `tableauCheck a b = false` or a failing
+   generator is not a refutation, though `Tableau.witness a b` names the first
+   Pauli generator whose images differ, which tells you where to look. For exact
+   `≡ᵤ` of a Clifford pair use the entries below.
 4. **The same gates reordered, or pairs that cancel.** `by circuit_simp`. It
    cancels adjacent-after-commuting inverse pairs and then pulls each gate
    of `b` to the front of what is left of `a`, checking every move.
@@ -347,15 +353,18 @@ cheap one.
 `ℚ(ζ₈)`), `Bits`, `Gates` (`Gate1`, the matrices, `applyOne`, `applyCNOT`),
 `Dyadic` (the ring the evaluator computes in), `Chunk` (`AllBelow`, a check
 proved one index range per declaration), `Semantics` (`Instr`, `Circuit`,
-`denote`, the relations `≡ᵤ`, `≡ₚ`, `≡ₚ[k]`, `≡ₛ` and their algebra,
-decidability, `checkEquivAt`, `findPhase`), `Checker` (the `check` + `sound`
-contract, `PhaseFinder`), `Structural` (fusion, commutation, layers,
-`phaseGadget`), `Support` (wire sets as bitmasks), `PhasePoly`, `Tableau`,
-`Rewriting`, `Layers`, `Embedding` (`rename`, the locality theorem),
-`Certificate` (`Step`, `replay`, `replay_sound`, `circuit_replay`;
-`replayPhase_sound`, `circuit_replay_phase`), `Tactic`, `Examples` (worked
-identities, the quickest way to see each tool
-used), and `Benchmarks/` (whole pairs proved with the patterns above).
+`denote`, the relations `≡ᵤ`, `≡ₚ`, `≡ₚ[k]`, `≡ₛ`: the trusted definitions),
+`Relations` (their algebra and `calc`), `Decide` (the basis reduction, the
+evaluators, the `Decidable` instances, `checkEquivAt`, `findPhase`), `Checker`
+(the `check` + `sound` contract, `PhaseFinder`), `Structural` (fusion,
+commutation, layers, `phaseGadget`), `Support` (wire sets as bitmasks), `Lanes`
+(the bit planes under the phase polynomial), `PhasePoly`, `PhasePoly.Complete`
+(the refuter), `Tableau`, `Rewriting`, `Layers`, `Embedding` (`rename`, the
+locality theorem), `Certificate` (`Step`, `replay`, `replay_sound`,
+`circuit_replay`; `replayPhase_sound`, `circuit_replay_phase`), `Defaults` (the
+checker tables `defaultCheckers`, `defaultPhaseFinders`), `Tactic`, `Examples`
+(worked identities, the quickest way to see each tool used), and `Benchmarks/`
+(whole pairs proved with the patterns above).
 
 ## Conventions that bite
 

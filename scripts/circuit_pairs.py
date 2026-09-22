@@ -63,6 +63,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import circuit_sources as cs  # noqa: E402
+from alphabet import DIAG  # noqa: E402
 
 np = cs.np
 PAIRS = cs.CATALOGUE / "pairs"
@@ -103,7 +104,6 @@ DIFF_MAX_CELLS = 3e7       # len(a) * len(b) for difflib
 SEGMENT_MAX_QUBITS = 20
 SEGMENT_WORK = 2e10        # (len(a) + len(b)) * 2^n * probes
 PROBES = 4
-DIAG = {"Z", "S", "Sdg", "T", "Tdg"}
 
 HOLDOUT_DELETE = ["scripts/circuit_pairs.py", "scripts/circuit_sources.py",
                   "scripts/peephole_pairs.py"]

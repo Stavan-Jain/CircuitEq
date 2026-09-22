@@ -26,6 +26,9 @@ import re
 import sys
 from pathlib import Path
 
+# Copies of `scripts/alphabet.py`'s tables: the harness installs this file on its own as
+# `./qasm`, so it imports nothing from the repository. `alphabet.py --self-test` (CI)
+# checks that the copies still agree.
 TO_QASM = {"H": "h", "X": "x", "Z": "z", "S": "s", "Sdg": "sdg", "T": "t", "Tdg": "tdg"}
 FROM_QASM = {v: k for k, v in TO_QASM.items()} | {"y": "Y"}
 PHASES = {0: [], 1: ["T"], 2: ["S"], 3: ["S", "T"], 4: ["Z"], 5: ["Z", "T"], 6: ["Sdg"], 7: ["Tdg"]}

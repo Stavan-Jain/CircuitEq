@@ -18,7 +18,7 @@
   },
   "known_leaks": [
     "the pair is a promoted benchmark of this repository, so a model may have seen its proof; removed from the run copy: its module, README.md, benchmarks/, and the window table of scripts/certificate.py",
-    "CircuitEq/PhasePoly.lean keeps three test theorems about sub-blocks of this circuit (`tof3_merge`, `tof3_controls`, `tof3_core`); not redacted, since that would rebuild the largest module of the library on every run"
+    "CircuitEqTest/PhasePoly.lean keeps three test theorems about sub-blocks of this circuit (`tof3_merge`, `tof3_controls`, `tof3_core`); the harness removes CircuitEqTest/ from every run copy (on a base from before that library existed they sit in CircuitEq/PhasePoly.lean, unredacted)"
   ],
   "mutation": {
     "side": "optimized",

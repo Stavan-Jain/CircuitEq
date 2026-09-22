@@ -11,9 +11,9 @@ import Mathlib.Data.List.Range
 The kernel memoises `whnf` by structural equality of terms and keeps the
 cache for the whole of one declaration, releasing it only when the
 declaration ends. A long `decide +kernel` is therefore bounded by memory
-before it is bounded by time: the seven-qubit basis decide was killed at
-6.9 GB after 20 s, and the 40-qubit tableau at 6.3 GB, with arithmetic that
-would have finished in under a minute.
+before it is bounded by time: the seven-qubit basis decide and the 40-qubit
+tableau both ran out of memory in one declaration, with arithmetic that would
+have finished in under a minute (`benchmarks/scale/README.md`).
 
 The lever is to give the kernel one declaration per *chunk* of the work. A
 check that is a conjunction over the indices `0, …, k − 1` (the basis
@@ -32,9 +32,9 @@ Peak memory is that of the largest chunk and total time is unchanged. The
 chunk boundaries are data an external tool chooses, in the spirit of the
 certificate language; `scripts/scale_test.py --chunk` and
 `scripts/chunked_decide.py` emit such files. Consumers:
-`equivalent_of_allBelow` and `equivalentUpToPhase_of_allBelow`
-(`CircuitEq.Semantics`) and `tableau_sound_of_allBelow`
-(`CircuitEq.Tableau`).
+`equivalent_of_allBelow`, `equivalentWithPhase_of_allBelow` and
+`equivalentUpToPhase_of_allBelow` (`CircuitEq.Decide`) and
+`tableau_sound_of_allBelow` (`CircuitEq.Tableau`).
 -/
 
 namespace Quantum.Circuit

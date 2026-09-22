@@ -1,7 +1,7 @@
 name = "CircuitEq"
 version = "0.1.0"
 keywords = ["math", "quantum", "verification"]
-defaultTargets = ["CircuitEq"]
+defaultTargets = ["CircuitEq", "CircuitEqTest"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -18,3 +18,8 @@ scope = "leanprover-community"
 
 [[lean_lib]]
 name = "CircuitEq"
+
+# The examples and the checkers' regression tests (`CircuitEqTest.lean`): built
+# and checked with the library, imported by nothing in it.
+[[lean_lib]]
+name = "CircuitEqTest"

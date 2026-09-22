@@ -9,8 +9,11 @@ import Mathlib.Data.List.Perm.Basic
 
 /-! # Rewriting circuits and commuting blocks
 
-All rules act on circuit equivalence. `Instr.CanCommute` is a conservative,
-decidable sufficient condition, not a characterization of commutation.
+The local rules the certificate language licenses its steps with, and the
+block lemmas a hand-written proof composes. All rules act on `≡ᵤ`, and
+`in_context` also on `≡ₚ[k]` and `≡ₚ`. `Instr.CanCommute` and
+`Instr.CanCancel` are conservative, decidable sufficient conditions, not
+characterizations; their `sound` lemmas are what `replayStep_sound` uses.
 -/
 
 namespace Quantum.Circuit
@@ -34,7 +37,7 @@ theorem EquivalentWithPhase.in_context {k : Fin 8} {a b : Circuit n} (h : a ≡�
 unchanged prefix and suffix. -/
 theorem EquivalentUpToPhase.in_context {a b : Circuit n} (h : a ≡ₚ b)
     (pre post : Circuit n) : pre ++ a ++ post ≡ₚ pre ++ b ++ post := by
-  obtain ⟨k, (hk : a ≡ₚ[k] b)⟩ := h
+  obtain ⟨k, hk⟩ := h
   exact ⟨k, hk.in_context pre post⟩
 
 /-- CNOTs commute unless a control is the other gate's target. -/
@@ -125,18 +128,6 @@ lemma Instr.CanCommute.of_no_shared_wire {a b : Instr n}
       exact ⟨fun e => h c ⟨Or.inl rfl, Or.inr e.symm⟩,
         fun e => h t ⟨Or.inr rfl, Or.inl e⟩⟩
 
-/-- Instructions with disjoint supports commute. -/
-lemma Instr.CanCommute.of_disjoint {a b : Instr n} (h : a.support &&& b.support = 0) :
-    a.CanCommute b :=
-  Instr.CanCommute.of_no_shared_wire (Instr.not_touches_both_of_disjoint h)
-
-/-- `g` passes the syntactic commutation check against every instruction
-of `c`: the side condition the tactics discharge by `decide`. -/
-def Instr.CanCommuteAll (g : Instr n) (c : Circuit n) : Prop := ∀ a ∈ c, g.CanCommute a
-
-instance (g : Instr n) (c : Circuit n) : Decidable (g.CanCommuteAll c) :=
-  inferInstanceAs (Decidable (∀ a ∈ c, g.CanCommute a))
-
 /-- Move an instruction through a block when it commutes with every gate. -/
 theorem gate_block_comm (g : Instr n) (c : Circuit n)
     (h : ∀ a ∈ c, [g, a] ≡ᵤ [a, g]) : [g] ++ c ≡ᵤ c ++ [g] := by
@@ -184,18 +175,6 @@ theorem perm_equivalent {a b : Circuit n} (hp : a.Perm b)
     exact (ihp hc).trans (ihq (fun x hx y hy => hc x (hp.mem_iff.mpr hx) y
       (hp.mem_iff.mpr hy)))
 
-/-- A computable permutation check plus syntactic commutation suffices. -/
-theorem perm_equivalent_of_check {a b : Circuit n} (hp : a.Perm b)
-    (hc : ∀ x ∈ a, ∀ y ∈ a, x.CanCommute y) : a ≡ᵤ b :=
-  perm_equivalent hp (fun x hx y hy => (hc x hx y hy).sound)
-
-/-- Pull a selected instruction to the front, then prove the remaining tail. -/
-theorem pull_cons (g : Instr n) (before after target : Circuit n)
-    (hc : g.CanCommuteAll before) (ht : before ++ after ≡ᵤ target) :
-    before ++ g :: after ≡ᵤ g :: target := by
-  have hm := (gate_block_comm g before (fun a ha => (hc a ha).sound)).symm
-  simpa [List.append_assoc] using (hm.in_context [] after).trans (ht.cons g)
-
 /-- The order of identical single-qubit gates within a layer is immaterial. -/
 theorem layer_perm (g : Gate1) {a b : List (Fin n)} (h : a.Perm b) :
     layer g a ≡ᵤ layer g b := by
@@ -233,15 +212,5 @@ theorem Instr.CanCancel.sound {a b : Instr n} (h : a.CanCancel b) : [a, b] ≡�
     | cnot d u =>
       obtain ⟨rfl, rfl, hct⟩ := h
       exact applyCNOT_applyCNOT_self hct
-
-/-- Cancel inverse gates separated by a block they can commute through. -/
-theorem cancel_window (a b : Instr n) (middle tail : Circuit n)
-    (hc : a.CanCancel b) (hm : a.CanCommuteAll middle) :
-    a :: (middle ++ b :: tail) ≡ᵤ middle ++ tail := by
-  have move := gate_block_comm a middle (fun g hg => (hm g hg).sound)
-  calc
-    _ ≡ᵤ (middle ++ [a, b]) ++ tail := by
-      simpa [List.append_assoc] using move.in_context [] (b :: tail)
-    _ ≡ᵤ middle ++ tail := by simpa using hc.sound.in_context middle tail
 
 end Quantum.Circuit

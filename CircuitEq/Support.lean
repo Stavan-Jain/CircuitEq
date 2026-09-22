@@ -84,22 +84,4 @@ lemma not_touches_of_disjoint {m : ℕ} {c : Circuit n} (h : m &&& support c = 0
   rw [h, Nat.zero_testBit] at h1
   exact Bool.false_ne_true h1
 
-/-- Instructions with disjoint supports share no wire. -/
-lemma Instr.not_touches_both_of_disjoint {a b : Instr n} (h : a.support &&& b.support = 0)
-    (i : Fin n) : ¬ (a.touches i ∧ b.touches i) := by
-  rintro ⟨ha, hb⟩
-  have h1 : (a.support &&& b.support).testBit i.val = true := by
-    rw [Nat.testBit_land, Instr.support_testBit, Instr.support_testBit]
-    simp [ha, hb]
-  rw [h, Nat.zero_testBit] at h1
-  exact Bool.false_ne_true h1
-
-/-- A single-qubit gate commutes past a circuit whose support avoids its
-wire: the mask form of `denote_applyOne_comm_of_not_touches`. -/
-theorem denote_applyOne_comm_of_disjoint (c : Circuit n) (i : Fin n) (A : Mat1)
-    (h : 2 ^ i.val &&& support c = 0) (ψ : Vec n) :
-    denote c (applyOne A i ψ) = applyOne A i (denote c ψ) :=
-  denote_applyOne_comm_of_not_touches c i A
-    (not_touches_of_disjoint h Nat.testBit_two_pow_self) ψ
-
 end Quantum.Circuit

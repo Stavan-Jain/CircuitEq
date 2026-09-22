@@ -16,9 +16,8 @@ instructions are in `benchmarks/rep3_phaseflip/`.
 
 PyZX reorders the Hadamards without reducing the five-gate count, so the
 benchmark pair closes by `circuit_simp`, which moves each gate of the PyZX
-order through the gates on other wires it must pass. `reorder` is the same
-fact for any three distinct qubits of any register, from the commutation
-lemmas directly.
+order through the gates on other wires it must pass. On three distinct wires
+of any register the same fact is `original_equiv_optimized.rename`.
 -/
 
 namespace Quantum.Circuit.Benchmarks.Rep3PhaseFlip
@@ -30,16 +29,6 @@ def original : Circuit 3 := [CX 0 1, CX 0 2, H 0, H 1, H 2]
 
 /-- The actual PyZX output, in QASM instruction order. -/
 def optimized : Circuit 3 := [CX 0 1, H 1, CX 0 2, H 2, H 0]
-
-/-- PyZX's reordering is valid on any three distinct qubits. -/
-theorem reorder {n : ℕ} {a b c : Fin n}
-    (hab : a ≠ b) (hac : a ≠ c) (hbc : b ≠ c) :
-    ([CX a b, CX a c, H a, H b, H c] : Circuit n) ≡ᵤ
-      [CX a b, H b, CX a c, H c, H a] := by
-  intro ψ
-  simp only [denote_cons, denote_nil, Instr.apply_cnot, Instr.apply_one]
-  rw [applyOne_comm hab.symm, applyOne_applyCNOT_comm hab.symm hbc,
-    applyOne_comm hac.symm]
 
 /-- Exact equivalence of the original benchmark and the PyZX output, found
 by the tactic: each step is a checked commutation of a gate past a gate on

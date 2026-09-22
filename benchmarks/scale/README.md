@@ -133,22 +133,22 @@ qubits); the combinatorial indexing keeps it at `C(n,3)`. Peeling set bits
 with `Nat.log2` was slower than testing each index, because the kernel does
 not accelerate `log2`.
 
-**Structured CNOT+T circuits found the next cost, and it was the loop, not
-the arithmetic.** A network of CCZ gadgets has parities of weight at most
-three, so its phase gates should be nearly free. The first run said
-otherwise: 40 s and 6.8 GB at 100 wires, 15 ms and 1.9 MB per phase gate,
-because each gate ran two loops over all hundred wire indices and the
-kernel retains about 10 KB per iteration. `sparseFold` visits only the set
-bits with operations the kernel does accelerate (the lowest set bit is
-`gcd m 2^W`; its index is a word-parallel population count of its
-predecessor, whose correctness on the 1024 powers of two is one finite
-check), a population count picks between it and the index loop, and the
-same specification covers both, so no proof downstream moved. That took the
-100-wire rung to 7 s at 2.8 GB and, because a random circuit's parities are
-sparse early on, the dense 80-qubit rung from 3.9 s to 1.9 s. The 200- and
-300-wire networks, 6800 and 10200 gates, certify in 5.9 s and 10.1 s of
-kernel time. What grows now is the triple plane itself, 164 KB at 200 wires
-and copied by every gate that changes it, which is the 5.3 GB at 300 wires.
+**Structured CNOT+T circuits found the next cost, and it was the loop, not the
+arithmetic.** A network of CCZ gadgets has parities of weight at most three, so
+its phase gates should be nearly free. The first run said otherwise: 40 s and
+6.8 GB at 100 wires, 15 ms and 1.9 MB per phase gate, because each gate ran two
+loops over all hundred wire indices and the kernel retains about 10 KB per
+iteration. `Lanes.sparseFold` visits only the set bits with operations the
+kernel does accelerate (the lowest set bit is `gcd m 2^W`; its index is a
+word-parallel population count of its predecessor, whose correctness on the 1024
+powers of two is one finite check), a population count picks between it and the
+index loop, and the same specification covers both, so no proof downstream
+moved. That took the 100-wire rung to 7 s at 2.8 GB and, because a random
+circuit's parities are sparse early on, the dense 80-qubit rung from 3.9 s to
+1.9 s. The 200- and 300-wire networks, 6800 and 10200 gates, certify in 5.9 s
+and 10.1 s of kernel time. What grows now is the triple plane itself, 164 KB at
+200 wires and copied by every gate that changes it, which is the 5.3 GB at 300
+wires.
 
 One attempted saving is recorded because it failed instructively. The
 kernel allocates a fresh literal even for `x ^^^ 0`, so returning an
@@ -170,6 +170,56 @@ circuit of a few hundred gates, Lean's error message fails to pretty-print
 on `check` and on the two forms is the way to see it. For the tableau the
 script's Python mirror answers the same question before Lean runs.
 
+## The basis evaluator (16 to 18 September 2026)
+
+What `decide +kernel` on `≡ᵤ` or `≡ₚ` costs, and why it is chunked. The
+kernel-cost rules drawn from these runs are in `CLAUDE.md`, "Kernel-cost
+notes".
+
+Measured on an Apple M4 (16 GB, shared with other builds), warm oleans,
+kernel type-checking time of the `decide`, before → after: a two-qubit
+five-gate window 0.35 s → 0.02 s; the three-qubit six-gate `Tof3` window
+2.66 s → 0.09 s. Whole files, wall time: `Examples.lean` 2.6 s → 1.2 s and
+`Tof3.lean` 4.2 s → 1.3 s, both now dominated by import time. The
+seven-qubit `SteanePlus` pair decided on the full basis (`original ≡ᵤ
+optimized` by `decide +kernel`, 32 gates × 128 basis states) is not
+measured: it is memory-bound on this 16 GB machine, both before and after.
+With the `Zeta8` `evalList` it did not finish in 15 minutes (71 s of CPU
+against 248 s of system time, 15.8 GB peak footprint; the estimate for its
+compute alone is 2 × 10⁵ Hadamard amplitude updates at some 10³ `Rat`
+operations each, hours of kernel time). With the closure evaluator,
+attempts of 9 and 3 minutes were stopped swap-starved (the 9-minute one
+before reads were forced: 2:22 of CPU, 9.9 GB resident; see `Dyadic.lean`
+on forcing). The expected cost is 5 × 10⁵ memoised gate steps and a cache
+of the order of 10⁷ terms, tens of seconds and a few GB. Measured on an
+idle machine (16 September 2026): a 6 GB watchdog killed the kernel after
+20 s at 6.9 GB resident and still growing, 19 s of CPU. The cache, not the
+arithmetic, is the wall, and chunked evaluation is the lever
+(`CircuitEq/Chunk.lean`): with one basis vector per declaration the same
+pair decides in 78 s at 1.98 GB peak, 0.06 GB above the imports
+(`scripts/chunked_decide.py SteanePlus --chunk 1`, 18 September 2026).
+A basis vector costs about 0.6 s and 165 MB of retained terms here (32
+gates, 128 amplitudes: some 150 µs and 40 KB per amplitude and gate), so
+the cost of a whole-register decide is `gates · 4^n` of those steps: about
+five minutes at eight qubits, over an hour at ten. Two facts that matter
+for every chunked file: memory is returned at a declaration boundary only
+with `set_option Elab.async false` (with asynchronous elaboration on,
+sixteen 4-vector declarations peak at 3.6 GB instead of 2.6 GB, and a
+128-declaration file at 5.2 GB), and `lean -j1` does not help. The same
+retention limits certificate replay (`QUEUE.md`, item 3), where the lever
+is a compact encoding of the instruction list.
+
+Two intermediate designs were measured on the way: the same dyadic arithmetic
+through the materialised list evaluator (`evalListD`, kept as the reference
+form) with a generic per-entry product (`applyOneD`, since removed) took 0.66 s
+on the three-qubit window and could not do seven qubits either, because reading
+amplitude `x` of a list costs `x` steps and the kernel retains every
+intermediate term (`O(4^k)` per gate, so memory runs out before time does); the
+per-gate shuffles and the memoised closures with forced reads bring it to 0.1 s.
+Depth is now linear: eighteen Hadamards on one qubit decide in 42 ms, where the
+unforced closures did not finish in a minute. Memory is the limit before time:
+the kernel's `whnf` cache retains everything evaluated during one declaration.
+
 ## Where each tool stands
 
 | Tool | Relation | Cost, measured | Reach on this machine |
@@ -177,7 +227,7 @@ script's Python mirror answers the same question before Lean runs.
 | Phase polynomial | `≡ᵤ`, and `¬ ≡ᵤ` | 0.2 ms per CNOT; about 1 ms per phase gate on a sparse parity, up to 10 ms on a dense 80-wire one | 80 random qubits, 800 gates in 1.9 s; 300 structured qubits, 10200 gates in 10 s at 5.3 GB; no chunking needed |
 | Tableau, chunked | `≡ₛ` | 0.2 to 0.3 ms per generator and gate | 80 random qubits (8261 gates) in 7 min; 241 structured qubits (2120 gates) in under 3 min |
 | Basis decide, chunked | `≡ᵤ`, `≡ₚ` | 0.6 s and 165 MB per basis vector at 7 qubits, 32 gates | 7 qubits in 78 s; `gates · 4^n` scaling puts 8 qubits at minutes, 10 at hours |
-| Certificate replay | `≡ᵤ`, `≡ₚ[k]`, `≡ₚ` | not rerun here | about 150 gates, bound by replay memory (`QUEUE.md`, item 3) |
+| Certificate replay | `≡ᵤ`, `≡ₚ[k]`, `≡ₚ` | 20 to 30 µs per list cell a move walks (50 moves on 64 gates: 0.1 s; 100 on 128: 0.5 s), plus each window's checker; up to phase about 1.2 times that (`tof_3`'s 62-step trace: 0.19 s against 0.16 s; 128 one-wire phase windows: 0.7 s against 0.4 s), measured 16 and 19 September | about 150 gates, bound by replay memory (`QUEUE.md`, item 3) |
 
 ## Reproduce
 

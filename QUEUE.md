@@ -43,10 +43,10 @@ agent has to handle, and item 4 is the tool planned for them.
    (Claude Code headless first) and: copies the repository at a pinned
    commit into a scratch directory, without `.git`; holds the answer out
    (deletes the pair's module under `CircuitEq/Benchmarks/`, its import
-   and its `benchmarks/<name>/README.md`; `Tableau.lean` also embeds the
-   `rep3` and Steane pairs with proofs, so those two are development
-   tasks at best, and a test task is a pair that appears nowhere in the
-   repository); writes a statement file with the two
+   and its `benchmarks/<name>/README.md`; the tableau's regression tests
+   in `CircuitEqTest/` embed the `rep3` and Steane pairs with proofs, so
+   those two are development tasks at best, and a test task is a pair that
+   appears nowhere in the repository); writes a statement file with the two
    circuit `def`s and `theorem … : original ≡ᵤ optimized := by sorry`
    (the relation is per task: `≡ᵤ`, `≡ₚ`, `≡ₛ`, or a negation for a
    mutant); gives the agent one checked-in prompt
@@ -54,7 +54,7 @@ agent has to handle, and item 4 is the tool planned for them.
    protocol's limits (one hour, 16 GB); then judges. The agent may write
    any Lean it likes, new lemmas, checkers and step kinds included. The
    judge for v0 is a person reading the diff: no existing file changed
-   (the modules up to `Semantics.lean`, the circuit `def`s and the
+   (the trusted `Semantics.lean`, the circuit `def`s and the
    statement above all), `lake build` passes and `#print axioms` shows
    the standard three. The axiom check alone is not enough: on this
    toolchain `set_option debug.skipKernelTC true` lets a false
@@ -66,8 +66,8 @@ agent has to handle, and item 4 is the tool planned for them.
    declarations the proof uses (the roadmap's flywheel record).
    Tasks v0, ordered by gates times width: the five promoted pairs, the
    survey's eleven circuits under both pipelines, and one gate-deleted
-   mutant of each. Two configurations, the full library and the modules
-   up to `Semantics.lean` alone, since their difference is the
+   mutant of each. Two configurations, the full library and the semantics
+   with its decision procedures alone (up to `Decide.lean`), since their difference is the
    hypothesis. An optimiser track follows item 2: the input is one
    circuit, the answer is `c'` with a proof of `c ≡ᵤ c'` and
    `tCount c' = k`, and `k` is reported against the uncertified T-counts
@@ -234,15 +234,15 @@ agent has to handle, and item 4 is the tool planned for them.
 
 9. **A column-packed tableau.** The tableau walks the circuit once per
    generator, `2n · gates` steps at 0.2 to 0.3 ms each: 7 minutes for the
-   80-qubit random rung (`benchmarks/scale/`). Keep the whole tableau as
-   two `Nat` bit matrices (bit `2n·j + g` for wire `j`, generator `g`) and
-   two phase planes, so a gate is a few shifts and xors on all generators
-   at once and the cost is `gates`: an estimated factor of sixty at 80
-   qubits, and no chunking. Soundness by decoding: the row `g` of the
-   packed state after a gate is `Gate1.conj` of the row before, so the
-   final state gives `ConjAgree` and `equivalentUpToScalar_of_conjAgree`
-   applies unchanged. Acceptance: the 80-qubit rung in seconds, 500
-   structured qubits. M. Depends on nothing.
+   80-qubit random rung (`benchmarks/scale/`). Keep the whole tableau as two
+   `Nat` bit matrices (bit `2n·j + g` for wire `j`, generator `g`) and two phase
+   planes, so a gate is a few shifts and xors on all generators at once and the
+   cost is `gates`: an estimated factor of sixty at 80 qubits, and no chunking.
+   Soundness by decoding: the row `g` of the packed state after a gate is
+   `Gate1.conj` of the row before, so the final state gives `Tableau.ConjAgree`
+   and `Tableau.equivalentUpToScalar_of_conjAgree` applies unchanged.
+   Acceptance: the 80-qubit rung in seconds, 500 structured qubits. M. Depends
+   on nothing.
 
 9a. **The 19-origin Clifford run.** Every QECUnitaryCircuits origin against
    its PyZX `full_reduce` twin by the tableau checker (`≡ₛ`), the
