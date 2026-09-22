@@ -274,7 +274,8 @@ applies next.
 ## Layout
 
 ```
-CircuitEq.lean              umbrella
+CircuitEq.lean              umbrella of the library
+CircuitEqTest.lean          umbrella of the examples and tests (a second lean_lib)
 CircuitEq/
 ├── Zeta8.lean              ℚ(ζ₈): the computable coefficient field
 ├── Bits.lean               bit / flipBit on Fin (2 ^ n), commutation lemmas
@@ -296,6 +297,7 @@ CircuitEq/
 ├── Embedding.lean          the locality theorem: circuits on selected wires
 ├── Examples.lean           worked identities: decided, refuted, structural, placed
 └── Benchmarks/             original-versus-PyZX proofs
+CircuitEqTest/              the checkers' regression tests
 benchmarks/                 QASM fixtures and provenance for each benchmark
 benchmarks/harness/         the agent harnesses: prompts, tasks, recorded runs
 benchmarks/circuits/        the circuit catalogue: 147 circuits, 390 pairs

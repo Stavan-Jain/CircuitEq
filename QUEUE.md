@@ -39,10 +39,10 @@ with a summary table, and the record of which declarations a proof uses
    (Claude Code headless first) and: copies the repository at a pinned
    commit into a scratch directory, without `.git`; holds the answer out
    (deletes the pair's module under `CircuitEq/Benchmarks/`, its import
-   and its `benchmarks/<name>/README.md`; `Tableau.lean` also embeds the
-   `rep3` and Steane pairs with proofs, so those two are development
-   tasks at best, and a test task is a pair that appears nowhere in the
-   repository); writes a statement file with the two
+   and its `benchmarks/<name>/README.md`; the tableau's regression tests
+   in `CircuitEqTest/` embed the `rep3` and Steane pairs with proofs, so
+   those two are development tasks at best, and a test task is a pair that
+   appears nowhere in the repository); writes a statement file with the two
    circuit `def`s and `theorem … : original ≡ᵤ optimized := by sorry`
    (the relation is per task: `≡ᵤ`, `≡ₚ`, `≡ₛ`, or a negation for a
    mutant); gives the agent one checked-in prompt

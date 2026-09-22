@@ -12,15 +12,15 @@ This guard is NOT sound, and it is not the defence. An option can be set from
 meta code under a name no text search recognises (a ``Name`` assembled from
 string pieces, an escaped TOML key), and meta code can add a declaration
 unchecked without setting any option. The defence is the kernel replay CI
-runs after the build, ``lake env leanchecker CircuitEq``, which re-checks
+runs after the build, ``lake env leanchecker CircuitEq CircuitEqTest``, which re-checks
 every declaration of the built ``.olean`` files and which no option can
 switch off (CLAUDE.md, "Conventions"; README.md, "Trust"). This script only
 reports the obvious spellings early, with a file and a line, before a build
 is paid for.
 
-Scanned by default: ``CircuitEq.lean``, every ``.lean`` file under
-``CircuitEq/``, ``scripts/`` and ``benchmarks/``, and ``lakefile.toml`` /
-``lakefile.lean``.
+Scanned by default: ``CircuitEq.lean``, ``CircuitEqTest.lean``, every
+``.lean`` file under ``CircuitEq/``, ``CircuitEqTest/``, ``scripts/`` and
+``benchmarks/``, and ``lakefile.toml`` / ``lakefile.lean``.
 Reported:
 
 * ``set_option`` of any ``debug.*`` option, also behind ``weak.``;
@@ -77,7 +77,9 @@ def default_files() -> list[Path]:
     tasks, recorded solutions) is in no `lean_lib` and is never built, so the text search is
     the only check it gets."""
     files = [ROOT / "CircuitEq.lean"]
+    files += [ROOT / "CircuitEqTest.lean"] if (ROOT / "CircuitEqTest.lean").exists() else []
     files += sorted((ROOT / "CircuitEq").rglob("*.lean"))
+    files += sorted((ROOT / "CircuitEqTest").rglob("*.lean"))
     files += sorted((ROOT / "scripts").rglob("*.lean"))
     files += sorted((ROOT / "benchmarks").rglob("*.lean"))
     files += [ROOT / name for name in CONFIG_NAMES]
@@ -142,7 +144,7 @@ def main(argv: list[str]) -> int:
             "`debug.skipKernelTC` switches the kernel off, and the axiom check cannot\n"
             "see it; no `debug.*` option belongs in this library (CLAUDE.md,\n"
             "\"Conventions\"). Remove it. This guard is an early warning only: the\n"
-            "kernel replay (`lake env leanchecker CircuitEq`) is the defence."
+            "kernel replay (`lake env leanchecker CircuitEq CircuitEqTest`) is the defence."
         )
         return 1
     print(f"debug-option guard OK: {len(files)} files scanned, no `debug.*` option set")

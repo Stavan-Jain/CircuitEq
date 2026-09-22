@@ -16,7 +16,6 @@ import CircuitEq.Layers
 import CircuitEq.Certificate
 import CircuitEq.Tactic
 import CircuitEq.Embedding
-import CircuitEq.Examples
 import CircuitEq.Benchmarks.Rep3PhaseFlip
 import CircuitEq.Benchmarks.SteanePlus
 import CircuitEq.Benchmarks.Tof3

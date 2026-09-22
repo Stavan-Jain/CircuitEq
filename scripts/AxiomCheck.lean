@@ -3,7 +3,7 @@ Axiom-policy enforcement for CI.
 
 Every declaration defined in this repository must depend on exactly mathlib's
 three standard axioms — `propext`, `Classical.choice`, `Quot.sound` — and
-nothing else. See CLAUDE.md § "Axiom policy".
+nothing else. See CLAUDE.md, "Conventions".
 
 This catches, without a hand-maintained list of capstones:
 
@@ -17,8 +17,8 @@ What it cannot catch is a declaration that never reached the kernel: Lean has
 a debug option that adds declarations unchecked, meta code can do the same, and
 a false `decide +kernel` theorem sealed that way depends on no axioms at all.
 That half of the policy is the kernel replay CI runs next,
-`LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq`; see CLAUDE.md §
-"Conventions". (The option is not named here on purpose: the text guard
+`LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq CircuitEqTest`; see
+CLAUDE.md, "Conventions". (The option is not named here on purpose: the text guard
 `scripts/check_debug_options.py` scans this file too.)
 
 Run with `lake env lean scripts/AxiomCheck.lean`; it exits non-zero and prints
@@ -26,6 +26,7 @@ every offender on failure. Not part of any `lean_lib`, so `lake build` does not
 pay for it, but it needs a completed build to run against.
 -/
 import CircuitEq
+import CircuitEqTest
 
 open Lean
 
@@ -38,8 +39,9 @@ def allowed : NameSet :=
     |>.insert ``Classical.choice
     |>.insert ``Quot.sound
 
-/-- Modules belonging to this repository (as opposed to mathlib/std/core). -/
-def isOurModule (m : Name) : Bool := m.getRoot == `CircuitEq
+/-- Modules belonging to this repository (as opposed to mathlib/std/core): the
+library and its examples and tests. -/
+def isOurModule (m : Name) : Bool := m.getRoot == `CircuitEq || m.getRoot == `CircuitEqTest
 
 run_cmd do
   let env ← Lean.getEnv
@@ -64,7 +66,7 @@ run_cmd do
     logInfo s!"axiom policy OK — {checked} declarations across {nmods} \
 modules depend on only [propext, Classical.choice, Quot.sound]"
   else
-    let mut msg := "AXIOM POLICY VIOLATION (see CLAUDE.md § \"Axiom policy\")\n"
+    let mut msg := "AXIOM POLICY VIOLATION (see CLAUDE.md, \"Conventions\")\n"
     unless declaredAxioms.isEmpty do
       msg := msg ++ s!"\n{declaredAxioms.size} bespoke `axiom` declaration(s):\n"
       for (m, c) in declaredAxioms do

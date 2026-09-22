@@ -47,8 +47,13 @@ Rules that follow, for anyone adding to the library:
 
 ## Layout
 
-- `CircuitEq.lean` — umbrella; every module must be imported here or it is
-  never built, never linted, and its errors are invisible.
+- `CircuitEq.lean` — umbrella of the library; every library module must be
+  imported here or it is never built, never linted, and its errors are
+  invisible. `CircuitEqTest.lean` is the same for the second `lean_lib`,
+  the examples and the tests: it imports `CircuitEq.Examples` and
+  `CircuitEqTest/*.lean`. Both are default targets, so `lake build`, the
+  axiom check and the kernel replay cover both; nothing in `CircuitEq`
+  imports them.
 - `CircuitEq/Zeta8.lean` — `Quantum.Zeta8`, computable ℚ(ζ₈). Constants
   `ω`, `I`, `sqrt2`, `invSqrt2`; identities by `decide +kernel`. Exponents
   of `ω` live in `Fin 8`: `ω_pow_mod`, `ω_pow_val_add` (`ω ^ ↑(j + k) =
@@ -268,7 +273,14 @@ Rules that follow, for anyone adding to the library:
   `rename_equivalentUpToPhase_iff`, and `EquivalentUpToScalar.rename`.
 - `CircuitEq/Examples.lean` — worked identities; add new showcase results
   here, new general lemmas to `Structural.lean`, `Rewriting.lean` or
-  `Layers.lean`.
+  `Layers.lean`. Built through `CircuitEqTest.lean`, not the umbrella; the
+  agent harness keeps it in a run's workspace, as the playbook's quickest
+  way to see each tool used.
+- `CircuitEqTest/PhasePoly.lean`, `CircuitEqTest/Tableau.lean` — the
+  checkers' regression tests (completeness cases, fragment boundaries,
+  refutations, chunked forms). Several restate parts of benchmark answers,
+  so the harness removes `CircuitEqTest/` from every run's workspace; a
+  test that shows how to use a tool belongs in `Examples.lean` instead.
 - `CircuitEq/Benchmarks/*.lean` — one module per original-versus-PyZX pair,
   with QASM fixtures and provenance under `benchmarks/<name>/`. Keep each to
   the two circuit `def`s (which `scripts/check_pyzx_benchmarks.py` parses
@@ -365,32 +377,31 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
   `[propext, Classical.choice, Quot.sound]`. Check a result with
   `#print axioms`. `sorry` only on WIP branches, tagged
   `sorry -- TODO(<tag>): <goal shape>`.
-- **`debug.*` options are banned, and the kernel replay is the other half of
-  the trust policy.** `set_option debug.skipKernelTC true` makes Lean add a
+- **`debug.*` options are banned, and the kernel replay is the other half of the
+  trust policy.** `set_option debug.skipKernelTC true` makes Lean add a
   declaration without sending it to the kernel. `decide +kernel` leaves its
-  whole check to the kernel, so under the option a false leaf proof
-  elaborates without an error and the axiom check reports it clean: it
-  depends on no axioms at all (verified on this toolchain, 18 September
-  2026: `2 + 2 = 5`, and `[H 0] ≡ᵤ [X 0]` inside a library module, with
-  `lake build` and `AxiomCheck` both green). So CI also replays every
-  declaration of the built `.olean` files through the kernel,
-  `LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq`, in a process where
-  no option or meta code of the library runs. `leanchecker` is the former
-  lean4checker, shipped inside the toolchain since v4.28 (the separate
-  repository is deprecated and has no tag for this toolchain), so it always
-  matches `lean-toolchain`. `scripts/check_replay_fixture.sh` asserts on
-  every CI run that the replay rejects the repro kept in
-  `scripts/SkipKernelTCFixture.lean`. `scripts/check_debug_options.py` is a
-  text guard for the obvious spellings in the Lean sources and
-  `lakefile.toml`; it is an early warning and is not sound, because an
-  option can be set from meta code under a name no search recognises (a
-  variant that assembles the name from string pieces passes the guard and
-  the axiom check, and the replay rejects it). The replay is the defence.
-  It re-checks this library's modules against their imports as delivered:
-  mathlib and core are trusted as the cache provides them, and it is the
-  same kernel again, not an independent checker. Never set a `debug.*`
-  option in the library, in `scripts/` or in `lakefile.toml`; a proof that
-  needs one is not a proof.
+  whole check to the kernel, so under the option a false leaf proof elaborates
+  without an error and the axiom check reports it clean: it depends on no axioms
+  at all (verified on this toolchain, 18 September 2026: `2 + 2 = 5`, and `[H 0]
+  ≡ᵤ [X 0]` inside a library module, with `lake build` and `AxiomCheck` both
+  green). So CI also replays every declaration of the built `.olean` files
+  through the kernel, `LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq
+  CircuitEqTest`, in a process where no option or meta code of the library runs.
+  `leanchecker` is the former lean4checker, shipped inside the toolchain since
+  v4.28 (the separate repository is deprecated and has no tag for this
+  toolchain), so it always matches `lean-toolchain`.
+  `scripts/check_replay_fixture.sh` asserts on every CI run that the replay
+  rejects the repro kept in `scripts/SkipKernelTCFixture.lean`.
+  `scripts/check_debug_options.py` is a text guard for the obvious spellings in
+  the Lean sources and `lakefile.toml`; it is an early warning and is not sound,
+  because an option can be set from meta code under a name no search recognises
+  (a variant that assembles the name from string pieces passes the guard and the
+  axiom check, and the replay rejects it). The replay is the defence. It
+  re-checks this library's modules against their imports as delivered: mathlib
+  and core are trusted as the cache provides them, and it is the same kernel
+  again, not an independent checker. Never set a `debug.*` option in the
+  library, in `scripts/` or in `lakefile.toml`; a proof that needs one is not a
+  proof.
 - **No `set_option linter.* false`.** Fix the warning or leave it visible.
   The build is currently warning-free; keep it that way.
 - **Docstring prose wraps at 80 columns**, code at 100 (the `longLine`
@@ -431,9 +442,9 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
 ## Build and verification
 
 ```bash
-lake build                            # whole library (~1 min warm)
+lake build                            # library, examples, tests (~1 min warm)
 lake env lean scripts/AxiomCheck.lean # axiom policy, needs a completed build
-LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq  # kernel replay, same
+LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq CircuitEqTest  # kernel replay
 bash scripts/check_replay_fixture.sh  # the replay still rejects the repro
 python3 scripts/check_debug_options.py  # text guard, needs no build
 lake env lean /tmp/probe.lean         # one-off file check

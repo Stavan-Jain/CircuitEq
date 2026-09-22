@@ -67,7 +67,7 @@
   },
   "known_leaks": [
     "the original is a promoted benchmark of this repository (CircuitEq/Benchmarks/Tof3.lean), whose PyZX twin (T-count 19) and its proof are in the repository and its history, so a model may have seen both; removed from the run copy: the module, README.md, benchmarks/, the window table of scripts/certificate.py, and the hand alignment in the self-test of scripts/tcount_survey.py",
-    "CircuitEq/PhasePoly.lean keeps three test theorems about sub-blocks of this circuit (`tof3_merge`, `tof3_controls`, `tof3_core`), which state the `T 0, T 0 = S 0` merge that is the whole of PyZX's T-count gain; not redacted, since that would rebuild the largest module of the library on every run",
+    "CircuitEqTest/PhasePoly.lean keeps three test theorems about sub-blocks of this circuit (`tof3_merge`, `tof3_controls`, `tof3_core`); the harness removes CircuitEqTest/ from every run copy (on a base from before that library existed they sit in CircuitEq/PhasePoly.lean, unredacted)",
     "scripts/tcount_survey.py generates this original (`tof(3)`) and scripts/check_pyzx_benchmarks.py names the PyZX pipeline that was used on it; calling PyZX is allowed anyway",
     "CircuitEq/Benchmarks/BarencoTof3.lean is held out as well: it is the same Toffoli decomposition through the same PyZX pipeline, with its optimised twin and the windows of its proof, which give this task's answer away"
   ]

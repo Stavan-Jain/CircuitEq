@@ -440,10 +440,11 @@ by searching for pieces of the twin: two more leaks were found and closed.
 through the same PyZX pipeline, twin and proof included, so each of the two
 Toffoli tasks holds out both modules; and the self-test of
 `scripts/tcount_survey.py` carries the four windows of the `tof_3` proof,
-which a task-level redaction removes. What stays is in `known_leaks`: three
-test theorems in `CircuitEq/PhasePoly.lean` that state the `T 0, T 0 = S 0`
-merge (redacting them would rebuild the largest module on every run), and
-the fact that a model may have seen these pairs. They are development
+which a task-level redaction removes. The checkers' regression tests, which
+restate sub-blocks of `tof_3` and copies of the `rep3` and Steane pairs,
+live in `CircuitEqTest/`, which every run copy loses (`GLOBAL_DELETE`;
+`CircuitEqTest.lean` then imports only `CircuitEq.Examples`). What stays is
+in `known_leaks`: the fact that a model may have seen these pairs. They are development
 tasks. `peephole_8q_1000g_s1` is held out: its twin and the proof an agent
 found for it are under `benchmarks/`, which no run sees.
 
