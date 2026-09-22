@@ -182,18 +182,17 @@ two independent reasons.
   agents prove larger and deeper pairs is a hypothesis, and it is measured
   rather than assumed: the harness runs one prompt under one set of limits
   against the library as it grows, and against the trusted modules alone.
-- **Checking proofs.** This reason does not go away with a better agent.
-  The kernel cannot finish a seven-qubit basis check as one declaration in
-  6 GB (chunked, it takes 78 s and 2 GB, and grows as `gates · 4^n`), and
-  a proof term assembled gate by gate is quadratic, so any agent, however
-  capable, has to route a large concrete proof through reflection: a
-  computable structure, a soundness theorem, one kernel evaluation. The library
-  amortises what every agent would otherwise rebuild. This is why, for
-  concrete circuits, the supported path is a certificate, data replayed by
-  `replay_sound`, and the agent's freedom is spent on finding the structure
-  (the alignment, the cut points, the template instance). Free-form Lean is
-  for parametric theorems and for the `calc` that composes around a
-  certificate.
+- **Checking proofs.** This reason does not go away with a better agent. The
+  kernel cannot finish a seven-qubit basis check as one declaration (chunked it
+  can, but the cost grows as `gates · 4^n`; `benchmarks/scale/README.md`), and a
+  proof term assembled gate by gate is quadratic, so any agent, however capable,
+  has to route a large concrete proof through reflection: a computable
+  structure, a soundness theorem, one kernel evaluation. The library amortises
+  what every agent would otherwise rebuild. This is why, for concrete circuits,
+  the supported path is a certificate, data replayed by `replay_sound`, and the
+  agent's freedom is spent on finding the structure (the alignment, the cut
+  points, the template instance). Free-form Lean is for parametric theorems and
+  for the `calc` that composes around a certificate.
 
 Where the infrastructure stands against that problem statement
 (18 September 2026, updated 22 September), so that nobody over-reads it:

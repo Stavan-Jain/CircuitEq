@@ -11,9 +11,9 @@ import Mathlib.Data.List.Range
 The kernel memoises `whnf` by structural equality of terms and keeps the
 cache for the whole of one declaration, releasing it only when the
 declaration ends. A long `decide +kernel` is therefore bounded by memory
-before it is bounded by time: the seven-qubit basis decide was killed at
-6.9 GB after 20 s, and the 40-qubit tableau at 6.3 GB, with arithmetic that
-would have finished in under a minute.
+before it is bounded by time: the seven-qubit basis decide and the 40-qubit
+tableau both ran out of memory in one declaration, with arithmetic that would
+have finished in under a minute (`benchmarks/scale/README.md`).
 
 The lever is to give the kernel one declaration per *chunk* of the work. A
 check that is a conjunction over the indices `0, …, k − 1` (the basis

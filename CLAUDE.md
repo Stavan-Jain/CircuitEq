@@ -165,40 +165,36 @@ Rules that follow, for anyone adding to the library:
   `CircuitEq/PhasePoly/Complete.lean` has `PhasePoly.complete` (equal unitaries
   give equal forms) and so `phasePolyRefutes n a b`, whose `true` proves
   `¬ a ≡ᵤ b`, and `phasePolyChecker_check_iff`: within the fragment `check` is a
-  decision procedure. Cost is linear in the gate count and never `2 ^ n`: the
-  scale test's random CNOT+T pairs on 20, 40 and 80 wires (200, 400, 800 gates)
-  certify in 0.2, 0.6 and 1.9 s of kernel time at 1.9, 2.0 and 2.5 GB, and CCZ
-  networks of 3400, 6800 and 10200 gates on 100, 200 and 300 wires in 2.8, 5.9
-  and 10.1 s at 2.7, 3.8 and 5.3 GB; what grows is the `C(n,3)`-bit triple
-  plane, copied by every gate that changes it (`QUEUE.md` item 8). A proof is
+  decision procedure. Cost is linear in the gate count and never `2 ^ n`
+  (seconds for thousands of gates on hundreds of wires; the figures are in
+  `benchmarks/scale/README.md`); what grows is the `C(n,3)`-bit triple plane,
+  copied by every gate that changes it (`QUEUE.md` item 8). A proof is
   `(phasePolyChecker n).sound _ _ (by decide +kernel)`, a refutation
   `phasePolyRefutes_sound (by decide +kernel)`; bare `decide` times out at about
   a hundred gates. The extension with Hadamard variables that certifies TZAP
   output across `H` gates is `QUEUE.md` item 4.
 - `CircuitEq/Tableau.lean` — the Clifford tableau checker: `Pauli` strings
-  (x-mask, z-mask, phase in `Fin 4`, denoting `i^p · Z^z · X^x`), the
-  gate update rules with pointwise soundness (`conjH_sound`, …,
-  `conjCX_sound`), `Tableau.conj` / `tableau` (images of the `2n`
-  generators, `none` outside the fragment or for `CX c c`),
-  `tableauCheck`, `tableau_sound` (equal tableaux give `≡ₛ`, the
-  normal-form shape) and the export `tableauChecker n : ScalarChecker n`;
-  `Tableau.witness` names the first disagreeing generator. The soundness
-  argument is stated on `Tableau.ConjAgree a b` (every generator has the
-  same image), so the chunked form shares it: `Tableau.genAt n g` numbers
-  the `2n` generators on `ℕ`, `tableauCheckGen a b g` checks one, and
-  `tableau_sound_of_allBelow` turns `AllBelow (tableauCheckGen a b) (2 * n)`
-  into `a ≡ₛ b`. The API (`Pauli`, `tableau`, `tableauCheck`,
-  `tableauChecker`, `tableauCheckGen` and the soundness theorems) is at
-  the top of `Quantum.Circuit`; the helpers (`Tableau.phaseVal`, `sign`,
-  `xorMask`, `generators`, `mapOpt`, the commutant argument) are under
-  `Tableau.`, as the phase polynomial's are under `PhasePoly.` and
-  `Lanes.`, so that checker internals do not crowd the library's namespace.
-  Structure-independent, `O(n)` bit operations per gate, no `Zeta8`
-  arithmetic in the kernel: the 15-qubit Reed–Muller pair decides in
-  about 0.3 s; about 0.2 ms of kernel time per generator and gate, so
-  cost is `2n · gates` and past a few thousand gates the check must be
-  chunked (`scripts/scale_test.py --chunk`). Extend `Gate1.conj` (with a
-  `sound` case) if the Clifford alphabet grows.
+  (x-mask, z-mask, phase in `Fin 4`, denoting `i^p · Z^z · X^x`), the gate
+  update rules with pointwise soundness (`conjH_sound`, …, `conjCX_sound`),
+  `Tableau.conj` / `tableau` (images of the `2n` generators, `none` outside the
+  fragment or for `CX c c`), `tableauCheck`, `tableau_sound` (equal tableaux
+  give `≡ₛ`, the normal-form shape) and the export
+  `tableauChecker n : ScalarChecker n`; `Tableau.witness` names the first
+  disagreeing generator. The soundness argument is stated on
+  `Tableau.ConjAgree a b` (every generator has the same image), so the chunked
+  form shares it: `Tableau.genAt n g` numbers the `2n` generators on `ℕ`,
+  `tableauCheckGen a b g` checks one, and `tableau_sound_of_allBelow` turns
+  `AllBelow (tableauCheckGen a b) (2 * n)` into `a ≡ₛ b`. The API (`Pauli`,
+  `tableau`, `tableauCheck`, `tableauChecker`, `tableauCheckGen` and the
+  soundness theorems) is at the top of `Quantum.Circuit`; the helpers
+  (`Tableau.phaseVal`, `sign`, `xorMask`, `generators`, `mapOpt`, the commutant
+  argument) are under `Tableau.`, as the phase polynomial's are under
+  `PhasePoly.` and `Lanes.`, so that checker internals do not crowd the
+  library's namespace. Structure-independent, `O(n)` bit operations per gate, no
+  `Zeta8` arithmetic in the kernel; the cost is `2n · gates` steps (per-step
+  figures in `benchmarks/scale/README.md`), and past a few thousand gates the
+  check must be chunked (`scripts/scale_test.py --chunk`). Extend `Gate1.conj`
+  (with a `sound` case) if the Clifford alphabet grows.
 - `CircuitEq/Structural.lean` — the parametric toolkit: fusion,
   commutation, `denote_applyOne_comm_of_not_touches`, `layer`, `hLayer`,
   and the phase gadget: `phaseGadget k i` is `k` rounds of `H S H S H S`
@@ -227,28 +223,27 @@ Rules that follow, for anyone adding to the library:
   positions as `ℕ`; `replay Cs steps c : Option (Circuit n)`, a kernel-friendly
   interpreter that checks each step (`Instr.CanCommute`, `masksDisjoint` on
   supports, `Instr.CanCancel`, or checker `k` of the table `Cs : CheckerTable`
-  on the window's own wires); `replay_sound`; the closing form `replay_sound Cs
-  steps (by decide +kernel)` and the macro `circuit_replay Cs steps`. Generic in
-  the table: it imports no checker, and no checker module imports it. A new
-  proof technique is a new step kind here with its case in `replayStep_sound`;
-  the kernel evaluates `replay` once per proof. The same `Step`s replay up to a
-  global phase: `replayPhase Fs steps c : Option (Fin 8 × Circuit n)` reads a
-  `window` against a `PhaseTable` of `PhaseFinder`s (`windowPhase`), places it
-  syntactically (`placeFront`) and adds the exponent found to an accumulator;
-  every other step is the exact rewrite. `replayPhase_sound : replayPhase Fs
-  steps c = some (k, c') → c ≡ₚ[k] c'`, so the kernel computes the phase of the
-  whole pair; `replayUpToPhase` / `replayUpToPhase_sound` forget it and conclude
-  `c ≡ₚ c'`; the macro `circuit_replay_phase Fs steps`, which closes either
-  goal. `rewriteAt_rel` is `rewriteAt_sound` for any relation that `cons`
-  preserves, and a new step kind needs its case in `replayStepPhase_sound` too.
-  Measured: the phase replay costs 1.2 times the exact one on `Tof3`'s trace (62
-  steps, four windows: 0.19 s against 0.16 s of kernel time, the same whether
-  the phase is named or not), and 128 one-wire phase windows replay in 0.7 s
-  against 0.4 s for 128 exact ones. Measure with `set_option Elab.async false`:
-  with asynchronous elaboration the kernel checks of neighbouring declarations
-  overlap and the profiler's figures grow with position in the file. The scalar
-  replay for `≡ₛ` (so that the tableau can justify a window) is still open
-  (`QUEUE.md` item 13).
+  on the window's own wires); `replay_sound`; the closing form
+  `replay_sound Cs steps (by decide +kernel)` and the macro
+  `circuit_replay Cs steps`. Generic in the table: it imports no checker, and no
+  checker module imports it. A new proof technique is a new step kind here with
+  its case in `replayStep_sound`; the kernel evaluates `replay` once per proof.
+  The same `Step`s replay up to a global phase:
+  `replayPhase Fs steps c : Option (Fin 8 × Circuit n)` reads a `window` against
+  a `PhaseTable` of `PhaseFinder`s (`windowPhase`), places it syntactically
+  (`placeFront`) and adds the exponent found to an accumulator; every other step
+  is the exact rewrite.
+  `replayPhase_sound : replayPhase Fs steps c = some (k, c') → c ≡ₚ[k] c'`, so
+  the kernel computes the phase of the whole pair; `replayUpToPhase` /
+  `replayUpToPhase_sound` forget it and conclude `c ≡ₚ c'`; the macro
+  `circuit_replay_phase Fs steps`, which closes either goal. `rewriteAt_rel` is
+  `rewriteAt_sound` for any relation that `cons` preserves, and a new step kind
+  needs its case in `replayStepPhase_sound` too. The phase replay costs about
+  1.2 times the exact one (`benchmarks/scale/README.md`, "Where each tool
+  stands"). Measure with `set_option Elab.async false`: with asynchronous
+  elaboration the kernel checks of neighbouring declarations overlap and the
+  profiler's figures grow with position in the file. The scalar replay for `≡ₛ`
+  (so that the tableau can justify a window) is still open (`QUEUE.md` item 13).
 - `CircuitEq/Defaults.lean` — the tables the tactics replay under, and the
   one place a checker joins them: `defaultCheckers` (index 0:
   `phasePolyChecker` with `evalChecker` as fallback, so a
@@ -384,6 +379,17 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
 
 ## Conventions
 
+- **Measurements are recorded once.** A kernel time, a memory peak or a
+  scale limit goes, dated and with the command that reproduces it, into
+  `benchmarks/scale/README.md` (the checkers, the evaluator, replay) or the
+  benchmark's own `benchmarks/<name>/README.md`. Every other living document,
+  this file, `README.md`, the Lean docstrings, states the conclusion (linear
+  in gates, bounded by memory at seven qubits) and links there. Two
+  exceptions: `PLAYBOOK.md` and `benchmarks/harness/PLAYBOOK.core.md` are
+  all an agent under test sees, so they carry the numbers they need; when
+  the scale README changes, update them in the same commit. `QUEUE.md`
+  "Done" entries and the dated status paragraphs of `ROADMAP.md` are records
+  of their date and are not rewritten.
 - **Lemmas** `snake_case`, **definitions** `camelCase`, `theorem` for
   results, `lemma` for stepping stones. Docstrings on every declaration.
 - **`decide +kernel`, never bare `decide`, for anything touching `Zeta8`.**
@@ -523,61 +529,25 @@ Do not run `lake build` between diagnostics edits; one build at the end.
 ## Kernel-cost notes
 
 The `Decidable` instances for `≡ᵤ`, `≡ₚ` and `≡ₚ[k]` run `checkEquiv`,
-`checkEquivUpToPhase` and `checkEquivWithPhase` (`Decide.lean`): the
-closure evaluator `evalFn` over `Dyadic8` (`Dyadic.lean`), the gcd-free
-ring `ℤ[ω, 1/√2]`, on
-`ℕ`-indexed states, proved equal to `denote` (`toZeta8_evalFn`). The kernel
-memoises `whnf` by structural term equality, so a depth-`d` decide on `k`
-qubits costs `d · 2^k` memoised gate steps, each a coordinate shuffle or,
-for `H`, four integer sums, plus `4^k` final comparisons; the kernel never
-sees a rational and never walks a list. Never `decide` through `denote`
-directly: its closures are over `Fin`, whose indices carry proof terms that
-defeat the cache, so it re-reads the input `2^d` times.
+`checkEquivUpToPhase` and `checkEquivWithPhase` (`Decide.lean`): the closure
+evaluator `evalFn` over `Dyadic8` (`Dyadic.lean`), the gcd-free ring
+`ℤ[ω, 1/√2]`, on `ℕ`-indexed states, proved equal to `denote`
+(`toZeta8_evalFn`). The kernel memoises `whnf` by structural term equality, so a
+depth-`d` decide on `k` qubits costs `d · 2^k` memoised gate steps, each a
+coordinate shuffle or, for `H`, four integer sums, plus `4^k` final comparisons;
+the kernel never sees a rational and never walks a list. Never `decide` through
+`denote` directly: its closures are over `Fin`, whose indices carry proof terms
+that defeat the cache, so it re-reads the input `2^d` times.
 
-Measured on an Apple M4 (16 GB, shared with other builds), warm oleans,
-kernel type-checking time of the `decide`, before → after: a two-qubit
-five-gate window 0.35 s → 0.02 s; the three-qubit six-gate `Tof3` window
-2.66 s → 0.09 s. Whole files, wall time: `Examples.lean` 2.6 s → 1.2 s and
-`Tof3.lean` 4.2 s → 1.3 s, both now dominated by import time. The
-seven-qubit `SteanePlus` pair decided on the full basis (`original ≡ᵤ
-optimized` by `decide +kernel`, 32 gates × 128 basis states) is not
-measured: it is memory-bound on this 16 GB machine, both before and after.
-With the `Zeta8` `evalList` it did not finish in 15 minutes (71 s of CPU
-against 248 s of system time, 15.8 GB peak footprint; the estimate for its
-compute alone is 2 × 10⁵ Hadamard amplitude updates at some 10³ `Rat`
-operations each, hours of kernel time). With the closure evaluator,
-attempts of 9 and 3 minutes were stopped swap-starved (the 9-minute one
-before reads were forced: 2:22 of CPU, 9.9 GB resident; see `Dyadic.lean`
-on forcing). The expected cost is 5 × 10⁵ memoised gate steps and a cache
-of the order of 10⁷ terms, tens of seconds and a few GB. Measured on an
-idle machine (16 September 2026): a 6 GB watchdog killed the kernel after
-20 s at 6.9 GB resident and still growing, 19 s of CPU. The cache, not the
-arithmetic, is the wall, and chunked evaluation is the lever
-(`CircuitEq/Chunk.lean`): with one basis vector per declaration the same
-pair decides in 78 s at 1.98 GB peak, 0.06 GB above the imports
-(`scripts/chunked_decide.py SteanePlus --chunk 1`, 18 September 2026).
-A basis vector costs about 0.6 s and 165 MB of retained terms here (32
-gates, 128 amplitudes: some 150 µs and 40 KB per amplitude and gate), so
-the cost of a whole-register decide is `gates · 4^n` of those steps: about
-five minutes at eight qubits, over an hour at ten. Two facts that matter
-for every chunked file: memory is returned at a declaration boundary only
-with `set_option Elab.async false` (with asynchronous elaboration on,
-sixteen 4-vector declarations peak at 3.6 GB instead of 2.6 GB, and a
-128-declaration file at 5.2 GB), and `lean -j1` does not help. The same
-retention limits certificate replay (`QUEUE.md`, item 3), where the lever
-is a compact encoding of the instruction list.
-
-Two intermediate designs were measured on the way: the same dyadic
-arithmetic through the materialised list evaluator (`evalListD`, kept as
-the reference form) with the generic per-entry product (`applyOneD`) took
-0.66 s on the three-qubit window and could not do seven qubits either,
-because reading amplitude `x` of a list costs `x` steps and the kernel
-retains every intermediate term (`O(4^k)` per gate, so memory runs out
-before time does); the per-gate shuffles and the memoised closures with
-forced reads bring it to 0.1 s. Depth is now linear: eighteen Hadamards on
-one qubit decide in 42 ms, where the unforced closures did not finish in a
-minute. Memory is the limit before time: the kernel's `whnf` cache retains
-everything evaluated during one declaration.
+A whole-register decide therefore costs `gates · 4^n` memoised amplitude
+steps, about 150 µs and 40 KB each, and the kernel retains all of them until
+the declaration ends: memory runs out before time does, a seven-qubit pair
+needs chunked evaluation (`CircuitEq/Chunk.lean`), eight qubits take minutes
+and ten over an hour. Chunked files need `set_option Elab.async false`, or
+the memory of one declaration is not returned before the next starts
+(`lean -j1` does not help). The measurements behind these figures, and the
+designs measured on the way, are in `benchmarks/scale/README.md`, "The basis
+evaluator".
 
 Kernel facts measured while scaling the fragment checkers
 (`benchmarks/scale/README.md`): a step of structural recursion with a few

@@ -77,6 +77,9 @@ by the repository's CI, and you can check both yourself.
 
 ## The cost model
 
+The figures below are copied from the repository's measurement record
+(`benchmarks/scale/README.md`, not in a run's workspace), Apple M4, 16 GB.
+
 Every leaf of a proof here is a kernel evaluation of a `Bool`: a checker's
 `check`, or the `Decidable` instance of `≡ᵤ` or `≡ₚ`, closed by
 `decide +kernel`. Bare `decide` stalls on the first rational addition.

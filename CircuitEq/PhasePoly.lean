@@ -100,21 +100,16 @@ builds the pair and triple masks of its parity with `maskFold`, which visits
 only the set bits of a sparse parity (`Lanes.sparseFold`: lowest set bit by
 `gcd`, its index by a population count checked on the 1024 powers of two below
 the word width) and tests every index of a dense one (`Lanes.bitFold`), and
-skips a plane it would add nothing to (`Lanes.addOnz`). Measured on an Apple M4
-with cached imports (`benchmarks/scale/README.md`), each pair with a
-gate-deleted mutant refuted: random CNOT-plus-`T` circuits of 200, 400 and 800
-gates on 20, 40 and 80 wires against their PyZX phase-folded forms in 0.2, 0.6
-and 1.9 s of kernel time at 1.9, 2.0 and 2.5 GB peak (the imports alone are 1.8
-GB); networks of CCZ gadgets, every parity of weight at most three, of 3400,
-6800 and 10200 gates on 100, 200 and 300 wires in 2.8, 5.9 and 10.1 s at 2.7,
-3.8 and 5.3 GB. What grows is the triple plane: 164 KB at 200 wires, and the
-kernel copies it at every gate that changes it. Two traps found on the way, both
-about what the kernel retains or re-walks rather than about arithmetic: a row
-table kept as a `List ℕ` cost 1.5 MB of retained terms per CNOT, and a plane
-passed through unchanged *inside* `add` made every later gate re-walk the chain
-of pass-through terms, quadratic time (see `Lanes.addOnz`). Use
-`decide +kernel`; the elaborator's own evaluator (bare `decide`, `rfl`) exhausts
-the default heartbeat limit at about a hundred gates. -/
+skips a plane it would add nothing to (`Lanes.addOnz`). The measured cost, a few
+seconds for thousands of gates on hundreds of wires, is in
+`benchmarks/scale/README.md`. What grows is the triple plane, `C(n, 3)` bits,
+and the kernel copies it at every gate that changes it. Two traps found on the
+way, both about what the kernel retains or re-walks rather than about
+arithmetic: a row table kept as a `List ℕ` cost 1.5 MB of retained terms per
+CNOT, and a plane passed through unchanged *inside* `add` made every later gate
+re-walk the chain of pass-through terms, quadratic time (see `Lanes.addOnz`).
+Use `decide +kernel`; the elaborator's own evaluator (bare `decide`, `rfl`)
+exhausts the default heartbeat limit at about a hundred gates. -/
 
 namespace Quantum.Circuit
 

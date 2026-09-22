@@ -20,8 +20,10 @@ is determined by that conjugation action up to a global scalar, which is why
 the certified relation is `≡ₛ` and not `≡ᵤ`: the tableau never sees the
 scalar, and showing it is a power of `ω` is number theory in `ℤ[ω]` that this
 library does not do. Memory is `2n` strings of `2n` bits, a gate costs `O(n)`
-bit operations, and no object of size `2 ^ n` is ever built, so circuits on
-hundreds of qubits are within reach of the kernel.
+bit operations, and no object of size `2 ^ n` is ever built. In one
+declaration the kernel's cache bounds the check at a few thousand gates;
+chunked, one declaration per range of generators (the last section), circuits
+on hundreds of qubits are within reach.
 
 ## Pauli strings
 
@@ -71,11 +73,13 @@ produces `λ⁻¹`, so `λ` is a unit.
 ## What the kernel runs
 
 `tableauCheck a b` is `Bool` code over `Nat` bit operations, `Fin 4`
-addition and list recursion: `conj` folds a gate update over the circuit
-for each of the `2n` generators, and the two `Option (List Pauli)` results
-are compared by the derived `DecidableEq`. Nothing touches `Zeta8`, so
-`decide +kernel` on the check costs `O(n · gates)` machine-word operations
-and the seven-qubit benchmarks below decide in milliseconds.
+addition and list recursion: `Tableau.conj` folds a gate update over the
+circuit for each of the `2n` generators, and the two `Option (List Pauli)`
+results are compared by the derived `DecidableEq`. Nothing touches `Zeta8`,
+so `decide +kernel` on the check costs `O(n · gates)` machine-word
+operations per generator. `tableauCheckGen a b g` is the same check on
+generator `g` alone, for a proof chunked one range of generators per
+declaration (`tableau_sound_of_allBelow`).
 -/
 
 namespace Quantum.Circuit
@@ -647,9 +651,10 @@ def tableauChecker (n : ℕ) : ScalarChecker n :=
 /-! ### The chunked check
 
 `tableauCheck` conjugates all `2n` generators inside one declaration, and
-the kernel keeps every intermediate Pauli string until it ends: the
-40-qubit rung of the scale test was killed at 6.3 GB. `tableauCheckGen` is
-the check on one generator, numbered on `ℕ` by `genAt`; a file proves it
+the kernel keeps every intermediate Pauli string until it ends, so the
+40-qubit rung of the scale test ran out of memory
+(`benchmarks/scale/README.md`). `tableauCheckGen` is the check on one
+generator, numbered on `ℕ` by `Tableau.genAt`; a file proves it
 on ranges of generators, one declaration per range, and
 `tableau_sound_of_allBelow` assembles them (`CircuitEq.Chunk`). -/
 

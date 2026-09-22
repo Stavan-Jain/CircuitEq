@@ -87,16 +87,14 @@ is a bug in the mirror, never a soundness problem.
 
 ## Kernel cost
 
-A step costs one pass over the prefix before its position plus one over
-the block it crosses, at roughly 20–30 µs per list cell in the kernel
-(structural recursion unfolds through `brecOn`), so a trace of `s` moves on
-a circuit of `m` gates costs `O(s · m)`: about 0.1 s for 50 moves on 64
-gates and 0.5 s for 100 moves on 128 gates, measured. Windows cost their
-checker, `2 ^ k` for the evaluator on `k` wires, and dominate real
-benchmarks. The next lever for long circuits is a `Nat` encoding of the
-instruction list, on which a move is a handful of GMP-accelerated
-bit operations instead of a walk.
--/
+A step costs one pass over the prefix before its position plus one over the
+block it crosses, at roughly 20–30 µs per list cell in the kernel (structural
+recursion unfolds through `brecOn`), so a trace of `s` moves on a circuit of `m`
+gates costs `O(s · m)` (measured in `benchmarks/scale/README.md`, "Where each
+tool stands"). Windows cost their checker, `2 ^ k` for the evaluator on `k`
+wires, and dominate real benchmarks. The next lever for long circuits is a `Nat`
+encoding of the instruction list, on which a move is a handful of
+GMP-accelerated bit operations instead of a walk. -/
 
 namespace Quantum.Circuit
 
