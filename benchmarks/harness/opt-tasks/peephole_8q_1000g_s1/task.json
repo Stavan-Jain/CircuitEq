@@ -62,13 +62,13 @@
       "relation": "p",
       "certified": false,
       "tCount": 109,
-      "note": "PyZX phase teleportation (benchmarks/harness/notes/optimisers.py); equal to the original only up to a global phase, no proof"
+      "note": "PyZX phase teleportation (benchmarks/harness/notes/README.md; now `scripts/circuit_pairs.py probe`); equal to the original only up to a global phase, no proof"
     },
     "pyzx full_reduce": {
       "relation": "p",
       "certified": false,
       "tCount": 101,
-      "note": "PyZX full_reduce + extraction (benchmarks/harness/notes/optimisers.py); equal to the original only up to a global phase, no proof"
+      "note": "PyZX full_reduce + extraction (benchmarks/harness/notes/README.md; now `scripts/circuit_pairs.py probe`); equal to the original only up to a global phase, no proof"
     }
   },
   "holdout": {

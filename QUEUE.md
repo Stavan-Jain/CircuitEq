@@ -10,12 +10,13 @@ are optimising for"); the rules for new modules are in the docstrings of
 
 Sizes: S is a session, M a few sessions, L a milestone.
 
-## In flight (19 September 2026)
+## In flight (22 September 2026)
 
 Item 1, the agent harness: a draft is in `scripts/agent_harness.py` and
-`benchmarks/harness/` with eight development tasks, one held-out pair of
-1000 gates and two TZAP pairs, the prompt, the playbook (`PLAYBOOK.md`)
-and a judge by restatement, axioms and kernel replay. Three runs so far,
+`benchmarks/harness/` with 21 tasks (ten for development, two of them TZAP
+pairs; eleven held out, the 1000-gate pair and ten from the catalogue),
+the prompt, the playbook (`PLAYBOOK.md`) and a judge by restatement,
+axioms and kernel replay. Three runs so far,
 the third proved. The optimisation harness (`scripts/optimizer_harness.py`)
 is built on the same pieces and tested by hand, with no agent run yet. The
 held-out ladder and the baselines landed on 21 September (`720583d` and
@@ -147,8 +148,8 @@ with a summary table, and the record of which declarations a proof uses
 6. **Linear certificates.** Make traces cursor-based (a position carried
    along, not re-indexed into a `List` per step) so replay is linear in
    trace plus circuit length; add a `template` step kind that applies a
-   registered lemma proved for all `n` at a concrete `n`; add the Python
-   mirror `scripts/certificate.py` if the in-flight branch did not.
+   registered lemma proved for all `n` at a concrete `n`, with its case in
+   the Python mirror `scripts/certificate.py`.
    Acceptance: kernel time on `Tof3.lean` alignment linear in gates;
    `layer_cnotNetwork_hLayer` usable as a step. M. Depends on item 3.
 
@@ -194,14 +195,13 @@ with a summary table, and the record of which declarations a proof uses
    its PyZX `full_reduce` twin by the tableau checker (`≡ₛ`), the
    gate-deleted mutants refuted with a Pauli witness, and the table
    published with kernel times: this is Rung 1's acceptance test for that
-   family and Rung 4's first evidence. S to M. Depends on the tableau
-   branch.
+   family and Rung 4's first evidence. S to M. Depends on nothing.
 
 10. **Residual pattern.** Cut points where one circuit's prefix times the
     inverse of the other's is a Clifford (tableau) or a diagonal (phase
     polynomial), proved preserved step by step, as a certificate step kind.
     First target: `tof_3` against `full_reduce` (T-count 15), which has no
-    window alignment. L. Depends on the tableau branch and item 4.
+    window alignment. L. Depends on item 4.
 
 11. **Refutation certificates.** Step kinds that prove `¬ (a ≡ᵤ b)`: a
     basis vector on which the evaluators differ, a Pauli whose images under

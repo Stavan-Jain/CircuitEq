@@ -177,7 +177,7 @@ script's Python mirror answers the same question before Lean runs.
 | Phase polynomial | `≡ᵤ`, and `¬ ≡ᵤ` | 0.2 ms per CNOT; about 1 ms per phase gate on a sparse parity, up to 10 ms on a dense 80-wire one | 80 random qubits, 800 gates in 1.9 s; 300 structured qubits, 10200 gates in 10 s at 5.3 GB; no chunking needed |
 | Tableau, chunked | `≡ₛ` | 0.2 to 0.3 ms per generator and gate | 80 random qubits (8261 gates) in 7 min; 241 structured qubits (2120 gates) in under 3 min |
 | Basis decide, chunked | `≡ᵤ`, `≡ₚ` | 0.6 s and 165 MB per basis vector at 7 qubits, 32 gates | 7 qubits in 78 s; `gates · 4^n` scaling puts 8 qubits at minutes, 10 at hours |
-| Certificate replay | `≡ᵤ` | not rerun here | about 150 gates, bound by replay memory (`QUEUE.md`, item 3) |
+| Certificate replay | `≡ᵤ`, `≡ₚ[k]`, `≡ₚ` | not rerun here | about 150 gates, bound by replay memory (`QUEUE.md`, item 3) |
 
 ## Reproduce
 

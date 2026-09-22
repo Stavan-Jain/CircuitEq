@@ -17,11 +17,12 @@ of the design is to make that agent's job mechanical where it can be
 (structural lemmas that hold for every `n` are the connectives).
 
 **Status: prototype.** Clifford+T only, one and two-qubit gates, some
-twenty worked identities, five original-versus-PyZX benchmark pairs, and
+forty worked identities, five original-versus-PyZX benchmark pairs, and
 certified checkers for the Clifford and the CNOT-plus-diagonal fragments.
-Around the library: a draft agent harness that runs an AI agent on a pair
-and judges its proof (`benchmarks/harness/README.md`; `PLAYBOOK.md` is the
-prover's guide) and a catalogue of 147 real circuits with 390 measured
+Around the library: draft agent harnesses that run an AI agent on a pair,
+or on one circuit to optimise, and judge its proof
+(`benchmarks/harness/README.md`; `PLAYBOOK.md` is the prover's guide) and a
+catalogue of 147 real circuits with 390 measured
 optimiser pairs to run it on (`benchmarks/circuits/README.md`). See
 "Roadmap" for what is missing and `QUEUE.md` for what is next.
 
@@ -281,8 +282,8 @@ CircuitEq/
 ├── Dyadic.lean             ℤ[ω, 1/√2]: the gcd-free ring the kernel computes in
 ├── Chunk.lean              chunked kernel evaluation: one declaration per index range
 ├── Semantics.lean          Instr, Circuit, denote, ≡ᵤ, ≡ₚ, ≡ₚ[k], ≡ₛ, decidability
-├── Checker.lean            the checker contract: check + sound, normal forms
-├── Structural.lean         the parametric toolkit: fusion, commutation, layers
+├── Checker.lean            the checker contract: check + sound, normal forms, PhaseFinder
+├── Structural.lean         the parametric toolkit: fusion, commutation, layers, phaseGadget
 ├── Support.lean            wire sets as Nat bitmasks
 ├── PhasePoly.lean          phase-polynomial normal form, CNOT + diagonal
 ├── Tableau.lean            Clifford tableau checker, soundness to ≡ₛ
@@ -335,18 +336,17 @@ with QECLean's when bumping mathlib, or drop the symlink and use the cache.
 
 ## Roadmap
 
-[`ROADMAP.md`](ROADMAP.md) is the full ladder: twelve rungs from the prototype
+[`ROADMAP.md`](ROADMAP.md) is the full ladder: twelve rungs above the prototype
 to modular arithmetic for Shor for all `n`, each with an acceptance test.
 Scale on real compiled circuits that today's checkers cannot handle is the
 goal; parametric theorems about circuit templates are the method; kernel-level
 trust is the byproduct. Basic equivalence, exact or up to a global phase,
 carries the whole S-critical path; refined relations on ancilla subspaces are
-introduced only when constructions that use ancillas need them. Near term: a
-materialised evaluator so concrete checks scale with depth; a
-conformance-checked OpenQASM generator and the bridge to ℂ; a locality theorem
-and compositional proofs of fixed-size optimiser-output pairs; then the first
-parametric templates, ripple-carry adders and multi-controlled gates for every
-`n`.
+introduced only when constructions that use ancillas need them. Near term:
+measured runs of the agent harnesses, cost functions in Lean, replay memory and
+phase polynomials with Hadamard variables (`QUEUE.md`); a conformance-checked
+OpenQASM generator and the bridge to ℂ; then the first parametric templates,
+ripple-carry adders and multi-controlled gates for every `n`.
 
 ## Trust
 
@@ -390,7 +390,8 @@ provides them, and it is the Lean kernel again, not an independent checker.
 - [QECLean](https://github.com/Stavan-Jain/QECLean): stabilizer-formalism
   library this grew out of; shares the `Quantum` namespace and mathlib pin.
 - [QECUnitaryCircuits](https://github.com/Stavan-Jain/QECUnitaryCircuits):
-  purely unitary Clifford+T QEC circuits in OpenQASM, a future benchmark input.
+  purely unitary Clifford+T QEC circuits in OpenQASM: the source of the
+  `rep3_phaseflip` pair and a family of the circuit catalogue.
 - [qec-lab](https://github.com/Stavan-Jain/qec-lab): research workbench and
   the `docs/mathlib-version-quirks.md` where the quirks above are recorded.
 

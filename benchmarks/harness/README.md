@@ -78,7 +78,8 @@ build mathlib.
 ## One run, step by step
 
 1. Clone the base. Delete what gives answers away: `README.md`,
-   `ROADMAP.md`, `QUEUE.md`, `benchmarks/`, the task's own module under
+   `ROADMAP.md`, `QUEUE.md`, `CLAUDE.md` (replaced by the playbook),
+   `.github/`, `benchmarks/`, the task's own module under
    `CircuitEq/Benchmarks/` with its import and its build products, the window
    table in `scripts/certificate.py`, and the task's own redactions.
 2. Write the harness's files: `Harness/Task.lean` (the two circuits),

@@ -846,7 +846,9 @@ per pair made so far.
   or `unchecked`. `sampled` marks a sparse simulation on sixteen random basis
   inputs (wide registers) instead of full unitaries or random states. The
   task's `relation` is `u` for `exact`, `p` for `phase`, and `u` with
-  `expected: not_equiv` for `different`.
+  `expected: not_equiv` for `different`. Lean names the phase the other way
+  round: `a ≡ₚ[k] b` is `a = ω^k · b`, so `phase (ω^k)` is
+  `original ≡ₚ[-k] optimized`.
 - **Diff raw / canonical**: the share of the original's gates that
   `difflib` matches against the twin, on the lists as they are and after both
   are put in one canonical order under `Instr.CanCommute`.

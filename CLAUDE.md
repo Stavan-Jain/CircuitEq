@@ -78,7 +78,8 @@ Rules that follow, for anyone adding to the library:
   chunk's. Generated files must start with `set_option Elab.async false`,
   or the memory of one declaration is not returned before the next
   starts. Consumers: `equivalent_of_allBelow`,
-  `equivalentUpToPhase_of_allBelow`, `tableau_sound_of_allBelow`.
+  `equivalentUpToPhase_of_allBelow`, `equivalentWithPhase_of_allBelow`,
+  `tableau_sound_of_allBelow`.
 - `CircuitEq/Semantics.lean` — `Instr`, `Circuit n := List (Instr n)`,
   `denote`, `denoteₗ`, `Equivalent` (`≡ᵤ`), `EquivalentUpToPhase` (`≡ₚ`),
   `EquivalentUpToScalar` (`≡ₛ`, up to a unit of `Zeta8`; what a tableau
@@ -145,8 +146,8 @@ Rules that follow, for anyone adding to the library:
   `maskFold`, which visits only the set bits of a sparse parity, lowest
   bit by `gcd`, index by a population count checked on 1024 powers of two,
   and tests every index of a dense one; `Lanes.addOnz` skips a plane with
-  nothing to add). `nf`, `phasePolyNormalForm n`, `phasePolyChecker n` as
-  before; new: `phasePolyRefutes n a b`, whose `true` proves `¬ a ≡ᵤ b`
+  nothing to add). `nf`, `phasePolyNormalForm n`, `phasePolyChecker n`,
+  and `phasePolyRefutes n a b`, whose `true` proves `¬ a ≡ᵤ b`
   (`PhasePoly.complete`: equal unitaries give equal forms), so within the
   fragment `check` is a decision procedure (`phasePolyChecker_check_iff`).
   Cost is linear in the gate count and never `2 ^ n`: the scale test's
@@ -234,7 +235,7 @@ Rules that follow, for anyone adding to the library:
   false`: with asynchronous elaboration the kernel checks of neighbouring
   declarations overlap and the profiler's figures grow with position in
   the file. The scalar replay for `≡ₛ` (so that the tableau can justify a
-  window) is still open (`QUEUE.md`).
+  window) is still open (`QUEUE.md` item 13).
 - `CircuitEq/Tactic.lean` — `circuit_simp` (cancel checked inverse pairs
   through commuting gates, then align two concrete lists gate by gate) and
   `circuit_windows [(a₁, b₁), …]` (the window pattern: each window is
@@ -325,7 +326,14 @@ Rules that follow, for anyone adding to the library:
   **The licence rule:** a pair whose twin comes from a source without a
   clear licence (Nam et al., T-par) lives in the cache only, never in the
   repository. `peephole_pairs.py` draws seeded random pairs equal by the
-  library's own rules. CI runs the scripts' self-tests.
+  library's own rules. CI runs the self-tests of `circuit_sources.py`,
+  `circuit_pairs.py` and both harnesses.
+- `scripts/certificate.py` — the Python mirror of the certificate language
+  (`replay`, `replay_phase`, `align`, `fmt_certificate`), so a search
+  outside Lean emits traces `replay` accepts; `--phase` certifies up to a
+  phase and names it, `--theorem` prints the Lean. `scripts/tcount_survey.py`
+  — the T-count survey (`benchmarks/survey/`), its diff-based alignment
+  search and a numpy comparison of unitaries.
 - `scripts/AxiomCheck.lean` — CI axiom policy; not in any `lean_lib`.
 - `scripts/check_debug_options.py`, `scripts/SkipKernelTCFixture.lean`,
   `scripts/check_replay_fixture.sh` — the kernel-replay policy's text guard
@@ -481,9 +489,10 @@ Do not run `lake build` between diagnostics edits; one build at the end.
 
 ## Kernel-cost notes
 
-The `Decidable` instances for `≡ᵤ` and `≡ₚ` run `checkEquiv` and
-`checkEquivUpToPhase` (`Semantics.lean`): the closure evaluator `evalFn`
-over `Dyadic8` (`Dyadic.lean`), the gcd-free ring `ℤ[ω, 1/√2]`, on
+The `Decidable` instances for `≡ᵤ`, `≡ₚ` and `≡ₚ[k]` run `checkEquiv`,
+`checkEquivUpToPhase` and `checkEquivWithPhase` (`Semantics.lean`): the
+closure evaluator `evalFn` over `Dyadic8` (`Dyadic.lean`), the gcd-free
+ring `ℤ[ω, 1/√2]`, on
 `ℕ`-indexed states, proved equal to `denote` (`toZeta8_evalFn`). The kernel
 memoises `whnf` by structural term equality, so a depth-`d` decide on `k`
 qubits costs `d · 2^k` memoised gate steps, each a coordinate shuffle or,

@@ -4,7 +4,7 @@ The prover's guide to this library: what exists, what it costs, and in which
 order to try it on a concrete pair. `CLAUDE.md` is for people who extend the
 library; this file is for whoever has two circuits and wants a proof. The
 agent harness (`scripts/agent_harness.py`) installs it as the `CLAUDE.md` of
-every run, so it is the agent's only description of the library. It is
+every `full` run, so it is the agent's only description of the library. It is
 versioned with the library: when a checker, a tactic, a certificate step or
 a block theorem lands, update the decision list below in the same commit.
 
@@ -23,13 +23,14 @@ phase-polynomial fold and the kernel replay in the trust policy).
   `Circuit 5`, `[H 0, CX 0 1, T 1]` and the notation below resolve. Ascribe
   one side of a literal equivalence, `([H 0, H 0] : Circuit 1) ≡ᵤ []`: the
   qubit count is not inferable from the list.
-- Three relations, in `CircuitEq/Semantics.lean`:
+- Four relations, in `CircuitEq/Semantics.lean`:
   - `a ≡ᵤ b` (`Equivalent`): `∀ ψ, denote a ψ = denote b ψ`. It has
     `refl`, `symm`, `trans`, `append`, `cons`, and `calc` works.
   - `a ≡ₚ b` (`EquivalentUpToPhase`): equal up to a power of `ω = e^{iπ/4}`.
-    It has everything `≡ᵤ` has: `refl`, `symm`, `trans`, `append`, `cons`,
-    `in_context`, `rename`, and `calc` mixes `≡ᵤ` and `≡ₚ` steps in any
-    order. `h.toUpToPhase` weakens `≡ᵤ` to it.
+    It has everything `≡ᵤ` has: `refl`, `symm`, `trans`, `append`, `cons`
+    (and `in_context` in `Rewriting.lean`, `rename` in `Embedding.lean`),
+    and `calc` mixes `≡ᵤ` and `≡ₚ` steps in any order. `h.toUpToPhase`
+    weakens `≡ᵤ` to it.
   - `a ≡ₚ[k] b` (`EquivalentWithPhase`, `k : Fin 8`): the same with the
     phase named, `a = ω^k · b`; `≡ₚ` is `∃ k` of it. Named phases add
     (`h₁.append h₂ : … ≡ₚ[j + k] …`), `h.cast (by decide)` restates an
@@ -100,7 +101,8 @@ Every leaf of a proof here is a kernel evaluation of a `Bool`: a checker's
   basis decide, tableau ranges, or one `circuit_windows` lemma per segment of
   a long pair. Without it the memory of one declaration is not returned
   before the next starts, and the file's peak is the sum, not the maximum
-  (sixteen declarations of 2.6 GB peaked at 3.6 GB with it on). Splitting
+  (sixteen declarations peaked at 3.6 GB with asynchronous elaboration
+  on, 2.6 GB with it off). Splitting
   into several modules bounds it further.
 - **Loading the imports costs 1.7 s and 1.8 GB** before any proof runs, so
   that much of a memory limit is already spent.
@@ -162,7 +164,7 @@ Look at the two gate sets first, then take the first entry that applies.
    turns `AllBelow (tableauCheckGen a b) (2 * n)` into `a ≡ₛ b`, with the
    ranges proved as in entry 1 (four to sixteen generators per theorem).
    The tableau is sound and not proved complete: `tableauCheck a b = false`
-   or a failing generator is not a refutation, though `Tableau.witness a b`
+   or a failing generator is not a refutation, though `witness a b`
    names the first Pauli generator whose images differ, which tells you
    where to look. For exact `≡ᵤ` of a Clifford pair use the entries below.
 4. **The same gates reordered, or pairs that cancel.** `by circuit_simp`. It
@@ -238,10 +240,11 @@ Look at the two gate sets first, then take the first entry that applies.
 8. **A pair equal only up to a global phase.** PyZX and TZAP drop
    scalars, so if `a ≡ᵤ b` is refuted, try `a ≡ₚ b` before suspecting the
    alignment. State the goal on `≡ₚ` and use exactly the tools you would for
-   `≡ᵤ`: `circuit_simp` and `circuit_windows [(a₁, b₁), …]` accept `≡ₚ` and
-   `≡ₚ[k]` goals unchanged. Each window may then hold only up to a phase of
-   its own (`Z X` against `X Z` is `ω⁴`), found on its own wires at cost
-   `2^k`, and every other move stays exact.
+   `≡ᵤ`: `circuit_windows [(a₁, b₁), …]` accepts `≡ₚ` and `≡ₚ[k]` goals
+   unchanged, and `circuit_simp`, whose moves are all exact, accepts `≡ₚ`
+   and `≡ₚ[0]`. Each window may then hold only up to a phase of its own
+   (`Z X` against `X Z` is `ω⁴`), found on its own wires at cost `2^k`, and
+   every other move stays exact.
    - To name the phase, state `a ≡ₚ[k] b`. If `k` is wrong the error names
      the right one, so guessing `0` is a fine way to find it.
    - Prove a long circuit segment by segment, one declaration each, and
@@ -306,8 +309,10 @@ cheap one.
 - `set_option trace.circuit.certificate true in` before a theorem prints
   the certificate a tactic found, in the syntax `circuit_replay` accepts.
 - `scripts/certificate.py` is a pure-Python mirror of the certificate
-  language (`align`, `replay`, `replay_phase`, `fmt_certificate`), for
-  searching outside Lean; `--phase` certifies up to a phase and names it.
+  language (`align`, `replay`, `fmt_certificate`, and
+  `replay_phase(default_phase_finders(…), steps, c)`, which returns the
+  phase with the result), for searching outside Lean. Its command line
+  covers only the repository's own benchmarks; import it for your pair.
 - `scripts/chunks.py` (no dependencies) writes a chunked check:
 
   ```python
@@ -346,9 +351,10 @@ proved one index range per declaration), `Semantics` (`Instr`, `Circuit`,
 decidability, `checkEquivAt`, `findPhase`), `Checker` (the `check` + `sound`
 contract, `PhaseFinder`), `Structural` (fusion, commutation, layers,
 `phaseGadget`), `Support` (wire sets as bitmasks), `PhasePoly`, `Tableau`,
-`Rewriting`, `Layers`, `Certificate` (`Step`, `replay`, `replay_sound`,
-`circuit_replay`; `replayPhase_sound`, `circuit_replay_phase`), `Tactic`,
-`Embedding`, `Examples` (worked identities, the quickest way to see each tool
+`Rewriting`, `Layers`, `Embedding` (`rename`, the locality theorem),
+`Certificate` (`Step`, `replay`, `replay_sound`, `circuit_replay`;
+`replayPhase_sound`, `circuit_replay_phase`), `Tactic`, `Examples` (worked
+identities, the quickest way to see each tool
 used), and `Benchmarks/` (whole pairs proved with the patterns above).
 
 ## Conventions that bite

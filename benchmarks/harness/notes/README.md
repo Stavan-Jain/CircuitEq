@@ -51,9 +51,11 @@ peephole pair. "Longest" counts the gates of both sides.
 
 - Every real optimiser's output is equal to the original only **up to a
   global phase** (for TZAP `-O1` the original is `ω¹` times the output).
-  The library cannot compose proofs of `≡ₚ` yet, so none of these pairs can
-  be stated piece by piece today. Since `(SH)³ = ω·I`, a Clifford gadget on
-  one wire would turn any of them into an exact pair at no T-cost.
+  When this was measured (library `a9a80ed`) the library could not compose
+  proofs of `≡ₚ`; from `83cc1d7` it can (`PLAYBOOK.md`, entry 8), and since
+  `(SH)³ = ω·I`, `equivalentWithPhase_iff_phaseGadget` turns any of these
+  pairs into an exact one against `optimized ++ phaseGadget k i` at no
+  T-cost.
 - TZAP at its lightest level is the next rung after our peephole pass: it
   keeps the skeleton (570 of 1000 gates match), but its merges act on
   parities across CNOTs, so the pair cuts into 118 segments of which five
@@ -71,7 +73,7 @@ peephole pair. "Longest" counts the gates of both sides.
 | circuit | T-count | PyZX teleport | PyZX full_reduce | TZAP (any level) | TZAP output |
 |---|---|---|---|---|---|
 | `tof_3` (45 gates) | 21 | 19 | 15 | 15 | exact, 38 gates at `-O2` |
-| `barenco_tof_3` (60 gates) | 28 | 24 | n/a | 16 | exact, 42 gates at `-Osuper` |
+| `barenco_tof_3` (60 gates) | 28 | 24 | 16 | 16 | exact, 42 gates at `-Osuper` |
 
 Here TZAP's output is exactly equal, and at five qubits the pairs are within
 reach of the whole-register basis decide. Both are harness tasks

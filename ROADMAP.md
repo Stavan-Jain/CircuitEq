@@ -183,10 +183,11 @@ two independent reasons.
   rather than assumed: the harness runs one prompt under one set of limits
   against the library as it grows, and against the trusted modules alone.
 - **Checking proofs.** This reason does not go away with a better agent.
-  The kernel cannot finish a seven-qubit basis check in 6 GB, and a proof
-  term assembled gate by gate is quadratic, so any agent, however capable,
-  has to route a large concrete proof through reflection: a computable
-  structure, a soundness theorem, one kernel evaluation. The library
+  The kernel cannot finish a seven-qubit basis check as one declaration in
+  6 GB (chunked, it takes 78 s and 2 GB, and grows as `gates · 4^n`), and
+  a proof term assembled gate by gate is quadratic, so any agent, however
+  capable, has to route a large concrete proof through reflection: a
+  computable structure, a soundness theorem, one kernel evaluation. The library
   amortises what every agent would otherwise rebuild. This is why, for
   concrete circuits, the supported path is a certificate, data replayed by
   `replay_sound`, and the agent's freedom is spent on finding the structure
@@ -195,13 +196,13 @@ two independent reasons.
   certificate.
 
 Where the infrastructure stands against that problem statement
-(18 September 2026), so that nobody over-reads it:
+(18 September 2026, updated 22 September), so that nobody over-reads it:
 
 - **Three relations exist, not two.** The tableau certifies `≡ₛ`, equality
   up to a unit of `Zeta8`. `Zeta8` is a field, so that is any nonzero
   scalar, and it is weaker than `≡ₚ` until the scalar of a Clifford pair is
   proved to be a power of `ω` (open, Rung 4). Certificates and
-  `circuit_windows` state `≡ᵤ`, `≡ₚ` and `≡ₚ[k]` (since 22 September 2026),
+  `circuit_windows` state `≡ᵤ`, `≡ₚ` and `≡ₚ[k]` (since `83cc1d7`),
   so a pair equal only up to a global phase is proved window by window; the
   tableau cannot justify such a window until the `≡ₛ` half of the scalar
   replay (`QUEUE.md`, item 13) and `≡ₛ → ≡ₚ` for Clifford circuits land.
@@ -294,16 +295,18 @@ registering it or by composing around the certificate. The P method stays
 the way to reach large `n`; certificates are how its instances and the
 concrete leftovers get checked.
 
-Where this stands (16 September 2026): the certificate language exists
+Where this stands (22 September 2026): the certificate language exists
 (`CircuitEq/Certificate.lean`: `Step`, `replay`, `replay_sound`, a checker
-table), and `circuit_windows` and `circuit_simp` emit its traces and close
-goals with one `replay_sound`. Two fragment checkers are behind it, the
-phase polynomial (`PhasePoly.lean`, `≡ᵤ`) and the Clifford tableau
-(`Tableau.lean`, `≡ₛ`), the basis evaluator runs on the gcd-free ring
-(`Dyadic.lean`), and a Python mirror of the language exists. What is
-missing is in `QUEUE.md`: the agent harness, without which the bet on the
-agent is unmeasured, cost functions in Lean, the scalar variant of replay
-so tableau windows and residuals compose, Hadamard variables in the phase
+table, and `replayPhase` / `replayPhase_sound`, which read the same steps up
+to a global phase and name it), and `circuit_windows` and `circuit_simp` emit
+its traces and close `≡ᵤ`, `≡ₚ` and `≡ₚ[k]` goals with one replay. Two
+fragment checkers are behind it, the phase polynomial (`PhasePoly.lean`,
+`≡ᵤ`) and the Clifford tableau (`Tableau.lean`, `≡ₛ`), the basis evaluator
+runs on the gcd-free ring (`Dyadic.lean`), and a Python mirror of the
+language exists. The agent harnesses exist as drafts with one proved run
+(`benchmarks/harness/`). What is missing is in `QUEUE.md`: repeated
+harness runs, cost functions in Lean, the `≡ₛ` half of the scalar replay so
+tableau windows and residuals compose, Hadamard variables in the phase
 polynomial, and the template step for registered parametric lemmas.
 
 ## The ladder
@@ -328,9 +331,11 @@ form. A three-qubit six-gate window went from 3 s to 0.09 s and depth is
 linear. The seven-qubit `SteanePlus` basis decide is memory-bound: on an
 idle 16 GB machine a 6 GB watchdog killed it after 20 s at 6.9 GB resident
 and still growing (the kernel's `whnf` cache retains everything evaluated
-in one declaration), so the 10–12-qubit acceptance below is not reached
-by evaluation until evaluation is chunked, and for the Clifford benchmark
-family the route is the tableau of Rung 4 instead. `swapNetwork`, mutants and the
+in one declaration). Chunked evaluation (`CircuitEq/Chunk.lean`, one basis
+vector per declaration) now decides it in 78 s at 1.98 GB; the cost grows
+as `gates · 4^n`, so the 10–12-qubit acceptance below is still hours by
+evaluation, and for the Clifford benchmark family the route is the tableau
+of Rung 4 instead. `swapNetwork`, mutants and the
 Qiskit-routed pairs have not been attempted.
 
 **Goal.** Decide `≡ᵤ` and `≡ₚ` for concrete Clifford+T circuits of the size
@@ -400,11 +405,11 @@ script found unaided), `cuccaro_4` is memory-bound in the replay of a
 155-gate certificate, and `tof_5` finds no alignment within eight wires
 because a `CZ` commuted through control-only blocks is not a gate-by-gate
 move. Re-synthesised output never aligns except as a whole-register decide
-(`mod5_4`, `random_4q`), which proves the pair but says nothing about
-locality. Three random pairs are equal only up to a global phase, which
-`circuit_windows` could not state at the time; it now accepts `≡ₚ` and
-`≡ₚ[k]` goals, with windows that hold up to a phase of their own, though
-those three pairs have no alignment either way. The decisive observation
+(`mod5_4`, `random_4q`, `cuccaro_2`), which proves the pair but says
+nothing about locality. Three random pairs are equal only up to a global
+phase, which `circuit_windows` could not state at the time; it now accepts
+`≡ₚ` and `≡ₚ[k]` goals, with windows that hold up to a phase of their own,
+though those three pairs have no alignment either way. The decisive observation
 for what comes next: every wide window of the structured pairs is one or two
 CNOT-plus-diagonal segments around a single interior Hadamard, each an
 equivalence on its own, so with the phase-polynomial checker as the leaf and
@@ -476,7 +481,7 @@ most interesting open question in the project.
 ### Rung 4 — A complete, certified Clifford decision procedure
 
 **Status (16 September 2026).** The tableau is in: `CircuitEq/Tableau.lean`
-conjugates the `2n` Pauli generators (x-mask, z-mask, phase in `ZMod 4`)
+conjugates the `2n` Pauli generators (x-mask, z-mask, phase in `Fin 4`)
 through `H, X, Y, Z, S, S†, CX` with `O(n)` bit operations per gate, and
 `tableau_sound` proves equal tableaux give `≡ₛ` by the commutant argument
 on state vectors, with a `witness` function naming the first disagreeing
@@ -707,8 +712,8 @@ checking at every `n`; the advantage there is T, not S.
   kernel evaluates; measured on every rung.
 - **Certificates.** Every proof technique lands as a step kind in the
   certificate language with a checker behind it, plus a Python mirror of the
-  step so search can run outside Lean. The tactic-built proof terms of
-  `CircuitEq/Tactic.lean` are the interim form.
+  step so search can run outside Lean. The tactics of `CircuitEq/Tactic.lean`
+  already search in meta code and emit certificate traces.
 - **Trust, proportionate.** Semantics reviewed by hand and pinned by identity
   lemmas; the evaluator proved, not tested; the generator conformance-checked
   against Qiskit in CI; the axiom policy in CI, and with it the kernel replay
