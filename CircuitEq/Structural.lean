@@ -21,7 +21,11 @@ matrix facts decided by the kernel:
 - **moving** (`denote_applyOne_comm_of_not_touches`): a single-qubit gate
   moves past any circuit that never touches its qubit;
 - **layers** (`layer_layer_cancel`, `hLayer_hLayer`): a layer of an
-  involutive gate on distinct qubits cancels against itself, for every `n`.
+  involutive gate on distinct qubits cancels against itself, for every `n`;
+- **the phase gadget** (`phaseGadget`, `denote_phaseGadget`,
+  `equivalentWithPhase_iff_phaseGadget`): a Clifford circuit on one wire
+  that denotes the scalar `ω ^ k`, which turns `a ≡ₚ[k] b` into the exact
+  `a ≡ᵤ b ++ phaseGadget k i`.
 
 This is the vocabulary a proof-search agent is meant to speak; `decide` is
 the leaf oracle, these lemmas are the connectives.
@@ -234,5 +238,68 @@ theorem denote_denote_inverse (c : Circuit n) (h : ∀ a b, Instr.cnot a b ∈ c
     (ψ : Vec n) : denote c (denote (inverse c) ψ) = ψ := by
   have := denote_inverse_denote (inverse c) (fun a b hm => h a b (cnot_mem_of_mem_inverse hm)) ψ
   rwa [inverse_inverse] at this
+
+/-! ### The phase gadget
+
+A global phase is not a gate of the alphabet, but the Clifford group
+contains it: `(S H)³ = ω` (`Gate1.S_mul_H_pow_three`), so the six gates
+`H S H S H S` on any one wire denote the scalar `ω`, and `phaseGadget k i`,
+`k` rounds of them, denotes `ω ^ k`. Appending it turns equivalence with a
+named phase into exact equivalence (`equivalentWithPhase_iff_phaseGadget`).
+So a pair that an optimiser preserved only up to a global phase can be
+normalised to an exact one at no `T`-cost, after which everything stated on
+`≡ᵤ` applies to it. -/
+
+/-- `k` rounds of `H S H S H S` on wire `i`: a Clifford circuit of `6 k`
+gates, none of them a `T`, that denotes the scalar `ω ^ k`. -/
+def phaseGadget : ℕ → Fin n → Circuit n
+  | 0, _ => []
+  | k + 1, i =>
+    .one .H i :: .one .S i :: .one .H i :: .one .S i :: .one .H i :: .one .S i :: phaseGadget k i
+
+/-- No rounds, no gates. -/
+@[simp] lemma phaseGadget_zero (i : Fin n) : phaseGadget 0 i = [] := rfl
+
+/-- The phase gadget denotes the scalar `ω ^ k`, on every register and
+every wire. -/
+theorem denote_phaseGadget (k : ℕ) (i : Fin n) (ψ : Vec n) :
+    denote (phaseGadget k i) ψ = Zeta8.ω ^ k • ψ := by
+  induction k generalizing ψ with
+  | zero => simp
+  | succ k ih =>
+    simp only [phaseGadget, denote_cons, Instr.apply_one, applyOne_applyOne_same,
+      Gate1.S_mul_H_pow_three, applyOne_smul_one, ih]
+    rw [smul_smul, pow_succ]
+
+/-- A scalar commutes with every circuit: the gadget may sit anywhere. -/
+theorem phaseGadget_comm (k : ℕ) (i : Fin n) (c : Circuit n) :
+    phaseGadget k i ++ c ≡ᵤ c ++ phaseGadget k i := fun ψ => by
+  simp only [denote_append, denote_phaseGadget, denote_smul]
+
+/-- The gadget does not depend on its wire. -/
+theorem phaseGadget_wire (k : ℕ) (i j : Fin n) : phaseGadget k i ≡ᵤ phaseGadget k j :=
+  fun ψ => by rw [denote_phaseGadget, denote_phaseGadget]
+
+/-- Eight rounds are the identity: `ω ^ 8 = 1`. -/
+theorem phaseGadget_eight (i : Fin n) : phaseGadget 8 i ≡ᵤ [] := fun ψ => by
+  rw [denote_phaseGadget, Zeta8.ω_pow_eight, one_smul, denote_nil]
+
+/-- The gadget is the empty circuit with the phase `ω ^ k`. -/
+theorem phaseGadget_equivalentWithPhase (k : Fin 8) (i : Fin n) : phaseGadget k i ≡ₚ[k] [] :=
+  fun ψ => by rw [denote_phaseGadget, denote_nil]
+
+/-- Appending the phase gadget makes a named phase exact: `a` is `ω ^ k`
+times `b` iff `a` is exactly `b` followed by `k` rounds of the gadget, on
+any wire. -/
+theorem equivalentWithPhase_iff_phaseGadget (k : Fin 8) (i : Fin n) (a b : Circuit n) :
+    a ≡ₚ[k] b ↔ a ≡ᵤ b ++ phaseGadget k i := by
+  simp only [EquivalentWithPhase, Equivalent, denote_append, denote_phaseGadget]
+
+/-- The bridge between `≡ₚ` and `≡ᵤ` on a register with at least one wire:
+equal up to a global phase iff exactly equal after some rounds of the
+gadget. -/
+theorem equivalentUpToPhase_iff_phaseGadget (i : Fin n) (a b : Circuit n) :
+    a ≡ₚ b ↔ ∃ k : Fin 8, a ≡ᵤ b ++ phaseGadget k i :=
+  exists_congr fun k => equivalentWithPhase_iff_phaseGadget k i a b
 
 end Quantum.Circuit

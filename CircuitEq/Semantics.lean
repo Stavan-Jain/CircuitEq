@@ -26,6 +26,13 @@ concrete equivalences and non-equivalences close by `decide +kernel`.
 
 `c₁ ≡ₚ c₂` (`EquivalentUpToPhase`) allows a global phase, which for
 Clifford+T is one of the eight powers of `ω`, so it is decidable the same way.
+`c₁ ≡ₚ[k] c₂` (`EquivalentWithPhase`) names the phase, `ω ^ k` with
+`k : Fin 8`, and `≡ₚ` is `∃ k`, by definition. Optimisers preserve a circuit
+only up to a global phase, so both compose as `≡ᵤ` does: `refl`, `symm`,
+`trans`, `append`, `cons`, and `Trans` instances that let one `calc` mix all
+three relations. In the named form the exponents add, in `Fin 8` and hence
+modulo eight, and `checkEquivWithPhase` decides it for one phase, so a
+window is decided with its phase named.
 
 The instances evaluate through `evalFn`, a closure evaluator over the
 gcd-free coefficients `Dyadic8` (`CircuitEq.Dyadic`) on `ℕ`-indexed states,
@@ -161,6 +168,16 @@ def EquivalentUpToPhase (c₁ c₂ : Circuit n) : Prop :=
 
 @[inherit_doc] scoped infix:50 " ≡ₚ " => EquivalentUpToPhase
 
+/-- Equivalence with a *named* global phase: as operators, `c₁` is `ω ^ k`
+times `c₂`. `c₁ ≡ₚ c₂` is `∃ k, c₁ ≡ₚ[k] c₂` by definition
+(`equivalentUpToPhase_iff_exists`). This is the form in which phases
+compose: the exponents add in `Fin 8`, that is, modulo eight, which is how
+`ω` behaves (`Zeta8.ω_pow_val_add`). -/
+def EquivalentWithPhase (k : Fin 8) (c₁ c₂ : Circuit n) : Prop :=
+  ∀ ψ : Vec n, denote c₁ ψ = Zeta8.ω ^ (k : ℕ) • denote c₂ ψ
+
+@[inherit_doc] scoped notation:50 c₁:51 " ≡ₚ[" k "] " c₂:51 => EquivalentWithPhase k c₁ c₂
+
 /-- Equivalence up to a global scalar that is a unit of the coefficient
 ring. For unitaries the scalar has modulus one, and for Clifford+T it is a
 power of `ω`, but that is a theorem about the ring rather than part of the
@@ -203,12 +220,122 @@ lemma toUpToPhase {c₁ c₂ : Circuit n} (h : c₁ ≡ᵤ c₂) : c₁ ≡ₚ c
 lemma toUpToScalar {c₁ c₂ : Circuit n} (h : c₁ ≡ᵤ c₂) : c₁ ≡ₛ c₂ :=
   ⟨1, isUnit_one, fun ψ => by simp [h ψ]⟩
 
+/-- Exact equivalence is equivalence with the phase `ω ^ 0 = 1`. -/
+lemma toWithPhase {c₁ c₂ : Circuit n} (h : c₁ ≡ᵤ c₂) : c₁ ≡ₚ[0] c₂ :=
+  fun ψ => by simp [h ψ]
+
+/-- An exact step before a step with a named phase keeps the phase. -/
+lemma trans_withPhase {k : Fin 8} {c₁ c₂ c₃ : Circuit n} (h₁ : c₁ ≡ᵤ c₂) (h₂ : c₂ ≡ₚ[k] c₃) :
+    c₁ ≡ₚ[k] c₃ :=
+  fun ψ => (h₁ ψ).trans (h₂ ψ)
+
 end Equivalent
 
+/-- `≡ₚ` says that some phase can be named. -/
+theorem equivalentUpToPhase_iff_exists {c₁ c₂ : Circuit n} : c₁ ≡ₚ c₂ ↔ ∃ k, c₁ ≡ₚ[k] c₂ :=
+  Iff.rfl
+
+/-- The phase `ω ^ 0 = 1` is exact equivalence. -/
+theorem equivalentWithPhase_zero_iff {c₁ c₂ : Circuit n} : c₁ ≡ₚ[0] c₂ ↔ c₁ ≡ᵤ c₂ :=
+  ⟨fun h ψ => by simpa using h ψ, Equivalent.toWithPhase⟩
+
+/-! ### The algebra of named phases
+
+Along a chain and along a sequential composition the phases multiply, so
+their exponents add in `Fin 8`; reversing a relation negates the exponent.
+Every lemma about `≡ₚ` below is one of these with the exponent forgotten. -/
+
+namespace EquivalentWithPhase
+
+variable {j k : Fin 8}
+
+/-- Every circuit is itself, with the phase `ω ^ 0 = 1`. -/
+protected lemma refl (c : Circuit n) : c ≡ₚ[0] c := (Equivalent.refl c).toWithPhase
+
+/-- Reversing the relation inverts the phase: `-k` in `Fin 8` is `8 - k`. -/
+protected lemma symm {c₁ c₂ : Circuit n} (h : c₁ ≡ₚ[k] c₂) : c₂ ≡ₚ[-k] c₁ := fun ψ => by
+  rw [h ψ, smul_smul, Zeta8.ω_pow_val_neg_mul, one_smul]
+
+/-- Along a chain the phases multiply: the exponents add modulo eight. -/
+protected lemma trans {c₁ c₂ c₃ : Circuit n} (h₁ : c₁ ≡ₚ[j] c₂) (h₂ : c₂ ≡ₚ[k] c₃) :
+    c₁ ≡ₚ[j + k] c₃ := fun ψ => by
+  rw [h₁ ψ, h₂ ψ, smul_smul, Zeta8.ω_pow_val_add]
+
+/-- An exact step after a step with a named phase keeps the phase. -/
+lemma trans_equivalent {c₁ c₂ c₃ : Circuit n} (h₁ : c₁ ≡ₚ[k] c₂) (h₂ : c₂ ≡ᵤ c₃) :
+    c₁ ≡ₚ[k] c₃ := fun ψ => by
+  rw [h₁ ψ, h₂ ψ]
+
+/-- Sequential composition multiplies the phases: a scalar passes through
+the second circuit by linearity. -/
+protected lemma append {c₁ c₁' c₂ c₂' : Circuit n} (h₁ : c₁ ≡ₚ[j] c₁') (h₂ : c₂ ≡ₚ[k] c₂') :
+    c₁ ++ c₂ ≡ₚ[j + k] c₁' ++ c₂' := fun ψ => by
+  rw [denote_append, denote_append, h₁ ψ, denote_smul, h₂, smul_smul, Zeta8.ω_pow_val_add]
+
+/-- The same circuit appended to both sides keeps the phase. -/
+lemma append_right {c₁ c₁' : Circuit n} (h : c₁ ≡ₚ[k] c₁') (c : Circuit n) :
+    c₁ ++ c ≡ₚ[k] c₁' ++ c := fun ψ => by
+  rw [denote_append, denote_append, h ψ, denote_smul]
+
+/-- The same circuit prepended to both sides keeps the phase. -/
+lemma append_left (c : Circuit n) {c₂ c₂' : Circuit n} (h : c₂ ≡ₚ[k] c₂') :
+    c ++ c₂ ≡ₚ[k] c ++ c₂' := fun ψ => by
+  rw [denote_append, denote_append, h]
+
+/-- Prepending the same instruction keeps the phase. -/
+protected lemma cons (g : Instr n) {c c' : Circuit n} (h : c ≡ₚ[k] c') : g :: c ≡ₚ[k] g :: c' :=
+  fun ψ => h (g.apply ψ)
+
+/-- Restate the phase: for an exponent that arithmetic produced, such as
+`3 + 7`, `h.cast (by decide)` names it `2`. -/
+protected lemma cast {c₁ c₂ : Circuit n} (h : c₁ ≡ₚ[j] c₂) (hjk : j = k) : c₁ ≡ₚ[k] c₂ :=
+  hjk ▸ h
+
+/-- A named phase is a phase. -/
+lemma toUpToPhase {c₁ c₂ : Circuit n} (h : c₁ ≡ₚ[k] c₂) : c₁ ≡ₚ c₂ := ⟨k, h⟩
+
+/-- The phase `ω ^ 0 = 1` is exact equivalence. -/
+lemma toEquivalent {c₁ c₂ : Circuit n} (h : c₁ ≡ₚ[0] c₂) : c₁ ≡ᵤ c₂ :=
+  equivalentWithPhase_zero_iff.1 h
+
+end EquivalentWithPhase
+
+namespace EquivalentUpToPhase
+
+/-- Reflexivity, with the phase `1`. -/
+@[refl] protected lemma refl (c : Circuit n) : c ≡ₚ c := ⟨0, EquivalentWithPhase.refl c⟩
+
+/-- Symmetry, with the inverse phase. -/
+@[symm] protected lemma symm {c₁ c₂ : Circuit n} (h : c₁ ≡ₚ c₂) : c₂ ≡ₚ c₁ := by
+  obtain ⟨k, (hk : c₁ ≡ₚ[k] c₂)⟩ := h
+  exact ⟨-k, hk.symm⟩
+
+/-- Transitivity: the phases multiply. -/
+@[trans] protected lemma trans {c₁ c₂ c₃ : Circuit n} (h₁ : c₁ ≡ₚ c₂) (h₂ : c₂ ≡ₚ c₃) :
+    c₁ ≡ₚ c₃ := by
+  obtain ⟨j, (hj : c₁ ≡ₚ[j] c₂)⟩ := h₁
+  obtain ⟨k, (hk : c₂ ≡ₚ[k] c₃)⟩ := h₂
+  exact ⟨j + k, hj.trans hk⟩
+
+/-- Equivalence up to phase is a congruence for sequential composition: the
+phases of the two halves multiply. -/
+protected lemma append {c₁ c₁' c₂ c₂' : Circuit n} (h₁ : c₁ ≡ₚ c₁') (h₂ : c₂ ≡ₚ c₂') :
+    c₁ ++ c₂ ≡ₚ c₁' ++ c₂' := by
+  obtain ⟨j, (hj : c₁ ≡ₚ[j] c₁')⟩ := h₁
+  obtain ⟨k, (hk : c₂ ≡ₚ[k] c₂')⟩ := h₂
+  exact ⟨j + k, hj.append hk⟩
+
+/-- Prepending the same instruction preserves equivalence up to phase. -/
+protected lemma cons (g : Instr n) {c c' : Circuit n} (h : c ≡ₚ c') : g :: c ≡ₚ g :: c' := by
+  obtain ⟨k, (hk : c ≡ₚ[k] c')⟩ := h
+  exact ⟨k, hk.cons g⟩
+
 /-- A phase is a unit scalar. -/
-lemma EquivalentUpToPhase.toUpToScalar {c₁ c₂ : Circuit n} (h : c₁ ≡ₚ c₂) : c₁ ≡ₛ c₂ := by
+lemma toUpToScalar {c₁ c₂ : Circuit n} (h : c₁ ≡ₚ c₂) : c₁ ≡ₛ c₂ := by
   obtain ⟨k, hk⟩ := h
   exact ⟨Zeta8.ω ^ (k : ℕ), isUnit_ω.pow _, hk⟩
+
+end EquivalentUpToPhase
 
 namespace EquivalentUpToScalar
 
@@ -240,6 +367,52 @@ end EquivalentUpToScalar
 instance : @Trans (Circuit n) (Circuit n) (Circuit n) Equivalent Equivalent Equivalent :=
   ⟨Equivalent.trans⟩
 
+/-! `calc` support for phases. A chain may mix `≡ᵤ`, `≡ₚ[k]` and `≡ₚ` steps
+in any order. Exact steps leave a named phase alone, two named phases add
+(`≡ₚ[j]` then `≡ₚ[k]` is `≡ₚ[j + k]`, and a goal stated with the numeral
+closes by unification, since `Fin 8` arithmetic on numerals computes), and
+as soon as one step is `≡ₚ` the chain is. -/
+
+/-- `calc` support: `≡ᵤ` then `≡ₚ`. -/
+instance : @Trans (Circuit n) (Circuit n) (Circuit n)
+    Equivalent EquivalentUpToPhase EquivalentUpToPhase :=
+  ⟨fun h₁ h₂ => h₁.toUpToPhase.trans h₂⟩
+
+/-- `calc` support: `≡ₚ` then `≡ᵤ`. -/
+instance : @Trans (Circuit n) (Circuit n) (Circuit n)
+    EquivalentUpToPhase Equivalent EquivalentUpToPhase :=
+  ⟨fun h₁ h₂ => h₁.trans h₂.toUpToPhase⟩
+
+/-- `calc` support: `≡ₚ` then `≡ₚ`. -/
+instance : @Trans (Circuit n) (Circuit n) (Circuit n)
+    EquivalentUpToPhase EquivalentUpToPhase EquivalentUpToPhase :=
+  ⟨EquivalentUpToPhase.trans⟩
+
+/-- `calc` support: `≡ᵤ` then `≡ₚ[k]` is `≡ₚ[k]`. -/
+instance {k : Fin 8} : @Trans (Circuit n) (Circuit n) (Circuit n)
+    Equivalent (EquivalentWithPhase k) (EquivalentWithPhase k) :=
+  ⟨Equivalent.trans_withPhase⟩
+
+/-- `calc` support: `≡ₚ[k]` then `≡ᵤ` is `≡ₚ[k]`. -/
+instance {k : Fin 8} : @Trans (Circuit n) (Circuit n) (Circuit n)
+    (EquivalentWithPhase k) Equivalent (EquivalentWithPhase k) :=
+  ⟨EquivalentWithPhase.trans_equivalent⟩
+
+/-- `calc` support: `≡ₚ[j]` then `≡ₚ[k]` is `≡ₚ[j + k]`. -/
+instance {j k : Fin 8} : @Trans (Circuit n) (Circuit n) (Circuit n)
+    (EquivalentWithPhase j) (EquivalentWithPhase k) (EquivalentWithPhase (j + k)) :=
+  ⟨EquivalentWithPhase.trans⟩
+
+/-- `calc` support: `≡ₚ[k]` then `≡ₚ`. -/
+instance {k : Fin 8} : @Trans (Circuit n) (Circuit n) (Circuit n)
+    (EquivalentWithPhase k) EquivalentUpToPhase EquivalentUpToPhase :=
+  ⟨fun h₁ h₂ => h₁.toUpToPhase.trans h₂⟩
+
+/-- `calc` support: `≡ₚ` then `≡ₚ[k]`. -/
+instance {k : Fin 8} : @Trans (Circuit n) (Circuit n) (Circuit n)
+    EquivalentUpToPhase (EquivalentWithPhase k) EquivalentUpToPhase :=
+  ⟨fun h₁ h₂ => h₁.trans h₂.toUpToPhase⟩
+
 /-! ### Reduction to the computational basis -/
 
 /-- The computational-basis vector `|y⟩`. -/
@@ -266,13 +439,18 @@ theorem equivalent_iff_basis (c₁ c₂ : Circuit n) :
   have : denoteₗ c₁ = denoteₗ c₂ := LinearMap.ext_basis h
   exact LinearMap.congr_fun this ψ
 
+/-- Equivalence with a named phase, reduced to the computational basis. -/
+theorem equivalentWithPhase_iff_basis (k : Fin 8) (c₁ c₂ : Circuit n) :
+    c₁ ≡ₚ[k] c₂ ↔ ∀ y, denote c₁ (basis y) = Zeta8.ω ^ (k : ℕ) • denote c₂ (basis y) := by
+  refine ⟨fun h y => h _, fun h ψ => ?_⟩
+  have : denoteₗ c₁ = Zeta8.ω ^ (k : ℕ) • denoteₗ c₂ := LinearMap.ext_basis fun y => by
+    rw [_root_.LinearMap.smul_apply, denoteₗ_apply, denoteₗ_apply, h y]
+  simpa using LinearMap.congr_fun this ψ
+
 /-- Equivalence up to phase, reduced to the computational basis. -/
 theorem equivalentUpToPhase_iff_basis (c₁ c₂ : Circuit n) :
-    c₁ ≡ₚ c₂ ↔ ∃ k : Fin 8, ∀ y, denote c₁ (basis y) = Zeta8.ω ^ (k : ℕ) • denote c₂ (basis y) := by
-  refine ⟨fun ⟨k, hk⟩ => ⟨k, fun y => hk _⟩, fun ⟨k, hk⟩ => ⟨k, fun ψ => ?_⟩⟩
-  have : denoteₗ c₁ = Zeta8.ω ^ (k : ℕ) • denoteₗ c₂ := LinearMap.ext_basis fun y => by
-    rw [_root_.LinearMap.smul_apply, denoteₗ_apply, denoteₗ_apply, hk y]
-  simpa using LinearMap.congr_fun this ψ
+    c₁ ≡ₚ c₂ ↔ ∃ k : Fin 8, ∀ y, denote c₁ (basis y) = Zeta8.ω ^ (k : ℕ) • denote c₂ (basis y) :=
+  exists_congr fun k => equivalentWithPhase_iff_basis k c₁ c₂
 
 /-! ### A materialised evaluator for the kernel
 
@@ -577,6 +755,66 @@ theorem equivalentUpToPhase_of_allBelow {c₁ c₂ : Circuit n} {k : ℕ} (hk : 
   rw [← checkEquivUpToPhase_iff, checkEquivUpToPhase, List.any_eq_true]
   exact ⟨k, List.mem_range.2 hk, h.all_range⟩
 
+/-! ### The basis decision with the phase named
+
+`checkEquivUpToPhase` tries the eight phases and forgets which one passed.
+`checkEquivWithPhase c₁ c₂ k` is the check for the one phase `ω ^ k`, the
+conjunction of `checkEquivUpToPhaseAt c₁ c₂ k` over the basis, so a window
+is decided with its phase named, `c₁ ≡ₚ[k] c₂` by `decide +kernel`, in one
+declaration or in chunks (`equivalentWithPhase_of_allBelow`). `findPhase`
+returns the first phase that passes; it is how a certificate replayed up to
+phase learns the phase of a window. A failing candidate stops at the first
+amplitude that disagrees, and the kernel has the amplitudes memoised, so
+the eight candidates cost little more than one. -/
+
+/-- The basis decision up to the one phase `ω ^ k`, as one `Bool`. -/
+def checkEquivWithPhase (c₁ c₂ : Circuit n) (k : ℕ) : Bool :=
+  (List.range (2 ^ n)).all (checkEquivUpToPhaseAt c₁ c₂ k)
+
+/-- `checkEquivUpToPhase` is `checkEquivWithPhase` at one of the eight
+phases. -/
+lemma checkEquivUpToPhase_eq_any (c₁ c₂ : Circuit n) :
+    checkEquivUpToPhase c₁ c₂ = (List.range 8).any (checkEquivWithPhase c₁ c₂) := rfl
+
+/-- `checkEquivWithPhase` decides `≡ₚ[k]`. -/
+theorem checkEquivWithPhase_iff (c₁ c₂ : Circuit n) (k : Fin 8) :
+    checkEquivWithPhase c₁ c₂ k = true ↔ c₁ ≡ₚ[k] c₂ := by
+  rw [equivalentWithPhase_iff_basis, checkEquivWithPhase]
+  simp only [checkEquivUpToPhaseAt, List.all_eq_true, List.mem_range, Dyadic8.eqv_iff,
+    Dyadic8.toZeta8_mul, Dyadic8.toZeta8_ωPow, VecN.at_eq]
+  constructor
+  · intro h y
+    funext x
+    have := h y.val y.isLt x.val x.isLt
+    rw [toZeta8_evalFn _ _ x.isLt, toZeta8_evalFn _ _ x.isLt, toZeta8_comp_basisN y.isLt] at this
+    exact this
+  · intro h y hy x hx
+    rw [toZeta8_evalFn _ _ hx, toZeta8_evalFn _ _ hx, toZeta8_comp_basisN hy, h]
+    rfl
+
+/-- The chunked basis decision with the phase named: the phase `ω ^ k` on
+every basis vector, proved a range at a time, gives `≡ₚ[k]`. -/
+theorem equivalentWithPhase_of_allBelow {c₁ c₂ : Circuit n} {k : Fin 8}
+    (h : AllBelow (checkEquivUpToPhaseAt c₁ c₂ k) (2 ^ n)) : c₁ ≡ₚ[k] c₂ :=
+  (checkEquivWithPhase_iff c₁ c₂ k).1 h.all_range
+
+/-- The first of the eight phases that the basis decision accepts. -/
+def findPhase (c₁ c₂ : Circuit n) : Option (Fin 8) :=
+  ([0, 1, 2, 3, 4, 5, 6, 7] : List (Fin 8)).find? fun k => checkEquivWithPhase c₁ c₂ k
+
+/-- A phase found is a proof. -/
+theorem findPhase_sound {c₁ c₂ : Circuit n} {k : Fin 8} (h : findPhase c₁ c₂ = some k) :
+    c₁ ≡ₚ[k] c₂ :=
+  (checkEquivWithPhase_iff c₁ c₂ k).1
+    (List.find?_some (p := fun k : Fin 8 => checkEquivWithPhase c₁ c₂ k) h)
+
+/-- `findPhase` finds a phase exactly when there is one. -/
+theorem findPhase_isSome_iff (c₁ c₂ : Circuit n) : (findPhase c₁ c₂).isSome ↔ c₁ ≡ₚ c₂ := by
+  have hmem : ∀ k : Fin 8, k ∈ ([0, 1, 2, 3, 4, 5, 6, 7] : List (Fin 8)) := by decide
+  rw [findPhase, List.find?_isSome]
+  exact ⟨fun ⟨k, _, hk⟩ => ⟨k, (checkEquivWithPhase_iff c₁ c₂ k).1 hk⟩,
+    fun ⟨k, hk⟩ => ⟨k, hmem k, (checkEquivWithPhase_iff c₁ c₂ k).2 hk⟩⟩
+
 /-- Equivalence of concrete circuits is decidable: run the closure
 evaluator on the `2 ^ n` basis vectors. -/
 instance decidableEquivalent (c₁ c₂ : Circuit n) : Decidable (c₁ ≡ᵤ c₂) :=
@@ -585,6 +823,11 @@ instance decidableEquivalent (c₁ c₂ : Circuit n) : Decidable (c₁ ≡ᵤ c�
 /-- Decidable: eight candidate phases, `2 ^ n` basis vectors each. -/
 instance decidableEquivalentUpToPhase (c₁ c₂ : Circuit n) : Decidable (c₁ ≡ₚ c₂) :=
   decidable_of_iff _ (checkEquivUpToPhase_iff c₁ c₂)
+
+/-- Decidable: the one named phase, `2 ^ n` basis vectors. -/
+instance decidableEquivalentWithPhase (k : Fin 8) (c₁ c₂ : Circuit n) :
+    Decidable (c₁ ≡ₚ[k] c₂) :=
+  decidable_of_iff _ (checkEquivWithPhase_iff c₁ c₂ k)
 
 end Circuit
 

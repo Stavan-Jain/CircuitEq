@@ -14,10 +14,15 @@ the equivalence; a step this mirror accepts and ``replay`` rejects is a bug
 in the mirror. Positions, take/drop semantics and the order of checks follow
 the Lean definitions exactly so that the two agree step by step.
 
+The same steps replay up to a global phase (``replayPhase``): a window then
+names the exponent ``p`` with ``a = w^p b`` on its own wires (``findPhase``),
+the exponents add modulo eight, and the theorem is stated on ``≡ₚ[k]``.
+
 Usage::
 
     python scripts/certificate.py tof_3            # print the Lean certificate
     python scripts/certificate.py tof_3 --theorem  # as a complete theorem
+    python scripts/certificate.py tof_3 --phase --theorem  # up to phase, named
 
 The benchmark's two circuits are read from the ``def original`` and
 ``def optimized`` of its Lean module (which ``check_pyzx_benchmarks.py``
@@ -217,6 +222,37 @@ def default_checkers(k: int):
     return [eval_checker(k), syntactic_checker]
 
 
+def eval_phase_finder(k: int):
+    """`evalPhaseFinder k` (`findPhase`): the first exponent `p` in `0..7` with
+    `a = w^p b` on the `2 ^ k` basis vectors, or `None`."""
+
+    def find(a: list[Instr], b: list[Instr]) -> int | None:
+        columns = []
+        for y in range(1 << k):
+            basis = [ONE if x == y else ZERO for x in range(1 << k)]
+            columns.append((eval_circuit(a, basis), eval_circuit(b, basis)))
+        phase = ONE
+        for p in range(8):
+            if all(va == [phase * z for z in vb] for va, vb in columns):
+                return p
+            phase = phase * OMEGA
+        return None
+
+    return find
+
+
+def syntactic_finder(a: list[Instr], b: list[Instr]) -> int | None:
+    """`(syntacticChecker k).toFinder`: phase 0 on equal lists."""
+    return 0 if a == b else None
+
+
+def default_phase_finders(k: int):
+    """`defaultPhaseFinders`: the basis evaluator with the phase named at index 0
+    (an exactly equal window has phase 0, which is what the phase-polynomial
+    checker in front of it answers in Lean), syntactic equality at 1."""
+    return [eval_phase_finder(k), syntactic_finder]
+
+
 # ---------------------------------------------------------------------------
 # Steps and replay, mirroring `Step`, `replayStep` and `replay`.
 
@@ -303,20 +339,29 @@ def replay_step(checkers, c: list[Instr], s: Step) -> list[Instr] | None:
             return c[:s.i] + [s.a, s.b] + c[s.i:]
         return None
     if isinstance(s, Window):
-        if s.i > len(c):
+        placed = place_window(c, s)
+        if placed is None:
             return None
-        wires = list(s.wires)
-        if len(set(wires)) != len(wires):
+        row = checkers(len(s.wires))
+        if s.k >= len(row) or not row[s.k](list(s.a), list(s.b)):
             return None
-        a, b = list(s.a), list(s.b)
-        suf = c[s.i:]
-        if suf[:len(a)] != rename(wires, a):
-            return None
-        row = checkers(len(wires))
-        if s.k >= len(row) or not row[s.k](a, b):
-            return None
-        return c[:s.i] + rename(wires, b) + suf[len(a):]
+        return placed
     raise TypeError(s)
+
+
+def place_window(c: list[Instr], s: Window) -> list[Instr] | None:
+    """`rewriteAt (placeFront wires a b) i`: the syntactic half of a window, no
+    checker consulted."""
+    if s.i > len(c):
+        return None
+    wires = list(s.wires)
+    if len(set(wires)) != len(wires):
+        return None
+    a, b = list(s.a), list(s.b)
+    suf = c[s.i:]
+    if suf[:len(a)] != rename(wires, a):
+        return None
+    return c[:s.i] + rename(wires, b) + suf[len(a):]
 
 
 def replay(checkers, steps: list[Step], c: list[Instr]) -> list[Instr] | None:
@@ -326,6 +371,29 @@ def replay(checkers, steps: list[Step], c: list[Instr]) -> list[Instr] | None:
         if c is None:
             return None
     return c
+
+
+def replay_phase(finders, steps: list[Step], c: list[Instr]) -> tuple[int, list[Instr]] | None:
+    """`replayPhase`: the same steps up to a global phase. A window is placed
+    syntactically and adds the exponent its finder names, modulo eight; every
+    other step is the exact rewrite of `replay_step`. Returns the exponent of
+    the total phase and the resulting circuit."""
+    phase = 0
+    for s in steps:
+        if isinstance(s, Window):
+            placed = place_window(c, s)
+            if placed is None:
+                return None
+            row = finders(len(s.wires))
+            q = row[s.k](list(s.a), list(s.b)) if s.k < len(row) else None
+            if q is None:
+                return None
+            phase, c = (phase + q) % 8, placed
+        else:
+            c = replay_step(default_checkers, c, s)
+            if c is None:
+                return None
+    return phase, c
 
 
 # ---------------------------------------------------------------------------
@@ -590,15 +658,21 @@ BENCHMARKS = {
 }
 
 
-def certify(name: str) -> tuple[int, list[Step]]:
-    """Search, then replay the result as a check; returns the qubit count and steps."""
+def certify(name: str, phase: bool = False) -> tuple[int, list[Step], int | None]:
+    """Search, then replay the result as a check; returns the qubit count, the
+    steps and, with `phase`, the exponent of the global phase the replay names."""
     module, windows, cancel = BENCHMARKS[name]
     root = Path(__file__).resolve().parents[1]
     n, c1, c2 = read_lean_defs(root / "CircuitEq" / "Benchmarks" / f"{module}.lean")
     steps = align(c1, c2, windows, cancel=cancel)
+    if phase:
+        result = replay_phase(default_phase_finders, steps, c1)
+        if result is None or result[1] != c2:
+            raise RuntimeError(f"{name}: the emitted certificate does not replay to the target")
+        return n, steps, result[0]
     if replay(default_checkers, steps, c1) != c2:
         raise RuntimeError(f"{name}: the emitted certificate does not replay to the target")
-    return n, steps
+    return n, steps, None
 
 
 def main() -> None:
@@ -606,10 +680,16 @@ def main() -> None:
     parser.add_argument("benchmark", choices=BENCHMARKS)
     parser.add_argument("--theorem", action="store_true",
                         help="print a complete theorem instead of the step list")
+    parser.add_argument("--phase", action="store_true",
+                        help="replay up to a global phase and name it (≡ₚ[k])")
     args = parser.parse_args()
-    n, steps = certify(args.benchmark)
+    n, steps, exponent = certify(args.benchmark, phase=args.phase)
     body = fmt_certificate(steps)
-    if args.theorem:
+    if args.theorem and args.phase:
+        print(f"theorem original_equiv_optimized : original ≡ₚ[{exponent}] optimized := by")
+        print("  circuit_replay_phase defaultPhaseFinders")
+        print(body)
+    elif args.theorem:
         print("theorem original_equiv_optimized : original ≡ᵤ optimized := by")
         print("  circuit_replay defaultCheckers")
         print(body)
@@ -619,7 +699,8 @@ def main() -> None:
     for s in steps:
         kinds[type(s).__name__] = kinds.get(type(s).__name__, 0) + 1
     summary = ", ".join(f"{v} {k}" for k, v in sorted(kinds.items()))
-    print(f"-- {len(steps)} steps on {n} qubits ({summary}); replays to the target.")
+    tail = f", global phase ω^{exponent}" if args.phase else ""
+    print(f"-- {len(steps)} steps on {n} qubits ({summary}); replays to the target{tail}.")
 
 
 if __name__ == "__main__":

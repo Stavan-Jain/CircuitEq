@@ -26,7 +26,8 @@ import CircuitEq.Benchmarks.BarencoTof3
 
 Unitary equivalence of Clifford+T quantum circuits in Lean 4: a computable
 coefficient field, sparse state-vector gate semantics, a decidable equivalence
-relation for concrete circuits, a structural toolkit for proofs that are
+relation for concrete circuits (exact, and up to a global phase that may be
+left open or named), a structural toolkit for proofs that are
 parametric in the qubit count (fusion and commutation, rewriting in context,
 Hadamard-layer and CNOT-network algebra, the certificate language with its
 replay interpreter, the `circuit_simp` and `circuit_windows` tactics, and the

@@ -19,7 +19,8 @@ the whole register, which is a brute-force basis decide and not a window
 proof. Full re-synthesis (`full_reduce` + extraction) aligns only as a
 single whole-register window, for three of the smallest circuits, and not
 at all for the other eight; three of the random pairs are equivalent only
-up to a global phase, which `circuit_windows` cannot state. The failures
+up to a global phase, which `circuit_windows` could not state at the time
+(it now accepts `≡ₚ` goals; see mechanism 2). The failures
 sort into five mechanisms, listed below; none of them is "the rewrite was
 not local", two are library gaps, one is the decide cost, one is
 `full_reduce` being a re-synthesis, and one is a global scalar. A
@@ -283,6 +284,15 @@ one extra step kind in the certificate language (a scalar window), not a
 new technique. Until then these pairs are out of reach and are reported as
 such rather than as alignment failures.
 
+*Since this run:* the window pattern has learned `≡ₚ`. `circuit_windows`
+accepts a goal `a ≡ₚ b` or `a ≡ₚ[k] b`, each window may hold up to a phase
+of its own, and the certificate is replayed by `replayPhase`, which adds
+the windows' phases up (`CircuitEq/Certificate.lean`). It took no new step
+kind, only a second interpretation of `window`. The survey has not been
+rerun: its three phase-only pairs are random circuits with no alignment,
+so for them the statement is now available but the proof is still the
+whole-register decide of `≡ₚ` (`scripts/chunked_decide.py --phase K`).
+
 ### 3. A diagonal two-qubit gate commuted through a control-only block
 
 `basic_optimization` rewrites `H t; CX c t` as `CZ c t; H t` and then
@@ -441,8 +451,8 @@ is CNOT+diagonal, and every pair of segments is equivalent on its own.
   skeletons differ, so no common cut exists; `random_4q`'s 24-gate window
   is the example), every `full_reduce` pair (different Hadamard skeleton,
   and `mod5_4`'s has an `X` inside a segment) and the global-phase pairs.
-  Those need the general machinery, Hadamard gadgets or path sums, and
-  `≡ₚ` respectively.
+  The first two need the general machinery, Hadamard gadgets or path sums;
+  the global-phase pairs are now statable on `≡ₚ` but have no alignment.
 
 ## Consequences for the roadmap
 

@@ -78,7 +78,8 @@ build mathlib.
 ## One run, step by step
 
 1. Clone the base. Delete what gives answers away: `README.md`,
-   `ROADMAP.md`, `QUEUE.md`, `benchmarks/`, the task's own module under
+   `ROADMAP.md`, `QUEUE.md`, `CLAUDE.md` (replaced by the playbook),
+   `.github/`, `benchmarks/`, the task's own module under
    `CircuitEq/Benchmarks/` with its import and its build products, the window
    table in `scripts/certificate.py`, and the task's own redactions.
 2. Write the harness's files: `Harness/Task.lean` (the two circuits),
@@ -395,10 +396,9 @@ The three real starter tasks (`tof_3`, `barenco_tof_3`,
 proof still counts, by `Equivalent.toUpToPhase`. What an agent can prove
 depends on the library commit: at `a9a80ed` `≡ₚ` has no composition lemmas,
 so a phase-only result is provable only by a whole-register decide on a few
-qubits; with the phase-composition work that is not merged yet (`≡ₚ[k]`,
-windows and certificates up to phase, the Clifford phase gadget;
-`notes/pending-playbook-phase.md`) it is provable piece by piece. `tiny_3q`
-stays on `≡ᵤ` and `tiny_2q_phase` tests `"p"`.
+qubits; from `83cc1d7` on (`≡ₚ[k]`, windows and certificates up to phase,
+the Clifford phase gadget; `PLAYBOOK.md`, decision entry 8) it is provable
+piece by piece. `tiny_3q` stays on `≡ᵤ` and `tiny_2q_phase` tests `"p"`.
 
 ## Tasks
 

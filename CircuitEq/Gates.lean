@@ -79,6 +79,12 @@ lemma H_mul_X_mul_H : H.mat * X.mat * H.mat = Z.mat := by decide +kernel
 lemma H_mul_Z_mul_H : H.mat * Z.mat * H.mat = X.mat := by decide +kernel
 lemma X_mul_Z : X.mat * Z.mat = -(Z.mat * X.mat) := by decide +kernel
 
+/-- `(S H)³ = ω`: three rounds of `H` then `S` are the scalar `ω`, so the
+Clifford group contains every global phase `ω ^ k` at no `T`-cost. -/
+lemma S_mul_H_pow_three :
+    S.mat * (H.mat * (S.mat * (H.mat * (S.mat * H.mat)))) = ω • (1 : Mat1) := by
+  decide +kernel
+
 /-- Whether a gate's matrix is diagonal: `Z`, `S`, `S†`, `T`, `T†`. -/
 def isDiag : Gate1 → Bool
   | Z | S | Sdg | T | Tdg => true
@@ -163,6 +169,14 @@ lemma applyOne_applyOne_same (A B : Mat1) (i : Fin n) (ψ : Vec n) :
 
 /-- The identity matrix acts trivially. -/
 lemma applyOne_one (i : Fin n) (ψ : Vec n) : applyOne 1 i ψ = ψ := by
+  funext x
+  simp only [applyOne]
+  cases bit i x <;> simp
+
+/-- A scalar matrix on any qubit scales the whole state: a global phase
+does not know which wire it was applied to. -/
+lemma applyOne_smul_one (s : Zeta8) (i : Fin n) (ψ : Vec n) :
+    applyOne (s • (1 : Mat1)) i ψ = s • ψ := by
   funext x
   simp only [applyOne]
   cases bit i x <;> simp

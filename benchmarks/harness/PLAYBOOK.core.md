@@ -15,11 +15,14 @@ build yourself, in `Solution.lean` and new modules under `Solution/`.
   `Solution.lean` does. Ascribe one side of a literal equivalence,
   `([H 0, H 0] : Circuit 1) ≡ᵤ []`.
 - `CircuitEq/Semantics.lean` defines `denote : Circuit n → Vec n → Vec n`
-  over the computable field `ℚ(ζ₈)` (`CircuitEq/Zeta8.lean`) and three
+  over the computable field `ℚ(ζ₈)` (`CircuitEq/Zeta8.lean`) and four
   relations: `a ≡ᵤ b` (`Equivalent`, equal on every state; it has `refl`,
   `symm`, `trans`, `append`, `cons`, and `calc` works), `a ≡ₚ b` (equal up to
-  a power of `ω = e^{iπ/4}`) and `a ≡ₛ b` (equal up to a nonzero scalar; it
-  has `refl`, `symm`, `trans`, `append`).
+  a power of `ω = e^{iπ/4}`; the same algebra, and `calc` mixes it with
+  `≡ᵤ`), `a ≡ₚ[k] b` (the same with the phase named, `a = ω^k · b`, `k : Fin
+  8`; phases add under `append`; keep the space in `a ≡ₚ [X 0]`, since
+  `≡ₚ[` is its own token) and `a ≡ₛ b` (equal up to a nonzero scalar;
+  it has `refl`, `symm`, `trans`, `append`).
 - `CircuitEq/Gates.lean` has the gate matrices and the state-vector actions
   `applyOne`, `applyCNOT` with their linearity, fusion and commutation lemmas
   (`applyOne_applyOne_same`, `applyOne_comm`, `applyOne_applyCNOT_comm`,
@@ -29,15 +32,16 @@ build yourself, in `Solution.lean` and new modules under `Solution/`.
 
 ## What decides a pair here
 
-`≡ᵤ` and `≡ₚ` are `Decidable` for concrete circuits: every instruction is
-linear, so equivalence reduces to the `2^n` basis vectors
+`≡ᵤ`, `≡ₚ` and `≡ₚ[k]` are `Decidable` for concrete circuits: every
+instruction is linear, so equivalence reduces to the `2^n` basis vectors
 (`equivalent_iff_basis`), and the instance evaluates both circuits with an
 evaluator over the gcd-free ring of `CircuitEq/Dyadic.lean` that is proved
 equal to `denote`. So `by decide +kernel` proves or refutes a small pair.
 
 - Always `decide +kernel`. Bare `decide` stalls on the first rational
   addition, and `native_decide` is banned.
-- The cost is depth × `2^k` steps on `k` qubits, and the kernel keeps every
+- The cost is `gates · 4^k` amplitude steps on `k` qubits (`gates · 2^k`
+  per basis vector), and the kernel keeps every
   intermediate term until the declaration ends, so memory runs out before
   time does. Measured (gates counted over both sides): three qubits and six
   gates, 0.1 s; four qubits and 59 gates, 3 s; five qubits and 108 gates,

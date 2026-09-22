@@ -4,13 +4,14 @@ The prover's guide to this library: what exists, what it costs, and in which
 order to try it on a concrete pair. `CLAUDE.md` is for people who extend the
 library; this file is for whoever has two circuits and wants a proof. The
 agent harness (`scripts/agent_harness.py`) installs it as the `CLAUDE.md` of
-every run, so it is the agent's only description of the library. It is
+every `full` run, so it is the agent's only description of the library. It is
 versioned with the library: when a checker, a tactic, a certificate step or
 a block theorem lands, update the decision list below in the same commit.
 
-Last brought in line with the library at `a9a80ed` (origin/main, 19 September
-2026: chunked kernel evaluation, the sparse phase-polynomial fold, the kernel
-replay in the trust policy).
+Last brought in line with the library at `83cc1d7` (22 September 2026:
+composition up to a global phase, `≡ₚ[k]`, certificates and windows up to
+phase, the phase gadget; on top of chunked kernel evaluation, the sparse
+phase-polynomial fold and the kernel replay in the trust policy).
 
 ## The objects
 
@@ -22,12 +23,19 @@ replay in the trust policy).
   `Circuit 5`, `[H 0, CX 0 1, T 1]` and the notation below resolve. Ascribe
   one side of a literal equivalence, `([H 0, H 0] : Circuit 1) ≡ᵤ []`: the
   qubit count is not inferable from the list.
-- Three relations, in `CircuitEq/Semantics.lean`:
+- Four relations, in `CircuitEq/Semantics.lean`:
   - `a ≡ᵤ b` (`Equivalent`): `∀ ψ, denote a ψ = denote b ψ`. It has
     `refl`, `symm`, `trans`, `append`, `cons`, and `calc` works.
   - `a ≡ₚ b` (`EquivalentUpToPhase`): equal up to a power of `ω = e^{iπ/4}`.
-    It has no composition lemmas yet: prove `≡ᵤ` and weaken it
-    (`h.toUpToPhase`), or decide it whole on a small register.
+    It has everything `≡ᵤ` has: `refl`, `symm`, `trans`, `append`, `cons`
+    (and `in_context` in `Rewriting.lean`, `rename` in `Embedding.lean`),
+    and `calc` mixes `≡ᵤ` and `≡ₚ` steps in any order. `h.toUpToPhase`
+    weakens `≡ᵤ` to it.
+  - `a ≡ₚ[k] b` (`EquivalentWithPhase`, `k : Fin 8`): the same with the
+    phase named, `a = ω^k · b`; `≡ₚ` is `∃ k` of it. Named phases add
+    (`h₁.append h₂ : … ≡ₚ[j + k] …`), `h.cast (by decide)` restates an
+    exponent, and `≡ₚ[0]` is `≡ᵤ` (`equivalentWithPhase_zero_iff`). Keep the
+    space in `a ≡ₚ [X 0]`: `≡ₚ[` is its own token.
   - `a ≡ₛ b` (`EquivalentUpToScalar`): equal up to a nonzero scalar; what
     the Clifford tableau certifies. It has `refl`, `symm`, `trans`,
     `append`; `h.toUpToScalar` weakens `≡ᵤ` and `≡ₚ` to it.
@@ -93,7 +101,8 @@ Every leaf of a proof here is a kernel evaluation of a `Bool`: a checker's
   basis decide, tableau ranges, or one `circuit_windows` lemma per segment of
   a long pair. Without it the memory of one declaration is not returned
   before the next starts, and the file's peak is the sum, not the maximum
-  (sixteen declarations of 2.6 GB peaked at 3.6 GB with it on). Splitting
+  (sixteen declarations peaked at 3.6 GB with asynchronous elaboration
+  on, 2.6 GB with it off). Splitting
   into several modules bounds it further.
 - **Loading the imports costs 1.7 s and 1.8 GB** before any proof runs, so
   that much of a memory limit is already spent.
@@ -109,14 +118,17 @@ Every leaf of a proof here is a kernel evaluation of a `Bool`: a checker's
 - **Certificates.** `circuit_simp` and `circuit_windows` search in meta code
   and hand the kernel one list of steps to replay; the cost is linear in the
   steps, plus each window on its own wires. A 155-gate certificate has been
-  seen to run past 4 GB, so long alignments are split too.
+  seen to run past 4 GB, so long alignments are split too. Replayed up to a
+  phase, the same certificate costs about 1.2 times the exact one (`tof_3`:
+  0.19 s against 0.16 s).
 
 ## Decision list for a concrete pair
 
 Look at the two gate sets first, then take the first entry that applies.
 
 1. **At most five qubits.** `by decide +kernel` proves `a ≡ᵤ b`, `a ≡ₚ b`,
-   `¬ (a ≡ᵤ b)` or `¬ (a ≡ₚ b)` outright. (`≡ₛ` has no `Decidable` instance.)
+   `a ≡ₚ[k] b`, `¬ (a ≡ᵤ b)` or `¬ (a ≡ₚ b)` outright. (`≡ₛ` has no
+   `Decidable` instance.)
    **Six to about eight qubits: the same decision in chunks.** One theorem
    per range of basis vectors and `equivalent_of_allBelow` to assemble them;
    the cost is the brute-force `gates · 4^n`, so check the budget first.
@@ -135,8 +147,9 @@ Look at the two gate sets first, then take the first entry that applies.
 
    `scripts/chunks.py` writes the theorems and the assembling term (see
    "Tools"). Up to a phase: `checkEquivUpToPhaseAt a b k` with
-   `equivalentUpToPhase_of_allBelow (by decide)`, where the file names the
-   phase `ω ^ k`, `k < 8`; find `k` on one basis vector first.
+   `equivalentWithPhase_of_allBelow : … → a ≡ₚ[k] b`, or
+   `equivalentUpToPhase_of_allBelow (by decide)` for `≡ₚ`, where the file
+   names the phase `ω ^ k`, `k < 8`; find `k` on one basis vector first.
 2. **Only `CX` and `Z S Sdg T Tdg` on both sides.**
    `(phasePolyChecker n).sound _ _ (by decide +kernel) : a ≡ᵤ b`
    (`CircuitEq/PhasePoly.lean`). The form is canonical, so on this fragment
@@ -151,7 +164,7 @@ Look at the two gate sets first, then take the first entry that applies.
    turns `AllBelow (tableauCheckGen a b) (2 * n)` into `a ≡ₛ b`, with the
    ranges proved as in entry 1 (four to sixteen generators per theorem).
    The tableau is sound and not proved complete: `tableauCheck a b = false`
-   or a failing generator is not a refutation, though `Tableau.witness a b`
+   or a failing generator is not a refutation, though `witness a b`
    names the first Pauli generator whose images differ, which tells you
    where to look. For exact `≡ᵤ` of a Clifford pair use the entries below.
 4. **The same gates reordered, or pairs that cancel.** `by circuit_simp`. It
@@ -213,16 +226,43 @@ Look at the two gate sets first, then take the first entry that applies.
    - `calc` and `Equivalent.trans`; `h₁.append h₂`; `h.in_context pre post`
      rewrites a window inside a fixed prefix and suffix.
    - `h.rename f` and `Equivalent.of_rename f h rfl rfl` place an identity
-     decided on `k` qubits on `k` wires of any register; `wires₂ hij` and
-     `wires₃ …` build the embedding (`CircuitEq/Embedding.lean`). This is
-     how a window costs `2^k` and not `2^n`.
+     decided on `k` qubits on `k` wires of any register; `wires₁ i`,
+     `wires₂ hij` and `wires₃ …` build the embedding
+     (`CircuitEq/Embedding.lean`). This is how a window costs `2^k` and not
+     `2^n`. The same names exist for `≡ₚ` and `≡ₚ[k]`
+     (`EquivalentWithPhase.rename`, `.of_rename`, `.in_context`).
    - Cut both circuits at a common layer and prove the halves separately,
      each by its own entry of this list, each in its own lemma.
    - Create a window by inserting a cancelling pair:
      `cancel_of_mul_eq_one`, `Instr.CanCancel.sound`, `fuse`, `fuse₃`.
    - `inverse c` with `denote_inverse_denote` for an argument about a
      residual (one prefix times the inverse of the other).
-8. **Refuting.** Up to five qubits: `by decide +kernel` on the negation. In
+8. **A pair equal only up to a global phase.** PyZX and TZAP drop
+   scalars, so if `a ≡ᵤ b` is refuted, try `a ≡ₚ b` before suspecting the
+   alignment. State the goal on `≡ₚ` and use exactly the tools you would for
+   `≡ᵤ`: `circuit_windows [(a₁, b₁), …]` accepts `≡ₚ` and `≡ₚ[k]` goals
+   unchanged, and `circuit_simp`, whose moves are all exact, accepts `≡ₚ`
+   and `≡ₚ[0]`. Each window may then hold only up to a phase of its own
+   (`Z X` against `X Z` is `ω⁴`), found on its own wires at cost `2^k`, and
+   every other move stays exact.
+   - To name the phase, state `a ≡ₚ[k] b`. If `k` is wrong the error names
+     the right one, so guessing `0` is a fine way to find it.
+   - Prove a long circuit segment by segment, one declaration each, and
+     compose with `append`. The exponents add: `seg₁.append seg₂ : … ≡ₚ[j +
+     k] …` closes a goal stated with the numeral, and `.cast (by decide)`
+     restates an exponent.
+   - For an exact statement,
+     `(equivalentWithPhase_iff_phaseGadget k i _ _).1 h : a ≡ᵤ b ++ phaseGadget k i`.
+     The gadget is Clifford-only (T-count 0, `(SH)³ = ω·I`) and commutes
+     with everything (`phaseGadget_comm`), so a phase-only pair becomes an
+     exact one at no `T`-cost.
+   - A certificate found by `set_option trace.circuit.certificate true`
+     replays up to phase with `circuit_replay_phase defaultPhaseFinders
+     steps` (`replayPhase_sound`, `replayUpToPhase_sound`).
+   - Never decide a phase on the whole register when a window can carry it.
+     The Clifford tableau names no phase, so it cannot justify a phase
+     window yet.
+9. **Refuting.** Up to five qubits: `by decide +kernel` on the negation. In
    the `CX` plus diagonal fragment: `phasePolyRefutes_sound`. Beyond those
    there is no ready-made refuter, but one basis vector on which the two
    evaluations differ is enough, and it costs `gates · 2^n`, not
@@ -269,8 +309,10 @@ cheap one.
 - `set_option trace.circuit.certificate true in` before a theorem prints
   the certificate a tactic found, in the syntax `circuit_replay` accepts.
 - `scripts/certificate.py` is a pure-Python mirror of the certificate
-  language (`align`, `replay`, `fmt_certificate`), for searching outside
-  Lean.
+  language (`align`, `replay`, `fmt_certificate`, and
+  `replay_phase(default_phase_finders(…), steps, c)`, which returns the
+  phase with the result), for searching outside Lean. Its command line
+  covers only the repository's own benchmarks; import it for your pair.
 - `scripts/chunks.py` (no dependencies) writes a chunked check:
 
   ```python
@@ -305,11 +347,14 @@ cheap one.
 `ℚ(ζ₈)`), `Bits`, `Gates` (`Gate1`, the matrices, `applyOne`, `applyCNOT`),
 `Dyadic` (the ring the evaluator computes in), `Chunk` (`AllBelow`, a check
 proved one index range per declaration), `Semantics` (`Instr`, `Circuit`,
-`denote`, the relations, decidability, `checkEquivAt`), `Checker` (the `check` +
-`sound` contract), `Structural` (fusion, commutation, layers), `Support`
-(wire sets as bitmasks), `PhasePoly`, `Tableau`, `Rewriting`, `Layers`,
-`Certificate` (`Step`, `replay`, `replay_sound`, `circuit_replay`), `Tactic`,
-`Embedding`, `Examples` (worked identities, the quickest way to see each tool
+`denote`, the relations `≡ᵤ`, `≡ₚ`, `≡ₚ[k]`, `≡ₛ` and their algebra,
+decidability, `checkEquivAt`, `findPhase`), `Checker` (the `check` + `sound`
+contract, `PhaseFinder`), `Structural` (fusion, commutation, layers,
+`phaseGadget`), `Support` (wire sets as bitmasks), `PhasePoly`, `Tableau`,
+`Rewriting`, `Layers`, `Embedding` (`rename`, the locality theorem),
+`Certificate` (`Step`, `replay`, `replay_sound`, `circuit_replay`;
+`replayPhase_sound`, `circuit_replay_phase`), `Tactic`, `Examples` (worked
+identities, the quickest way to see each tool
 used), and `Benchmarks/` (whole pairs proved with the patterns above).
 
 ## Conventions that bite

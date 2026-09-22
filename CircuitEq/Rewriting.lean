@@ -23,6 +23,20 @@ theorem Equivalent.in_context {a b : Circuit n} (h : a ≡ᵤ b)
     (pre post : Circuit n) : pre ++ a ++ post ≡ᵤ pre ++ b ++ post :=
   ((Equivalent.refl pre).append h).append (Equivalent.refl post)
 
+/-- Replace a window that is equivalent with a named phase inside an
+unchanged prefix and suffix: the phase of the window is the phase of the
+whole, because a scalar passes through the suffix by linearity. -/
+theorem EquivalentWithPhase.in_context {k : Fin 8} {a b : Circuit n} (h : a ≡ₚ[k] b)
+    (pre post : Circuit n) : pre ++ a ++ post ≡ₚ[k] pre ++ b ++ post :=
+  (h.append_left pre).append_right post
+
+/-- Replace a window that is equivalent up to a global phase inside an
+unchanged prefix and suffix. -/
+theorem EquivalentUpToPhase.in_context {a b : Circuit n} (h : a ≡ₚ b)
+    (pre post : Circuit n) : pre ++ a ++ post ≡ₚ pre ++ b ++ post := by
+  obtain ⟨k, (hk : a ≡ₚ[k] b)⟩ := h
+  exact ⟨k, hk.in_context pre post⟩
+
 /-- CNOTs commute unless a control is the other gate's target. -/
 theorem cnot_cnot_comm {a b c d : Fin n} (had : a ≠ d) (hcb : c ≠ b) :
     [CX a b, CX c d] ≡ᵤ [CX c d, CX a b] :=

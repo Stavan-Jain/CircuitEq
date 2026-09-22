@@ -10,12 +10,13 @@ are optimising for"); the rules for new modules are in the docstrings of
 
 Sizes: S is a session, M a few sessions, L a milestone.
 
-## In flight (19 September 2026)
+## In flight (22 September 2026)
 
 Item 1, the agent harness: a draft is in `scripts/agent_harness.py` and
-`benchmarks/harness/` with eight development tasks, one held-out pair of
-1000 gates and two TZAP pairs, the prompt, the playbook (`PLAYBOOK.md`)
-and a judge by restatement, axioms and kernel replay. Three runs so far,
+`benchmarks/harness/` with 21 tasks (ten for development, two of them TZAP
+pairs; eleven held out, the 1000-gate pair and ten from the catalogue),
+the prompt, the playbook (`PLAYBOOK.md`) and a judge by restatement,
+axioms and kernel replay. Three runs so far,
 the third proved. The optimisation harness (`scripts/optimizer_harness.py`)
 is built on the same pieces and tested by hand, with no agent run yet. The
 held-out ladder and the baselines landed on 21 September (`720583d` and
@@ -147,8 +148,8 @@ with a summary table, and the record of which declarations a proof uses
 6. **Linear certificates.** Make traces cursor-based (a position carried
    along, not re-indexed into a `List` per step) so replay is linear in
    trace plus circuit length; add a `template` step kind that applies a
-   registered lemma proved for all `n` at a concrete `n`; add the Python
-   mirror `scripts/certificate.py` if the in-flight branch did not.
+   registered lemma proved for all `n` at a concrete `n`, with its case in
+   the Python mirror `scripts/certificate.py`.
    Acceptance: kernel time on `Tof3.lean` alignment linear in gates;
    `layer_cnotNetwork_hLayer` usable as a step. M. Depends on item 3.
 
@@ -194,14 +195,13 @@ with a summary table, and the record of which declarations a proof uses
    its PyZX `full_reduce` twin by the tableau checker (`≡ₛ`), the
    gate-deleted mutants refuted with a Pauli witness, and the table
    published with kernel times: this is Rung 1's acceptance test for that
-   family and Rung 4's first evidence. S to M. Depends on the tableau
-   branch.
+   family and Rung 4's first evidence. S to M. Depends on nothing.
 
 10. **Residual pattern.** Cut points where one circuit's prefix times the
     inverse of the other's is a Clifford (tableau) or a diagonal (phase
     polynomial), proved preserved step by step, as a certificate step kind.
     First target: `tof_3` against `full_reduce` (T-count 15), which has no
-    window alignment. L. Depends on the tableau branch and item 4.
+    window alignment. L. Depends on item 4.
 
 11. **Refutation certificates.** Step kinds that prove `¬ (a ≡ᵤ b)`: a
     basis vector on which the evaluators differ, a Pauli whose images under
@@ -215,12 +215,18 @@ with a summary table, and the record of which declarations a proof uses
     circuits (the `rz` global-phase trap), run in CI. S. Depends on
     nothing.
 
-13. **The scalar replay.** A `ScalarCheckerTable`, a window step whose
-    soundness uses `EquivalentUpToScalar.append` and a rename lemma for
-    `≡ₛ`, and `replayₛ_sound : … → c ≡ₛ c'`, so that `tableauChecker` can
-    justify windows and, later, residuals, and so that pairs equal only up
-    to a global phase (three of the survey's random pairs) can be stated
-    at all by the window pattern. S to M. Depends on nothing.
+13. **The scalar replay.** Done for a global phase (see "Done":
+    `replayPhase`, `circuit_windows` on `≡ₚ` goals), which is what pairs
+    equal only up to a phase needed. What is left is the `≡ₛ` half, so that
+    `tableauChecker` can justify windows and, later, residuals: a
+    `ScalarCheckerTable`, a third interpretation of `window` whose
+    soundness uses `EquivalentUpToScalar.append` and
+    `EquivalentUpToScalar.rename` (landed with the phase work), a `cons`
+    lemma for `≡ₛ` (one line, for `rewriteAt_rel`), and
+    `replayScalar_sound : … → c ≡ₛ c'`. A unit scalar cannot be accumulated
+    as data the way an exponent in `Fin 8` is, so this replay concludes the
+    existential and names nothing; follow `replayUpToPhase`. S. Depends on
+    nothing.
 
 14. **A block-theorem step.** A step kind that applies a registered lemma
     such as `layer_cnotNetwork_hLayer` at a position, so the Steane proof
@@ -247,6 +253,14 @@ with a summary table, and the record of which declarations a proof uses
 - Routing as `rename` by a permutation; ancilla subspaces as a side
   condition on congruence (Rung 5, only as Rung 6 needs it).
 - `≡ₛ → ≡ₚ` for Clifford circuits (units and the prime over 2 in `ℤ[ω]`).
+  It now has a customer: with it, and one amplitude of each side evaluated
+  to name the exponent, the tableau becomes a `PhaseFinder` and joins
+  `defaultPhaseFinders`, so a wide Clifford window of a pair stated on
+  `≡ₚ[k]` is decided in `O(n)` per gate instead of `2 ^ k`.
+- The uniqueness of a named phase: `a ≡ₚ[j] b → a ≡ₚ[k] b → j = k` needs
+  `denote b ≠ 0`, which fails for a circuit with a degenerate `CX c c`
+  (`[CX c c, Z c, H c, CX c c]` denotes zero); state it for circuits whose
+  CNOTs have distinct wires, by `denote_inverse_denote`.
 - `Zeta8.toComplex`, unitarity of every gate, the QECLean bridge.
 - Dyadic normalisation tuning once the ring's measurements are in.
 - Rung 8: the phase-polynomial form with phases in `ZMod (2 ^ m)` (the
@@ -255,6 +269,20 @@ with a summary table, and the record of which declarations a proof uses
 
 ## Done
 
+- `83cc1d7` Composition up to
+  a global phase, because PyZX and TZAP preserve a circuit only up to one.
+  `EquivalentWithPhase` (`a ≡ₚ[k] b`, `k : Fin 8`) under `≡ₚ`, with the
+  algebra of both (`refl`, `symm`, `trans`, `append`, `cons`,
+  `in_context`), `Trans` instances so that one `calc` mixes `≡ᵤ`, `≡ₚ[k]`
+  and `≡ₚ`, the locality theorem for a phase (proved once for any scalar,
+  so `≡ₛ` has `rename` too), `checkEquivWithPhase` / `findPhase` and the
+  `Decidable` instance that names a window's phase. `PhaseFinder`,
+  `replayPhase` and `replayPhase_sound` (the same `Step`s; the kernel adds
+  the windows' exponents up and the theorem names the total),
+  `circuit_simp` and `circuit_windows` on `≡ₚ` and `≡ₚ[k]` goals, the
+  Python mirror's `replay_phase`. `phaseGadget k i` (`(S H)³ = ω`) and
+  `a ≡ₚ[k] b ↔ a ≡ᵤ b ++ phaseGadget k i`. Phase replay of `tof_3`'s
+  trace: 0.19 s of kernel time against 0.16 s exact.
 - `16a1a02` Kernel replay in CI. The axiom check could not see a false
   `decide +kernel` theorem sealed behind `debug.skipKernelTC` (no axioms,
   no error); CI now replays the built `.olean` files with the toolchain's

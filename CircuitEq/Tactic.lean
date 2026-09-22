@@ -16,6 +16,16 @@ the proof term is constant-size and the kernel's work is one check per
 step. No state vector is ever evaluated on the full register: windows are
 decided on their own wires by the checker table `defaultCheckers`.
 
+Both also accept a goal up to a global phase, `c₁ ≡ₚ c₂` or, with the
+exponent named, `c₁ ≡ₚ[k] c₂`. The search and the certificate are the
+same; the trace is replayed by `replayPhase` under `defaultPhaseFinders`
+and the goal is closed by `replayUpToPhase_sound` or `replayPhase_sound`.
+Each window may then hold only up to a phase of its own (`Z X` against
+`X Z` is `ω ^ 4`): the basis evaluator names it on the window's wires, the
+kernel adds the windows' phases up, and a goal `c₁ ≡ₚ[k] c₂` checks the
+sum against `k`. Every move outside a window is still an exact commutation
+or cancellation.
+
 * `circuit_simp` cancels checked inverse pairs through the gates they
   commute with, then aligns the two lists by pulling each gate of `c₂` to
   the front of what remains of `c₁` through the gates before it. A pull is
@@ -247,6 +257,24 @@ private partial def cancelPairs (side : Side) (cur : Array Gate) :
         return (rest, moves ++ #[.cancel i a.e b.e] ++ more)
   return (cur, #[])
 
+/-! ### The goal's relation -/
+
+/-- The relation a goal is stated on, which decides how the certificate is
+replayed: exactly (`replay`), or up to a global phase (`replayPhase`), with
+the phase left open or named by the goal. -/
+private inductive GoalKind where
+  /-- `c₁ ≡ᵤ c₂`. -/
+  | exact
+  /-- `c₁ ≡ₚ c₂`. -/
+  | upToPhase
+  /-- `c₁ ≡ₚ[k] c₂`, with the exponent `k : Fin 8` as an expression. -/
+  | withPhase (k : Expr)
+
+/-- Whether windows are decided up to a global phase. -/
+private def GoalKind.isPhase : GoalKind → Bool
+  | .exact => false
+  | _ => true
+
 /-! ### Windows -/
 
 /-- One window of an alignment: its two sides on the full register, and
@@ -263,7 +291,8 @@ private structure Window where
   a : Expr
   /-- The right side on its wires. -/
   b : Expr
-  /-- `a ≡ᵤ b`, for the failure diagnosis. -/
+  /-- `a ≡ᵤ b`, or `a ≡ₚ b` when the goal is up to a global phase, for the
+  failure diagnosis. -/
   smallProp : Expr
   /-- The wire numbers, for printing. -/
   wireNums : List Nat
@@ -273,7 +302,8 @@ private structure Window where
   bData : List MInstr
 
 /-- Restrict a window to the wires it touches, in order of first use. -/
-private def mkWindow (n : Expr) (left right : Array Gate) : MetaM Window := do
+private def mkWindow (kind : GoalKind) (n : Expr) (left right : Array Gate) :
+    MetaM Window := do
   let mut wires : Array (Nat × Expr) := #[]
   for g in left ++ right do
     for (w, we) in g.instr.wires.zip g.wireExprs do
@@ -297,7 +327,7 @@ private def mkWindow (n : Expr) (left right : Array Gate) : MetaM Window := do
   let tyK := mkApp (mkConst ``Instr) k
   let a ← mkListLit tyK (← left.toList.mapM restrict)
   let b ← mkListLit tyK (← right.toList.mapM restrict)
-  let smallProp ← mkAppM ``Equivalent #[a, b]
+  let smallProp ← mkAppM (if kind.isPhase then ``EquivalentUpToPhase else ``Equivalent) #[a, b]
   return { left, right, wires := wiresE, a, b, smallProp,
            wireNums := wires.toList.map (·.1), aData := left.toList.map small,
            bData := right.toList.map small }
@@ -372,12 +402,21 @@ private partial def alignWindows (ws : Array Window) (i : Nat) (st : State) : Me
 
 /-! ### Closing the goal -/
 
-/-- Read the goal `c₁ ≡ᵤ c₂` and return `n` and the two circuits. -/
-private def readGoal : TacticM (Expr × Expr × Expr) := do
+/-- Read the goal `c₁ ≡ᵤ c₂`, `c₁ ≡ₚ c₂` or `c₁ ≡ₚ[k] c₂` and return its
+relation, `n` and the two circuits. -/
+private def readGoal : TacticM (GoalKind × Expr × Expr × Expr) := do
   let target ← instantiateMVars (← (← getMainGoal).getType)
-  let_expr Equivalent n a b := target |
-    throwError "expected a goal of the form c₁ ≡ᵤ c₂, got{indentExpr target}"
-  return (n, a, b)
+  match_expr target with
+  | Equivalent n a b => return (.exact, n, a, b)
+  | EquivalentUpToPhase n a b => return (.upToPhase, n, a, b)
+  | EquivalentWithPhase n k a b =>
+    if k.hasExprMVar then
+      throwError "the phase of the goal is not determined: state the goal as c₁ ≡ₚ c₂, or name \
+        the exponent in c₁ ≡ₚ[k] c₂ (a wrong exponent is answered with the right one)"
+    return (.withPhase k, n, a, b)
+  | _ =>
+    throwError "expected a goal of the form c₁ ≡ᵤ c₂, c₁ ≡ₚ c₂ or c₁ ≡ₚ[k] c₂, \
+      got{indentExpr target}"
 
 /-- Prove a closed proposition by running a tactic on a fresh goal. -/
 private def proveBy (p : Expr) (tac : TSyntax `tactic) : TacticM Expr := do
@@ -386,49 +425,95 @@ private def proveBy (p : Expr) (tac : TSyntax `tactic) : TacticM Expr := do
   unless goals.isEmpty do throwError "could not prove{indentExpr p}"
   instantiateMVars m
 
-/-- Assemble the trace and close the goal by `replay_sound` applied to a
-kernel evaluation of `replay`. If the kernel refuses the trace, look for a
-window it refutes on its own wires and report it. -/
-private def closeByReplay (n a b : Expr) (st : State) (ws : Array Window) : TacticM Unit := do
+/-- The proposition the kernel decides for a trace, and the proof of the
+goal that a proof of it yields: `replay … = some b` with `replay_sound`,
+`replayUpToPhase … = some b` with `replayUpToPhase_sound`, or
+`replayPhase … = some (k, b)` with `replayPhase_sound`. -/
+private def replayProp (kind : GoalKind) (n stepsE a b : Expr) :
+    MetaM (Expr × (Expr → Expr)) := do
+  match kind with
+  | .exact =>
+    let table := mkConst ``defaultCheckers
+    let prop ← mkEq (mkApp4 (mkConst ``replay) n table stepsE a) (← mkAppM ``Option.some #[b])
+    return (prop, fun h => mkAppN (mkConst ``replay_sound) #[n, table, stepsE, a, b, h])
+  | .upToPhase =>
+    let table := mkConst ``defaultPhaseFinders
+    let prop ← mkEq (mkApp4 (mkConst ``replayUpToPhase) n table stepsE a)
+      (← mkAppM ``Option.some #[b])
+    return (prop, fun h => mkAppN (mkConst ``replayUpToPhase_sound) #[n, table, stepsE, a, b, h])
+  | .withPhase k =>
+    let table := mkConst ``defaultPhaseFinders
+    let prop ← mkEq (mkApp4 (mkConst ``replayPhase) n table stepsE a)
+      (← mkAppM ``Option.some #[← mkAppM ``Prod.mk #[k, b]])
+    return (prop, fun h => mkAppN (mkConst ``replayPhase_sound) #[n, table, stepsE, k, a, b, h])
+
+/-- Assemble the trace and close the goal by the soundness theorem of the
+goal's relation applied to a kernel evaluation of the replay. If the kernel
+refuses the trace, look for a window it refutes on its own wires and report
+it; for a goal with a named phase, also check whether the trace replays
+with a different phase, and name that one. -/
+private def closeByReplay (kind : GoalKind) (n a b : Expr) (st : State) (ws : Array Window) :
+    TacticM Unit := do
   let inverted ← st.stepsR.reverse.mapM fun s => do
     let some s' := s.invert | throwError "internal error: a window step on the right-hand circuit"
     return s'
   let steps := st.stepsL ++ inverted
   trace[circuit.certificate] "[{MessageData.joinSep (steps.toList.map MStep.format) ", "}]"
   let stepsE ← mkListLit (mkApp (mkConst ``Step) n) (steps.toList.map (·.toExpr n))
-  let table := mkConst ``defaultCheckers
-  let prop ← mkEq (mkApp4 (mkConst ``replay) n table stepsE a) (← mkAppM ``Option.some #[b])
+  let (prop, close) ← replayProp kind n stepsE a b
   let h ←
     try proveBy prop (← `(tactic| decide +kernel))
     catch e =>
+      let upTo := if kind.isPhase then " up to a global phase" else ""
       for w in ws do
         let refuted ← observing? (proveBy (mkNot w.smallProp) (← `(tactic| decide +kernel)))
         if refuted.isSome then
-          throwError "the window {sideMsg w.left} ↔ {sideMsg w.right} is not an equivalence: \
-            on its wires the kernel refutes{indentExpr w.smallProp}"
-      throwError "the certificate was not accepted by `replay`:{indentExpr stepsE}\n\
+          let mut hint : MessageData := ""
+          unless kind.isPhase do
+            let phaseProp ← mkAppM ``EquivalentUpToPhase #[w.a, w.b]
+            if (← observing? (proveBy phaseProp (← `(tactic| decide +kernel)))).isSome then
+              hint := "\nThe window does hold up to a global phase: state the goal as \
+                c₁ ≡ₚ c₂ (or c₁ ≡ₚ[k] c₂) and this window is accepted."
+          throwError "the window {sideMsg w.left} ↔ {sideMsg w.right} is not an \
+            equivalence{upTo}: on its wires the kernel refutes{indentExpr w.smallProp}{hint}"
+      if let .withPhase k := kind then
+        let (open_, _) ← replayProp .upToPhase n stepsE a b
+        if (← observing? (proveBy open_ (← `(tactic| decide +kernel)))).isSome then
+          for j in [0:8] do
+            let jE ← mkNumeral (mkApp (mkConst ``Fin) (mkNatLit 8)) j
+            let (named, _) ← replayProp (.withPhase jE) n stepsE a b
+            if (← observing? (proveBy named (← `(tactic| decide +kernel)))).isSome then
+              throwError "the circuits are equal up to the global phase ω ^ {j}, not \
+                ω ^ {k}: the goal that holds is c₁ ≡ₚ[{j}] c₂"
+      throwError "the certificate was not accepted by the replay:{indentExpr stepsE}\n\
         {e.toMessageData}"
-  (← getMainGoal).assign (mkAppN (mkConst ``replay_sound) #[n, table, stepsE, a, b, h])
+  (← getMainGoal).assign (close h)
   replaceMainGoal []
 
 /-! ### The tactics -/
 
 /-- Cancel checked inverse pairs on both sides, then align the remainders
 by checked commutations; the result is one certificate replayed by the
-kernel. -/
+kernel. The goal is `c₁ ≡ᵤ c₂`; `c₁ ≡ₚ c₂` and `c₁ ≡ₚ[0] c₂` are accepted
+too, and proved by the same exact moves. -/
 elab "circuit_simp" : tactic => withMainContext do
-  let (n, a, b) ← readGoal
+  let (kind, n, a, b) ← readGoal
   let (left, stepsL) ← cancelPairs .left (← readCircuit a)
   let (right, stepsR) ← cancelPairs .right (← readCircuit b)
   let st ← alignWindows #[] 0 { left, right, done := 0, stepsL, stepsR }
-  closeByReplay n a b st #[]
+  closeByReplay kind n a b st #[]
 
 /-- Prove `c₁ ≡ᵤ c₂` from an alignment: a list of windows `(aᵢ, bᵢ)`, each
 a pair of gate lists on the full register, in the order they occur. Each
 window becomes a `window` step decided on its own wires; every other move
-is a checked commutation. -/
+is a checked commutation.
+
+On a goal `c₁ ≡ₚ c₂` each window need only hold up to a global phase of
+its own, which the kernel finds on the window's wires; on `c₁ ≡ₚ[k] c₂` the
+phases of the windows must add up to `k`, and if they add up to something
+else the error names it. -/
 elab "circuit_windows " ws:term : tactic => withMainContext do
-  let (n, a, b) ← readGoal
+  let (kind, n, a, b) ← readGoal
   let circ := mkApp (mkConst ``Quantum.Circuit) n
   let listTy ← mkAppM ``List #[← mkAppM ``Prod #[circ, circ]]
   let wsE ← instantiateMVars (← elabTermEnsuringType ws (some listTy))
@@ -436,9 +521,9 @@ elab "circuit_windows " ws:term : tactic => withMainContext do
   for p in ← readList wsE do
     let p ← whnf p
     let_expr Prod.mk _ _ l r := p | throwError "expected a pair of circuits, got{indentExpr p}"
-    windows := windows.push (← mkWindow n (← readCircuit l) (← readCircuit r))
+    windows := windows.push (← mkWindow kind n (← readCircuit l) (← readCircuit r))
   let st ← alignWindows windows 0
     { left := ← readCircuit a, right := ← readCircuit b, done := 0, stepsL := #[], stepsR := #[] }
-  closeByReplay n a b st windows
+  closeByReplay kind n a b st windows
 
 end Quantum.Circuit.Tactic

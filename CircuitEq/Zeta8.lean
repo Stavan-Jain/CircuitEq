@@ -173,6 +173,23 @@ lemma star_ω : star ω = -ω ^ 3 := by decide +kernel
 lemma star_I : star I = -I := by decide +kernel
 lemma star_invSqrt2 : star invSqrt2 = invSqrt2 := by decide +kernel
 
+/-! ### Exponents of `ω` live in `Fin 8`
+
+`ω ^ 8 = 1`, so a power of `ω` is named by an exponent modulo eight. Global
+phases are carried as `k : Fin 8`, whose addition and negation are already
+modular, and these lemmas are what makes phases compose. -/
+
+/-- An exponent of `ω` may be reduced modulo eight. -/
+lemma ω_pow_mod (m : ℕ) : ω ^ (m % 8) = ω ^ m := (pow_eq_pow_mod m ω_pow_eight).symm
+
+/-- Exponents in `Fin 8` add: the sum wraps at eight, and so does `ω`. -/
+lemma ω_pow_val_add (j k : Fin 8) : ω ^ ((j + k : Fin 8) : ℕ) = ω ^ (j : ℕ) * ω ^ (k : ℕ) := by
+  rw [Fin.val_add, ω_pow_mod, pow_add]
+
+/-- The exponent `-k` in `Fin 8` names the inverse of `ω ^ k`. -/
+lemma ω_pow_val_neg_mul : ∀ k : Fin 8, ω ^ ((-k : Fin 8) : ℕ) * ω ^ (k : ℕ) = 1 := by
+  decide +kernel
+
 end Zeta8
 
 end Quantum
