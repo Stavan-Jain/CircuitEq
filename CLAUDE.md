@@ -321,6 +321,15 @@ Rules that follow, for anyone adding to the library:
   that pre-checks a pair and names a mutant's witness generator.
   `scripts/chunked_decide.py <Module>` emits and times the chunked basis
   decide of a benchmark module; `scripts/chunks.py` is what both share.
+- `docs/tool-survey.md`, `scripts/hard_pair.py`, `benchmarks/hard_pair/` —
+  the survey of published equivalence checkers and optimisers (where each
+  stops scaling, and which structural quantity sets its cost), and a pair
+  built from it to sit past all of them: random all-to-all Clifford+T rounds
+  against the same unitary in Pauli-rotation form with spider nests folded
+  in, plus two one-gate mutants. `hard_pair.py ladder` runs PyZX, quizx,
+  QCEC and numpy checks on a ladder of sizes under a timeout and a memory
+  watchdog (the harness env `envs/qcec`); CI runs its self-test. The pair is
+  a target for the checker, not a regression test: nothing proves it yet.
 - `PLAYBOOK.md` — the prover's guide: what exists, what it costs, and in
   which order to try it on a concrete pair. The agent harness installs it
   as the `CLAUDE.md` of every run (`benchmarks/harness/PLAYBOOK.core.md`
