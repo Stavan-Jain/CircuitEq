@@ -348,17 +348,17 @@ cheap one.
 `ℚ(ζ₈)`), `Bits`, `Gates` (`Gate1`, the matrices, `applyOne`, `applyCNOT`),
 `Dyadic` (the ring the evaluator computes in), `Chunk` (`AllBelow`, a check
 proved one index range per declaration), `Semantics` (`Instr`, `Circuit`,
-`denote`, the relations `≡ᵤ`, `≡ₚ`, `≡ₚ[k]`, `≡ₛ`: the trusted
-definitions), `Relations` (their algebra and `calc`), `Decide` (the basis
-reduction, the evaluators, the `Decidable` instances, `checkEquivAt`,
-`findPhase`), `Checker` (the `check` + `sound`
-contract, `PhaseFinder`), `Structural` (fusion, commutation, layers,
-`phaseGadget`), `Support` (wire sets as bitmasks), `PhasePoly`, `Tableau`,
-`Rewriting`, `Layers`, `Embedding` (`rename`, the locality theorem),
-`Certificate` (`Step`, `replay`, `replay_sound`, `circuit_replay`;
-`replayPhase_sound`, `circuit_replay_phase`), `Tactic`, `Examples` (worked
-identities, the quickest way to see each tool
-used), and `Benchmarks/` (whole pairs proved with the patterns above).
+`denote`, the relations `≡ᵤ`, `≡ₚ`, `≡ₚ[k]`, `≡ₛ`: the trusted definitions),
+`Relations` (their algebra and `calc`), `Decide` (the basis reduction, the
+evaluators, the `Decidable` instances, `checkEquivAt`, `findPhase`), `Checker`
+(the `check` + `sound` contract, `PhaseFinder`), `Structural` (fusion,
+commutation, layers, `phaseGadget`), `Support` (wire sets as bitmasks),
+`PhasePoly`, `Tableau`, `Rewriting`, `Layers`, `Embedding` (`rename`, the
+locality theorem), `Certificate` (`Step`, `replay`, `replay_sound`,
+`circuit_replay`; `replayPhase_sound`, `circuit_replay_phase`), `Defaults` (the
+checker tables `defaultCheckers`, `defaultPhaseFinders`), `Tactic`, `Examples`
+(worked identities, the quickest way to see each tool used), and `Benchmarks/`
+(whole pairs proved with the patterns above).
 
 ## Conventions that bite
 

@@ -210,40 +210,40 @@ Rules that follow, for anyone adding to the library:
 - `CircuitEq/Layers.lean` — `cnotNetwork`, `swapEndpoints`, `hOn` (a layer
   indexed by a `Finset`), `hOn_symmDiff`, `cnotNetwork_layer`, and the
   benchmark-facing `layer_cnotNetwork_hLayer`.
-- `CircuitEq/Certificate.lean` — the certificate language: `Step n`
-  (`swap`, `moveLeft`, `moveRight`, `cancel`, `insert`, `window`), plain
-  data with positions as `ℕ`; `replay Cs steps c : Option (Circuit n)`, a
-  kernel-friendly interpreter that checks each step (`Instr.CanCommute`,
-  `masksDisjoint` on supports, `Instr.CanCancel`, or checker `k` of the
-  table `Cs : CheckerTable` on the window's own wires); `replay_sound`;
-  `defaultCheckers` (index 0: `phasePolyChecker` with `evalChecker` as
-  fallback, so a CNOT-plus-diagonal window is decided symbolically and
-  only otherwise by the basis; index 1: `syntacticChecker`);
-  the closing form `replay_sound Cs steps (by decide +kernel)` and the
-  macro `circuit_replay Cs steps`. Never imported by a checker module. A
-  new proof technique is a new step kind here with its case in
-  `replayStep_sound`; the kernel evaluates `replay` once per proof.
-  The same `Step`s replay up to a global phase: `replayPhase Fs steps c :
-  Option (Fin 8 × Circuit n)` reads a `window` against a `PhaseTable` of
-  `PhaseFinder`s (`windowPhase`), places it syntactically (`placeFront`)
-  and adds the exponent found to an accumulator; every other step is the
-  exact rewrite. `replayPhase_sound : replayPhase Fs steps c = some (k, c')
-  → c ≡ₚ[k] c'`, so the kernel computes the phase of the whole pair;
-  `replayUpToPhase` / `replayUpToPhase_sound` forget it and conclude
-  `c ≡ₚ c'`; `defaultPhaseFinders` (index 0: `phasePolyChecker` lifted,
-  then `evalPhaseFinder`; index 1: syntactic) and the macro
-  `circuit_replay_phase Fs steps`, which closes either goal. `replay`,
-  `replayStep` and `replay_sound` are unchanged; `rewriteAt_rel` is
-  `rewriteAt_sound` for any relation that `cons` preserves, and a new step
-  kind needs its case in `replayStepPhase_sound` too. Measured: the phase
-  replay costs 1.2 times the exact one on `Tof3`'s trace (62 steps, four
-  windows: 0.19 s against 0.16 s of kernel time, the same whether the
-  phase is named or not), and 128 one-wire phase windows replay in 0.7 s
-  against 0.4 s for 128 exact ones. Measure with `set_option Elab.async
-  false`: with asynchronous elaboration the kernel checks of neighbouring
-  declarations overlap and the profiler's figures grow with position in
-  the file. The scalar replay for `≡ₛ` (so that the tableau can justify a
-  window) is still open (`QUEUE.md` item 13).
+- `CircuitEq/Certificate.lean` — the certificate language: `Step n` (`swap`,
+  `moveLeft`, `moveRight`, `cancel`, `insert`, `window`), plain data with
+  positions as `ℕ`; `replay Cs steps c : Option (Circuit n)`, a kernel-friendly
+  interpreter that checks each step (`Instr.CanCommute`, `masksDisjoint` on
+  supports, `Instr.CanCancel`, or checker `k` of the table `Cs : CheckerTable`
+  on the window's own wires); `replay_sound`; the closing form `replay_sound Cs
+  steps (by decide +kernel)` and the macro `circuit_replay Cs steps`. Generic in
+  the table: it imports no checker, and no checker module imports it. A new
+  proof technique is a new step kind here with its case in `replayStep_sound`;
+  the kernel evaluates `replay` once per proof. The same `Step`s replay up to a
+  global phase: `replayPhase Fs steps c : Option (Fin 8 × Circuit n)` reads a
+  `window` against a `PhaseTable` of `PhaseFinder`s (`windowPhase`), places it
+  syntactically (`placeFront`) and adds the exponent found to an accumulator;
+  every other step is the exact rewrite. `replayPhase_sound : replayPhase Fs
+  steps c = some (k, c') → c ≡ₚ[k] c'`, so the kernel computes the phase of the
+  whole pair; `replayUpToPhase` / `replayUpToPhase_sound` forget it and conclude
+  `c ≡ₚ c'`; the macro `circuit_replay_phase Fs steps`, which closes either
+  goal. `rewriteAt_rel` is `rewriteAt_sound` for any relation that `cons`
+  preserves, and a new step kind needs its case in `replayStepPhase_sound` too.
+  Measured: the phase replay costs 1.2 times the exact one on `Tof3`'s trace (62
+  steps, four windows: 0.19 s against 0.16 s of kernel time, the same whether
+  the phase is named or not), and 128 one-wire phase windows replay in 0.7 s
+  against 0.4 s for 128 exact ones. Measure with `set_option Elab.async false`:
+  with asynchronous elaboration the kernel checks of neighbouring declarations
+  overlap and the profiler's figures grow with position in the file. The scalar
+  replay for `≡ₛ` (so that the tableau can justify a window) is still open
+  (`QUEUE.md` item 13).
+- `CircuitEq/Defaults.lean` — the tables the tactics replay under, and the
+  one place a checker joins them: `defaultCheckers` (index 0:
+  `phasePolyChecker` with `evalChecker` as fallback, so a
+  CNOT-plus-diagonal window is decided symbolically and only otherwise by
+  the basis; index 1: `syntacticChecker`) and `defaultPhaseFinders` (index
+  0: `phasePolyChecker` lifted, then `evalPhaseFinder`; index 1:
+  syntactic).
 - `CircuitEq/Tactic.lean` — `circuit_simp` (cancel checked inverse pairs
   through commuting gates, then align two concrete lists gate by gate) and
   `circuit_windows [(a₁, b₁), …]` (the window pattern: each window is

@@ -14,6 +14,7 @@ import CircuitEq.Tableau
 import CircuitEq.Rewriting
 import CircuitEq.Layers
 import CircuitEq.Certificate
+import CircuitEq.Defaults
 import CircuitEq.Tactic
 import CircuitEq.Embedding
 import CircuitEq.Benchmarks.Rep3PhaseFlip

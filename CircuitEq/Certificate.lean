@@ -7,7 +7,6 @@ import CircuitEq.Rewriting
 import CircuitEq.Embedding
 import CircuitEq.Checker
 import CircuitEq.Support
-import CircuitEq.PhasePoly
 
 /-!
 # The certificate language and its replay interpreter
@@ -46,12 +45,11 @@ Positions are indices into the instruction list, in time order.
   depends on `wires.length`, never on `n`.
 
 A checker table `Cs : CheckerTable` gives, for each register size, the
-checkers a window may name by index. `defaultCheckers` has, at index `0`, the
-phase-polynomial checker with the basis evaluator `evalChecker` as its
-fallback, and `syntacticChecker` at index `1`;
-every certified checker written against `CircuitEq.Checker` can be added to
-a table, and `replay_sound` holds for every table because each checker
-carries its own proof.
+checkers a window may name by index. Every certified checker written
+against `CircuitEq.Checker` can be added to a table, and `replay_sound`
+holds for every table because each checker carries its own proof. This
+file imports no checker; the tables the tactics use, `defaultCheckers` and
+`defaultPhaseFinders`, are in `CircuitEq.Defaults`.
 
 ## Replay
 
@@ -78,8 +76,9 @@ the exponent `q` with `a ≡ₚ[q] b` on the window's wires, the interpreter
 adds the exponents up in `Fin 8`, and the result is `some (k, c₂)`.
 `replayPhase_sound` concludes `c₁ ≡ₚ[k] c₂`, `replayUpToPhase_sound`
 forgets `k`, and `circuit_replay_phase defaultPhaseFinders steps` closes
-either goal. `replay` and `replay_sound` are untouched. See the section
-"Replay up to a global phase" below.
+either goal. The step data is the same for all three relations; only the
+reading of `window` differs. See the section "Replay up to a global phase"
+below.
 
 `Step` and `replay` are meant to be mirrored outside Lean, so that a search
 can run the same interpreter fast and hand Lean only the data
@@ -452,9 +451,8 @@ window's phase (`EquivalentWithPhase.rename`) and so do the gates around it
 (`EquivalentWithPhase.cons`, `append_right`), so the sum of the window
 phases is the phase of the whole: `replayPhase_sound` concludes
 `c ≡ₚ[k] c'` with `k` computed by the kernel, and `replayUpToPhase_sound`
-forgets it and concludes `c ≡ₚ c'`. Neither `replay` nor `replay_sound`
-changes, and a certificate for `≡ᵤ` replays here with phase `0` under a
-table of `Checker.toFinder`s.
+forgets it and concludes `c ≡ₚ c'`. A certificate for `≡ᵤ` replays here
+with phase `0` under a table of `Checker.toFinder`s.
 
 The phase travels as an accumulator so that the interpreter stays a loop,
 and it is matched out of each step's result rather than projected: a step
@@ -629,27 +627,7 @@ theorem replayUpToPhase_sound (Fs : PhaseTable) (steps : List (Step n)) {c c' : 
     exact (replayPhase_sound Fs steps (k := r.1) hr).toUpToPhase
   · exact absurd h (by simp)
 
-/-! ### The default table and the closing form -/
-
-/-- The default checker table. Index `0` tries the phase-polynomial
-checker first (linear in the window's gates, for CNOT-plus-diagonal
-windows of any width) and falls back to the basis evaluator (cost `2 ^ k`
-for a window on `k` wires); `||` is lazy in the kernel, so the evaluator
-runs only when the symbolic check declines. Index `1` is syntactic
-equality. The tableau checker certifies `≡ₛ`, not `≡ᵤ`, and needs a
-scalar variant of `replay` before it can join a table. -/
-def defaultCheckers : CheckerTable := fun k =>
-  [(phasePolyChecker k).orElse (evalChecker k), syntacticChecker k]
-
-/-- The default phase table, index for index the phase form of
-`defaultCheckers`. Index `0` tries the phase-polynomial checker first, which
-answers only for windows that are exactly equal (phase `0`), and falls back
-to the basis evaluator with the phase named (`evalPhaseFinder`, cost `2 ^ k`
-for a window on `k` wires), which is where a window that holds only up to
-phase is decided. Index `1` is syntactic equality. The tableau checker
-certifies `≡ₛ` and does not name a phase, so it cannot join this table. -/
-def defaultPhaseFinders : PhaseTable := fun k =>
-  [(phasePolyChecker k).toFinder.orElse (evalPhaseFinder k), (syntacticChecker k).toFinder]
+/-! ### The closing forms -/
 
 /-- Close a goal `c₁ ≡ᵤ c₂` by replaying a certificate:
 `circuit_replay Cs steps` is `replay_sound Cs steps (by decide +kernel)`,

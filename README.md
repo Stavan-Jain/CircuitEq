@@ -292,7 +292,8 @@ CircuitEq/
 ├── Tableau.lean            Clifford tableau checker, soundness to ≡ₛ
 ├── Rewriting.lean          rewriting in context, checked swaps and cancellations
 ├── Layers.lean             Hadamard-layer algebra, CNOT-network conjugation
-├── Certificate.lean        Step, replay, replay_sound, replayPhase, the tables
+├── Certificate.lean        Step, replay, replay_sound, replayPhase (generic in the checker table)
+├── Defaults.lean           the checker tables the tactics use
 ├── Tactic.lean             circuit_simp, circuit_windows (emit certificates; ≡ᵤ, ≡ₚ, ≡ₚ[k])
 ├── Embedding.lean          the locality theorem: circuits on selected wires
 ├── Examples.lean           worked identities: decided, refuted, structural, placed
