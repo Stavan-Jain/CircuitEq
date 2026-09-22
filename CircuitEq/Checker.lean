@@ -3,7 +3,7 @@ Copyright (c) 2026 Stavan Jain. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stavan Jain
 -/
-import CircuitEq.Semantics
+import CircuitEq.Decide
 
 /-!
 # The checker interface
@@ -19,7 +19,7 @@ beyond `Checker.sound`.
 
 Rules for a module that provides a checker:
 
-* import only `CircuitEq.Semantics`, `CircuitEq.Structural`,
+* import only `CircuitEq.Decide`, `CircuitEq.Structural`,
   `CircuitEq.Support` and this file (plus Mathlib), never the rewriting,
   layer or tactic modules, so that the certificate module can import every
   checker without a cycle;

@@ -32,9 +32,9 @@ Peak memory is that of the largest chunk and total time is unchanged. The
 chunk boundaries are data an external tool chooses, in the spirit of the
 certificate language; `scripts/scale_test.py --chunk` and
 `scripts/chunked_decide.py` emit such files. Consumers:
-`equivalent_of_allBelow` and `equivalentUpToPhase_of_allBelow`
-(`CircuitEq.Semantics`) and `tableau_sound_of_allBelow`
-(`CircuitEq.Tableau`).
+`equivalent_of_allBelow`, `equivalentWithPhase_of_allBelow` and
+`equivalentUpToPhase_of_allBelow` (`CircuitEq.Decide`) and
+`tableau_sound_of_allBelow` (`CircuitEq.Tableau`).
 -/
 
 namespace Quantum.Circuit

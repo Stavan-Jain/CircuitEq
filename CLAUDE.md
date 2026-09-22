@@ -80,37 +80,40 @@ Rules that follow, for anyone adding to the library:
   starts. Consumers: `equivalent_of_allBelow`,
   `equivalentUpToPhase_of_allBelow`, `equivalentWithPhase_of_allBelow`,
   `tableau_sound_of_allBelow`.
-- `CircuitEq/Semantics.lean` — `Instr`, `Circuit n := List (Instr n)`,
-  `denote`, `denoteₗ`, `Equivalent` (`≡ᵤ`), `EquivalentUpToPhase` (`≡ₚ`),
-  `EquivalentUpToScalar` (`≡ₛ`, up to a unit of `Zeta8`; what a tableau
-  certifies), basis reduction, the evaluators `evalList` (reference, over
-  `Zeta8`), `evalListD` (its dyadic form) and `evalFn` (dyadic closures on
-  `ℕ` indices, what the instances run), `checkEquiv` /
-  `checkEquivUpToPhase`, their per-basis-vector chunks `checkEquivAt` /
-  `checkEquivUpToPhaseAt` with `equivalent_of_allBelow` /
-  `equivalentUpToPhase_of_allBelow`, `Decidable` instances, `Trans`
-  instance for `calc`. Up to a global phase there are two relations and
-  one algebra: `EquivalentWithPhase k` (`a ≡ₚ[k] b`, `k : Fin 8`: `a` is
-  `ω ^ k` times `b`) and `≡ₚ`, which is `∃ k` of it by definition
-  (`equivalentUpToPhase_iff_exists`). `EquivalentWithPhase.refl` (phase
-  `0`), `symm` (`-k`), `trans` and `append` (`j + k`, modulo eight because
-  it is `Fin 8`), `append_left` / `append_right` / `cons` /
-  `trans_equivalent` (the phase is kept), `cast` (restate an exponent that
-  arithmetic produced), `toUpToPhase`, `toEquivalent` and
-  `equivalentWithPhase_zero_iff` (`≡ₚ[0]` is `≡ᵤ`); the `≡ₚ` lemmas
-  (`@[refl]`, `@[symm]`, `@[trans]`, `append`, `cons`) are these with the
-  exponent forgotten. `Trans` instances for every pair among `≡ᵤ`,
-  `≡ₚ[k]` and `≡ₚ`, so one `calc` mixes them: exact steps keep a named
-  phase, named phases add (a goal stated with the numeral closes by
-  unification), and one `≡ₚ` step makes the chain `≡ₚ`.
-  `checkEquivWithPhase a b k` with `checkEquivWithPhase_iff` and the
-  `Decidable` instance for `≡ₚ[k]` (one phase, so `decide +kernel` names
-  a window's phase and refutes a wrong one), the chunked
-  `equivalentWithPhase_of_allBelow`, and `findPhase` (`findPhase_sound`,
-  `findPhase_isSome_iff`), the first of the eight phases that passes. When
-  you destructure `h : a ≡ₚ b`, ascribe the component,
-  `obtain ⟨k, (hk : a ≡ₚ[k] b)⟩ := h`, or `hk` has the unfolded type and
-  dot notation fails.
+- `CircuitEq/Semantics.lean` — the trusted core, and nothing else:
+  `Instr`, `Circuit n := List (Instr n)`, the readable constructors,
+  `denote` with `denote_cons` / `_append` / `_add` / `_smul`, and the four
+  relations: `Equivalent` (`≡ᵤ`), `EquivalentWithPhase k` (`a ≡ₚ[k] b`,
+  `k : Fin 8`: `a` is `ω ^ k` times `b`), `EquivalentUpToPhase` (`≡ₚ`,
+  defined as `∃ k, a ≡ₚ[k] b`) and `EquivalentUpToScalar` (`≡ₛ`, up to a
+  unit of `Zeta8`; what a tableau certifies). A trust review reads this
+  file; keep proofs out of it.
+- `CircuitEq/Relations.lean` — the algebra of the relations. `≡ᵤ`:
+  `@[refl]`, `@[symm]`, `@[trans]`, `append`, `cons`, `toWithPhase`,
+  `toUpToPhase`, `toUpToScalar`. `EquivalentWithPhase.refl` (phase `0`),
+  `symm` (`-k`), `trans` and `append` (`j + k`, modulo eight because it is
+  `Fin 8`), `append_left` / `append_right` / `cons` / `trans_equivalent`
+  (the phase is kept), `cast` (restate an exponent that arithmetic
+  produced), `toUpToPhase`, `toEquivalent` and
+  `equivalentWithPhase_zero_iff` (`≡ₚ[0]` is `≡ᵤ`); the `≡ₚ` lemmas are
+  these with the exponent forgotten; `≡ₛ` has `refl`, `symm`, `trans`,
+  `append`. `Trans` instances for every pair among `≡ᵤ`, `≡ₚ[k]` and
+  `≡ₚ`, so one `calc` mixes them: exact steps keep a named phase, named
+  phases add (a goal stated with the numeral closes by unification), and
+  one `≡ₚ` step makes the chain `≡ₚ`.
+- `CircuitEq/Decide.lean` — deciding concrete pairs: `denoteₗ`, basis
+  reduction (`equivalent_iff_basis`, `equivalentWithPhase_iff_basis`), the
+  evaluators `evalList` (reference, over `Zeta8`), `evalListD` (its dyadic
+  form) and `evalFn` (dyadic closures on `ℕ` indices, what the instances
+  run), `checkEquiv`, `checkEquivWithPhase a b k` and `checkEquivUpToPhase`
+  (the first at each of the eight phases) with their `_iff` lemmas, the
+  per-basis-vector chunks `checkEquivAt` / `checkEquivUpToPhaseAt` with
+  `equivalent_of_allBelow`, `equivalentWithPhase_of_allBelow` and
+  `equivalentUpToPhase_of_allBelow`, `findPhase` (`findPhase_sound`,
+  `findPhase_isSome_iff`; the first of the eight phases that passes), and
+  the `Decidable` instances for `≡ᵤ`, `≡ₚ[k]` (one phase, so
+  `decide +kernel` names a window's phase and refutes a wrong one) and
+  `≡ₚ`.
 - `CircuitEq/Checker.lean` — the checker contract: `Checker n` is
   `check : Circuit n → Circuit n → Bool` plus `sound : check a b = true →
   a ≡ᵤ b` (`PhaseChecker`, `ScalarChecker` for `≡ₚ`, `≡ₛ`); `NormalForm n`
@@ -123,7 +126,7 @@ Rules that follow, for anyone adding to the library:
   basis evaluator by `findPhase`), `Checker.toFinder` (an exact checker
   finds `0` or nothing), `PhaseFinder.orElse`, `PhaseFinder.toChecker`.
   A checker module imports only
-  `Semantics`, `Structural`, `Support` and `Checker`, writes `check` as
+  `Decide`, `Structural`, `Support` and `Checker`, writes `check` as
   kernel-friendly `Bool` code, and exports exactly one checker.
 - `CircuitEq/Support.lean` — wire sets as `Nat` bitmasks, the one encoding
   every checker and the certificate language use: `Instr.support`,
@@ -288,7 +291,7 @@ Rules that follow, for anyone adding to the library:
 - `PLAYBOOK.md` — the prover's guide: what exists, what it costs, and in
   which order to try it on a concrete pair. The agent harness installs it
   as the `CLAUDE.md` of every run (`benchmarks/harness/PLAYBOOK.core.md`
-  for the `core` configuration, the modules up to `Semantics.lean`), so it
+  for the `core` configuration, the modules up to `Decide.lean`), so it
   is all an agent under test knows about the library. **When a checker, a
   tactic, a certificate step or a block theorem lands, update its decision
   list in the same commit** (both playbooks if the module is in
@@ -490,7 +493,7 @@ Do not run `lake build` between diagnostics edits; one build at the end.
 ## Kernel-cost notes
 
 The `Decidable` instances for `≡ᵤ`, `≡ₚ` and `≡ₚ[k]` run `checkEquiv`,
-`checkEquivUpToPhase` and `checkEquivWithPhase` (`Semantics.lean`): the
+`checkEquivUpToPhase` and `checkEquivWithPhase` (`Decide.lean`): the
 closure evaluator `evalFn` over `Dyadic8` (`Dyadic.lean`), the gcd-free
 ring `ℤ[ω, 1/√2]`, on
 `ℕ`-indexed states, proved equal to `denote` (`toZeta8_evalFn`). The kernel

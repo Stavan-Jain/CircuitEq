@@ -281,7 +281,9 @@ CircuitEq/
 ├── Gates.lean              Gate1 alphabet, 2×2 matrices, applyOne / applyCNOT
 ├── Dyadic.lean             ℤ[ω, 1/√2]: the gcd-free ring the kernel computes in
 ├── Chunk.lean              chunked kernel evaluation: one declaration per index range
-├── Semantics.lean          Instr, Circuit, denote, ≡ᵤ, ≡ₚ, ≡ₚ[k], ≡ₛ, decidability
+├── Semantics.lean          the trusted core: Instr, Circuit, denote, ≡ᵤ, ≡ₚ, ≡ₚ[k], ≡ₛ
+├── Relations.lean          their algebra: refl, symm, trans, append, calc
+├── Decide.lean             basis reduction, the evaluators, decidability
 ├── Checker.lean            the checker contract: check + sound, normal forms, PhaseFinder
 ├── Structural.lean         the parametric toolkit: fusion, commutation, layers, phaseGadget
 ├── Support.lean            wire sets as Nat bitmasks

@@ -50,9 +50,9 @@ specialised `Gate1.applyD` instead: a diagonal gate is a coordinate shuffle
 (`mulω`, `mulI`, …) on the amplitudes with the bit set, `X` and `Y` are the
 flip with a shuffle, and `H` is one `add` and an exponent bump, with no
 `Dyadic8` product anywhere. `Gate1.applyN` and `applyCNOTN` are the same
-actions on `ℕ`-indexed states, definitionally, which is what lets the
-kernel memoise the closure evaluator of `CircuitEq.Semantics` (see the
-section docstring below).
+actions on `ℕ`-indexed states (definitionally, up to unfolding `VecN.at`),
+which is what lets the kernel memoise the closure evaluator of
+`CircuitEq.Decide` (see the section docstring below).
 
 ## Trust
 
@@ -60,7 +60,7 @@ section docstring below).
 `denote` and `≡ᵤ`. Every operation comes with its `toZeta8_*` lemma, the
 dyadic gate matrices are checked against `Gate1.mat` entry by entry, and
 every gate action has a correspondence lemma with `applyOne` or
-`applyCNOT`. `CircuitEq/Semantics.lean` builds the evaluators on top and
+`applyCNOT`. `CircuitEq/Decide.lean` builds the evaluators on top and
 routes the `Decidable` instances through them, so the kernel never sees a
 rational.
 

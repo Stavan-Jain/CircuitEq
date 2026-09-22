@@ -23,7 +23,8 @@ phase-polynomial fold and the kernel replay in the trust policy).
   `Circuit 5`, `[H 0, CX 0 1, T 1]` and the notation below resolve. Ascribe
   one side of a literal equivalence, `([H 0, H 0] : Circuit 1) ≡ᵤ []`: the
   qubit count is not inferable from the list.
-- Four relations, in `CircuitEq/Semantics.lean`:
+- Four relations, defined in `CircuitEq/Semantics.lean`, with their algebra
+  in `CircuitEq/Relations.lean`:
   - `a ≡ᵤ b` (`Equivalent`): `∀ ψ, denote a ψ = denote b ψ`. It has
     `refl`, `symm`, `trans`, `append`, `cons`, and `calc` works.
   - `a ≡ₚ b` (`EquivalentUpToPhase`): equal up to a power of `ω = e^{iπ/4}`.
@@ -347,8 +348,10 @@ cheap one.
 `ℚ(ζ₈)`), `Bits`, `Gates` (`Gate1`, the matrices, `applyOne`, `applyCNOT`),
 `Dyadic` (the ring the evaluator computes in), `Chunk` (`AllBelow`, a check
 proved one index range per declaration), `Semantics` (`Instr`, `Circuit`,
-`denote`, the relations `≡ᵤ`, `≡ₚ`, `≡ₚ[k]`, `≡ₛ` and their algebra,
-decidability, `checkEquivAt`, `findPhase`), `Checker` (the `check` + `sound`
+`denote`, the relations `≡ᵤ`, `≡ₚ`, `≡ₚ[k]`, `≡ₛ`: the trusted
+definitions), `Relations` (their algebra and `calc`), `Decide` (the basis
+reduction, the evaluators, the `Decidable` instances, `checkEquivAt`,
+`findPhase`), `Checker` (the `check` + `sound`
 contract, `PhaseFinder`), `Structural` (fusion, commutation, layers,
 `phaseGadget`), `Support` (wire sets as bitmasks), `PhasePoly`, `Tableau`,
 `Rewriting`, `Layers`, `Embedding` (`rename`, the locality theorem),

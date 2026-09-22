@@ -90,7 +90,7 @@ RELATIONS = {
 CLAIMS = ("equiv", "not_equiv")
 
 # The modules the `core` configuration keeps: the semantics and nothing else.
-CORE_MODULES = ("Zeta8", "Bits", "Gates", "Dyadic", "Chunk", "Semantics")
+CORE_MODULES = ("Zeta8", "Bits", "Gates", "Dyadic", "Chunk", "Semantics", "Relations", "Decide")
 
 # Removed from every run workspace: documents that quote benchmark proofs, and
 # fixtures that record alignments. `CLAUDE.md` is replaced by the playbook.
@@ -793,7 +793,10 @@ def strip_to_core(ws: Path) -> None:
     for d in sorted((p for p in lib.rglob("*") if p.is_dir()), reverse=True):
         if not any(d.iterdir()):
             d.rmdir()
-    (ws / "CircuitEq.lean").write_text("".join(f"import CircuitEq.{m}\n" for m in CORE_MODULES))
+    # A library commit from before `Relations` and `Decide` were split out of `Semantics`
+    # has fewer core modules; import the ones it has.
+    present = [m for m in CORE_MODULES if (lib / f"{m}.lean").exists()]
+    (ws / "CircuitEq.lean").write_text("".join(f"import CircuitEq.{m}\n" for m in present))
     shutil.rmtree(ws / "scripts", ignore_errors=True)
 
 
@@ -1494,7 +1497,7 @@ def add_run_options(p: argparse.ArgumentParser) -> None:
     p.add_argument("task")
     p.add_argument("--commit", default="HEAD", help="library commit (must have been prepared)")
     p.add_argument("--config", choices=("full", "core"), default="full",
-                   help="`core` strips the library to the modules up to Semantics")
+                   help="`core` strips the library to the semantics and its decision procedures")
     p.add_argument("--budget-min", type=int, default=30)
     p.add_argument("--memory-gb", type=int, default=6, help="limit per Lean process")
     p.add_argument("--setup-timeout-min", type=int, default=30)

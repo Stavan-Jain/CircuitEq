@@ -40,7 +40,8 @@ three, so that a difference can be attributed.
 - **The model** (a pinned id, `claude-fable-5-1` by default, not an alias).
 
 Two configurations of the library: `full`, and `core`, which strips the run
-copy down to the modules up to `Semantics.lean` and uses
+copy down to the semantics and its decision procedures (`CORE_MODULES`,
+up to `Decide.lean`) and uses
 `PLAYBOOK.core.md`. Their difference is the project's hypothesis.
 
 ## Running it
@@ -487,8 +488,9 @@ choice among candidates with a stand-in for Lean.
   user account.
 - The `core` configuration is untested. `--config core` strips the run copy
   to `CORE_MODULES` of `agent_harness.py` (`Zeta8`, `Bits`, `Gates`,
-  `Dyadic`, `Chunk`, `Semantics`; `Chunk` because `Semantics.lean` imports
-  it) with `PLAYBOOK.core.md`, and no run has used it yet.
+  `Dyadic`, `Chunk`, `Semantics`, `Relations`, `Decide`; `Dyadic` and
+  `Chunk` because `Decide.lean` imports them) with `PLAYBOOK.core.md`, and
+  no run has used it yet.
 - Depth as a cost (it needs a definition in Lean that the kernel evaluates
   cheaply), and any cost that is not a count.
 - A playbook section on optimising: which oracles exist and how to call them.

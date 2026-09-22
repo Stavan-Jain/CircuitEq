@@ -50,7 +50,7 @@ with a summary table, and the record of which declarations a proof uses
    protocol's limits (one hour, 16 GB); then judges. The agent may write
    any Lean it likes, new lemmas, checkers and step kinds included. The
    judge for v0 is a person reading the diff: no existing file changed
-   (the modules up to `Semantics.lean`, the circuit `def`s and the
+   (the trusted `Semantics.lean`, the circuit `def`s and the
    statement above all), `lake build` passes and `#print axioms` shows
    the standard three. The axiom check alone is not enough: on this
    toolchain `set_option debug.skipKernelTC true` lets a false
@@ -62,8 +62,8 @@ with a summary table, and the record of which declarations a proof uses
    declarations the proof uses (the roadmap's flywheel record).
    Tasks v0, ordered by gates times width: the five promoted pairs, the
    survey's eleven circuits under both pipelines, and one gate-deleted
-   mutant of each. Two configurations, the full library and the modules
-   up to `Semantics.lean` alone, since their difference is the
+   mutant of each. Two configurations, the full library and the semantics
+   with its decision procedures alone (up to `Decide.lean`), since their difference is the
    hypothesis. An optimiser track follows item 2: the input is one
    circuit, the answer is `c'` with a proof of `c ≡ᵤ c'` and
    `tCount c' = k`, and `k` is reported against the uncertified T-counts
