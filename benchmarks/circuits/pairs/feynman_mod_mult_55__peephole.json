@@ -1,0 +1,82 @@
+{
+ "name": "feynman_mod_mult_55__peephole",
+ "qubits": 9,
+ "relation": "u",
+ "expected": "equiv",
+ "split": "held-out",
+ "family": "mod_mult",
+ "rung": 55,
+ "source": {
+  "generator": "scripts/circuit_pairs.py",
+  "optimiser": "peephole",
+  "circuit": "feynman_mod_mult_55",
+  "circuit_source": {
+   "source": "feynman",
+   "path": "benchmarks/qasm/mod_mult_55.qasm",
+   "sha256": "331cdd418872c0f2e627b83e7a72ecf95ec78630f294459563d92bef4c46c0fe"
+  },
+  "circuit_licence": "BSD-3-Clause",
+  "twin": "peephole",
+  "twin_tool": {
+   "tool": "scripts/peephole_pairs.py peephole",
+   "rewrites": 16,
+   "seconds": 0.0
+  },
+  "tier": 1,
+  "relation_found": {
+   "method": "unitary",
+   "relation": "exact",
+   "max_abs_diff": 1.1253585863309762e-15
+  },
+  "gates": [
+   147,
+   117
+  ],
+  "t_count": [
+   49,
+   45
+  ],
+  "h_count": [
+   42,
+   14
+  ],
+  "cx_count": [
+   48,
+   48
+  ],
+  "fragment": [
+   "general",
+   "general"
+  ],
+  "diff_matched": {
+   "raw": {
+    "matched": 115,
+    "of": 147,
+    "fraction": 0.7823
+   },
+   "greedy/cancommute": {
+    "matched": 115,
+    "of": 147,
+    "fraction": 0.7823
+   }
+  },
+  "segments": {
+   "raw": {
+    "segments": 30,
+    "longest": 160
+   },
+   "greedy/cancommute": {
+    "segments": 117,
+    "longest": 4
+   }
+  }
+ },
+ "holdout_delete": [
+  "scripts/circuit_pairs.py",
+  "scripts/circuit_sources.py",
+  "scripts/peephole_pairs.py"
+ ],
+ "known_leaks": [],
+ "original": ["X 2", "H 7", "H 7", "H 7", "CX 2 7", "Tdg 7", "CX 0 7", "T 7", "CX 2 7", "Tdg 7", "CX 0 7", "T 2", "T 7", "H 7", "CX 0 2", "T 0", "Tdg 2", "CX 0 2", "H 7", "H 7", "X 2", "X 0", "H 6", "H 8", "H 6", "H 6", "CX 7 6", "Tdg 6", "CX 1 6", "T 6", "CX 7 6", "Tdg 6", "CX 1 6", "T 7", "T 6", "H 6", "CX 1 7", "T 1", "Tdg 7", "CX 1 7", "H 6", "H 8", "H 8", "CX 2 8", "Tdg 8", "CX 0 8", "T 8", "CX 2 8", "Tdg 8", "CX 0 8", "T 2", "T 8", "H 8", "CX 0 2", "T 0", "Tdg 2", "CX 0 2", "H 8", "H 8", "H 6", "CX 6 5", "CX 6 3", "CX 8 7", "X 1", "X 7", "H 3", "H 6", "H 6", "H 6", "CX 8 6", "Tdg 6", "CX 1 6", "T 6", "CX 8 6", "Tdg 6", "CX 1 6", "T 8", "T 6", "H 6", "CX 1 8", "T 1", "Tdg 8", "CX 1 8", "H 6", "H 3", "H 3", "CX 7 3", "Tdg 3", "CX 1 3", "T 3", "CX 7 3", "Tdg 3", "CX 1 3", "T 7", "T 3", "H 3", "CX 1 7", "T 1", "Tdg 7", "CX 1 7", "H 3", "H 6", "H 3", "X 1", "CX 6 4", "CX 5 8", "H 5", "H 8", "H 5", "H 5", "CX 7 5", "Tdg 5", "CX 1 5", "T 5", "CX 7 5", "Tdg 5", "CX 1 5", "T 7", "T 5", "H 5", "CX 1 7", "T 1", "Tdg 7", "CX 1 7", "H 5", "H 8", "H 8", "CX 2 8", "Tdg 8", "CX 0 8", "T 8", "CX 2 8", "Tdg 8", "CX 0 8", "T 2", "T 8", "H 8", "CX 0 2", "T 0", "Tdg 2", "CX 0 2", "H 8", "H 8", "H 5", "X 0", "X 7", "CX 5 8"],
+ "optimized": ["X 2", "H 7", "CX 2 7", "Tdg 7", "CX 0 7", "T 7", "CX 2 7", "Tdg 7", "CX 0 7", "T 2", "T 7", "CX 0 2", "T 0", "Tdg 2", "CX 0 2", "H 7", "X 2", "X 0", "H 6", "CX 7 6", "Tdg 6", "CX 1 6", "T 6", "CX 7 6", "Tdg 6", "CX 1 6", "T 7", "T 6", "CX 1 7", "T 1", "Tdg 7", "CX 1 7", "H 8", "CX 2 8", "Tdg 8", "CX 0 8", "T 8", "CX 2 8", "Tdg 8", "CX 0 8", "T 2", "T 8", "CX 0 2", "Tdg 2", "CX 0 2", "H 8", "H 6", "CX 6 5", "CX 6 3", "CX 8 7", "X 1", "X 7", "H 6", "CX 8 6", "Tdg 6", "CX 1 6", "T 6", "CX 8 6", "Tdg 6", "CX 1 6", "T 8", "T 6", "CX 1 8", "Tdg 8", "CX 1 8", "H 3", "CX 7 3", "Tdg 3", "CX 1 3", "T 3", "CX 7 3", "Tdg 3", "CX 1 3", "T 7", "T 3", "CX 1 7", "S 1", "Tdg 7", "CX 1 7", "H 6", "H 3", "X 1", "CX 6 4", "CX 5 8", "H 5", "CX 7 5", "Tdg 5", "CX 1 5", "T 5", "CX 7 5", "Tdg 5", "CX 1 5", "T 7", "T 5", "CX 1 7", "T 1", "Tdg 7", "CX 1 7", "H 8", "CX 2 8", "Tdg 8", "CX 0 8", "T 8", "CX 2 8", "Tdg 8", "CX 0 8", "T 2", "T 8", "CX 0 2", "S 0", "Tdg 2", "CX 0 2", "H 8", "H 5", "X 0", "X 7", "CX 5 8"]
+}

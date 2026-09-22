@@ -1,0 +1,73 @@
+{
+  "verdict": "ACCEPT",
+  "claim": "equiv",
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "reasons": [],
+  "warnings": [
+    "Solution/Seg0.lean: `set_option`",
+    "Solution/Seg1.lean: `set_option`",
+    "Solution/Seg10.lean: `set_option`",
+    "Solution/Seg11.lean: `set_option`",
+    "Solution/Seg12.lean: `set_option`",
+    "Solution/Seg13.lean: `set_option`",
+    "Solution/Seg14.lean: `set_option`",
+    "Solution/Seg15.lean: `set_option`",
+    "Solution/Seg16.lean: `set_option`",
+    "Solution/Seg17.lean: `set_option`",
+    "Solution/Seg18.lean: `set_option`",
+    "Solution/Seg2.lean: `set_option`",
+    "Solution/Seg3.lean: `set_option`",
+    "Solution/Seg4.lean: `set_option`",
+    "Solution/Seg5.lean: `set_option`",
+    "Solution/Seg6.lean: `set_option`",
+    "Solution/Seg7.lean: `set_option`",
+    "Solution/Seg8.lean: `set_option`",
+    "Solution/Seg9.lean: `set_option`"
+  ],
+  "modified": [
+    "Solution.lean"
+  ],
+  "deleted": [],
+  "added": [
+    "Solution/Seg0.lean",
+    "Solution/Seg1.lean",
+    "Solution/Seg10.lean",
+    "Solution/Seg11.lean",
+    "Solution/Seg12.lean",
+    "Solution/Seg13.lean",
+    "Solution/Seg14.lean",
+    "Solution/Seg15.lean",
+    "Solution/Seg16.lean",
+    "Solution/Seg17.lean",
+    "Solution/Seg18.lean",
+    "Solution/Seg2.lean",
+    "Solution/Seg3.lean",
+    "Solution/Seg4.lean",
+    "Solution/Seg5.lean",
+    "Solution/Seg6.lean",
+    "Solution/Seg7.lean",
+    "Solution/Seg8.lean",
+    "Solution/Seg9.lean"
+  ],
+  "broke_rules": false,
+  "replayed": true,
+  "submissions": [
+    {
+      "time": "2026-09-19T17:30:45Z",
+      "elapsed_s": 1013,
+      "claim": "equiv",
+      "verdict": "ACCEPT"
+    },
+    {
+      "time": "2026-09-19T17:31:10Z",
+      "elapsed_s": 1038,
+      "claim": "equiv",
+      "verdict": "ACCEPT"
+    }
+  ],
+  "first_accept_s": 1013
+}

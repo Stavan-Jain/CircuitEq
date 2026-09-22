@@ -1,0 +1,37 @@
+{
+  "name": "tiny_2q_phase",
+  "kind": "optimize",
+  "qubits": 2,
+  "relation": "p",
+  "cost_order": [
+    "tCount",
+    "cxCount",
+    "gateCount"
+  ],
+  "original_cost": {
+    "tCount": 2,
+    "cxCount": 0,
+    "gateCount": 5
+  },
+  "gates": {
+    "H": 1,
+    "T": 2,
+    "X": 2
+  },
+  "split": "dev",
+  "family": "selftest",
+  "rung": 5,
+  "source": {
+    "written_by_hand": "for the harness's own end-to-end test of `relation: p`: `T 0, X 0, T 0, X 0` is the scalar ω, so `[H 1]` is equal to the original up to a global phase and not as a unitary",
+    "pair": "tiny_2q_phase"
+  },
+  "baselines": {},
+  "holdout": {
+    "modules": [],
+    "redact": [],
+    "delete": []
+  },
+  "known_leaks": [
+    "the improvement is named in this file's `source`; the task tests the harness, not an agent"
+  ]
+}

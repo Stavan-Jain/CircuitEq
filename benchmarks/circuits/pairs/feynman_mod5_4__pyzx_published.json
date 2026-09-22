@@ -1,0 +1,89 @@
+{
+ "name": "feynman_mod5_4__pyzx_published",
+ "qubits": 5,
+ "relation": "u",
+ "expected": "equiv",
+ "split": "held-out",
+ "family": "mod5",
+ "rung": 4,
+ "source": {
+  "generator": "scripts/circuit_pairs.py",
+  "optimiser": "pyzx_published",
+  "circuit": "feynman_mod5_4",
+  "circuit_source": {
+   "source": "feynman",
+   "path": "benchmarks/qasm/mod5_4.qasm",
+   "sha256": "c277690c4715fc8241062a142b30770c3b50a197d3f1ee8722881c1f6510656e"
+  },
+  "circuit_licence": "BSD-3-Clause",
+  "twin": "pyzx_published",
+  "twin_tool": {
+   "tool": "PyZX's published output (Kissinger, van de Wetering)",
+   "url": "https://github.com/zxcalc/pyzx",
+   "commit": "ad022cf1d9041bb320656f208bfd0ffdaa8599d8",
+   "path": "circuits/optimized/mod5_4_pyzx.qc",
+   "sha256": "63d22d3efcaea66b18a23392b920807de5002f76114c4cac714134ede15e944c",
+   "licence": "Apache-2.0",
+   "input_check": "the published input is this circuit: equal normal forms (Toffoli as H; CCZ; H, H pairs cancelled, commuting operations ordered)",
+   "notes": [
+    "PyZX's published output (Kissinger, van de Wetering)"
+   ]
+  },
+  "tier": 1,
+  "relation_found": {
+   "method": "unitary",
+   "relation": "exact",
+   "max_abs_diff": 1.121163319635076e-15
+  },
+  "gates": [
+   79,
+   56
+  ],
+  "t_count": [
+   28,
+   8
+  ],
+  "h_count": [
+   22,
+   12
+  ],
+  "cx_count": [
+   28,
+   27
+  ],
+  "fragment": [
+   "general",
+   "general"
+  ],
+  "diff_matched": {
+   "raw": {
+    "matched": 26,
+    "of": 79,
+    "fraction": 0.3291
+   },
+   "greedy/cancommute": {
+    "matched": 37,
+    "of": 79,
+    "fraction": 0.4684
+   }
+  },
+  "segments": {
+   "raw": {
+    "segments": 2,
+    "longest": 133
+   },
+   "greedy/cancommute": {
+    "segments": 3,
+    "longest": 131
+   }
+  }
+ },
+ "holdout_delete": [
+  "scripts/circuit_pairs.py",
+  "scripts/circuit_sources.py",
+  "scripts/peephole_pairs.py"
+ ],
+ "known_leaks": [],
+ "original": ["X 4", "H 4", "H 4", "H 4", "CX 3 4", "Tdg 4", "CX 0 4", "T 4", "CX 3 4", "Tdg 4", "CX 0 4", "T 3", "T 4", "H 4", "CX 0 3", "T 0", "Tdg 3", "CX 0 3", "H 4", "H 4", "H 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 3", "T 4", "H 4", "CX 2 3", "T 2", "Tdg 3", "CX 2 3", "H 4", "H 4", "CX 3 4", "H 4", "H 4", "H 4", "CX 2 4", "Tdg 4", "CX 1 4", "T 4", "CX 2 4", "Tdg 4", "CX 1 4", "T 2", "T 4", "H 4", "CX 1 2", "T 1", "Tdg 2", "CX 1 2", "H 4", "H 4", "CX 2 4", "H 4", "H 4", "H 4", "CX 1 4", "Tdg 4", "CX 0 4", "T 4", "CX 1 4", "Tdg 4", "CX 0 4", "T 1", "T 4", "H 4", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "H 4", "H 4", "CX 1 4", "CX 0 4"],
+ "optimized": ["S 1", "S 2", "S 3", "H 4", "CX 3 4", "H 4", "H 4", "CX 0 4", "H 4", "H 4", "Z 4", "T 4", "CX 3 4", "CX 0 4", "CX 0 3", "Z 3", "Tdg 3", "CX 0 3", "CX 3 4", "Sdg 4", "CX 2 4", "T 4", "CX 3 4", "Sdg 4", "CX 2 4", "CX 2 3", "Tdg 3", "CX 2 3", "H 4", "CX 3 4", "H 4", "CX 2 4", "CX 1 4", "T 4", "CX 2 4", "Sdg 4", "CX 1 4", "S 4", "CX 1 2", "Tdg 2", "CX 1 2", "H 4", "CX 2 4", "H 4", "CX 1 4", "CX 0 4", "T 4", "CX 1 4", "CX 0 4", "CX 0 1", "Tdg 1", "CX 0 1", "H 4", "CX 1 4", "H 4", "H 4"]
+}

@@ -1,0 +1,37 @@
+{
+  "name": "tiny_3q",
+  "kind": "optimize",
+  "qubits": 3,
+  "relation": "u",
+  "cost_order": [
+    "tCount",
+    "cxCount",
+    "gateCount"
+  ],
+  "original_cost": {
+    "tCount": 3,
+    "cxCount": 2,
+    "gateCount": 8
+  },
+  "gates": {
+    "CX": 2,
+    "H": 3,
+    "T": 3
+  },
+  "split": "dev",
+  "family": "selftest",
+  "rung": 8,
+  "source": {
+    "written_by_hand": "for the harness's own end-to-end test: `T 1, T 1` fuses to `S 1` and `H 2, H 2` cancels, so T-count 3 -> 1 and 8 gates -> 5",
+    "pair": "tiny_3q"
+  },
+  "baselines": {},
+  "holdout": {
+    "modules": [],
+    "redact": [],
+    "delete": []
+  },
+  "known_leaks": [
+    "the improvements are named in this file's `source`; the task tests the harness, not an agent"
+  ]
+}

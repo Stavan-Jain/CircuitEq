@@ -1,0 +1,95 @@
+{
+  "name": "feynman_gf2_4_mult__pyzx_published",
+  "qubits": 12,
+  "relation": "u",
+  "expected": "equiv",
+  "split": "held-out",
+  "family": "gf2_mult",
+  "rung": 4,
+  "source": {
+    "generator": "scripts/circuit_pairs.py",
+    "optimiser": "pyzx_published",
+    "circuit": "feynman_gf2_4_mult",
+    "circuit_source": {
+      "source": "feynman",
+      "path": "benchmarks/qasm/gf2^4_mult.qasm",
+      "sha256": "f3a787e9044b62fa616f39a2520ec0661f7233b1d9aa21404eb1ce87200e81af"
+    },
+    "circuit_licence": "BSD-3-Clause",
+    "twin": "pyzx_published",
+    "twin_tool": {
+      "tool": "PyZX's published output (Kissinger, van de Wetering)",
+      "url": "https://github.com/zxcalc/pyzx",
+      "commit": "ad022cf1d9041bb320656f208bfd0ffdaa8599d8",
+      "path": "circuits/optimized/gf2^4_mult_pyzx.qc",
+      "sha256": "3a8fe634fef55be7ae24aff6b14498b246c14b09671f4c9eeddcd7321e3b9134",
+      "licence": "Apache-2.0",
+      "input_check": "the published input is this circuit: equal normal forms (Toffoli as H; CCZ; H, H pairs cancelled, commuting operations ordered)",
+      "notes": [
+        "PyZX's published output (Kissinger, van de Wetering)"
+      ]
+    },
+    "tier": 2,
+    "relation_found": {
+      "method": "2 random state(s)",
+      "relation": "exact",
+      "max_abs_diff": 1.9800179653334632e-16
+    },
+    "gates": [
+      289,
+      199
+    ],
+    "t_count": [
+      112,
+      68
+    ],
+    "h_count": [
+      78,
+      14
+    ],
+    "cx_count": [
+      99,
+      99
+    ],
+    "fragment": [
+      "general",
+      "general"
+    ],
+    "diff_matched": {
+      "raw": {
+        "matched": 119,
+        "of": 289,
+        "fraction": 0.4118
+      },
+      "greedy/cancommute": {
+        "matched": 172,
+        "of": 289,
+        "fraction": 0.5952
+      }
+    },
+    "segments": {
+      "raw": {
+        "segments": 1,
+        "longest": 488
+      },
+      "greedy/cancommute": {
+        "segments": 11,
+        "longest": 429
+      }
+    }
+  },
+  "holdout": {
+    "modules": [],
+    "redact": [],
+    "delete": [
+      "scripts/circuit_pairs.py",
+      "scripts/circuit_sources.py",
+      "scripts/peephole_pairs.py"
+    ]
+  },
+  "known_leaks": [],
+  "gates": [
+    289,
+    199
+  ]
+}

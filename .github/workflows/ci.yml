@@ -26,6 +26,21 @@ jobs:
       # this step only names the file and line before a build is paid for.
       - name: Option guard (no debug.* options; early warning only)
         run: python3 scripts/check_debug_options.py
+      # The Python that is not Lean: the two agent harnesses (standard library
+      # only, no lake, no agent) and the circuit catalogue's fetch/translate
+      # and pairing scripts, whose self-tests check every translation rule
+      # numerically and so need numpy. pyzx is optional to them; without it
+      # the PyZX comparisons are skipped and say so.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Python self-tests (harnesses, circuit catalogue)
+        run: |
+          python3 scripts/agent_harness.py selftest
+          python3 scripts/optimizer_harness.py selftest
+          python3 -m pip install --quiet numpy
+          python3 scripts/circuit_sources.py --self-test
+          python3 scripts/circuit_pairs.py --self-test
       # Fetches the mathlib olean cache and runs `lake build`.
       - uses: leanprover/lean-action@v1
       # Every declaration must depend on exactly [propext, Classical.choice,

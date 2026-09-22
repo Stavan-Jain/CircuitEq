@@ -1,0 +1,88 @@
+{
+  "name": "feynman_mod5_4__pyzx_full_reduce",
+  "qubits": 5,
+  "relation": "u",
+  "expected": "equiv",
+  "split": "held-out",
+  "family": "mod5",
+  "rung": 4,
+  "source": {
+    "generator": "scripts/circuit_pairs.py",
+    "optimiser": "pyzx_full_reduce",
+    "circuit": "feynman_mod5_4",
+    "circuit_source": {
+      "source": "feynman",
+      "path": "benchmarks/qasm/mod5_4.qasm",
+      "sha256": "c277690c4715fc8241062a142b30770c3b50a197d3f1ee8722881c1f6510656e"
+    },
+    "circuit_licence": "BSD-3-Clause",
+    "twin": "pyzx_full_reduce",
+    "twin_tool": {
+      "tool": "pyzx full_reduce + extract_circuit + basic_optimization (scripts/check_pyzx_benchmarks.py optimize)",
+      "pyzx": "0.9.0",
+      "seconds": 0.05
+    },
+    "tier": 1,
+    "relation_found": {
+      "method": "unitary",
+      "relation": "exact",
+      "max_abs_diff": 1.4248638448940853e-15
+    },
+    "gates": [
+      79,
+      30
+    ],
+    "t_count": [
+      28,
+      8
+    ],
+    "h_count": [
+      22,
+      2
+    ],
+    "cx_count": [
+      28,
+      20
+    ],
+    "fragment": [
+      "general",
+      "general"
+    ],
+    "diff_matched": {
+      "raw": {
+        "matched": 4,
+        "of": 79,
+        "fraction": 0.0506
+      },
+      "greedy/cancommute": {
+        "matched": 6,
+        "of": 79,
+        "fraction": 0.0759
+      }
+    },
+    "segments": {
+      "raw": {
+        "segments": 1,
+        "longest": 109
+      },
+      "greedy/cancommute": {
+        "segments": 1,
+        "longest": 109
+      }
+    }
+  },
+  "holdout": {
+    "modules": [],
+    "redact": [],
+    "delete": [
+      "scripts/circuit_pairs.py",
+      "scripts/circuit_sources.py",
+      "scripts/peephole_pairs.py"
+    ]
+  },
+  "known_leaks": [],
+  "gates": [
+    79,
+    30
+  ]
+}

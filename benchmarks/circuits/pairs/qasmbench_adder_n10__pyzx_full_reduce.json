@@ -1,0 +1,82 @@
+{
+ "name": "qasmbench_adder_n10__pyzx_full_reduce",
+ "qubits": 10,
+ "relation": "u",
+ "expected": "equiv",
+ "split": "held-out",
+ "family": "qb_adder",
+ "rung": 10,
+ "source": {
+  "generator": "scripts/circuit_pairs.py",
+  "optimiser": "pyzx_full_reduce",
+  "circuit": "qasmbench_adder_n10",
+  "circuit_source": {
+   "source": "qasmbench",
+   "path": "small/adder_n10/adder_n10.qasm",
+   "sha256": "89af975627593648e7aca6ac6cb936d2c872093c1eedcaa1b2ab4fa14b602624"
+  },
+  "circuit_licence": "BSD-style (Battelle Memorial Institute, 2020)",
+  "twin": "pyzx_full_reduce",
+  "twin_tool": {
+   "tool": "pyzx full_reduce + extract_circuit + basic_optimization (scripts/check_pyzx_benchmarks.py optimize)",
+   "pyzx": "0.9.0",
+   "seconds": 0.07
+  },
+  "tier": 1,
+  "relation_found": {
+   "method": "unitary",
+   "relation": "exact",
+   "max_abs_diff": 2.727875267282099e-15
+  },
+  "gates": [
+   142,
+   181
+  ],
+  "t_count": [
+   56,
+   32
+  ],
+  "h_count": [
+   16,
+   32
+  ],
+  "cx_count": [
+   65,
+   89
+  ],
+  "fragment": [
+   "general",
+   "general"
+  ],
+  "diff_matched": {
+   "raw": {
+    "matched": 17,
+    "of": 142,
+    "fraction": 0.1197
+   },
+   "greedy/cancommute": {
+    "matched": 17,
+    "of": 142,
+    "fraction": 0.1197
+   }
+  },
+  "segments": {
+   "raw": {
+    "segments": 1,
+    "longest": 323
+   },
+   "greedy/cancommute": {
+    "segments": 1,
+    "longest": 323
+   }
+  }
+ },
+ "holdout_delete": [
+  "scripts/circuit_pairs.py",
+  "scripts/circuit_sources.py",
+  "scripts/peephole_pairs.py"
+ ],
+ "known_leaks": [],
+ "original": ["X 1", "X 5", "X 6", "X 7", "X 8", "CX 1 5", "CX 1 0", "H 1", "CX 5 1", "Tdg 1", "CX 0 1", "T 1", "CX 5 1", "Tdg 1", "CX 0 1", "T 5", "T 1", "H 1", "CX 0 5", "T 0", "Tdg 5", "CX 0 5", "CX 2 6", "CX 2 1", "H 2", "CX 6 2", "Tdg 2", "CX 1 2", "T 2", "CX 6 2", "Tdg 2", "CX 1 2", "T 6", "T 2", "H 2", "CX 1 6", "T 1", "Tdg 6", "CX 1 6", "CX 3 7", "CX 3 2", "H 3", "CX 7 3", "Tdg 3", "CX 2 3", "T 3", "CX 7 3", "Tdg 3", "CX 2 3", "T 7", "T 3", "H 3", "CX 2 7", "T 2", "Tdg 7", "CX 2 7", "CX 4 8", "CX 4 3", "H 4", "CX 8 4", "Tdg 4", "CX 3 4", "T 4", "CX 8 4", "Tdg 4", "CX 3 4", "T 8", "T 4", "H 4", "CX 3 8", "T 3", "Tdg 8", "CX 3 8", "CX 4 9", "H 4", "CX 8 4", "Tdg 4", "CX 3 4", "T 4", "CX 8 4", "Tdg 4", "CX 3 4", "T 8", "T 4", "H 4", "CX 3 8", "T 3", "Tdg 8", "CX 3 8", "CX 4 3", "CX 3 8", "H 3", "CX 7 3", "Tdg 3", "CX 2 3", "T 3", "CX 7 3", "Tdg 3", "CX 2 3", "T 7", "T 3", "H 3", "CX 2 7", "T 2", "Tdg 7", "CX 2 7", "CX 3 2", "CX 2 7", "H 2", "CX 6 2", "Tdg 2", "CX 1 2", "T 2", "CX 6 2", "Tdg 2", "CX 1 2", "T 6", "T 2", "H 2", "CX 1 6", "T 1", "Tdg 6", "CX 1 6", "CX 2 1", "CX 1 6", "H 1", "CX 5 1", "Tdg 1", "CX 0 1", "T 1", "CX 5 1", "Tdg 1", "CX 0 1", "T 5", "T 1", "H 1", "CX 0 5", "T 0", "Tdg 5", "CX 0 5", "CX 1 0", "CX 0 5"],
+ "optimized": ["CX 1 0", "S 1", "S 4", "Sdg 5", "CX 1 5", "S 5", "CX 2 6", "CX 3 7", "Sdg 8", "CX 4 8", "H 1", "CX 1 0", "Z 1", "T 1", "H 2", "CX 1 2", "H 2", "Z 0", "T 0", "H 2", "CX 0 2", "H 2", "CX 0 5", "CX 5 1", "H 5", "CX 2 5", "H 5", "S 5", "T 5", "CX 0 5", "CX 1 0", "Sdg 1", "CX 3 2", "Tdg 0", "CX 0 2", "H 2", "Tdg 2", "H 0", "T 0", "CX 0 6", "Z 6", "T 6", "CX 2 6", "CX 0 6", "S 6", "T 6", "CX 0 2", "CX 6 0", "CX 3 6", "CX 2 6", "H 3", "T 3", "H 4", "CX 3 4", "H 4", "CX 3 7", "H 7", "CX 6 7", "H 7", "H 7", "CX 4 7", "H 7", "T 7", "CX 3 7", "CX 4 6", "H 6", "S 6", "T 6", "CX 6 7", "S 7", "T 7", "CX 9 4", "CX 3 9", "CX 6 9", "CX 7 9", "H 9", "Z 9", "T 9", "CX 9 4", "H 4", "Tdg 4", "CX 6 3", "CX 7 6", "H 7", "Z 7", "T 7", "CX 7 8", "Tdg 8", "CX 8 9", "CX 4 8", "CX 9 4", "S 4", "T 4", "H 7", "CX 4 7", "H 7", "CX 8 4", "H 4", "S 4", "T 4", "CX 3 4", "T 4", "H 7", "CX 4 7", "H 7", "CX 8 7", "CX 9 8", "CX 6 4", "CX 3 6", "T 7", "CX 7 9", "Z 9", "T 9", "CX 8 9", "T 4", "CX 3 4", "S 4", "T 4", "CX 6 4", "H 6", "CX 6 0", "Tdg 6", "CX 2 6", "T 6", "CX 8 7", "H 8", "T 0", "CX 2 0", "CX 7 4", "Tdg 7", "CX 7 9", "Tdg 0", "CX 0 6", "CX 2 7", "CX 0 7", "CX 4 7", "H 7", "CX 7 3", "CX 2 0", "H 2", "Tdg 2", "CX 1 2", "T 2", "H 4", "CX 5 2", "CX 5 0", "CX 1 5", "Sdg 5", "CX 4 9", "Tdg 2", "CX 1 2", "CX 2 0", "T 2", "H 2", "CX 2 5", "S 5", "H 0", "Z 0", "CX 2 1", "CX 0 6", "S 1", "X 1", "X 3", "X 6", "X 9", "X 5", "CX 0 5", "CX 5 0", "CX 0 5", "CX 1 2", "CX 2 1", "CX 1 2", "CX 2 5", "CX 5 2", "CX 2 5", "CX 3 7", "CX 7 3", "CX 3 7", "CX 8 9", "CX 9 8", "CX 8 9"]
+}

@@ -1,0 +1,85 @@
+{
+  "name": "gen_tof_50__pyzx_teleport",
+  "qubits": 99,
+  "relation": "u",
+  "expected": "equiv",
+  "split": "held-out",
+  "family": "gen_tof",
+  "rung": 50,
+  "source": {
+    "generator": "scripts/circuit_pairs.py",
+    "optimiser": "pyzx_teleport",
+    "circuit": "gen_tof_50",
+    "circuit_source": {
+      "source": "generated",
+      "path": null,
+      "sha256": null
+    },
+    "circuit_licence": "this repository's",
+    "twin": "pyzx_teleport",
+    "twin_tool": {
+      "tool": "pyzx teleport_reduce + basic_optimization (scripts/check_pyzx_benchmarks.py optimize)",
+      "pyzx": "0.9.0",
+      "seconds": 0.39
+    },
+    "tier": 3,
+    "relation_found": {
+      "relation": "exact",
+      "method": "sparse simulation on 16 random basis inputs"
+    },
+    "gates": [
+      1455,
+      1601
+    ],
+    "t_count": [
+      679,
+      583
+    ],
+    "h_count": [
+      194,
+      388
+    ],
+    "cx_count": [
+      582,
+      582
+    ],
+    "fragment": [
+      "general",
+      "general"
+    ],
+    "diff_matched": {
+      "raw": {
+        "matched": 1070,
+        "of": 1455,
+        "fraction": 0.7354
+      },
+      "greedy/cancommute": {
+        "matched": 1310,
+        "of": 1455,
+        "fraction": 0.9003
+      }
+    },
+    "segments": {
+      "raw": {
+        "skipped": "99 qubits and 3056 gates are past the budget for prefix states"
+      },
+      "greedy/cancommute": {
+        "skipped": "99 qubits and 3056 gates are past the budget for prefix states"
+      }
+    }
+  },
+  "holdout": {
+    "modules": [],
+    "redact": [],
+    "delete": [
+      "scripts/circuit_pairs.py",
+      "scripts/circuit_sources.py",
+      "scripts/peephole_pairs.py"
+    ]
+  },
+  "known_leaks": [],
+  "gates": [
+    1455,
+    1601
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "name": "qasmbench_adder_n10__peephole",
+  "qubits": 10,
+  "relation": "u",
+  "expected": "equiv",
+  "split": "held-out",
+  "family": "qb_adder",
+  "rung": 10,
+  "source": {
+    "generator": "scripts/circuit_pairs.py",
+    "optimiser": "peephole",
+    "circuit": "qasmbench_adder_n10",
+    "circuit_source": {
+      "source": "qasmbench",
+      "path": "small/adder_n10/adder_n10.qasm",
+      "sha256": "89af975627593648e7aca6ac6cb936d2c872093c1eedcaa1b2ab4fa14b602624"
+    },
+    "circuit_licence": "BSD-style (Battelle Memorial Institute, 2020)",
+    "twin": "peephole",
+    "twin_tool": {
+      "tool": "scripts/peephole_pairs.py peephole",
+      "rewrites": 4,
+      "seconds": 0.0
+    },
+    "tier": 1,
+    "relation_found": {
+      "method": "unitary",
+      "relation": "exact",
+      "max_abs_diff": 1.2780985374813346e-15
+    },
+    "gates": [
+      142,
+      138
+    ],
+    "t_count": [
+      56,
+      48
+    ],
+    "h_count": [
+      16,
+      16
+    ],
+    "cx_count": [
+      65,
+      65
+    ],
+    "fragment": [
+      "general",
+      "general"
+    ],
+    "diff_matched": {
+      "raw": {
+        "matched": 134,
+        "of": 142,
+        "fraction": 0.9437
+      },
+      "greedy/cancommute": {
+        "matched": 134,
+        "of": 142,
+        "fraction": 0.9437
+      }
+    },
+    "segments": {
+      "raw": {
+        "segments": 24,
+        "longest": 234
+      },
+      "greedy/cancommute": {
+        "segments": 138,
+        "longest": 3
+      }
+    }
+  },
+  "holdout": {
+    "modules": [],
+    "redact": [],
+    "delete": [
+      "scripts/circuit_pairs.py",
+      "scripts/circuit_sources.py",
+      "scripts/peephole_pairs.py"
+    ]
+  },
+  "known_leaks": [],
+  "gates": [
+    142,
+    138
+  ]
+}

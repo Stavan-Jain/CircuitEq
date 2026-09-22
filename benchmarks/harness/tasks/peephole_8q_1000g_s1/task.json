@@ -1,0 +1,42 @@
+{
+  "name": "peephole_8q_1000g_s1",
+  "qubits": 8,
+  "relation": "u",
+  "expected": "equiv",
+  "split": "held-out",
+  "family": "peephole",
+  "rung": 1000,
+  "source": {
+    "generator": "scripts/peephole_pairs.py",
+    "seed": 1,
+    "rewrites": 182,
+    "tcount": [
+      257,
+      127
+    ],
+    "alphabet": [
+      "CX",
+      "H",
+      "S",
+      "Sdg",
+      "T",
+      "Tdg",
+      "X",
+      "Y",
+      "Z"
+    ],
+    "float_distance_on_a_random_state": 1.5888218580782548e-14
+  },
+  "holdout": {
+    "modules": [],
+    "redact": [],
+    "delete": [
+      "scripts/peephole_pairs.py"
+    ]
+  },
+  "known_leaks": [],
+  "gates": [
+    1000,
+    752
+  ]
+}
