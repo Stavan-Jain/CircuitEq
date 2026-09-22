@@ -1,12 +1,13 @@
 # Queue — what to do next, in order
 
-The working list for this repository: the next pieces of work, each with
-enough context to pick it up cold. Items are ordered by priority within a
-section; take the top item whose dependencies have landed. When an item
-lands, move it to "Done" with its commit hash. Design context is in
-`ROADMAP.md` ("Two products, one architecture") and CLAUDE.md ("What we
-are optimising for"); the rules for new modules are in the docstrings of
-`CircuitEq/Checker.lean` and `CircuitEq/Support.lean`.
+The working list for this repository: the next pieces of work, each with enough
+context to pick it up cold. Items are ordered by priority within a section; take
+the top item whose dependencies have landed. When an item lands, move it to
+"Done" with its commit hash. Design context is in `ROADMAP.md` ("Two products,
+one architecture") and CLAUDE.md ("What we are optimising for"); the rules for
+new modules are in the docstrings of `CircuitEq/Checker.lean` and
+`CircuitEq/Support.lean`, and a new checker joins the tactics in
+`CircuitEq/Defaults.lean`.
 
 Sizes: S is a session, M a few sessions, L a milestone.
 
@@ -30,55 +31,51 @@ with a summary table, and the record of which declarations a proof uses
 
 ## Next
 
-1. **Agent harness v0.** The project's bet is that this infrastructure
-   lets an agent prove pairs it otherwise could not, and nothing measures
-   it: every alignment so far was found by a person or by the diff script
-   in `scripts/tcount_survey.py`. Build the instrument now, so that each
-   later item is judged by what it moves, and rerun it as the library
-   grows. `scripts/agent_harness.py` takes a task and an agent command
-   (Claude Code headless first) and: copies the repository at a pinned
-   commit into a scratch directory, without `.git`; holds the answer out
-   (deletes the pair's module under `CircuitEq/Benchmarks/`, its import
-   and its `benchmarks/<name>/README.md`; the tableau's regression tests
-   in `CircuitEqTest/` embed the `rep3` and Steane pairs with proofs, so
-   those two are development tasks at best, and a test task is a pair that
-   appears nowhere in the repository); writes a statement file with the two
-   circuit `def`s and `theorem … : original ≡ᵤ optimized := by sorry`
-   (the relation is per task: `≡ᵤ`, `≡ₚ`, `≡ₛ`, or a negation for a
-   mutant); gives the agent one checked-in prompt
-   (`benchmarks/harness/PROMPT.md`), the lean-lsp tools and the benchmark
-   protocol's limits (one hour, 16 GB); then judges. The agent may write
-   any Lean it likes, new lemmas, checkers and step kinds included. The
-   judge for v0 is a person reading the diff: no existing file changed
-   (the trusted `Semantics.lean`, the circuit `def`s and the
-   statement above all), `lake build` passes and `#print axioms` shows
-   the standard three. The axiom check alone is not enough: on this
-   toolchain `set_option debug.skipKernelTC true` lets a false
-   `decide +kernel` through with a clean axiom report, so the review also
-   looks for `debug.` options until the CI guard against them lands. An
-   automated judge that replays the solution through the kernel is
-   deferred (see "Later"). Record outcome (proved, refuted, no
-   certificate), wall time, kernel time, tokens, and which library
-   declarations the proof uses (the roadmap's flywheel record).
-   Tasks v0, ordered by gates times width: the five promoted pairs, the
-   survey's eleven circuits under both pipelines, and one gate-deleted
-   mutant of each. Two configurations, the full library and the semantics
-   with its decision procedures alone (up to `Decide.lean`), since their difference is the
-   hypothesis. An optimiser track follows item 2: the input is one
-   circuit, the answer is `c'` with a proof of `c ≡ᵤ c'` and
-   `tCount c' = k`, and `k` is reported against the uncertified T-counts
-   of PyZX and TZAP, which the agent may call. Acceptance: the v0 table
-   is checked in under `benchmarks/harness/` with a written failure mode
-   for every miss; a run is reproducible from commit, prompt and task;
-   submissions that use `native_decide`, `sorry`, `debug.skipKernelTC` or
-   an edited statement are rejected. S to M. Depends on nothing; the
-   optimiser track on item 2. Since this was written (21 September 2026):
-   the harness, its automated judge (restatement, axioms, kernel replay;
+1. **Agent harness v0.** The project's bet is that this infrastructure lets an
+   agent prove pairs it otherwise could not, and nothing measures it: every
+   alignment so far was found by a person or by the diff script in
+   `scripts/tcount_survey.py`. Build the instrument now, so that each later item
+   is judged by what it moves, and rerun it as the library grows.
+   `scripts/agent_harness.py` takes a task and an agent command (Claude Code
+   headless first) and: copies the repository at a pinned commit into a scratch
+   directory, without `.git`; holds the answer out (deletes the pair's module
+   under `CircuitEq/Benchmarks/`, its import and its
+   `benchmarks/<name>/README.md`; the tableau's regression tests in
+   `CircuitEqTest/` embed the `rep3` and Steane pairs with proofs, so those two
+   are development tasks at best, and a test task is a pair that appears nowhere
+   in the repository); writes a statement file with the two circuit `def`s and
+   `theorem … : original ≡ᵤ optimized := by sorry` (the relation is per task:
+   `≡ᵤ`, `≡ₚ`, `≡ₛ`, or a negation for a mutant); gives the agent one checked-in
+   prompt (`benchmarks/harness/PROMPT.md`), the lean-lsp tools and the benchmark
+   protocol's limits (one hour, 16 GB); then judges. The agent may write any
+   Lean it likes, new lemmas, checkers and step kinds included. The judge for v0
+   is a person reading the diff: no existing file changed (the trusted modules
+   up to `Semantics.lean`, the circuit `def`s and the statement above all),
+   `lake build` passes and `#print axioms` shows the standard three. The axiom
+   check alone is not enough: on this toolchain
+   `set_option debug.skipKernelTC true` lets a false `decide +kernel` through
+   with a clean axiom report, so the review also looks for `debug.` options
+   until the CI guard against them lands. An automated judge that replays the
+   solution through the kernel is deferred (see "Later"). Record outcome
+   (proved, refuted, no certificate), wall time, kernel time, tokens, and which
+   library declarations the proof uses (the roadmap's flywheel record). Tasks
+   v0, ordered by gates times width: the five promoted pairs, the survey's
+   eleven circuits under both pipelines, and one gate-deleted mutant of each.
+   Two configurations, the full library and the semantics with its decision
+   procedures alone (up to `Decide.lean`), since their difference is the
+   hypothesis. An optimiser track follows item 2: the input is one circuit, the
+   answer is `c'` with a proof of `c ≡ᵤ c'` and `tCount c' = k`, and `k` is
+   reported against the uncertified T-counts of PyZX and TZAP, which the agent
+   may call. Acceptance: the v0 table is checked in under `benchmarks/harness/`
+   with a written failure mode for every miss; a run is reproducible from
+   commit, prompt and task; submissions that use `native_decide`, `sorry`,
+   `debug.skipKernelTC` or an edited statement are rejected. S to M. Depends on
+   nothing; the optimiser track on item 2. Since this was written (21 September
+   2026): the harness, its automated judge (restatement, axioms, kernel replay;
    the `debug.*` guard is in CI) and the optimiser track exist in
-   `benchmarks/harness/`, and the held-out ladder is the circuit
-   catalogue; the task set is the one recorded there, not the one planned
-   above. Still open: repeated runs with a summary table and the
-   declaration record ("In flight").
+   `benchmarks/harness/`, and the held-out ladder is the circuit catalogue; the
+   task set is the one recorded there, not the one planned above. Still open:
+   repeated runs with a summary table and the declaration record ("In flight").
 
 2. **Cost functions in Lean.** The roadmap's architecture says costs are
    computed in Lean so that "this circuit has T-count 19" is a checked
@@ -206,7 +203,7 @@ with a summary table, and the record of which declarations a proof uses
 11. **Refutation certificates.** Step kinds that prove `¬ (a ≡ᵤ b)`: a
     basis vector on which the evaluators differ, a Pauli whose images under
     the two tableaux differ. `phasePolyRefutes` already does this for the
-    CNOT-plus-diagonal fragment by completeness (`PhasePoly.refutes_sound`);
+    CNOT-plus-diagonal fragment by completeness (`phasePolyRefutes_sound`);
     the step kinds make it composable. Needed for mutants and for the
     survey's negative results. S. Depends on item 3.
 
@@ -233,10 +230,6 @@ with a summary table, and the record of which declarations a proof uses
     and the Python mirror no longer need a `calc` around the certificate;
     this is the first form of the template step of item 6. S. Depends on
     nothing.
-
-15. *(done, folded into item 3)* The seven-qubit decide was measured on
-    an idle machine: killed by a 6 GB watchdog after 20 s at 6.9 GB and
-    growing, so memory is the limit and chunked evaluation is the lever.
 
 ## Later
 

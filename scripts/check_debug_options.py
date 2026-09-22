@@ -11,12 +11,12 @@ one is set in the Lean sources or in the Lake configuration.
 This guard is NOT sound, and it is not the defence. An option can be set from
 meta code under a name no text search recognises (a ``Name`` assembled from
 string pieces, an escaped TOML key), and meta code can add a declaration
-unchecked without setting any option. The defence is the kernel replay CI
-runs after the build, ``lake env leanchecker CircuitEq CircuitEqTest``, which re-checks
-every declaration of the built ``.olean`` files and which no option can
-switch off (CLAUDE.md, "Conventions"; README.md, "Trust"). This script only
-reports the obvious spellings early, with a file and a line, before a build
-is paid for.
+unchecked without setting any option. The defence is the kernel replay CI runs
+after the build, ``LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq
+CircuitEqTest``, which re-checks every declaration of the built ``.olean`` files
+and which no option can switch off (CLAUDE.md, "Conventions"; README.md,
+"Trust"). This script only reports the obvious spellings early, with a file and
+a line, before a build is paid for.
 
 Scanned by default: ``CircuitEq.lean``, ``CircuitEqTest.lean``, every
 ``.lean`` file under ``CircuitEq/``, ``CircuitEqTest/``, ``scripts/`` and

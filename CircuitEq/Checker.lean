@@ -20,9 +20,10 @@ beyond `Checker.sound` (and `PhaseFinder.sound`, for replay up to phase).
 Rules for a module that provides a checker:
 
 * import only `CircuitEq.Decide`, `CircuitEq.Structural`,
-  `CircuitEq.Support` and this file (plus Mathlib), never the rewriting,
-  layer or tactic modules, so that the certificate module can import every
-  checker without a cycle;
+  `CircuitEq.Support`, this file and its own helper modules (as
+  `CircuitEq.PhasePoly` imports `CircuitEq.Lanes`), plus Mathlib, never the
+  rewriting, layer, certificate or tactic modules, so that
+  `CircuitEq.Defaults` can import every checker without a cycle;
 * `check` must be kernel-evaluable: structural recursion, `Bool`-valued
   functions rather than chains of `Decidable` instances, `Nat` bit
   operations for wire masks and `𝔽₂` rows, no `Finset.sum`, no

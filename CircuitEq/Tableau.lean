@@ -62,11 +62,11 @@ case split on the three relevant bits.
 
 If `tableau a = tableau b = some T`, then for every generator `P` both
 circuits satisfy `denote c (P.op ψ) = Q.op (denote c ψ)` with the same `Q`
-(`conj_sound`). With the inverse circuit of `CircuitEq.Structural`, the
+(`Tableau.conj_sound`). With the inverse circuit of `CircuitEq.Structural`, the
 operator `W ψ := denote (inverse b) (denote a ψ)` therefore commutes with
 every generator, and an operator commuting with all `Z_j` is diagonal in the
 computational basis while commuting with all `X_j` makes the diagonal
-constant (`eq_smul_of_comm_generators`), so `W = λ • id` by linearity and
+constant (`Tableau.eq_smul_of_comm_generators`), so `W = λ • id` by linearity and
 `denote a ψ = λ • denote b ψ`. The same argument with the roles swapped
 produces `λ⁻¹`, so `λ` is a unit.
 

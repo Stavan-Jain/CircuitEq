@@ -76,7 +76,7 @@ import time
 import uuid
 from pathlib import Path
 
-HARNESS_VERSION = "0.6-draft"
+HARNESS_VERSION = "0.7-draft"
 
 SCRIPT = Path(__file__).resolve()
 ALLOWED_AXIOMS = ("propext", "Classical.choice", "Quot.sound")
@@ -770,6 +770,21 @@ def drop_module(ws: Path, module: str) -> None:
                 p.unlink()
 
 
+def drop_build_tree(ws: Path, root: str) -> None:
+    """Delete the build products of every module under `root` (the `.olean`, `.ilean`,
+    `.c` and trace files of `root` and `root.*`), so that a module tree whose sources are
+    gone cannot be imported from what the warm base compiled."""
+    build = ws / ".lake" / "build"
+    if not build.exists():
+        return
+    for p in sorted(build.rglob(f"{root}*"), key=lambda q: len(q.parts), reverse=True):
+        if p.name == root or p.name.startswith(root + "."):
+            if p.is_dir():
+                shutil.rmtree(p)
+            else:
+                p.unlink(missing_ok=True)
+
+
 def prune_test_root(ws: Path) -> None:
     """Keep `CircuitEqTest.lean`, the root of the examples-and-tests library, importing
     only the modules still in the workspace, so a bare `lake build` there still works."""
@@ -935,6 +950,8 @@ def setup_run(args, task: dict, customise=None) -> dict:
 
     for name in GLOBAL_DELETE + (".harness-base.json", ".harness-prepare.log", "watchdog.log"):
         p = ws / name
+        if (ws / f"{name}.lean").exists():
+            drop_build_tree(ws, name)  # a module tree: its compiled modules go too
         if p.is_dir():
             shutil.rmtree(p)
         else:
@@ -1465,6 +1482,14 @@ def cmd_selftest(_args) -> None:
         drop_module(ws, "CircuitEq.Benchmarks.Tof3")
         assert not olean.exists() and other.exists(), "only the held-out module's products go"
         assert "Tof3" not in (ws / "CircuitEq.lean").read_text()
+        lib = ws / ".lake" / "build" / "lib" / "lean"
+        (lib / "CircuitEqTest").mkdir(parents=True)
+        for p in (lib / "CircuitEqTest" / "Tableau.olean", lib / "CircuitEqTest.olean",
+                  lib / "CircuitEq" / "Tableau.olean"):
+            p.write_text("x")
+        drop_build_tree(ws, "CircuitEqTest")
+        assert not (lib / "CircuitEqTest").exists() and not (lib / "CircuitEqTest.olean").exists()
+        assert (lib / "CircuitEq" / "Tableau.olean").exists(), "only the dropped tree's products go"
         (ws / "CircuitEq" / "Examples.lean").write_text("-- examples\n")
         (ws / "CircuitEqTest.lean").write_text(
             "import CircuitEq.Examples\nimport CircuitEqTest.Tableau\n\n/-! tests -/\n")

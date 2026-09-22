@@ -76,15 +76,14 @@ peephole pair. "Longest" counts the gates of both sides.
 | `barenco_tof_3` (60 gates) | 28 | 24 | 16 | 16 | exact, 42 gates at `-Osuper` |
 
 Here TZAP's output is exactly equal, and at five qubits the pairs are within
-reach of the whole-register basis decide. Both are harness tasks
-(`tof_3_tzap`, `barenco_tof_3_tzap`), and both were certified through the
-harness's judge with `by decide +kernel` (restatement, the three standard
-axioms, kernel replay; 24 s and 26 s), by hand with `setup` and `./submit`
-rather than in a recorded run, so `results.jsonl` has no row for them:
-T-count 15 and 16, against the 19 and 24 of the promoted benchmarks. They do
-not cut into segments either (the
-longest segment spans most of the pair), so the same circuits at larger
-sizes need the Hadamard-variable form.
+reach of the whole-register basis decide. Both are harness tasks (`tof_3_tzap`,
+`barenco_tof_3_tzap`), and both were certified through the harness's judge with
+`by decide +kernel` (restatement, the three standard axioms, kernel replay; 24 s
+and 26 s), by hand with `setup` and `./submit` rather than in a recorded run, so
+`results.jsonl` has no row for them: T-count 15 and 16, against the 19 and 24 of
+the promoted benchmarks. They do not cut into segments either (the longest
+segment spans most of the pair), so the same circuits at larger sizes need the
+Hadamard-variable form.
 
 ## Reproducing
 

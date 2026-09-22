@@ -96,12 +96,12 @@ forms", proves `¬ a ≡ᵤ b` (`phasePolyRefutes_sound`), and for the fragment
 `&&&`, `|||`, `<<<`, `>>>`, `testBit`, `gcd`, all GMP-accelerated in the
 kernel). Nothing of size `2 ^ n` is built; the planes are `n`, `C(n,2)` and
 `C(n,3)` bits and the rows `n²` bits. A CNOT is a shift and an xor. A phase gate
-builds the pair and triple masks of its parity with `maskFold`, which visits
-only the set bits of a sparse parity (`Lanes.sparseFold`: lowest set bit by
-`gcd`, its index by a population count checked on the 1024 powers of two below
-the word width) and tests every index of a dense one (`Lanes.bitFold`), and
-skips a plane it would add nothing to (`Lanes.addOnz`). The measured cost, a few
-seconds for thousands of gates on hundreds of wires, is in
+builds the pair and triple masks of its parity with `Lanes.maskFold`, which
+visits only the set bits of a sparse parity (`Lanes.sparseFold`: lowest set bit
+by `gcd`, its index by a population count checked on the 1024 powers of two
+below the word width) and tests every index of a dense one (`Lanes.bitFold`),
+and skips a plane it would add nothing to (`Lanes.addOnz`). The measured cost, a
+few seconds for thousands of gates on hundreds of wires, is in
 `benchmarks/scale/README.md`. What grows is the triple plane, `C(n, 3)` bits,
 and the kernel copies it at every gate that changes it. Two traps found on the
 way, both about what the kernel retains or re-walks rather than about

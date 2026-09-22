@@ -14,38 +14,41 @@ build yourself, in `Solution.lean` and new modules under `Solution/`.
 - Write Lean inside `namespace Quantum.Circuit.<Name>` with `open Instr`, as
   `Solution.lean` does. Ascribe one side of a literal equivalence,
   `([H 0, H 0] : Circuit 1) ≡ᵤ []`.
-- `CircuitEq/Semantics.lean` defines `denote : Circuit n → Vec n → Vec n`
-  over the computable field `ℚ(ζ₈)` (`CircuitEq/Zeta8.lean`) and four
-  relations, whose algebra is in `CircuitEq/Relations.lean`: `a ≡ᵤ b` (`Equivalent`, equal on every state; it has `refl`,
-  `symm`, `trans`, `append`, `cons`, and `calc` works), `a ≡ₚ b` (equal up to
-  a power of `ω = e^{iπ/4}`; the same algebra, and `calc` mixes it with
-  `≡ᵤ`), `a ≡ₚ[k] b` (the same with the phase named, `a = ω^k · b`, `k : Fin
-  8`; phases add under `append`; keep the space in `a ≡ₚ [X 0]`, since
-  `≡ₚ[` is its own token) and `a ≡ₛ b` (equal up to a nonzero scalar;
-  it has `refl`, `symm`, `trans`, `append`).
+- `CircuitEq/Semantics.lean` defines `denote : Circuit n → Vec n → Vec n` over
+  the computable field `ℚ(ζ₈)` (`CircuitEq/Zeta8.lean`) and four relations,
+  whose algebra is in `CircuitEq/Relations.lean`: `a ≡ᵤ b` (`Equivalent`, equal
+  on every state; it has `refl`, `symm`, `trans`, `append`, `cons`, and `calc`
+  works), `a ≡ₚ b` (equal up to a power of `ω = e^{iπ/4}`; the same algebra, and
+  `calc` mixes it with `≡ᵤ`), `a ≡ₚ[k] b` (the same with the phase named,
+  `a = ω^k · b`, `k : Fin 8`; phases add under `append`; keep the space in
+  `a ≡ₚ [X 0]`, since `≡ₚ[` is its own token) and `a ≡ₛ b` (equal up to a
+  nonzero scalar; it has `refl`, `symm`, `trans`, `append`).
 - `CircuitEq/Gates.lean` has the gate matrices and the state-vector actions
   `applyOne`, `applyCNOT` with their linearity, fusion and commutation lemmas
   (`applyOne_applyOne_same`, `applyOne_comm`, `applyOne_applyCNOT_comm`,
   `applyCNOT_comm`, `applyCNOT_applyCNOT_self`, …) and the matrix identities
-  (`H_mul_H`, `T_mul_T`, `S_mul_Sdg`, …). `CircuitEq/Bits.lean` has the four
-  bit lemmas every commutation proof rewrites with.
+  (`Gate1.H_mul_H`, `Gate1.T_mul_T`, `Gate1.S_mul_Sdg`, …).
+  `CircuitEq/Bits.lean` has the bit lemmas every commutation proof rewrites
+  with (`bit_flipBit_self`, `bit_flipBit_of_ne`, `flipBit_flipBit_self`,
+  `flipBit_comm`) and `flipBit_eq_iff`, `eq_of_bit_eq`, `exists_bit_ne`.
 
 ## What decides a pair here
 
-`≡ᵤ`, `≡ₚ` and `≡ₚ[k]` are `Decidable` for concrete circuits: every
-instruction is linear, so equivalence reduces to the `2^n` basis vectors
+`≡ᵤ`, `≡ₚ` and `≡ₚ[k]` are `Decidable` for concrete circuits: every instruction
+is linear, so equivalence reduces to the `2^n` basis vectors
 (`equivalent_iff_basis`), and the instance evaluates both circuits with an
-evaluator over the gcd-free ring of `CircuitEq/Dyadic.lean` that is proved
-equal to `denote` (`CircuitEq/Decide.lean`). So `by decide +kernel` proves or refutes a small pair.
+evaluator over the gcd-free ring of `CircuitEq/Dyadic.lean` that is proved equal
+to `denote` (`CircuitEq/Decide.lean`). So `by decide +kernel` proves or refutes
+a small pair.
 
 - Always `decide +kernel`. Bare `decide` stalls on the first rational
   addition, and `native_decide` is banned.
-- The cost is `gates · 4^k` amplitude steps on `k` qubits (`gates · 2^k`
-  per basis vector), and the kernel keeps every
-  intermediate term until the declaration ends, so memory runs out before
-  time does. Measured (gates counted over both sides): three qubits and six
-  gates, 0.1 s; four qubits and 59 gates, 3 s; five qubits and 108 gates,
-  10 s; seven qubits and 32 gates run past 6 GB and are killed.
+- The cost is `gates · 4^k` amplitude steps on `k` qubits (`gates · 2^k` per
+  basis vector), and the kernel keeps every intermediate term until the
+  declaration ends, so memory runs out before time does. Measured (gates counted
+  over both sides): three qubits and six gates, 0.1 s; four qubits and 59 gates,
+  3 s; five qubits and 108 gates, 10 s; seven qubits and 32 gates run past 6 GB
+  and are killed.
 - Memory is per declaration: several small lemmas composed by `trans` and
   `append` survive where one large `decide` does not. The same holds for one
   decision: `checkEquivAt a b y` is the check on the basis vector `y` alone,

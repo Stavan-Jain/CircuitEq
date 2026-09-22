@@ -8,9 +8,11 @@ import CircuitEq.Gates
 /-!
 # Circuits, their denotation, and the equivalence relations
 
-This file is the trusted core: what a circuit is, what it means, and what it
-means for two circuits to be equivalent. Everything else in the library is
-proved against these definitions, and nothing here is proved about them
+This file, with the gate semantics it builds on (`Gate1.mat`, `applyOne`,
+`applyCNOT` in `CircuitEq.Gates`, `bit` and `flipBit` in `CircuitEq.Bits`,
+the field in `CircuitEq.Zeta8`), is the trusted core: what a circuit is, what
+it means, and what it means for two circuits to be equivalent. Everything
+else in the library is proved against these definitions, and nothing here is proved about them
 beyond the facts about `denote` that every other file uses.
 
 A `Circuit n` is a list of instructions (`Instr n`: a single-qubit
@@ -30,8 +32,8 @@ operator the circuit `[g₁, g₂, g₃]` is `U₃ · U₂ · U₁`.
 - `c₁ ≡ₛ c₂` (`EquivalentUpToScalar`): equal up to a unit of the
   coefficient ring; what a Clifford tableau certifies.
 
-Their algebra (`refl`, `symm`, `trans`, `append`, `cons`, `calc`) is in
-`CircuitEq.Relations`. Their decision procedures, the reduction to the
+Their algebra (`refl`, `symm`, `trans`, `append`, and for the first three
+`cons` and `calc`) is in `CircuitEq.Relations`. Their decision procedures, the reduction to the
 computational basis and the evaluators the kernel runs, are in
 `CircuitEq.Decide`.
 

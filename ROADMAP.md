@@ -434,14 +434,15 @@ test of the working hypothesis above. Everything here is stated with `≡ᵤ` an
   small `decide` per window. The alignment is *input*; the tactic only checks
   it. ✅ (September 2026.) `circuit_windows` in `CircuitEq/Tactic.lean` takes the
   alignment as a list of windows, decides each on its own wires (cost `2^k`),
-  and checks every move (then by `Equivalent.of_rename` and `pull_cons`; since
-  `a163ea5` as the `window` and move steps of one replayed certificate);
-  `circuit_simp` is the same engine without windows. The block theorems of
-  `CircuitEq/Layers.lean` closed the first two QECUnitaryCircuits-versus-PyZX
-  pairs, and `circuit_windows` closed `tof_3` against PyZX phase teleportation
-  (T-count 21 → 19) with four windows on at most three wires
-  (`CircuitEq/Benchmarks/`). Re-synthesised output (`full_reduce`, T-count 15 on
-  the same input) has no alignment; that is the residual pattern's job.
+  and checks every move (then by `Equivalent.of_rename` and `pull_cons`, since
+  removed; since `a163ea5` as the `window` and move steps of one replayed
+  certificate); `circuit_simp` is the same engine without windows. The block
+  theorems of `CircuitEq/Layers.lean` closed the first two
+  QECUnitaryCircuits-versus-PyZX pairs, and `circuit_windows` closed `tof_3`
+  against PyZX phase teleportation (T-count 21 → 19) with four windows on at
+  most three wires (`CircuitEq/Benchmarks/`). Re-synthesised output
+  (`full_reduce`, T-count 15 on the same input) has no alignment; that is the
+  residual pattern's job.
 - **The certificate language and replay interpreter.** ✅ (16 September
   2026, `CircuitEq/Certificate.lean`.) `Step` (`swap`, `moveLeft`,
   `moveRight` across a block with disjoint bitmask support, `cancel`,
@@ -736,8 +737,10 @@ and it strengthens 3. Rung 5 before 6 and 10. Rung 6 before 8, and 8 before
   to brute force at Rung 1 sizes or to replaying the certificate the external
   tool produced. A systematic failure is a finding about that optimiser, and
   narrows the hypothesis rather than the project.
-- **Kernel performance wall.** Fallback: a clearly labelled second trust tier
-  using `native_decide` for concrete checks only, never for library lemmas.
+- **Kernel performance wall.** Not a `native_decide` tier, which the trust
+  policy bans outright: the levers are chunked evaluation (`CircuitEq.Chunk`),
+  a symbolic checker for the fragment, and a compact encoding of what the
+  kernel walks (`QUEUE.md`, item 3).
 - **A parametric target needs new mathematics.** That is the point; scope the
   acceptance test to what is provable and record the rest as conjectures.
 - **Coefficient-field growth in Rung 8.** Prefer phase polynomials to a tower
