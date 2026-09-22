@@ -1,0 +1,26 @@
+{
+  "name": "barenco_tof_3",
+  "qubits": 5,
+  "relation": "u",
+  "expected": "equiv",
+  "split": "dev",
+  "family": "barenco_tof",
+  "rung": 3,
+  "source": {
+    "module": "CircuitEq/Benchmarks/BarencoTof3.lean",
+    "pipeline": "pyzx teleport"
+  },
+  "holdout": {
+    "modules": [
+      "CircuitEq.Benchmarks.BarencoTof3"
+    ],
+    "redact": []
+  },
+  "known_leaks": [
+    "the pair is a promoted benchmark of this repository, so a model may have seen its proof; removed from the run copy: its module, README.md, benchmarks/, and the window table of scripts/certificate.py"
+  ],
+  "gates": [
+    60,
+    62
+  ]
+}

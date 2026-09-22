@@ -19,7 +19,8 @@ reports the obvious spellings early, with a file and a line, before a build
 is paid for.
 
 Scanned by default: ``CircuitEq.lean``, every ``.lean`` file under
-``CircuitEq/`` and ``scripts/``, and ``lakefile.toml`` / ``lakefile.lean``.
+``CircuitEq/``, ``scripts/`` and ``benchmarks/``, and ``lakefile.toml`` /
+``lakefile.lean``.
 Reported:
 
 * ``set_option`` of any ``debug.*`` option, also behind ``weak.``;
@@ -72,10 +73,13 @@ CONFIG_RULES = [
 
 
 def default_files() -> list[Path]:
-    """The files the policy covers, without the fixture."""
+    """The files the policy covers, without the fixture. The Lean under `benchmarks/` (harness
+    tasks, recorded solutions) is in no `lean_lib` and is never built, so the text search is
+    the only check it gets."""
     files = [ROOT / "CircuitEq.lean"]
     files += sorted((ROOT / "CircuitEq").rglob("*.lean"))
     files += sorted((ROOT / "scripts").rglob("*.lean"))
+    files += sorted((ROOT / "benchmarks").rglob("*.lean"))
     files += [ROOT / name for name in CONFIG_NAMES]
     return [f for f in files if f.is_file() and f.relative_to(ROOT) != FIXTURE]
 

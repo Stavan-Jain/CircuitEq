@@ -1,0 +1,88 @@
+{
+  "name": "feynman_grover_5__peephole",
+  "qubits": 9,
+  "relation": "u",
+  "expected": "equiv",
+  "split": "held-out",
+  "family": "grover",
+  "rung": 5,
+  "source": {
+    "generator": "scripts/circuit_pairs.py",
+    "optimiser": "peephole",
+    "circuit": "feynman_grover_5",
+    "circuit_source": {
+      "source": "feynman",
+      "path": "benchmarks/qasm/grover_5.qasm",
+      "sha256": "dccb7c3a0e4811e8b30af7d1ae5186e9e628ab5a2c8d70d88aa7868b9dc434de"
+    },
+    "circuit_licence": "BSD-3-Clause",
+    "twin": "peephole",
+    "twin_tool": {
+      "tool": "scripts/peephole_pairs.py peephole",
+      "rewrites": 137,
+      "seconds": 0.01
+    },
+    "tier": 2,
+    "relation_found": {
+      "method": "unitary",
+      "relation": "exact",
+      "max_abs_diff": 2.026310850214159e-15
+    },
+    "gates": [
+      1023,
+      769
+    ],
+    "t_count": [
+      336,
+      296
+    ],
+    "h_count": [
+      334,
+      100
+    ],
+    "cx_count": [
+      288,
+      288
+    ],
+    "fragment": [
+      "general",
+      "general"
+    ],
+    "diff_matched": {
+      "raw": {
+        "matched": 303,
+        "of": 1023,
+        "fraction": 0.2962
+      },
+      "greedy/cancommute": {
+        "matched": 749,
+        "of": 1023,
+        "fraction": 0.7322
+      }
+    },
+    "segments": {
+      "raw": {
+        "segments": 8,
+        "longest": 1016
+      },
+      "greedy/cancommute": {
+        "segments": 393,
+        "longest": 512
+      }
+    }
+  },
+  "holdout": {
+    "modules": [],
+    "redact": [],
+    "delete": [
+      "scripts/circuit_pairs.py",
+      "scripts/circuit_sources.py",
+      "scripts/peephole_pairs.py"
+    ]
+  },
+  "known_leaks": [],
+  "gates": [
+    1023,
+    769
+  ]
+}

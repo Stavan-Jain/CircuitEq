@@ -1,0 +1,84 @@
+{
+  "name": "feynman_hwb8__peephole",
+  "qubits": 12,
+  "relation": "u",
+  "expected": "equiv",
+  "split": "held-out",
+  "family": "hwb",
+  "rung": 8,
+  "source": {
+    "generator": "scripts/circuit_pairs.py",
+    "optimiser": "peephole",
+    "circuit": "feynman_hwb8",
+    "circuit_source": {
+      "source": "feynman",
+      "path": "benchmarks/qasm/hwb8.qasm",
+      "sha256": "c229d40bc2d1ea65cb268189315d004d46aa1f0785f75f6d6444209f79536dc8"
+    },
+    "circuit_licence": "BSD-3-Clause",
+    "twin": "peephole",
+    "twin_tool": {
+      "tool": "scripts/peephole_pairs.py peephole",
+      "rewrites": 2196,
+      "seconds": 0.08
+    },
+    "tier": 3,
+    "relation_found": {
+      "method": "2 random state(s)",
+      "relation": "exact",
+      "max_abs_diff": 1.06467174749857e-14
+    },
+    "gates": [
+      18220,
+      14077
+    ],
+    "t_count": [
+      5887,
+      5437
+    ],
+    "h_count": [
+      5046,
+      1208
+    ],
+    "cx_count": [
+      7129,
+      7073
+    ],
+    "fragment": [
+      "general",
+      "general"
+    ],
+    "diff_matched": {
+      "raw": {
+        "skipped": "18220 x 14077 gates is past the diff's budget"
+      },
+      "greedy/cancommute": {
+        "skipped": "18220 x 14077 gates is past the diff's budget"
+      }
+    },
+    "segments": {
+      "raw": {
+        "segments": 166,
+        "longest": 31810
+      },
+      "greedy/cancommute": {
+        "segments": 14075,
+        "longest": 10
+      }
+    }
+  },
+  "holdout": {
+    "modules": [],
+    "redact": [],
+    "delete": [
+      "scripts/circuit_pairs.py",
+      "scripts/circuit_sources.py",
+      "scripts/peephole_pairs.py"
+    ]
+  },
+  "known_leaks": [],
+  "gates": [
+    18220,
+    14077
+  ]
+}

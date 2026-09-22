@@ -1,0 +1,22 @@
+{
+  "verdict": "REJECT",
+  "claim": null,
+  "axioms": null,
+  "reasons": [
+    "`equiv` depends on sorryAx; only propext, Classical.choice, Quot.sound are allowed",
+    "`not_equiv` depends on sorryAx; only propext, Classical.choice, Quot.sound are allowed"
+  ],
+  "warnings": [],
+  "modified": [
+    "Solution.lean"
+  ],
+  "deleted": [],
+  "added": [
+    ".harness/manifest.json",
+    "scripts/__pycache__/check_pyzx_benchmarks.cpython-314.pyc",
+    "scripts/__pycache__/tcount_survey.cpython-314.pyc"
+  ],
+  "broke_rules": false,
+  "submissions": [],
+  "first_accept_s": null
+}

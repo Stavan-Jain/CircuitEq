@@ -1,0 +1,31 @@
+{
+  "name": "barenco_tof_3_tzap",
+  "qubits": 5,
+  "relation": "u",
+  "expected": "equiv",
+  "split": "dev",
+  "family": "barenco_tof",
+  "rung": 3,
+  "source": {
+    "optimiser": "tzap 0.6.1 -Osuper --decompose-rz --decompose-cz",
+    "tcount": [
+      28,
+      16
+    ],
+    "numeric": "exact (numpy, full unitary)"
+  },
+  "holdout": {
+    "modules": [
+      "CircuitEq.Benchmarks.BarencoTof3"
+    ],
+    "redact": [],
+    "delete": []
+  },
+  "known_leaks": [
+    "the original is the promoted benchmark CircuitEq/Benchmarks/BarencoTof3.lean, whose PyZX twin and proof are in the repository; the TZAP twin is not"
+  ],
+  "gates": [
+    60,
+    42
+  ]
+}

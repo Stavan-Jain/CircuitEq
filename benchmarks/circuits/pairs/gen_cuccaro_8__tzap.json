@@ -1,0 +1,83 @@
+{
+ "name": "gen_cuccaro_8__tzap",
+ "qubits": 18,
+ "relation": "u",
+ "expected": "equiv",
+ "split": "held-out",
+ "family": "gen_cuccaro",
+ "rung": 8,
+ "source": {
+  "generator": "scripts/circuit_pairs.py",
+  "optimiser": "tzap",
+  "circuit": "gen_cuccaro_8",
+  "circuit_source": {
+   "source": "generated",
+   "path": null,
+   "sha256": null
+  },
+  "circuit_licence": "this repository's",
+  "twin": "tzap",
+  "twin_tool": {
+   "tool": "tzap -O2 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+   "tzap": "tzap 0.6.1",
+   "options": "-O2 --decompose-rz --decompose-cz",
+   "seconds": 0.07
+  },
+  "tier": 2,
+  "relation_found": {
+   "method": "2 random state(s)",
+   "relation": "exact",
+   "max_abs_diff": 2.4992212352109423e-17
+  },
+  "gates": [
+   273,
+   225
+  ],
+  "t_count": [
+   112,
+   64
+  ],
+  "h_count": [
+   32,
+   32
+  ],
+  "cx_count": [
+   129,
+   105
+  ],
+  "fragment": [
+   "general",
+   "general"
+  ],
+  "diff_matched": {
+   "raw": {
+    "matched": 186,
+    "of": 273,
+    "fraction": 0.6813
+   },
+   "greedy/cancommute": {
+    "matched": 193,
+    "of": 273,
+    "fraction": 0.707
+   }
+  },
+  "segments": {
+   "raw": {
+    "segments": 12,
+    "longest": 473
+   },
+   "greedy/cancommute": {
+    "segments": 4,
+    "longest": 491
+   }
+  }
+ },
+ "holdout_delete": [
+  "scripts/circuit_pairs.py",
+  "scripts/circuit_sources.py",
+  "scripts/peephole_pairs.py"
+ ],
+ "known_leaks": [],
+ "original": ["CX 2 1", "CX 2 0", "H 2", "CX 1 2", "Tdg 2", "CX 0 2", "T 2", "CX 1 2", "Tdg 2", "CX 0 2", "T 1", "T 2", "H 2", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "CX 4 3", "CX 4 2", "H 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 3", "T 4", "H 4", "CX 2 3", "T 2", "Tdg 3", "CX 2 3", "CX 6 5", "CX 6 4", "H 6", "CX 5 6", "Tdg 6", "CX 4 6", "T 6", "CX 5 6", "Tdg 6", "CX 4 6", "T 5", "T 6", "H 6", "CX 4 5", "T 4", "Tdg 5", "CX 4 5", "CX 8 7", "CX 8 6", "H 8", "CX 7 8", "Tdg 8", "CX 6 8", "T 8", "CX 7 8", "Tdg 8", "CX 6 8", "T 7", "T 8", "H 8", "CX 6 7", "T 6", "Tdg 7", "CX 6 7", "CX 10 9", "CX 10 8", "H 10", "CX 9 10", "Tdg 10", "CX 8 10", "T 10", "CX 9 10", "Tdg 10", "CX 8 10", "T 9", "T 10", "H 10", "CX 8 9", "T 8", "Tdg 9", "CX 8 9", "CX 12 11", "CX 12 10", "H 12", "CX 11 12", "Tdg 12", "CX 10 12", "T 12", "CX 11 12", "Tdg 12", "CX 10 12", "T 11", "T 12", "H 12", "CX 10 11", "T 10", "Tdg 11", "CX 10 11", "CX 14 13", "CX 14 12", "H 14", "CX 13 14", "Tdg 14", "CX 12 14", "T 14", "CX 13 14", "Tdg 14", "CX 12 14", "T 13", "T 14", "H 14", "CX 12 13", "T 12", "Tdg 13", "CX 12 13", "CX 16 15", "CX 16 14", "H 16", "CX 15 16", "Tdg 16", "CX 14 16", "T 16", "CX 15 16", "Tdg 16", "CX 14 16", "T 15", "T 16", "H 16", "CX 14 15", "T 14", "Tdg 15", "CX 14 15", "CX 16 17", "H 16", "CX 15 16", "Tdg 16", "CX 14 16", "T 16", "CX 15 16", "Tdg 16", "CX 14 16", "T 15", "T 16", "H 16", "CX 14 15", "T 14", "Tdg 15", "CX 14 15", "CX 16 14", "CX 14 15", "H 14", "CX 13 14", "Tdg 14", "CX 12 14", "T 14", "CX 13 14", "Tdg 14", "CX 12 14", "T 13", "T 14", "H 14", "CX 12 13", "T 12", "Tdg 13", "CX 12 13", "CX 14 12", "CX 12 13", "H 12", "CX 11 12", "Tdg 12", "CX 10 12", "T 12", "CX 11 12", "Tdg 12", "CX 10 12", "T 11", "T 12", "H 12", "CX 10 11", "T 10", "Tdg 11", "CX 10 11", "CX 12 10", "CX 10 11", "H 10", "CX 9 10", "Tdg 10", "CX 8 10", "T 10", "CX 9 10", "Tdg 10", "CX 8 10", "T 9", "T 10", "H 10", "CX 8 9", "T 8", "Tdg 9", "CX 8 9", "CX 10 8", "CX 8 9", "H 8", "CX 7 8", "Tdg 8", "CX 6 8", "T 8", "CX 7 8", "Tdg 8", "CX 6 8", "T 7", "T 8", "H 8", "CX 6 7", "T 6", "Tdg 7", "CX 6 7", "CX 8 6", "CX 6 7", "H 6", "CX 5 6", "Tdg 6", "CX 4 6", "T 6", "CX 5 6", "Tdg 6", "CX 4 6", "T 5", "T 6", "H 6", "CX 4 5", "T 4", "Tdg 5", "CX 4 5", "CX 6 4", "CX 4 5", "H 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 3", "T 4", "H 4", "CX 2 3", "T 2", "Tdg 3", "CX 2 3", "CX 4 2", "CX 2 3", "H 2", "CX 1 2", "Tdg 2", "CX 0 2", "T 2", "CX 1 2", "Tdg 2", "CX 0 2", "T 1", "T 2", "H 2", "CX 0 1", "T 0", "Tdg 1", "CX 0 1", "CX 2 0", "CX 0 1"],
+ "optimized": ["CX 2 1", "CX 2 0", "H 2", "CX 1 2", "Tdg 2", "CX 0 2", "T 2", "CX 1 2", "Tdg 2", "CX 0 2", "T 2", "H 2", "CX 4 2", "CX 4 3", "H 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 4", "H 4", "CX 6 4", "CX 6 5", "H 6", "CX 5 6", "Tdg 6", "CX 4 6", "T 6", "CX 5 6", "Tdg 6", "CX 4 6", "T 6", "H 6", "CX 8 6", "CX 8 7", "H 8", "CX 7 8", "Tdg 8", "CX 6 8", "T 8", "CX 7 8", "Tdg 8", "CX 6 8", "T 8", "H 8", "CX 10 8", "CX 10 9", "H 10", "CX 9 10", "Tdg 10", "CX 8 10", "T 10", "CX 9 10", "Tdg 10", "CX 8 10", "T 10", "H 10", "CX 12 10", "CX 12 11", "H 12", "CX 11 12", "Tdg 12", "CX 10 12", "T 12", "CX 11 12", "Tdg 12", "CX 10 12", "T 12", "H 12", "CX 14 12", "CX 14 13", "H 14", "CX 13 14", "Tdg 14", "CX 12 14", "T 14", "CX 13 14", "Tdg 14", "CX 12 14", "T 14", "H 14", "CX 16 14", "CX 16 15", "H 16", "CX 15 16", "Tdg 16", "CX 14 16", "T 16", "CX 15 16", "Tdg 16", "CX 14 16", "T 16", "H 16", "CX 16 17", "H 16", "CX 15 16", "Tdg 16", "CX 14 16", "T 16", "CX 15 16", "Tdg 16", "CX 14 16", "S 15", "T 16", "H 16", "S 14", "CX 14 15", "Sdg 15", "CX 16 14", "CX 16 15", "H 14", "CX 13 14", "Tdg 14", "CX 12 14", "T 14", "CX 13 14", "Tdg 14", "CX 12 14", "S 13", "T 14", "H 14", "S 12", "CX 12 13", "Sdg 13", "CX 14 12", "CX 14 13", "H 12", "CX 11 12", "Tdg 12", "CX 10 12", "T 12", "CX 11 12", "Tdg 12", "CX 10 12", "S 11", "T 12", "H 12", "S 10", "CX 10 11", "Sdg 11", "CX 12 10", "CX 12 11", "H 10", "CX 9 10", "Tdg 10", "CX 8 10", "T 10", "CX 9 10", "Tdg 10", "CX 8 10", "S 9", "T 10", "H 10", "S 8", "CX 8 9", "Sdg 9", "CX 10 8", "CX 10 9", "H 8", "CX 7 8", "Tdg 8", "CX 6 8", "T 8", "CX 7 8", "Tdg 8", "CX 6 8", "S 7", "T 8", "H 8", "S 6", "CX 6 7", "Sdg 7", "CX 8 6", "CX 8 7", "H 6", "CX 5 6", "Tdg 6", "CX 4 6", "T 6", "CX 5 6", "Tdg 6", "CX 4 6", "S 5", "T 6", "H 6", "S 4", "CX 4 5", "Sdg 5", "CX 6 4", "CX 6 5", "H 4", "CX 3 4", "Tdg 4", "CX 2 4", "T 4", "CX 3 4", "Tdg 4", "CX 2 4", "S 3", "T 4", "H 4", "S 2", "CX 2 3", "Sdg 3", "CX 4 2", "CX 4 3", "H 2", "CX 1 2", "Tdg 2", "CX 0 2", "T 2", "CX 1 2", "Tdg 2", "CX 0 2", "S 1", "T 2", "H 2", "S 0", "CX 0 1", "Sdg 1", "CX 2 0", "CX 2 1"]
+}

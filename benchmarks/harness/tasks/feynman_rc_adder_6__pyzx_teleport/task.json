@@ -1,0 +1,88 @@
+{
+  "name": "feynman_rc_adder_6__pyzx_teleport",
+  "qubits": 14,
+  "relation": "u",
+  "expected": "equiv",
+  "split": "held-out",
+  "family": "rc_adder",
+  "rung": 6,
+  "source": {
+    "generator": "scripts/circuit_pairs.py",
+    "optimiser": "pyzx_teleport",
+    "circuit": "feynman_rc_adder_6",
+    "circuit_source": {
+      "source": "feynman",
+      "path": "benchmarks/qasm/rc_adder_6.qasm",
+      "sha256": "b7fff2267fe08799a7b50eb69a27c498fd890ca3e965cca16a1ad7b121179174"
+    },
+    "circuit_licence": "BSD-3-Clause",
+    "twin": "pyzx_teleport",
+    "twin_tool": {
+      "tool": "pyzx teleport_reduce + basic_optimization (scripts/check_pyzx_benchmarks.py optimize)",
+      "pyzx": "0.9.0",
+      "seconds": 0.08
+    },
+    "tier": 2,
+    "relation_found": {
+      "method": "2 random state(s)",
+      "relation": "exact",
+      "max_abs_diff": 6.800912535878896e-17
+    },
+    "gates": [
+      244,
+      195
+    ],
+    "t_count": [
+      77,
+      59
+    ],
+    "h_count": [
+      66,
+      46
+    ],
+    "cx_count": [
+      93,
+      81
+    ],
+    "fragment": [
+      "general",
+      "general"
+    ],
+    "diff_matched": {
+      "raw": {
+        "matched": 103,
+        "of": 244,
+        "fraction": 0.4221
+      },
+      "greedy/cancommute": {
+        "matched": 133,
+        "of": 244,
+        "fraction": 0.5451
+      }
+    },
+    "segments": {
+      "raw": {
+        "segments": 1,
+        "longest": 439
+      },
+      "greedy/cancommute": {
+        "segments": 31,
+        "longest": 367
+      }
+    }
+  },
+  "holdout": {
+    "modules": [],
+    "redact": [],
+    "delete": [
+      "scripts/circuit_pairs.py",
+      "scripts/circuit_sources.py",
+      "scripts/peephole_pairs.py"
+    ]
+  },
+  "known_leaks": [],
+  "gates": [
+    244,
+    195
+  ]
+}

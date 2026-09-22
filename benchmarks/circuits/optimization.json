@@ -1,0 +1,4030 @@
+{
+ "generated_by": "scripts/circuit_pairs.py optimization",
+ "task": "Given the source circuit, produce a cheaper circuit (T-count first, then gates) with a Lean proof of equivalence. The numbers are what uncertified tools reach on the same gate list; `best_uncertified_t_count` counts only outputs that were not found to differ from the source.",
+ "how_to_get_a_circuit": "scripts/circuit_sources.py translate NAME --out DIR; compare `translated_sha256`",
+ "recommended": "the ladder to report on: one or two rungs per family and tier; the other entries are the rest of the catalogue's T-bearing circuits",
+ "tools": {
+  "pyzx_teleport": "pyzx 0.9.0 teleport_reduce + basic_optimization, run here (limit 240 s and 8000 gates)",
+  "pyzx_full_reduce": "pyzx 0.9.0 full_reduce + extract_circuit + basic_optimization, run here (same limits)",
+  "nam_light, nam_heavy": "published outputs of Nam, Ross, Su, Childs, Maslov (arXiv:1710.07345), from the PyZX repository",
+  "tpar": "published T-par outputs, from the PyZX repository; T-par may assume that ancillas start in |0>, see `relation_to_source`",
+  "pyzx_published": "PyZX's published outputs (arXiv:1903.10477), which add phase gadget optimisation (TODD) on some circuits",
+  "tzap": "TZAP 0.6.1 -O2 --decompose-rz --decompose-cz (github.com/qqq-wisc/tzap), run here on every T-bearing circuit, tier 4 included (linear in the gate count). Its own copy of the Feynman suite is these gate lists exactly"
+ },
+ "tier_1": [
+  {
+   "name": "qasmbench_teleportation_n3",
+   "recommended": false,
+   "family": "qb_teleportation",
+   "size": 3,
+   "qubits": 3,
+   "gates": 8,
+   "t_count": 1,
+   "cx_count": 2,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "887bdf943da0d5852bda02faaad703580bf4d2d99fec353b9ad6067d014c3b8e",
+   "best_uncertified_t_count": 1,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 1,
+     "gates": 8,
+     "cx_count": 2,
+     "relation_to_source": "exact",
+     "seconds": 0.05
+    },
+    "pyzx_full_reduce": {
+     "t_count": 1,
+     "gates": 10,
+     "cx_count": 2,
+     "relation_to_source": "phase",
+     "seconds": 0.05
+    },
+    "tzap": {
+     "t_count": 1,
+     "gates": 8,
+     "cx_count": 2,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "qasmbench_toffoli_n3",
+   "recommended": false,
+   "family": "qb_toffoli",
+   "size": 3,
+   "qubits": 3,
+   "gates": 18,
+   "t_count": 7,
+   "cx_count": 6,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "4beefc08590747b5a15ba1e0b96c923016530d85e9d8d447db02aaca4a16da1e",
+   "best_uncertified_t_count": 7,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 7,
+     "gates": 20,
+     "cx_count": 6,
+     "relation_to_source": "exact",
+     "seconds": 0.05
+    },
+    "pyzx_full_reduce": {
+     "t_count": 7,
+     "gates": 23,
+     "cx_count": 10,
+     "relation_to_source": "exact",
+     "seconds": 0.05
+    },
+    "tzap": {
+     "t_count": 7,
+     "gates": 17,
+     "cx_count": 6,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "qec_steane_713_H_nf_fig4",
+   "recommended": false,
+   "family": "qec_encoder",
+   "size": 7,
+   "qubits": 7,
+   "gates": 18,
+   "t_count": 1,
+   "cx_count": 11,
+   "fragment": "general",
+   "source": "qec",
+   "translated_sha256": "8a9fc0ffd3e648d93a824bb92ce71b7cc97925a6a5d0e40467b1528abd477992",
+   "best_uncertified_t_count": 1,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 1,
+     "gates": 18,
+     "cx_count": 11,
+     "relation_to_source": "exact",
+     "seconds": 0.05
+    },
+    "pyzx_full_reduce": {
+     "t_count": 1,
+     "gates": 39,
+     "cx_count": 13,
+     "relation_to_source": "exact",
+     "seconds": 0.05
+    },
+    "tzap": {
+     "t_count": 1,
+     "gates": 18,
+     "cx_count": 11,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "qasmbench_fredkin_n3",
+   "recommended": false,
+   "family": "qb_fredkin",
+   "size": 3,
+   "qubits": 3,
+   "gates": 19,
+   "t_count": 7,
+   "cx_count": 8,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "d0b4fb0525d63e64c25a8bb7f17695907e3d5800256cd339025f1608ccbac7a4",
+   "best_uncertified_t_count": 7,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 7,
+     "gates": 19,
+     "cx_count": 8,
+     "relation_to_source": "exact",
+     "seconds": 0.05
+    },
+    "pyzx_full_reduce": {
+     "t_count": 7,
+     "gates": 31,
+     "cx_count": 10,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "tzap": {
+     "t_count": 7,
+     "gates": 18,
+     "cx_count": 8,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "qasmbench_adder_n4",
+   "recommended": false,
+   "family": "qb_adder",
+   "size": 4,
+   "qubits": 4,
+   "gates": 23,
+   "t_count": 8,
+   "cx_count": 10,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "6366daca7c0e7d283cbd5b0b5e0bdf40552e392d64e7b203acaeeb32174657b3",
+   "best_uncertified_t_count": 8,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 8,
+     "gates": 24,
+     "cx_count": 10,
+     "relation_to_source": "exact",
+     "seconds": 0.05
+    },
+    "pyzx_full_reduce": {
+     "t_count": 8,
+     "gates": 32,
+     "cx_count": 18,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "tzap": {
+     "t_count": 8,
+     "gates": 20,
+     "cx_count": 8,
+     "relation_to_source": "phase",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "qasmbench_qec_en_n5",
+   "recommended": false,
+   "family": "qb_qec_en",
+   "size": 5,
+   "qubits": 5,
+   "gates": 25,
+   "t_count": 1,
+   "cx_count": 10,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "6df92a945d5963cdca9ccaf3911447c9b7a99f965ac7f36874026422876f7c06",
+   "best_uncertified_t_count": 1,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 1,
+     "gates": 17,
+     "cx_count": 14,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "pyzx_full_reduce": {
+     "t_count": 1,
+     "gates": 17,
+     "cx_count": 14,
+     "relation_to_source": "exact",
+     "seconds": 0.05
+    },
+    "tzap": {
+     "t_count": 1,
+     "gates": 12,
+     "cx_count": 9,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "qasmbench_simon_n6",
+   "recommended": false,
+   "family": "qb_simon",
+   "size": 6,
+   "qubits": 6,
+   "gates": 44,
+   "t_count": 14,
+   "cx_count": 14,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "edfc30ebfe99502f0095ddc479147983a123a911b477da9b890d10d992e5b486",
+   "best_uncertified_t_count": 0,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 12,
+     "gates": 39,
+     "cx_count": 14,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "pyzx_full_reduce": {
+     "t_count": 0,
+     "gates": 13,
+     "cx_count": 4,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "tzap": {
+     "t_count": 0,
+     "gates": 13,
+     "cx_count": 4,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "gen_tof_3",
+   "recommended": false,
+   "family": "gen_tof",
+   "size": 3,
+   "qubits": 5,
+   "gates": 45,
+   "t_count": 21,
+   "cx_count": 18,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "d1d3f8c238904a1118f3f320780e70add445f294f2ab9b50010c8adcc4649bc5",
+   "best_uncertified_t_count": 15,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 19,
+     "gates": 50,
+     "cx_count": 18,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "pyzx_full_reduce": {
+     "t_count": 15,
+     "gates": 51,
+     "cx_count": 25,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "tzap": {
+     "t_count": 15,
+     "gates": 38,
+     "cx_count": 15,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_tof_3",
+   "recommended": true,
+   "family": "tof",
+   "size": 3,
+   "qubits": 5,
+   "gates": 57,
+   "t_count": 21,
+   "cx_count": 18,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "13184c5b9a2cd5317e21e7be96cb44dc367ff6bc525fcea0006b80a39cf212b8",
+   "best_uncertified_t_count": 15,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 19,
+     "gates": 48,
+     "cx_count": 18,
+     "relation_to_source": "exact",
+     "seconds": 0.09
+    },
+    "pyzx_full_reduce": {
+     "t_count": 15,
+     "gates": 64,
+     "cx_count": 31,
+     "relation_to_source": "exact",
+     "seconds": 0.05
+    },
+    "tzap": {
+     "t_count": 15,
+     "gates": 38,
+     "cx_count": 15,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 15,
+     "gates": 35,
+     "cx_count": 14,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 15,
+     "gates": 35,
+     "cx_count": 14,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 15,
+     "gates": 59,
+     "cx_count": 35,
+     "relation_to_source": "exact"
+    },
+    "pyzx_published": {
+     "t_count": 15,
+     "gates": 44,
+     "cx_count": 16,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "gen_barenco_tof_3",
+   "recommended": false,
+   "family": "gen_barenco_tof",
+   "size": 3,
+   "qubits": 5,
+   "gates": 60,
+   "t_count": 28,
+   "cx_count": 24,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "a638126151de6de0e84afc291303b457d825828ee1aee9e8cbae8176d9e03283",
+   "best_uncertified_t_count": 16,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 24,
+     "gates": 62,
+     "cx_count": 24,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "pyzx_full_reduce": {
+     "t_count": 16,
+     "gates": 75,
+     "cx_count": 34,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "tzap": {
+     "t_count": 16,
+     "gates": 46,
+     "cx_count": 19,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "gen_cuccaro_2",
+   "recommended": false,
+   "family": "gen_cuccaro",
+   "size": 2,
+   "qubits": 6,
+   "gates": 69,
+   "t_count": 28,
+   "cx_count": 33,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "65fe83fdb74ba61823e0620b1504dd12392e9111b9c4d781dbe2722ac9f3f289",
+   "best_uncertified_t_count": 16,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 24,
+     "gates": 77,
+     "cx_count": 31,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "pyzx_full_reduce": {
+     "t_count": 16,
+     "gates": 78,
+     "cx_count": 40,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "tzap": {
+     "t_count": 16,
+     "gates": 57,
+     "cx_count": 27,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_barenco_tof_3",
+   "recommended": false,
+   "family": "barenco_tof",
+   "size": 3,
+   "qubits": 5,
+   "gates": 76,
+   "t_count": 28,
+   "cx_count": 24,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "efe3d553ff7192af15c8dba45bbc6ada177519e1ddb8c287f3e76d41a96eb23b",
+   "best_uncertified_t_count": 16,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 24,
+     "gates": 62,
+     "cx_count": 24,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "pyzx_full_reduce": {
+     "t_count": 16,
+     "gates": 78,
+     "cx_count": 35,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "tzap": {
+     "t_count": 16,
+     "gates": 46,
+     "cx_count": 19,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 16,
+     "gates": 42,
+     "cx_count": 20,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 16,
+     "gates": 40,
+     "cx_count": 18,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 16,
+     "gates": 82,
+     "cx_count": 54,
+     "relation_to_source": "exact"
+    },
+    "pyzx_published": {
+     "t_count": 16,
+     "gates": 56,
+     "cx_count": 22,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "feynman_mod5_4",
+   "recommended": true,
+   "family": "mod5",
+   "size": 4,
+   "qubits": 5,
+   "gates": 79,
+   "t_count": 28,
+   "cx_count": 28,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "b7f4fe8644b385a554788ebca75ccffa4672d5e7384bac13f382f6317ebb45b4",
+   "best_uncertified_t_count": 8,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 22,
+     "gates": 66,
+     "cx_count": 27,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "pyzx_full_reduce": {
+     "t_count": 8,
+     "gates": 30,
+     "cx_count": 20,
+     "relation_to_source": "exact",
+     "seconds": 0.05
+    },
+    "tzap": {
+     "t_count": 16,
+     "gates": 55,
+     "cx_count": 26,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 16,
+     "gates": 51,
+     "cx_count": 28,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 16,
+     "gates": 51,
+     "cx_count": 28,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 16,
+     "gates": 77,
+     "cx_count": 48,
+     "relation_to_source": "exact"
+    },
+    "pyzx_published": {
+     "t_count": 8,
+     "gates": 56,
+     "cx_count": 27,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "feynman_tof_4",
+   "recommended": false,
+   "family": "tof",
+   "size": 4,
+   "qubits": 7,
+   "gates": 95,
+   "t_count": 35,
+   "cx_count": 30,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "23941ce7126816f23b6d9a7d5788e2cc1f063c36dd6f71eb9bc93b45ddb8b014",
+   "best_uncertified_t_count": 23,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 31,
+     "gates": 79,
+     "cx_count": 30,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "pyzx_full_reduce": {
+     "t_count": 23,
+     "gates": 100,
+     "cx_count": 46,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "tzap": {
+     "t_count": 23,
+     "gates": 61,
+     "cx_count": 24,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 23,
+     "gates": 55,
+     "cx_count": 22,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 23,
+     "gates": 55,
+     "cx_count": 22,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 23,
+     "gates": 102,
+     "cx_count": 63,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 23,
+     "gates": 71,
+     "cx_count": 26,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "gen_tof_5",
+   "recommended": false,
+   "family": "gen_tof",
+   "size": 5,
+   "qubits": 9,
+   "gates": 105,
+   "t_count": 49,
+   "cx_count": 42,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "4cdccb76d191fc831d6cdccd7ca7f5cf6d28477c06f74b1e69f82c18c72513cd",
+   "best_uncertified_t_count": 31,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 43,
+     "gates": 116,
+     "cx_count": 42,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "pyzx_full_reduce": {
+     "t_count": 31,
+     "gates": 124,
+     "cx_count": 57,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "tzap": {
+     "t_count": 31,
+     "gates": 84,
+     "cx_count": 33,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_tof_5",
+   "recommended": true,
+   "family": "tof",
+   "size": 5,
+   "qubits": 9,
+   "gates": 133,
+   "t_count": 49,
+   "cx_count": 42,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "840d8997f1d14e2d22764f294339f2bf8cafdfe96471c13804058653435784a3",
+   "best_uncertified_t_count": 31,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 43,
+     "gates": 110,
+     "cx_count": 42,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "pyzx_full_reduce": {
+     "t_count": 31,
+     "gates": 135,
+     "cx_count": 61,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "tzap": {
+     "t_count": 31,
+     "gates": 84,
+     "cx_count": 33,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "nam_light": {
+     "t_count": 31,
+     "gates": 75,
+     "cx_count": 30,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 31,
+     "gates": 75,
+     "cx_count": 30,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 31,
+     "gates": 148,
+     "cx_count": 94,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 31,
+     "gates": 98,
+     "cx_count": 36,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "gen_cuccaro_4",
+   "recommended": true,
+   "family": "gen_cuccaro",
+   "size": 4,
+   "qubits": 10,
+   "gates": 137,
+   "t_count": 56,
+   "cx_count": 65,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "9e7c5c31b148ecc8de99dd205061354b81b9c419e8bff1d25dcb8a4092fce465",
+   "best_uncertified_t_count": 32,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 48,
+     "gates": 155,
+     "cx_count": 61,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "pyzx_full_reduce": {
+     "t_count": 32,
+     "gates": 190,
+     "cx_count": 90,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "tzap": {
+     "t_count": 32,
+     "gates": 113,
+     "cx_count": 53,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "qasmbench_adder_n10",
+   "recommended": true,
+   "family": "qb_adder",
+   "size": 10,
+   "qubits": 10,
+   "gates": 142,
+   "t_count": 56,
+   "cx_count": 65,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "9c5be9728b16e70b844632ba57a50d8637636ee8bee52b43bd14c379edc52a7a",
+   "best_uncertified_t_count": 32,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 48,
+     "gates": 158,
+     "cx_count": 61,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "pyzx_full_reduce": {
+     "t_count": 32,
+     "gates": 181,
+     "cx_count": 89,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "tzap": {
+     "t_count": 32,
+     "gates": 117,
+     "cx_count": 53,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_barenco_tof_4",
+   "recommended": true,
+   "family": "barenco_tof",
+   "size": 4,
+   "qubits": 7,
+   "gates": 146,
+   "t_count": 56,
+   "cx_count": 48,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "1b819b49b793bac520e95489d0db15580e362992cd52844c9d04cf03c920d3dc",
+   "best_uncertified_t_count": 28,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 48,
+     "gates": 119,
+     "cx_count": 48,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "pyzx_full_reduce": {
+     "t_count": 28,
+     "gates": 121,
+     "cx_count": 57,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "tzap": {
+     "t_count": 28,
+     "gates": 87,
+     "cx_count": 37,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 28,
+     "gates": 78,
+     "cx_count": 40,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 28,
+     "gates": 72,
+     "cx_count": 34,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 28,
+     "gates": 141,
+     "cx_count": 90,
+     "relation_to_source": "exact"
+    },
+    "pyzx_published": {
+     "t_count": 28,
+     "gates": 105,
+     "cx_count": 44,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "feynman_mod_mult_55",
+   "recommended": true,
+   "family": "mod_mult",
+   "size": 55,
+   "qubits": 9,
+   "gates": 147,
+   "t_count": 49,
+   "cx_count": 48,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "6f2c0e008f11f9b3f2d1be4b0973c47cecb5df5ac8dabe10d9cbba8c6abf10e7",
+   "best_uncertified_t_count": 35,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 43,
+     "gates": 109,
+     "cx_count": 48,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "pyzx_full_reduce": {
+     "t_count": 35,
+     "gates": 175,
+     "cx_count": 92,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "tzap": {
+     "t_count": 35,
+     "gates": 99,
+     "cx_count": 40,
+     "relation_to_source": "phase",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 35,
+     "gates": 91,
+     "cx_count": 40,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 35,
+     "gates": 91,
+     "cx_count": 40,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 37,
+     "gates": 231,
+     "cx_count": 161,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 35,
+     "gates": 97,
+     "cx_count": 42,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "gen_barenco_tof_5",
+   "recommended": false,
+   "family": "gen_barenco_tof",
+   "size": 5,
+   "qubits": 9,
+   "gates": 180,
+   "t_count": 84,
+   "cx_count": 72,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "058f74a9f09de3cd3010c7401d81ee253067d8ab802f13e2e1010423d28e4db1",
+   "best_uncertified_t_count": 40,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 72,
+     "gates": 176,
+     "cx_count": 72,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "pyzx_full_reduce": {
+     "t_count": 40,
+     "gates": 161,
+     "cx_count": 73,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    },
+    "tzap": {
+     "t_count": 40,
+     "gates": 128,
+     "cx_count": 55,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "qasmbench_sat_n7",
+   "recommended": true,
+   "family": "qb_sat",
+   "size": 7,
+   "qubits": 7,
+   "gates": 180,
+   "t_count": 70,
+   "cx_count": 60,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "7a6daf3294b7cc684b4904abd6b90288f4f26cff2de8183101c9d3933bfd90e6",
+   "best_uncertified_t_count": 46,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 62,
+     "gates": 167,
+     "cx_count": 60,
+     "relation_to_source": "phase",
+     "seconds": 0.07
+    },
+    "pyzx_full_reduce": {
+     "t_count": 46,
+     "gates": 182,
+     "cx_count": 76,
+     "relation_to_source": "phase",
+     "seconds": 0.07
+    },
+    "tzap": {
+     "t_count": 46,
+     "gates": 134,
+     "cx_count": 46,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_qft_4",
+   "recommended": true,
+   "family": "qft",
+   "size": 4,
+   "qubits": 5,
+   "gates": 187,
+   "t_count": 69,
+   "cx_count": 46,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "a907433fc2b34413425dcc8ed938bd3d32fe7137d123432513c8fc3c48a56315",
+   "best_uncertified_t_count": 67,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 67,
+     "gates": 181,
+     "cx_count": 45,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "pyzx_full_reduce": {
+     "t_count": 67,
+     "gates": 206,
+     "cx_count": 56,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "tzap": {
+     "t_count": 67,
+     "gates": 157,
+     "cx_count": 46,
+     "relation_to_source": "phase",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_vbe_adder_3",
+   "recommended": true,
+   "family": "vbe_adder",
+   "size": 3,
+   "qubits": 10,
+   "gates": 190,
+   "t_count": 70,
+   "cx_count": 70,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "0763a60727aa5f58595bd4173a74f2b9f5524a7deb4907271fa7b9d76188f153",
+   "best_uncertified_t_count": 24,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 56,
+     "gates": 138,
+     "cx_count": 58,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "pyzx_full_reduce": {
+     "t_count": 24,
+     "gates": 158,
+     "cx_count": 75,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "tzap": {
+     "t_count": 24,
+     "gates": 94,
+     "cx_count": 47,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 24,
+     "gates": 89,
+     "cx_count": 50,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 24,
+     "gates": 89,
+     "cx_count": 50,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 24,
+     "gates": 161,
+     "cx_count": 114,
+     "relation_to_source": "exact"
+    },
+    "pyzx_published": {
+     "t_count": 24,
+     "gates": 115,
+     "cx_count": 54,
+     "relation_to_source": "exact"
+    }
+   }
+  }
+ ],
+ "tier_2": [
+  {
+   "name": "qec_rm15_1531_transversal_Tdg",
+   "recommended": false,
+   "family": "qec_transversal",
+   "size": 15,
+   "qubits": 15,
+   "gates": 15,
+   "t_count": 15,
+   "cx_count": 0,
+   "fragment": "CX+diagonal",
+   "source": "qec",
+   "translated_sha256": "d8bfca597917b885f2fa059a62ea4507571b2e04e75310278622d0cea14224b2",
+   "best_uncertified_t_count": 15,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 15,
+     "gates": 15,
+     "cx_count": 0,
+     "relation_to_source": "exact",
+     "seconds": 0.05
+    },
+    "pyzx_full_reduce": {
+     "t_count": 15,
+     "gates": 15,
+     "cx_count": 0,
+     "relation_to_source": "exact",
+     "seconds": 0.05
+    },
+    "tzap": {
+     "t_count": 15,
+     "gates": 15,
+     "cx_count": 0,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "qasmbench_multiply_n13",
+   "recommended": false,
+   "family": "qb_multiply",
+   "size": 13,
+   "qubits": 13,
+   "gates": 98,
+   "t_count": 42,
+   "cx_count": 40,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "cf25598dab979083c60fc6cc92cf86a75e4192a1b972528e91473667f7aba5e6",
+   "best_uncertified_t_count": 32,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 36,
+     "gates": 107,
+     "cx_count": 40,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "pyzx_full_reduce": {
+     "t_count": 32,
+     "gates": 168,
+     "cx_count": 93,
+     "relation_to_source": "exact",
+     "seconds": 0.06
+    },
+    "tzap": {
+     "t_count": 32,
+     "gates": 93,
+     "cx_count": 40,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "gen_tof_8",
+   "recommended": false,
+   "family": "gen_tof",
+   "size": 8,
+   "qubits": 15,
+   "gates": 195,
+   "t_count": 91,
+   "cx_count": 78,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "5df6e77f46e2996cfb5db26313d90258b62e3112478ced7163a176a9fe468c3a",
+   "best_uncertified_t_count": 55,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 79,
+     "gates": 215,
+     "cx_count": 78,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "pyzx_full_reduce": {
+     "t_count": 55,
+     "gates": 222,
+     "cx_count": 94,
+     "relation_to_source": "exact",
+     "seconds": 0.1
+    },
+    "tzap": {
+     "t_count": 55,
+     "gates": 153,
+     "cx_count": 60,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_csla_mux_3",
+   "recommended": true,
+   "family": "csla_mux",
+   "size": 3,
+   "qubits": 15,
+   "gates": 210,
+   "t_count": 70,
+   "cx_count": 80,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "a156309dbfacfd47902f6045b71190f54f84ab3cee47e0dc179dc12d2d7834ab",
+   "best_uncertified_t_count": 62,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 64,
+     "gates": 163,
+     "cx_count": 73,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "pyzx_full_reduce": {
+     "t_count": 62,
+     "gates": 311,
+     "cx_count": 155,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    },
+    "tzap": {
+     "t_count": 64,
+     "gates": 153,
+     "cx_count": 70,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 64,
+     "gates": 161,
+     "cx_count": 76,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 64,
+     "gates": 155,
+     "cx_count": 70,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 62,
+     "gates": 508,
+     "cx_count": 425,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 62,
+     "gates": 164,
+     "cx_count": 75,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "feynman_barenco_tof_5",
+   "recommended": false,
+   "family": "barenco_tof",
+   "size": 5,
+   "qubits": 9,
+   "gates": 218,
+   "t_count": 84,
+   "cx_count": 72,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "41719d309dd6e91e654ae4e6a856879fa78b12346f4c4efee8b0a748dc77c26e",
+   "best_uncertified_t_count": 40,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 72,
+     "gates": 176,
+     "cx_count": 72,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "pyzx_full_reduce": {
+     "t_count": 40,
+     "gates": 184,
+     "cx_count": 81,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    },
+    "tzap": {
+     "t_count": 40,
+     "gates": 128,
+     "cx_count": 55,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 40,
+     "gates": 114,
+     "cx_count": 60,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 40,
+     "gates": 104,
+     "cx_count": 50,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 40,
+     "gates": 206,
+     "cx_count": 132,
+     "relation_to_source": "exact"
+    },
+    "pyzx_published": {
+     "t_count": 40,
+     "gates": 158,
+     "cx_count": 66,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "feynman_rc_adder_6",
+   "recommended": true,
+   "family": "rc_adder",
+   "size": 6,
+   "qubits": 14,
+   "gates": 244,
+   "t_count": 77,
+   "cx_count": 93,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "17579844d1570a60587f92e705016628f939d228e6694029b6ac741f55ee0b9a",
+   "best_uncertified_t_count": 47,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 59,
+     "gates": 195,
+     "cx_count": 81,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    },
+    "pyzx_full_reduce": {
+     "t_count": 47,
+     "gates": 257,
+     "cx_count": 119,
+     "relation_to_source": "exact",
+     "seconds": 0.09
+    },
+    "tzap": {
+     "t_count": 47,
+     "gates": 163,
+     "cx_count": 75,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 47,
+     "gates": 142,
+     "cx_count": 73,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 47,
+     "gates": 140,
+     "cx_count": 71,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 63,
+     "gates": 334,
+     "cx_count": 230,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 47,
+     "gates": 191,
+     "cx_count": 75,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "gen_cuccaro_8",
+   "recommended": false,
+   "family": "gen_cuccaro",
+   "size": 8,
+   "qubits": 18,
+   "gates": 273,
+   "t_count": 112,
+   "cx_count": 129,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "668a118d9626ff07f081580890d8980d45014458e97832f01c289c68554c092e",
+   "best_uncertified_t_count": 64,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 96,
+     "gates": 311,
+     "cx_count": 121,
+     "relation_to_source": "exact",
+     "seconds": 0.09
+    },
+    "pyzx_full_reduce": {
+     "t_count": 64,
+     "gates": 358,
+     "cx_count": 171,
+     "relation_to_source": "exact",
+     "seconds": 0.14
+    },
+    "tzap": {
+     "t_count": 64,
+     "gates": 225,
+     "cx_count": 105,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "qasmbench_bigadder_n18",
+   "recommended": false,
+   "family": "qb_bigadder",
+   "size": 18,
+   "qubits": 18,
+   "gates": 284,
+   "t_count": 112,
+   "cx_count": 130,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "15d64b62cb60701dcfd59f0ff4e51a834cf0425cde5578f9ce038ca81d1b7fa6",
+   "best_uncertified_t_count": 64,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 96,
+     "gates": 312,
+     "cx_count": 122,
+     "relation_to_source": "exact",
+     "seconds": 0.09
+    },
+    "pyzx_full_reduce": {
+     "t_count": 64,
+     "gates": 380,
+     "cx_count": 184,
+     "relation_to_source": "phase",
+     "seconds": 0.12
+    },
+    "tzap": {
+     "t_count": 64,
+     "gates": 233,
+     "cx_count": 106,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_4_mult",
+   "recommended": true,
+   "family": "gf2_mult",
+   "size": 4,
+   "qubits": 12,
+   "gates": 289,
+   "t_count": 112,
+   "cx_count": 99,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "2b3dbb423904c584f900d50dddb8bccf14584fb0b509344b4ccaf6bb605c41a0",
+   "best_uncertified_t_count": 68,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 96,
+     "gates": 213,
+     "cx_count": 99,
+     "relation_to_source": "exact",
+     "seconds": 0.09
+    },
+    "pyzx_full_reduce": {
+     "t_count": 68,
+     "gates": 498,
+     "cx_count": 305,
+     "relation_to_source": "exact",
+     "seconds": 0.1
+    },
+    "tzap": {
+     "t_count": 68,
+     "gates": 193,
+     "cx_count": 99,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 68,
+     "gates": 187,
+     "cx_count": 99,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 68,
+     "gates": 187,
+     "cx_count": 99,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 68,
+     "gates": 419,
+     "cx_count": 324,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 68,
+     "gates": 199,
+     "cx_count": 99,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "feynman_hwb6",
+   "recommended": true,
+   "family": "hwb",
+   "size": 6,
+   "qubits": 7,
+   "gates": 319,
+   "t_count": 105,
+   "cx_count": 116,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "da79e8a9e30fa1aacb9931a4d550135f70b524d5a359526f8771662a3bdfd7d2",
+   "best_uncertified_t_count": 75,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 95,
+     "gates": 267,
+     "cx_count": 111,
+     "relation_to_source": "phase",
+     "seconds": 0.1
+    },
+    "pyzx_full_reduce": {
+     "t_count": 75,
+     "gates": 317,
+     "cx_count": 149,
+     "relation_to_source": "exact",
+     "seconds": 0.1
+    },
+    "tzap": {
+     "t_count": 75,
+     "gates": 221,
+     "cx_count": 108,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "qasmbench_qram_n20",
+   "recommended": true,
+   "family": "qb_qram",
+   "size": 20,
+   "qubits": 20,
+   "gates": 321,
+   "t_count": 140,
+   "cx_count": 136,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "c7ee7ba33c17514cb64141ebe030d92a20c8eaefcc785cc068afc0404b808a95",
+   "best_uncertified_t_count": 96,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 128,
+     "gates": 318,
+     "cx_count": 130,
+     "relation_to_source": "phase",
+     "seconds": 0.1
+    },
+    "pyzx_full_reduce": {
+     "t_count": 96,
+     "gates": 451,
+     "cx_count": 229,
+     "relation_to_source": "phase",
+     "seconds": 0.16
+    },
+    "tzap": {
+     "t_count": 96,
+     "gates": 261,
+     "cx_count": 123,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_tof_10",
+   "recommended": true,
+   "family": "tof",
+   "size": 10,
+   "qubits": 19,
+   "gates": 323,
+   "t_count": 119,
+   "cx_count": 102,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "dab2940778154506aded3b7414832e1d07df2f3ca97ed2ea8f5fe32ae7544ef6",
+   "best_uncertified_t_count": 71,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 103,
+     "gates": 265,
+     "cx_count": 102,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    },
+    "pyzx_full_reduce": {
+     "t_count": 71,
+     "gates": 332,
+     "cx_count": 144,
+     "relation_to_source": "exact",
+     "seconds": 0.12
+    },
+    "tzap": {
+     "t_count": 71,
+     "gates": 199,
+     "cx_count": 78,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 71,
+     "gates": 175,
+     "cx_count": 70,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 71,
+     "gates": 175,
+     "cx_count": 70,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 71,
+     "gates": 361,
+     "cx_count": 232,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 71,
+     "gates": 233,
+     "cx_count": 86,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "feynman_mod_red_21",
+   "recommended": true,
+   "family": "mod_red",
+   "size": 21,
+   "qubits": 11,
+   "gates": 346,
+   "t_count": 119,
+   "cx_count": 105,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "7b464ad5cdeef6e90de21b937f54b68bb6af490ef8758cede9deacec9f77e018",
+   "best_uncertified_t_count": 73,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 107,
+     "gates": 274,
+     "cx_count": 105,
+     "relation_to_source": "exact",
+     "seconds": 0.09
+    },
+    "pyzx_full_reduce": {
+     "t_count": 73,
+     "gates": 315,
+     "cx_count": 136,
+     "relation_to_source": "exact",
+     "seconds": 0.1
+    },
+    "tzap": {
+     "t_count": 73,
+     "gates": 214,
+     "cx_count": 86,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 73,
+     "gates": 184,
+     "cx_count": 81,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 73,
+     "gates": 180,
+     "cx_count": 77,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 73,
+     "gates": 433,
+     "cx_count": 290,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 73,
+     "gates": 254,
+     "cx_count": 93,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "qasmbench_adder_n28",
+   "recommended": true,
+   "family": "qb_adder",
+   "size": 28,
+   "qubits": 28,
+   "gates": 424,
+   "t_count": 168,
+   "cx_count": 195,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "1035b5d6ce4b1a2a2ccd80cfb5ac6c44d9348bf784735e881bc4cf12a82ccb4c",
+   "best_uncertified_t_count": 96,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 144,
+     "gates": 496,
+     "cx_count": 183,
+     "relation_to_source": "exact",
+     "seconds": 0.12
+    },
+    "pyzx_full_reduce": {
+     "t_count": 96,
+     "gates": 575,
+     "cx_count": 269,
+     "relation_to_source": "phase",
+     "seconds": 0.29
+    },
+    "tzap": {
+     "t_count": 96,
+     "gates": 352,
+     "cx_count": 159,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_5_mult",
+   "recommended": false,
+   "family": "gf2_mult",
+   "size": 5,
+   "qubits": 15,
+   "gates": 447,
+   "t_count": 175,
+   "cx_count": 154,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "09dfa0c4414838d282049396101cce48e72958f733ddc42ea19a34c1245d8d59",
+   "best_uncertified_t_count": 115,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 155,
+     "gates": 332,
+     "cx_count": 154,
+     "relation_to_source": "exact",
+     "seconds": 0.1
+    },
+    "pyzx_full_reduce": {
+     "t_count": 115,
+     "gates": 637,
+     "cx_count": 470,
+     "relation_to_source": "exact",
+     "seconds": 0.13
+    },
+    "tzap": {
+     "t_count": 115,
+     "gates": 303,
+     "cx_count": 154,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 115,
+     "gates": 296,
+     "cx_count": 154,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 115,
+     "gates": 296,
+     "cx_count": 154,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 111,
+     "gates": 682,
+     "cx_count": 535,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 115,
+     "gates": 312,
+     "cx_count": 154,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "gen_cuccaro_14",
+   "recommended": true,
+   "family": "gen_cuccaro",
+   "size": 14,
+   "qubits": 30,
+   "gates": 477,
+   "t_count": 196,
+   "cx_count": 225,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "ac3459d088e89596c2310b1eb7c6619bd36f43e1a4b4ca62f094d0bd3b011f96",
+   "best_uncertified_t_count": 112,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 168,
+     "gates": 545,
+     "cx_count": 211,
+     "relation_to_source": "exact",
+     "seconds": 0.14
+    },
+    "pyzx_full_reduce": {
+     "t_count": 112,
+     "gates": 637,
+     "cx_count": 315,
+     "relation_to_source": "exact",
+     "seconds": 0.84
+    },
+    "tzap": {
+     "t_count": 112,
+     "gates": 393,
+     "cx_count": 183,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "gen_barenco_tof_10",
+   "recommended": false,
+   "family": "gen_barenco_tof",
+   "size": 10,
+   "qubits": 19,
+   "gates": 480,
+   "t_count": 224,
+   "cx_count": 192,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "7867d1606c0144f2f546634ffe7d7c01ed5cc07116be331db05d4c3a1f0a92d3",
+   "best_uncertified_t_count": 100,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 192,
+     "gates": 461,
+     "cx_count": 192,
+     "relation_to_source": "exact",
+     "seconds": 0.12
+    },
+    "pyzx_full_reduce": {
+     "t_count": 100,
+     "gates": 481,
+     "cx_count": 194,
+     "relation_to_source": "exact",
+     "seconds": 0.29
+    },
+    "tzap": {
+     "t_count": 100,
+     "gates": 333,
+     "cx_count": 145,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_csum_mux_9",
+   "recommended": true,
+   "family": "csum_mux",
+   "size": 9,
+   "qubits": 30,
+   "gates": 532,
+   "t_count": 196,
+   "cx_count": 168,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "223a0927f9fd7d66b1567e0741b7be76932b29d3afd232b50fd7a44c29d91adc",
+   "best_uncertified_t_count": 84,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 168,
+     "gates": 380,
+     "cx_count": 168,
+     "relation_to_source": "unchecked",
+     "seconds": 0.11
+    },
+    "pyzx_full_reduce": {
+     "t_count": 84,
+     "gates": 527,
+     "cx_count": 311,
+     "relation_to_source": "unchecked",
+     "seconds": 0.22
+    },
+    "tzap": {
+     "t_count": 84,
+     "gates": 294,
+     "cx_count": 154,
+     "relation_to_source": "unchecked",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 84,
+     "gates": 294,
+     "cx_count": 168,
+     "relation_to_source": "unchecked"
+    },
+    "nam_heavy": {
+     "t_count": 84,
+     "gates": 266,
+     "cx_count": 140,
+     "relation_to_source": "unchecked"
+    },
+    "tpar": {
+     "t_count": 112,
+     "gates": 611,
+     "cx_count": 405,
+     "relation_to_source": "unchecked"
+    },
+    "pyzx_published": {
+     "t_count": 84,
+     "gates": 346,
+     "cx_count": 168,
+     "relation_to_source": "unchecked"
+    }
+   }
+  },
+  {
+   "name": "feynman_ham15_low",
+   "recommended": true,
+   "family": "ham15",
+   "size": "low",
+   "qubits": 17,
+   "gates": 535,
+   "t_count": 161,
+   "cx_count": 236,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "107d18be3635c9be90b61d7d462b76c3c5c3705e8a86bae48c7fcabfd486159e",
+   "best_uncertified_t_count": 97,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 147,
+     "gates": 479,
+     "cx_count": 252,
+     "relation_to_source": "exact",
+     "seconds": 0.23
+    },
+    "pyzx_full_reduce": {
+     "t_count": 97,
+     "gates": 603,
+     "cx_count": 370,
+     "relation_to_source": "exact",
+     "seconds": 0.31
+    },
+    "tzap": {
+     "t_count": 97,
+     "gates": 370,
+     "cx_count": 216,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_qcla_com_7",
+   "recommended": true,
+   "family": "qcla_com",
+   "size": 7,
+   "qubits": 24,
+   "gates": 559,
+   "t_count": 203,
+   "cx_count": 186,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "0db5f79468a643d70291f498387b68c62ae6bf219bdc6c56c3496acb0e66d721",
+   "best_uncertified_t_count": 95,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 169,
+     "gates": 428,
+     "cx_count": 174,
+     "relation_to_source": "exact",
+     "seconds": 0.14
+    },
+    "pyzx_full_reduce": {
+     "t_count": 95,
+     "gates": 514,
+     "cx_count": 244,
+     "relation_to_source": "exact",
+     "seconds": 0.43
+    },
+    "tzap": {
+     "t_count": 95,
+     "gates": 315,
+     "cx_count": 139,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 95,
+     "gates": 284,
+     "cx_count": 132,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 95,
+     "gates": 284,
+     "cx_count": 132,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 95,
+     "gates": 699,
+     "cx_count": 496,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 95,
+     "gates": 358,
+     "cx_count": 148,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "qasmbench_multiplier_n15",
+   "recommended": true,
+   "family": "qb_multiplier",
+   "size": 15,
+   "qubits": 15,
+   "gates": 574,
+   "t_count": 252,
+   "cx_count": 246,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "ba1d94dae436bc8475fda1f91e71b69becb9b051499aaecff5523e41ad8d6400",
+   "best_uncertified_t_count": 70,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 204,
+     "gates": 510,
+     "cx_count": 222,
+     "relation_to_source": "exact",
+     "seconds": 0.23
+    },
+    "pyzx_full_reduce": {
+     "t_count": 70,
+     "gates": 407,
+     "cx_count": 196,
+     "relation_to_source": "exact",
+     "seconds": 0.26
+    },
+    "tzap": {
+     "t_count": 74,
+     "gates": 298,
+     "cx_count": 149,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_barenco_tof_10",
+   "recommended": true,
+   "family": "barenco_tof",
+   "size": 10,
+   "qubits": 19,
+   "gates": 578,
+   "t_count": 224,
+   "cx_count": 192,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "75d407b8c39f284ea87f9f6a8d5e74dee651230feca1355c13f53df17a914df3",
+   "best_uncertified_t_count": 100,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 192,
+     "gates": 461,
+     "cx_count": 192,
+     "relation_to_source": "exact",
+     "seconds": 0.12
+    },
+    "pyzx_full_reduce": {
+     "t_count": 100,
+     "gates": 446,
+     "cx_count": 198,
+     "relation_to_source": "exact",
+     "seconds": 0.2
+    },
+    "tzap": {
+     "t_count": 100,
+     "gates": 333,
+     "cx_count": 145,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 100,
+     "gates": 294,
+     "cx_count": 160,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 100,
+     "gates": 264,
+     "cx_count": 130,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 100,
+     "gates": 517,
+     "cx_count": 328,
+     "relation_to_source": "exact"
+    },
+    "pyzx_published": {
+     "t_count": 100,
+     "gates": 415,
+     "cx_count": 176,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_6_mult",
+   "recommended": false,
+   "family": "gf2_mult",
+   "size": 6,
+   "qubits": 18,
+   "gates": 639,
+   "t_count": 252,
+   "cx_count": 221,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "002917f2ec62cf3ca99d463cbc077b69fe585cd2f00bf052dc1b92026fec5c0b",
+   "best_uncertified_t_count": 150,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 216,
+     "gates": 465,
+     "cx_count": 221,
+     "relation_to_source": "exact",
+     "seconds": 0.18
+    },
+    "pyzx_full_reduce": {
+     "t_count": 150,
+     "gates": 1267,
+     "cx_count": 820,
+     "relation_to_source": "exact",
+     "seconds": 0.27
+    },
+    "tzap": {
+     "t_count": 150,
+     "gates": 414,
+     "cx_count": 221,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 150,
+     "gates": 403,
+     "cx_count": 221,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 150,
+     "gates": 403,
+     "cx_count": 221,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 150,
+     "gates": 842,
+     "cx_count": 649,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 150,
+     "gates": 432,
+     "cx_count": 221,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "qasmbench_sat_n11",
+   "recommended": true,
+   "family": "qb_sat",
+   "size": 11,
+   "qubits": 11,
+   "gates": 679,
+   "t_count": 294,
+   "cx_count": 252,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "323385d670cf244f0bfb3ece681ad164a26e69d2feb486a76519dcb4db1db8eb",
+   "best_uncertified_t_count": 126,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 254,
+     "gates": 623,
+     "cx_count": 252,
+     "relation_to_source": "exact",
+     "seconds": 0.3
+    },
+    "pyzx_full_reduce": {
+     "t_count": 126,
+     "gates": 521,
+     "cx_count": 250,
+     "relation_to_source": "phase",
+     "seconds": 0.33
+    },
+    "tzap": {
+     "t_count": 126,
+     "gates": 421,
+     "cx_count": 169,
+     "relation_to_source": "phase",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_7_mult",
+   "recommended": true,
+   "family": "gf2_mult",
+   "size": 7,
+   "qubits": 21,
+   "gates": 865,
+   "t_count": 343,
+   "cx_count": 300,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "496a553b48c60f433dc3a13892830ad2b113badeeadabcdf793db4f05ccefaa8",
+   "best_uncertified_t_count": 217,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 301,
+     "gates": 627,
+     "cx_count": 300,
+     "relation_to_source": "exact",
+     "seconds": 0.24
+    },
+    "pyzx_full_reduce": {
+     "t_count": 217,
+     "gates": 1689,
+     "cx_count": 1088,
+     "relation_to_source": "exact",
+     "seconds": 0.38
+    },
+    "tzap": {
+     "t_count": 217,
+     "gates": 553,
+     "cx_count": 300,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 217,
+     "gates": 555,
+     "cx_count": 300,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 217,
+     "gates": 555,
+     "cx_count": 300,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 217,
+     "gates": 1245,
+     "cx_count": 992,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 217,
+     "gates": 585,
+     "cx_count": 300,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "feynman_grover_5",
+   "recommended": true,
+   "family": "grover",
+   "size": 5,
+   "qubits": 9,
+   "gates": 1023,
+   "t_count": 336,
+   "cx_count": 288,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "8f3f98d0279b60a2f0db8cf6d1146f015155af25c29807d5ad10b12dcf6c219c",
+   "best_uncertified_t_count": 166,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 290,
+     "gates": 726,
+     "cx_count": 288,
+     "relation_to_source": "exact",
+     "seconds": 0.22
+    },
+    "pyzx_full_reduce": {
+     "t_count": 166,
+     "gates": 675,
+     "cx_count": 295,
+     "relation_to_source": "exact",
+     "seconds": 0.25
+    },
+    "tzap": {
+     "t_count": 166,
+     "gates": 587,
+     "cx_count": 222,
+     "relation_to_source": "phase",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_qcla_mod_7",
+   "recommended": true,
+   "family": "qcla_mod",
+   "size": 7,
+   "qubits": 26,
+   "gates": 1120,
+   "t_count": 413,
+   "cx_count": 382,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "d18bd94b2ad1564f89dde935ee4a3f5f6720201fe1960c57bb124a0d8e9f8e27",
+   "best_uncertified_t_count": 237,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 351,
+     "gates": 903,
+     "cx_count": 366,
+     "relation_to_source": "exact",
+     "seconds": 0.37
+    },
+    "pyzx_full_reduce": {
+     "t_count": 237,
+     "gates": 1353,
+     "cx_count": 644,
+     "relation_to_source": "phase",
+     "seconds": 1.69
+    },
+    "tzap": {
+     "t_count": 237,
+     "gates": 695,
+     "cx_count": 323,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 237,
+     "gates": 636,
+     "cx_count": 302,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 235,
+     "gates": 624,
+     "cx_count": 292,
+     "relation_to_source": "different"
+    },
+    "tpar": {
+     "t_count": 249,
+     "gates": 1619,
+     "cx_count": 1150,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 237,
+     "gates": 815,
+     "cx_count": 324,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "feynman_adder_8",
+   "recommended": true,
+   "family": "adder",
+   "size": 8,
+   "qubits": 24,
+   "gates": 1128,
+   "t_count": 399,
+   "cx_count": 409,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "e41936df3f0d68f9c1d0b6b330296c4273137a0a0923124222bea4a470a8d99b",
+   "best_uncertified_t_count": 173,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 349,
+     "gates": 898,
+     "cx_count": 385,
+     "relation_to_source": "exact",
+     "seconds": 0.48
+    },
+    "pyzx_full_reduce": {
+     "t_count": 173,
+     "gates": 831,
+     "cx_count": 440,
+     "relation_to_source": "exact",
+     "seconds": 1.03
+    },
+    "tzap": {
+     "t_count": 215,
+     "gates": 684,
+     "cx_count": 326,
+     "relation_to_source": "phase",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 215,
+     "gates": 646,
+     "cx_count": 331,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 215,
+     "gates": 606,
+     "cx_count": 291,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 215,
+     "gates": 1280,
+     "cx_count": 885,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 173,
+     "gates": 706,
+     "cx_count": 335,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_8_mult",
+   "recommended": false,
+   "family": "gf2_mult",
+   "size": 8,
+   "qubits": 24,
+   "gates": 1139,
+   "t_count": 448,
+   "cx_count": 405,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "bea8d5fe0ebfd7759cbe2280fa9fab3a6513e57ad68860d61527818dcf18e41b",
+   "best_uncertified_t_count": 264,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 384,
+     "gates": 819,
+     "cx_count": 405,
+     "relation_to_source": "exact",
+     "seconds": 0.56
+    },
+    "pyzx_full_reduce": {
+     "t_count": 264,
+     "gates": 2651,
+     "cx_count": 1709,
+     "relation_to_source": "exact",
+     "seconds": 0.82
+    },
+    "tzap": {
+     "t_count": 264,
+     "gates": 709,
+     "cx_count": 405,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    },
+    "nam_light": {
+     "t_count": 264,
+     "gates": 712,
+     "cx_count": 405,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 264,
+     "gates": 712,
+     "cx_count": 405,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 264,
+     "gates": 1560,
+     "cx_count": 1256,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 264,
+     "gates": 759,
+     "cx_count": 405,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_9_mult",
+   "recommended": false,
+   "family": "gf2_mult",
+   "size": 9,
+   "qubits": 27,
+   "gates": 1419,
+   "t_count": 567,
+   "cx_count": 494,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "d44cdf451524b1ed52a4a76bea37daebc74f1dfed12e929dd5e10ab0b9728779",
+   "best_uncertified_t_count": 351,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 495,
+     "gates": 1023,
+     "cx_count": 494,
+     "relation_to_source": "exact",
+     "seconds": 0.56
+    },
+    "pyzx_full_reduce": {
+     "t_count": 351,
+     "gates": 3187,
+     "cx_count": 2059,
+     "relation_to_source": "exact",
+     "seconds": 0.91
+    },
+    "tzap": {
+     "t_count": 351,
+     "gates": 889,
+     "cx_count": 494,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    },
+    "nam_light": {
+     "t_count": 351,
+     "gates": 891,
+     "cx_count": 494,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 351,
+     "gates": 891,
+     "cx_count": 494,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 351,
+     "gates": 2096,
+     "cx_count": 1701,
+     "relation_to_source": "different"
+    },
+    "pyzx_published": {
+     "t_count": 351,
+     "gates": 951,
+     "cx_count": 494,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "feynman_ham15_med",
+   "recommended": true,
+   "family": "ham15",
+   "size": "med",
+   "qubits": 17,
+   "gates": 1600,
+   "t_count": 574,
+   "cx_count": 534,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "0ab0b72316ca14df1dd6360596c620ac8103f67b4f58646335ddb517a8092774",
+   "best_uncertified_t_count": 212,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 504,
+     "gates": 1270,
+     "cx_count": 555,
+     "relation_to_source": "exact",
+     "seconds": 1.46
+    },
+    "pyzx_full_reduce": {
+     "t_count": 212,
+     "gates": 958,
+     "cx_count": 527,
+     "relation_to_source": "exact",
+     "seconds": 1.53
+    },
+    "tzap": {
+     "t_count": 234,
+     "gates": 786,
+     "cx_count": 382,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_10_mult",
+   "recommended": true,
+   "family": "gf2_mult",
+   "size": 10,
+   "qubits": 30,
+   "gates": 1747,
+   "t_count": 700,
+   "cx_count": 609,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "4853be55ad8afcbacd212ed70ed561e140760a165483b0eb091cabb093334564",
+   "best_uncertified_t_count": 410,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 600,
+     "gates": 1257,
+     "cx_count": 609,
+     "relation_to_source": "exact",
+     "seconds": 0.64
+    },
+    "pyzx_full_reduce": {
+     "t_count": 410,
+     "gates": 4087,
+     "cx_count": 2810,
+     "relation_to_source": "exact",
+     "seconds": 1.16
+    },
+    "tzap": {
+     "t_count": 410,
+     "gates": 1088,
+     "cx_count": 609,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    },
+    "nam_light": {
+     "t_count": 410,
+     "gates": 1070,
+     "cx_count": 609,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 410,
+     "gates": 1070,
+     "cx_count": 609,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 410,
+     "gates": 2655,
+     "cx_count": 2176,
+     "relation_to_source": "exact"
+    },
+    "pyzx_published": {
+     "t_count": 410,
+     "gates": 1162,
+     "cx_count": 609,
+     "relation_to_source": "exact"
+    }
+   }
+  }
+ ],
+ "tier_3": [
+  {
+   "name": "gen_tof_16",
+   "recommended": false,
+   "family": "gen_tof",
+   "size": 16,
+   "qubits": 31,
+   "gates": 435,
+   "t_count": 203,
+   "cx_count": 174,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "5b2293b87a05b676abc6c5d7a8df785f9ffa1335c69cb16155e55040f147e62d",
+   "best_uncertified_t_count": 119,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 175,
+     "gates": 479,
+     "cx_count": 174,
+     "relation_to_source": "exact",
+     "seconds": 0.1
+    },
+    "pyzx_full_reduce": {
+     "t_count": 119,
+     "gates": 537,
+     "cx_count": 239,
+     "relation_to_source": "exact",
+     "seconds": 0.58
+    },
+    "tzap": {
+     "t_count": 119,
+     "gates": 337,
+     "cx_count": 132,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "feynman_qcla_adder_10",
+   "recommended": true,
+   "family": "qcla_adder",
+   "size": 10,
+   "qubits": 36,
+   "gates": 657,
+   "t_count": 238,
+   "cx_count": 233,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "6ef968541df8e76547b5ba763bf5b672d5f2eefb7cf5e6ff27f5b04ed82312d9",
+   "best_uncertified_t_count": 162,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 208,
+     "gates": 529,
+     "cx_count": 209,
+     "relation_to_source": "unchecked",
+     "seconds": 0.14
+    },
+    "pyzx_full_reduce": {
+     "t_count": 162,
+     "gates": 726,
+     "cx_count": 346,
+     "relation_to_source": "unchecked",
+     "seconds": 0.47
+    },
+    "tzap": {
+     "t_count": 162,
+     "gates": 422,
+     "cx_count": 193,
+     "relation_to_source": "unchecked",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "gen_barenco_tof_16",
+   "recommended": false,
+   "family": "gen_barenco_tof",
+   "size": 16,
+   "qubits": 31,
+   "gates": 840,
+   "t_count": 392,
+   "cx_count": 336,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "d1e3443c4a2f88dc2ea5469ee960b4f1ccadb1088f9ebb095a5c5076e11c4866",
+   "best_uncertified_t_count": 172,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 336,
+     "gates": 803,
+     "cx_count": 336,
+     "relation_to_source": "unchecked",
+     "seconds": 0.22
+    },
+    "pyzx_full_reduce": {
+     "t_count": 172,
+     "gates": 817,
+     "cx_count": 356,
+     "relation_to_source": "unchecked",
+     "seconds": 1.51
+    },
+    "tzap": {
+     "t_count": 172,
+     "gates": 579,
+     "cx_count": 253,
+     "relation_to_source": "unchecked",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "gen_tof_32",
+   "recommended": false,
+   "family": "gen_tof",
+   "size": 32,
+   "qubits": 63,
+   "gates": 915,
+   "t_count": 427,
+   "cx_count": 366,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "c2511693d91a4c945e15230f6bc33b623efc92658651c1e929413a5602883f64",
+   "best_uncertified_t_count": 247,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 367,
+     "gates": 1007,
+     "cx_count": 366,
+     "relation_to_source": "exact",
+     "seconds": 0.24
+    },
+    "pyzx_full_reduce": {
+     "t_count": 247,
+     "gates": 1199,
+     "cx_count": 494,
+     "relation_to_source": "unchecked",
+     "seconds": 5.99
+    },
+    "tzap": {
+     "t_count": 247,
+     "gates": 705,
+     "cx_count": 276,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "qasmbench_adder_n64",
+   "recommended": true,
+   "family": "qb_adder",
+   "size": 64,
+   "qubits": 64,
+   "gates": 988,
+   "t_count": 392,
+   "cx_count": 455,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "6f7064844becb225687245ce5f0fae835c1c0e3ad3791ef206ddad5357ecefa0",
+   "best_uncertified_t_count": 224,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 336,
+     "gates": 1160,
+     "cx_count": 427,
+     "relation_to_source": "exact",
+     "seconds": 0.3
+    },
+    "pyzx_full_reduce": {
+     "t_count": 224,
+     "gates": 1353,
+     "cx_count": 634,
+     "relation_to_source": "exact",
+     "seconds": 5.16
+    },
+    "tzap": {
+     "t_count": 224,
+     "gates": 820,
+     "cx_count": 371,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "gen_cuccaro_32",
+   "recommended": false,
+   "family": "gen_cuccaro",
+   "size": 32,
+   "qubits": 66,
+   "gates": 1089,
+   "t_count": 448,
+   "cx_count": 513,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "54897663f3f3320714db24bbdbebb489f1c7229404202b625be16ab9fcc167c6",
+   "best_uncertified_t_count": 256,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 384,
+     "gates": 1247,
+     "cx_count": 481,
+     "relation_to_source": "exact",
+     "seconds": 0.4
+    },
+    "pyzx_full_reduce": {
+     "t_count": 256,
+     "gates": 1468,
+     "cx_count": 695,
+     "relation_to_source": "exact",
+     "seconds": 11.24
+    },
+    "tzap": {
+     "t_count": 256,
+     "gates": 897,
+     "cx_count": 417,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "gen_tof_50",
+   "recommended": true,
+   "family": "gen_tof",
+   "size": 50,
+   "qubits": 99,
+   "gates": 1455,
+   "t_count": 679,
+   "cx_count": 582,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "2b01610b55472824c6f7276a0fd6cfbcad12cdcbd3e1d538402c9784c08e5985",
+   "best_uncertified_t_count": 391,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 583,
+     "gates": 1601,
+     "cx_count": 582,
+     "relation_to_source": "exact",
+     "seconds": 0.39
+    },
+    "pyzx_full_reduce": {
+     "t_count": 391,
+     "gates": 1882,
+     "cx_count": 819,
+     "relation_to_source": "unchecked",
+     "seconds": 31.51
+    },
+    "tzap": {
+     "t_count": 391,
+     "gates": 1119,
+     "cx_count": 438,
+     "relation_to_source": "exact",
+     "seconds": 0.07
+    }
+   }
+  },
+  {
+   "name": "gen_cuccaro_49",
+   "recommended": true,
+   "family": "gen_cuccaro",
+   "size": 49,
+   "qubits": 100,
+   "gates": 1667,
+   "t_count": 686,
+   "cx_count": 785,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "b72d9edb548e63aa0923e4e677e94542665e6fa290d808dddd44b12e422781f3",
+   "best_uncertified_t_count": 392,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 588,
+     "gates": 1910,
+     "cx_count": 736,
+     "relation_to_source": "exact",
+     "seconds": 0.7
+    },
+    "pyzx_full_reduce": {
+     "t_count": 392,
+     "gates": 2306,
+     "cx_count": 1108,
+     "relation_to_source": "exact",
+     "seconds": 44.51
+    },
+    "tzap": {
+     "t_count": 392,
+     "gates": 1373,
+     "cx_count": 638,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    }
+   }
+  },
+  {
+   "name": "gen_barenco_tof_50",
+   "recommended": true,
+   "family": "gen_barenco_tof",
+   "size": 50,
+   "qubits": 99,
+   "gates": 2880,
+   "t_count": 1344,
+   "cx_count": 1152,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "cd8545a9056ed647c144c981ef85662abbbc978ba7fc485498a975c0cc645212",
+   "best_uncertified_t_count": 580,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 1152,
+     "gates": 2741,
+     "cx_count": 1152,
+     "relation_to_source": "unchecked",
+     "seconds": 1.32
+    },
+    "pyzx_full_reduce": {
+     "t_count": 580,
+     "gates": 2893,
+     "cx_count": 1290,
+     "relation_to_source": "unchecked",
+     "seconds": 85.18
+    },
+    "tzap": {
+     "t_count": 580,
+     "gates": 1973,
+     "cx_count": 865,
+     "relation_to_source": "unchecked",
+     "seconds": 0.08
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_16_mult",
+   "recommended": true,
+   "family": "gf2_mult",
+   "size": 16,
+   "qubits": 48,
+   "gates": 4459,
+   "t_count": 1792,
+   "cx_count": 1581,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "c03626c76cc975433e52a83326a88dcf12d7e04d54e2f5c2dabc94b4f3bce7c9",
+   "best_uncertified_t_count": 1040,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 1536,
+     "gates": 3179,
+     "cx_count": 1581,
+     "relation_to_source": "unchecked",
+     "seconds": 12.26
+    },
+    "pyzx_full_reduce": {
+     "t_count": 1040,
+     "gates": 12235,
+     "cx_count": 7869,
+     "relation_to_source": "unchecked",
+     "seconds": 15.44
+    },
+    "tzap": {
+     "t_count": 1040,
+     "gates": 2703,
+     "cx_count": 1581,
+     "relation_to_source": "unchecked",
+     "seconds": 0.08
+    },
+    "nam_light": {
+     "t_count": 1040,
+     "gates": 2707,
+     "cx_count": 1581,
+     "relation_to_source": "unchecked"
+    },
+    "nam_heavy": {
+     "t_count": 1040,
+     "gates": 2707,
+     "cx_count": 1581,
+     "relation_to_source": "unchecked"
+    },
+    "tpar": {
+     "t_count": 1040,
+     "gates": 7714,
+     "cx_count": 6592,
+     "relation_to_source": "unchecked"
+    },
+    "pyzx_published": {
+     "t_count": 1040,
+     "gates": 2931,
+     "cx_count": 1581,
+     "relation_to_source": "unchecked"
+    }
+   }
+  },
+  {
+   "name": "feynman_mod_adder_1024",
+   "recommended": true,
+   "family": "mod_adder",
+   "size": 1024,
+   "qubits": 28,
+   "gates": 5425,
+   "t_count": 1995,
+   "cx_count": 1720,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "ff4bdc131a084d305172ffb255090028ec3bcd7e7e7b1c30db0d37eca70be441",
+   "best_uncertified_t_count": 1011,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 1739,
+     "gates": 4189,
+     "cx_count": 1702,
+     "relation_to_source": "exact",
+     "seconds": 5.67
+    },
+    "pyzx_full_reduce": {
+     "t_count": 1011,
+     "gates": 4452,
+     "cx_count": 2420,
+     "relation_to_source": "exact",
+     "seconds": 26.44
+    },
+    "tzap": {
+     "t_count": 1011,
+     "gates": 2760,
+     "cx_count": 1303,
+     "relation_to_source": "exact",
+     "seconds": 0.09
+    },
+    "nam_light": {
+     "t_count": 1011,
+     "gates": 2738,
+     "cx_count": 1280,
+     "relation_to_source": "exact"
+    },
+    "nam_heavy": {
+     "t_count": 1011,
+     "gates": 2736,
+     "cx_count": 1278,
+     "relation_to_source": "exact"
+    },
+    "tpar": {
+     "t_count": 1011,
+     "gates": 5183,
+     "cx_count": 3540,
+     "relation_to_source": "unchecked"
+    },
+    "pyzx_published": {
+     "t_count": 1011,
+     "gates": 3582,
+     "cx_count": 1436,
+     "relation_to_source": "exact"
+    }
+   }
+  },
+  {
+   "name": "qasmbench_multiplier_n45",
+   "recommended": true,
+   "family": "qb_multiplier",
+   "size": 45,
+   "qubits": 45,
+   "gates": 5981,
+   "t_count": 2646,
+   "cx_count": 2574,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "f2400a418b4f9c984c8f958814c2f8ca968b24af919f27c8c1034a95ceed2a53",
+   "best_uncertified_t_count": 634,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 2124,
+     "gates": 5062,
+     "cx_count": 2286,
+     "relation_to_source": "unchecked",
+     "seconds": 37.43
+    },
+    "pyzx_full_reduce": {
+     "t_count": 634,
+     "gates": 4711,
+     "cx_count": 2320,
+     "relation_to_source": "unchecked",
+     "seconds": 75.01
+    },
+    "tzap": {
+     "t_count": 650,
+     "gates": 2743,
+     "cx_count": 1507,
+     "relation_to_source": "unchecked",
+     "seconds": 0.09
+    }
+   }
+  },
+  {
+   "name": "feynman_ham15_high",
+   "recommended": true,
+   "family": "ham15",
+   "size": "high",
+   "qubits": 20,
+   "gates": 6712,
+   "t_count": 2457,
+   "cx_count": 2149,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "1d77791bb907fbbd66160c0af6fd29f34c6f142917116e91d802ba57bff699e4",
+   "best_uncertified_t_count": 1019,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 2173,
+     "gates": 5167,
+     "cx_count": 2169,
+     "relation_to_source": "exact",
+     "seconds": 30.98
+    },
+    "pyzx_full_reduce": {
+     "t_count": 1019,
+     "gates": 4243,
+     "cx_count": 2187,
+     "relation_to_source": "phase",
+     "seconds": 34.09
+    },
+    "tzap": {
+     "t_count": 1019,
+     "gates": 3385,
+     "cx_count": 1595,
+     "relation_to_source": "exact",
+     "seconds": 0.09
+    }
+   }
+  },
+  {
+   "name": "qasmbench_multiplier_n75",
+   "recommended": true,
+   "family": "qb_multiplier",
+   "size": 75,
+   "qubits": 75,
+   "gates": 17077,
+   "t_count": 7560,
+   "cx_count": 7350,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "2a739995b79fbb701277042decfccaddaaff38302cceb7c42c47492318a52480",
+   "best_uncertified_t_count": 1802,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "skipped: 17077 gates is past the bound of 8000 for a 240 s PyZX run"
+    },
+    "pyzx_full_reduce": {
+     "status": "skipped: 17077 gates is past the bound of 8000 for a 240 s PyZX run"
+    },
+    "tzap": {
+     "t_count": 1802,
+     "gates": 7738,
+     "cx_count": 4337,
+     "relation_to_source": "unchecked",
+     "seconds": 0.12
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_32_mult",
+   "recommended": true,
+   "family": "gf2_mult",
+   "size": 32,
+   "qubits": 96,
+   "gates": 17658,
+   "t_count": 7168,
+   "cx_count": 6268,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "a1e9561b68e945d0222dd816f9c32a559a5b8ca014cfb1373d1e1c570887a4fa",
+   "best_uncertified_t_count": 4128,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "skipped: 17658 gates is past the bound of 8000 for a 240 s PyZX run"
+    },
+    "pyzx_full_reduce": {
+     "status": "skipped: 17658 gates is past the bound of 8000 for a 240 s PyZX run"
+    },
+    "tzap": {
+     "t_count": 4128,
+     "gates": 10562,
+     "cx_count": 6268,
+     "relation_to_source": "unchecked",
+     "seconds": 0.13
+    }
+   }
+  },
+  {
+   "name": "feynman_hwb8",
+   "recommended": true,
+   "family": "hwb",
+   "size": 8,
+   "qubits": 12,
+   "gates": 18220,
+   "t_count": 5887,
+   "cx_count": 7129,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "d44845d347f33a022fa9771ed5cd0f79d254f129031cd3e7d15c29ed4bb82832",
+   "best_uncertified_t_count": 3561,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "skipped: 18220 gates is past the bound of 8000 for a 240 s PyZX run"
+    },
+    "pyzx_full_reduce": {
+     "status": "skipped: 18220 gates is past the bound of 8000 for a 240 s PyZX run"
+    },
+    "tzap": {
+     "t_count": 3561,
+     "gates": 11509,
+     "cx_count": 5949,
+     "relation_to_source": "phase",
+     "seconds": 0.14
+    }
+   }
+  }
+ ],
+ "tier_4": [
+  {
+   "name": "qasmbench_adder_n118",
+   "recommended": false,
+   "family": "qb_adder",
+   "size": 118,
+   "qubits": 118,
+   "gates": 1834,
+   "t_count": 728,
+   "cx_count": 845,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "98822edc554cda03e336035bff3271ba438aedcf0b42067150f669626dd70704",
+   "best_uncertified_t_count": 416,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 624,
+     "gates": 2156,
+     "cx_count": 793,
+     "relation_to_source": "unchecked",
+     "seconds": 0.74
+    },
+    "pyzx_full_reduce": {
+     "t_count": 416,
+     "gates": 2616,
+     "cx_count": 1224,
+     "relation_to_source": "phase",
+     "seconds": 32.43
+    },
+    "tzap": {
+     "t_count": 416,
+     "gates": 1522,
+     "cx_count": 689,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    }
+   }
+  },
+  {
+   "name": "gen_tof_100",
+   "recommended": false,
+   "family": "gen_tof",
+   "size": 100,
+   "qubits": 199,
+   "gates": 2955,
+   "t_count": 1379,
+   "cx_count": 1182,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "4f4c90960b643f315cf547ab79205b4164272e58c5c7e174f57e4ba882ba5d28",
+   "best_uncertified_t_count": 791,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 1183,
+     "gates": 3251,
+     "cx_count": 1182,
+     "relation_to_source": "exact",
+     "seconds": 1.27
+    },
+    "pyzx_full_reduce": {
+     "status": "stopped after 240 s"
+    },
+    "tzap": {
+     "t_count": 791,
+     "gates": 2269,
+     "cx_count": 888,
+     "relation_to_source": "exact",
+     "seconds": 0.08
+    }
+   }
+  },
+  {
+   "name": "gen_cuccaro_128",
+   "recommended": false,
+   "family": "gen_cuccaro",
+   "size": 128,
+   "qubits": 258,
+   "gates": 4353,
+   "t_count": 1792,
+   "cx_count": 2049,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "bfa5ac3bb5b2bb36c07e83b2f233567c7312c066860f95dbacf5ff47e90cf649",
+   "best_uncertified_t_count": 1024,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 1536,
+     "gates": 4991,
+     "cx_count": 1921,
+     "relation_to_source": "exact",
+     "seconds": 3.74
+    },
+    "pyzx_full_reduce": {
+     "status": "stopped after 240 s"
+    },
+    "tzap": {
+     "t_count": 1024,
+     "gates": 3585,
+     "cx_count": 1665,
+     "relation_to_source": "exact",
+     "seconds": 0.09
+    }
+   }
+  },
+  {
+   "name": "gen_barenco_tof_100",
+   "recommended": false,
+   "family": "gen_barenco_tof",
+   "size": 100,
+   "qubits": 199,
+   "gates": 5880,
+   "t_count": 2744,
+   "cx_count": 2352,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "307fff94e14a1a42e2fd182eef19118ea4b8eb10eb7ca0d40e0b177c322fe1ed",
+   "best_uncertified_t_count": 1180,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 2352,
+     "gates": 5591,
+     "cx_count": 2352,
+     "relation_to_source": "unchecked",
+     "seconds": 4.3
+    },
+    "pyzx_full_reduce": {
+     "status": "stopped after 240 s"
+    },
+    "tzap": {
+     "t_count": 1180,
+     "gates": 4023,
+     "cx_count": 1765,
+     "relation_to_source": "unchecked",
+     "seconds": 0.09
+    }
+   }
+  },
+  {
+   "name": "qasmbench_adder_n433",
+   "recommended": true,
+   "family": "qb_adder",
+   "size": 433,
+   "qubits": 433,
+   "gates": 6769,
+   "t_count": 2688,
+   "cx_count": 3120,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "9d7fb4bf9707c84ba8c03f410bc5d60326907aeb81b537b28175b242f1368739",
+   "best_uncertified_t_count": 1536,
+   "tools": {
+    "pyzx_teleport": {
+     "t_count": 2304,
+     "gates": 7966,
+     "cx_count": 2928,
+     "relation_to_source": "unchecked",
+     "seconds": 8.23
+    },
+    "pyzx_full_reduce": {
+     "status": "stopped after 240 s"
+    },
+    "tzap": {
+     "t_count": 1536,
+     "gates": 5617,
+     "cx_count": 2544,
+     "relation_to_source": "exact",
+     "seconds": 0.1
+    }
+   }
+  },
+  {
+   "name": "gen_cuccaro_512",
+   "recommended": true,
+   "family": "gen_cuccaro",
+   "size": 512,
+   "qubits": 1026,
+   "gates": 17409,
+   "t_count": 7168,
+   "cx_count": 8193,
+   "fragment": "general",
+   "source": "generated",
+   "translated_sha256": "b02dc5d58ac352aba8c52b19dea91a7ca23de2fd26ee5da7493d12be2fc1363b",
+   "best_uncertified_t_count": 4096,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 4096,
+     "gates": 14337,
+     "cx_count": 6657,
+     "relation_to_source": "exact",
+     "seconds": 0.15
+    }
+   }
+  },
+  {
+   "name": "tzap_cobble_t_laplacian_filter",
+   "recommended": true,
+   "family": "cobble",
+   "size": 11,
+   "qubits": 11,
+   "gates": 34138,
+   "t_count": 13442,
+   "cx_count": 660,
+   "fragment": "general",
+   "source": "tzap",
+   "translated_sha256": "e5f9705a5e5bb1a12bb6fd30e4841f15a7e2a2d3dc99b7970bfd4c6ea6e6fe81",
+   "best_uncertified_t_count": 12842,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 12842,
+     "gates": 26730,
+     "cx_count": 392,
+     "relation_to_source": "exact",
+     "seconds": 0.23
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_64_mult",
+   "recommended": true,
+   "family": "gf2_mult",
+   "size": 64,
+   "qubits": 192,
+   "gates": 70075,
+   "t_count": 28672,
+   "cx_count": 24765,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "6f7ada8c20c5f0f91452d83640aef14fdaf552b86869ba1308c63eeac1cf3392",
+   "best_uncertified_t_count": 16448,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 16448,
+     "gates": 41547,
+     "cx_count": 24765,
+     "relation_to_source": "unchecked",
+     "seconds": 0.34
+    }
+   }
+  },
+  {
+   "name": "tzap_cobble_t_matrix_inversion",
+   "recommended": false,
+   "family": "cobble",
+   "size": 12,
+   "qubits": 12,
+   "gates": 82861,
+   "t_count": 34423,
+   "cx_count": 11985,
+   "fragment": "general",
+   "source": "tzap",
+   "translated_sha256": "d379be058dc13a1600bedb5cd60f257bc5e698ae9e23062e779d02f9f0b343af",
+   "best_uncertified_t_count": 23863,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 23863,
+     "gates": 52833,
+     "cx_count": 5717,
+     "relation_to_source": "phase",
+     "seconds": 0.36
+    }
+   }
+  },
+  {
+   "name": "feynman_hwb10",
+   "recommended": true,
+   "family": "hwb",
+   "size": 10,
+   "qubits": 16,
+   "gates": 91642,
+   "t_count": 29939,
+   "cx_count": 35170,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "9b1c3f867b99aeaf5bf21dee7084e252c24eefb9ead022ab46443ce742c5ab12",
+   "best_uncertified_t_count": 15921,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 15921,
+     "gates": 54235,
+     "cx_count": 28003,
+     "relation_to_source": "exact",
+     "seconds": 0.43
+    }
+   }
+  },
+  {
+   "name": "tzap_cobble_t_chebyshev",
+   "recommended": false,
+   "family": "cobble",
+   "size": 14,
+   "qubits": 14,
+   "gates": 112554,
+   "t_count": 47894,
+   "cx_count": 20459,
+   "fragment": "general",
+   "source": "tzap",
+   "translated_sha256": "07079dcd5791ae2a4ff73c86e3a9afef713bc95c3f56c2392c1e289ea3e38306",
+   "best_uncertified_t_count": 28330,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 28330,
+     "gates": 64569,
+     "cx_count": 8694,
+     "relation_to_source": "exact",
+     "seconds": 0.44
+    }
+   }
+  },
+  {
+   "name": "tzap_cobble_t_hamiltonian_simulation",
+   "recommended": false,
+   "family": "cobble",
+   "size": 16,
+   "qubits": 16,
+   "gates": 226196,
+   "t_count": 99219,
+   "cx_count": 56764,
+   "fragment": "general",
+   "source": "tzap",
+   "translated_sha256": "a4b6dd7756280c21969e3e9d8a2c5d02e28ac4bded65d2c9065ae87a11bd2dfc",
+   "best_uncertified_t_count": 44183,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 44183,
+     "gates": 107053,
+     "cx_count": 21675,
+     "relation_to_source": "phase",
+     "seconds": 0.77
+    }
+   }
+  },
+  {
+   "name": "feynman_hwb11",
+   "recommended": false,
+   "family": "hwb",
+   "size": 11,
+   "qubits": 15,
+   "gates": 256181,
+   "t_count": 84196,
+   "cx_count": 98023,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "b2a6e292e92932a7c063acd7fca0f0db6b1edb40434ef00eba80b5c894969276",
+   "best_uncertified_t_count": 44874,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 44874,
+     "gates": 149527,
+     "cx_count": 78850,
+     "relation_to_source": "phase",
+     "seconds": 0.98
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_128_mult",
+   "recommended": true,
+   "family": "gf2_mult",
+   "size": 128,
+   "qubits": 384,
+   "gates": 279419,
+   "t_count": 114688,
+   "cx_count": 98685,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "048011c8beac9f0a3c8f1ae4979476206c39c6ca1c2523271243b9336fc80f0a",
+   "best_uncertified_t_count": 65664,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 65664,
+     "gates": 165019,
+     "cx_count": 98685,
+     "relation_to_source": "unchecked",
+     "seconds": 1.21
+    }
+   }
+  },
+  {
+   "name": "tzap_qft_qft_q020_d32421",
+   "recommended": true,
+   "family": "synth_qft",
+   "size": 20,
+   "qubits": 20,
+   "gates": 309835,
+   "t_count": 167567,
+   "cx_count": 410,
+   "fragment": "general",
+   "source": "tzap",
+   "translated_sha256": "940175d0987533034f87f213c1f9737018c4664fa748b73d4806bc217777acd9",
+   "best_uncertified_t_count": 122387,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 122387,
+     "gates": 249902,
+     "cx_count": 380,
+     "relation_to_source": "unchecked",
+     "seconds": 1.33
+    }
+   }
+  },
+  {
+   "name": "tzap_cobble_t_spectral_thresholding",
+   "recommended": false,
+   "family": "cobble",
+   "size": 16,
+   "qubits": 16,
+   "gates": 309871,
+   "t_count": 137061,
+   "cx_count": 84506,
+   "fragment": "general",
+   "source": "tzap",
+   "translated_sha256": "73cf1f24cf29272d1edc24d646c1b7c66e02d2e5d6dfba7e7535d91db9477274",
+   "best_uncertified_t_count": 56511,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 56511,
+     "gates": 140907,
+     "cx_count": 33673,
+     "relation_to_source": "phase",
+     "seconds": 0.93
+    }
+   }
+  },
+  {
+   "name": "qasmbench_multiplier_n350",
+   "recommended": false,
+   "family": "qb_multiplier",
+   "size": 350,
+   "qubits": 350,
+   "gates": 383844,
+   "t_count": 170030,
+   "cx_count": 165200,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "6a563ac7958423a33d1c98d39a45e315059f677b8b480da21e9255daf2ec4b67",
+   "best_uncertified_t_count": 39202,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 39202,
+     "gates": 172696,
+     "cx_count": 99106,
+     "relation_to_source": "unchecked",
+     "seconds": 1.15
+    }
+   }
+  },
+  {
+   "name": "qasmbench_multiplier_n400",
+   "recommended": true,
+   "family": "qb_multiplier",
+   "size": 400,
+   "qubits": 400,
+   "gates": 501877,
+   "t_count": 222320,
+   "cx_count": 216000,
+   "fragment": "general",
+   "source": "qasmbench",
+   "translated_sha256": "6e37f6f674ccdfc044d9a152acc902d2de9b9d46dfd16a19f3626f5ceb7149bf",
+   "best_uncertified_t_count": 51202,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 51202,
+     "gates": 225764,
+     "cx_count": 129663,
+     "relation_to_source": "unchecked",
+     "seconds": 1.49
+    }
+   }
+  },
+  {
+   "name": "feynman_hwb12",
+   "recommended": true,
+   "family": "hwb",
+   "size": 12,
+   "qubits": 20,
+   "gates": 514412,
+   "t_count": 171465,
+   "cx_count": 191803,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "745914f34228d01bdc960467487f9038df6c44a67d46c5fb68524731b4de45ec",
+   "best_uncertified_t_count": 86173,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 86173,
+     "gates": 295803,
+     "cx_count": 153809,
+     "relation_to_source": "exact",
+     "seconds": 1.83
+    }
+   }
+  },
+  {
+   "name": "tzap_qft_qft_q030_d50671",
+   "recommended": false,
+   "family": "synth_qft",
+   "size": 30,
+   "qubits": 30,
+   "gates": 549880,
+   "t_count": 297387,
+   "cx_count": 915,
+   "fragment": "general",
+   "source": "tzap",
+   "translated_sha256": "1c7d887e368458eed65728b7b816b957d1bbfae4ac1a4db2c11487de5cb9d7ae",
+   "best_uncertified_t_count": 216729,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 216729,
+     "gates": 442253,
+     "cx_count": 675,
+     "relation_to_source": "unchecked",
+     "seconds": 2.34
+    }
+   }
+  },
+  {
+   "name": "tzap_cobble_t_ols_ridge",
+   "recommended": true,
+   "family": "cobble",
+   "size": 22,
+   "qubits": 22,
+   "gates": 587755,
+   "t_count": 255692,
+   "cx_count": 139716,
+   "fragment": "general",
+   "source": "tzap",
+   "translated_sha256": "f6e12bbd9aa6ac3ab26fdbaedeae05638edc4ed57af07fe73baf8b29ef1d38d5",
+   "best_uncertified_t_count": 119052,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 119052,
+     "gates": 284816,
+     "cx_count": 51136,
+     "relation_to_source": "unchecked",
+     "seconds": 1.78
+    }
+   }
+  },
+  {
+   "name": "tzap_qft_qft_q040_d68921",
+   "recommended": false,
+   "family": "synth_qft",
+   "size": 40,
+   "qubits": 40,
+   "gates": 790125,
+   "t_count": 427207,
+   "cx_count": 1620,
+   "fragment": "general",
+   "source": "tzap",
+   "translated_sha256": "f6f3a842c94e1c0ed0c726d3e49672c3b002ce2e59e8eb8cd81c8db79939fe5e",
+   "best_uncertified_t_count": 311069,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 311069,
+     "gates": 634598,
+     "cx_count": 970,
+     "relation_to_source": "unchecked",
+     "seconds": 3.3
+    }
+   }
+  },
+  {
+   "name": "tzap_qft_qft_q050_d87171",
+   "recommended": true,
+   "family": "synth_qft",
+   "size": 50,
+   "qubits": 50,
+   "gates": 1030570,
+   "t_count": 557027,
+   "cx_count": 2525,
+   "fragment": "general",
+   "source": "tzap",
+   "translated_sha256": "3c27310fa8c393f9899ee9629c5d3155066b1303d0a13e318e6d5a5b14d7df91",
+   "best_uncertified_t_count": 405409,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 405409,
+     "gates": 826943,
+     "cx_count": 1265,
+     "relation_to_source": "unchecked",
+     "seconds": 4.34
+    }
+   }
+  },
+  {
+   "name": "feynman_gf2_256_mult",
+   "recommended": true,
+   "family": "gf2_mult",
+   "size": 256,
+   "qubits": 768,
+   "gates": 1115899,
+   "t_count": 458752,
+   "cx_count": 393981,
+   "fragment": "general",
+   "source": "feynman",
+   "translated_sha256": "c33e90c4fc8f01578b61d985114522cdc2ba46a4c9ef49ff7a850ebd6214ffef",
+   "best_uncertified_t_count": 262400,
+   "tools": {
+    "pyzx_teleport": {
+     "status": "not run at this size"
+    },
+    "pyzx_full_reduce": {
+     "status": "not run at this size"
+    },
+    "tzap": {
+     "t_count": 262400,
+     "gates": 657723,
+     "cx_count": 393981,
+     "relation_to_source": "unchecked",
+     "seconds": 4.97
+    }
+   }
+  }
+ ]
+}

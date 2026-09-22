@@ -1,0 +1,82 @@
+{
+ "name": "qasmbench_qram_n20__pyzx_full_reduce",
+ "qubits": 20,
+ "relation": "p",
+ "expected": "equiv",
+ "split": "held-out",
+ "family": "qb_qram",
+ "rung": 20,
+ "source": {
+  "generator": "scripts/circuit_pairs.py",
+  "optimiser": "pyzx_full_reduce",
+  "circuit": "qasmbench_qram_n20",
+  "circuit_source": {
+   "source": "qasmbench",
+   "path": "medium/qram_n20/qram_n20.qasm",
+   "sha256": "2b22f2a0a013cb91c5b59063b04e33998a1e24bbd5300a085b01edadd9ac763d"
+  },
+  "circuit_licence": "BSD-style (Battelle Memorial Institute, 2020)",
+  "twin": "pyzx_full_reduce",
+  "twin_tool": {
+   "tool": "pyzx full_reduce + extract_circuit + basic_optimization (scripts/check_pyzx_benchmarks.py optimize)",
+   "pyzx": "0.9.0",
+   "seconds": 0.16
+  },
+  "tier": 2,
+  "relation_found": {
+   "method": "2 random state(s)",
+   "relation": "phase",
+   "omega_power": 4
+  },
+  "gates": [
+   321,
+   451
+  ],
+  "t_count": [
+   140,
+   96
+  ],
+  "h_count": [
+   40,
+   80
+  ],
+  "cx_count": [
+   136,
+   229
+  ],
+  "fragment": [
+   "general",
+   "general"
+  ],
+  "diff_matched": {
+   "raw": {
+    "matched": 9,
+    "of": 321,
+    "fraction": 0.028
+   },
+   "greedy/cancommute": {
+    "matched": 22,
+    "of": 321,
+    "fraction": 0.0685
+   }
+  },
+  "segments": {
+   "raw": {
+    "segments": 1,
+    "longest": 772
+   },
+   "greedy/cancommute": {
+    "segments": 3,
+    "longest": 768
+   }
+  }
+ },
+ "holdout_delete": [
+  "scripts/circuit_pairs.py",
+  "scripts/circuit_sources.py",
+  "scripts/peephole_pairs.py"
+ ],
+ "known_leaks": [],
+ "original": ["X 1", "X 11", "X 13", "X 18", "X 10", "CX 0 6", "CX 6 10", "H 4", "CX 6 4", "Tdg 4", "CX 1 4", "T 4", "CX 6 4", "Tdg 4", "CX 1 4", "T 6", "T 4", "H 4", "CX 1 6", "T 1", "Tdg 6", "CX 1 6", "CX 4 6", "H 8", "CX 10 8", "Tdg 8", "CX 1 8", "T 8", "CX 10 8", "Tdg 8", "CX 1 8", "T 10", "T 8", "H 8", "CX 1 10", "T 1", "Tdg 10", "CX 1 10", "CX 8 10", "H 3", "CX 4 3", "Tdg 3", "CX 2 3", "T 3", "CX 4 3", "Tdg 3", "CX 2 3", "T 4", "T 3", "H 3", "CX 2 4", "T 2", "Tdg 4", "CX 2 4", "H 5", "CX 6 5", "Tdg 5", "CX 2 5", "T 5", "CX 6 5", "Tdg 5", "CX 2 5", "T 6", "T 5", "H 5", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 7", "CX 8 7", "Tdg 7", "CX 2 7", "T 7", "CX 8 7", "Tdg 7", "CX 2 7", "T 8", "T 7", "H 7", "CX 2 8", "T 2", "Tdg 8", "CX 2 8", "H 9", "CX 10 9", "Tdg 9", "CX 2 9", "T 9", "CX 10 9", "Tdg 9", "CX 2 9", "T 10", "T 9", "H 9", "CX 2 10", "T 2", "Tdg 10", "CX 2 10", "CX 3 4", "CX 5 6", "CX 7 8", "CX 9 10", "H 19", "CX 18 19", "Tdg 19", "CX 10 19", "T 19", "CX 18 19", "Tdg 19", "CX 10 19", "T 18", "T 19", "H 19", "CX 10 18", "T 10", "Tdg 18", "CX 10 18", "H 19", "CX 17 19", "Tdg 19", "CX 9 19", "T 19", "CX 17 19", "Tdg 19", "CX 9 19", "T 17", "T 19", "H 19", "CX 9 17", "T 9", "Tdg 17", "CX 9 17", "H 19", "CX 16 19", "Tdg 19", "CX 8 19", "T 19", "CX 16 19", "Tdg 19", "CX 8 19", "T 16", "T 19", "H 19", "CX 8 16", "T 8", "Tdg 16", "CX 8 16", "H 19", "CX 15 19", "Tdg 19", "CX 7 19", "T 19", "CX 15 19", "Tdg 19", "CX 7 19", "T 15", "T 19", "H 19", "CX 7 15", "T 7", "Tdg 15", "CX 7 15", "H 19", "CX 14 19", "Tdg 19", "CX 6 19", "T 19", "CX 14 19", "Tdg 19", "CX 6 19", "T 14", "T 19", "H 19", "CX 6 14", "T 6", "Tdg 14", "CX 6 14", "H 19", "CX 13 19", "Tdg 19", "CX 5 19", "T 19", "CX 13 19", "Tdg 19", "CX 5 19", "T 13", "T 19", "H 19", "CX 5 13", "T 5", "Tdg 13", "CX 5 13", "H 19", "CX 12 19", "Tdg 19", "CX 4 19", "T 19", "CX 12 19", "Tdg 19", "CX 4 19", "T 12", "T 19", "H 19", "CX 4 12", "T 4", "Tdg 12", "CX 4 12", "H 19", "CX 11 19", "Tdg 19", "CX 3 19", "T 19", "CX 11 19", "Tdg 19", "CX 3 19", "T 11", "T 19", "H 19", "CX 3 11", "T 3", "Tdg 11", "CX 3 11", "CX 9 10", "CX 7 8", "CX 5 6", "CX 3 4", "H 9", "CX 10 9", "Tdg 9", "CX 2 9", "T 9", "CX 10 9", "Tdg 9", "CX 2 9", "T 10", "T 9", "H 9", "CX 2 10", "T 2", "Tdg 10", "CX 2 10", "H 7", "CX 8 7", "Tdg 7", "CX 2 7", "T 7", "CX 8 7", "Tdg 7", "CX 2 7", "T 8", "T 7", "H 7", "CX 2 8", "T 2", "Tdg 8", "CX 2 8", "H 5", "CX 6 5", "Tdg 5", "CX 2 5", "T 5", "CX 6 5", "Tdg 5", "CX 2 5", "T 6", "T 5", "H 5", "CX 2 6", "T 2", "Tdg 6", "CX 2 6", "H 3", "CX 4 3", "Tdg 3", "CX 2 3", "T 3", "CX 4 3", "Tdg 3", "CX 2 3", "T 4", "T 3", "H 3", "CX 2 4", "T 2", "Tdg 4", "CX 2 4", "CX 8 10", "H 8", "CX 10 8", "Tdg 8", "CX 1 8", "T 8", "CX 10 8", "Tdg 8", "CX 1 8", "T 10", "T 8", "H 8", "CX 1 10", "T 1", "Tdg 10", "CX 1 10", "CX 4 6", "H 4", "CX 6 4", "Tdg 4", "CX 1 4", "T 4", "CX 6 4", "Tdg 4", "CX 1 4", "T 6", "T 4", "H 4", "CX 1 6", "T 1", "Tdg 6", "CX 1 6", "CX 6 10", "CX 0 6"],
+ "optimized": ["Sdg 1", "H 4", "H 4", "CX 3 4", "H 4", "T 4", "CX 0 6", "H 8", "CX 8 6", "CX 8 1", "T 8", "Tdg 11", "CX 11 12", "T 1", "CX 1 6", "Sdg 6", "CX 1 10", "CX 6 10", "CX 10 8", "CX 10 7", "Z 10", "T 10", "CX 1 10", "Sdg 10", "H 7", "CX 7 2", "T 7", "S 8", "H 2", "CX 1 2", "H 2", "S 2", "T 2", "CX 8 1", "Z 1", "T 1", "H 7", "CX 1 7", "H 7", "CX 10 1", "H 1", "T 1", "CX 1 2", "S 2", "CX 2 16", "H 1", "H 7", "CX 1 7", "H 7", "CX 1 15", "H 15", "CX 8 15", "H 15", "CX 7 8", "CX 2 7", "S 7", "T 7", "CX 8 7", "CX 19 8", "H 19", "CX 19 15", "S 19", "T 19", "CX 2 19", "Tdg 19", "CX 19 18", "H 8", "Z 8", "T 8", "CX 15 1", "CX 15 9", "CX 8 16", "Tdg 16", "CX 7 18", "CX 19 16", "T 1", "CX 2 1", "CX 2 8", "H 9", "CX 9 7", "H 9", "CX 6 9", "H 9", "T 9", "CX 16 8", "CX 16 1", "Tdg 16", "Z 7", "T 7", "CX 8 1", "T 8", "CX 16 8", "CX 2 16", "CX 10 16", "CX 4 16", "Tdg 1", "CX 2 1", "T 8", "CX 8 18", "H 18", "CX 9 18", "H 18", "CX 19 1", "CX 8 19", "CX 19 15", "CX 19 17", "CX 9 19", "CX 7 19", "Tdg 1", "CX 1 8", "CX 2 8", "T 8", "H 15", "Tdg 15", "CX 9 15", "CX 7 1", "CX 7 9", "CX 10 1", "CX 15 7", "H 7", "CX 6 7", "H 7", "S 7", "T 7", "CX 7 1", "H 7", "Tdg 7", "CX 7 18", "CX 18 17", "S 18", "T 18", "CX 18 19", "S 19", "T 19", "H 1", "S 1", "T 1", "CX 2 1", "CX 4 6", "T 6", "Tdg 17", "CX 7 17", "CX 9 18", "CX 18 16", "Z 18", "T 18", "CX 19 17", "CX 9 19", "CX 19 16", "Z 19", "T 19", "T 1", "CX 18 7", "T 7", "CX 7 17", "T 17", "CX 19 17", "CX 9 7", "Tdg 17", "CX 19 7", "CX 18 19", "CX 2 19", "CX 10 19", "T 7", "CX 7 18", "Tdg 18", "CX 15 7", "CX 9 15", "CX 15 1", "H 15", "CX 5 15", "H 15", "H 15", "CX 3 15", "H 15", "Z 1", "T 1", "CX 4 5", "H 7", "Tdg 7", "H 8", "CX 1 8", "H 8", "CX 9 7", "CX 2 9", "CX 19 5", "CX 4 19", "CX 1 2", "S 2", "T 2", "H 5", "H 5", "CX 3 5", "H 5", "S 5", "T 5", "Tdg 7", "CX 15 7", "T 7", "CX 2 7", "H 2", "Tdg 2", "CX 2 9", "S 9", "T 9", "CX 10 2", "S 2", "T 2", "CX 2 9", "Sdg 9", "CX 9 6", "CX 4 9", "S 9", "T 9", "CX 9 16", "T 16", "CX 9 19", "CX 19 13", "CX 19 17", "CX 4 2", "H 6", "CX 3 6", "H 6", "S 6", "T 6", "CX 9 2", "CX 10 2", "CX 4 10", "CX 1 10", "CX 9 10", "CX 10 7", "CX 4 10", "CX 6 10", "CX 1 10", "T 17", "H 2", "CX 1 2", "H 2", "Tdg 2", "H 2", "Z 2", "CX 6 4", "Z 7", "T 7", "CX 9 6", "H 9", "H 9", "CX 5 9", "H 9", "H 9", "CX 3 9", "H 9", "Z 9", "T 9", "CX 15 9", "H 18", "CX 7 18", "H 18", "H 19", "CX 7 19", "H 19", "S 4", "Tdg 9", "CX 9 3", "CX 15 5", "CX 19 9", "CX 5 3", "Z 5", "T 5", "CX 5 9", "H 3", "Z 3", "T 3", "H 4", "CX 3 4", "H 4", "CX 15 5", "CX 3 15", "S 15", "T 15", "H 5", "Tdg 5", "CX 9 5", "T 5", "CX 19 5", "S 5", "T 5", "CX 5 9", "Z 9", "T 9", "CX 9 3", "CX 5 13", "T 13", "CX 9 14", "Tdg 14", "CX 19 13", "CX 19 14", "CX 4 5", "Tdg 13", "CX 9 13", "CX 4 13", "T 14", "CX 9 14", "Tdg 14", "CX 15 13", "CX 19 5", "CX 19 14", "CX 5 3", "CX 9 5", "T 14", "CX 15 9", "Tdg 3", "CX 3 9", "H 9", "T 9", "CX 4 9", "Sdg 9", "CX 5 9", "T 9", "CX 5 15", "CX 15 13", "T 15", "T 13", "CX 15 3", "H 15", "T 15", "CX 5 15", "T 15", "CX 19 15", "CX 19 13", "H 3", "CX 1 3", "H 3", "H 7", "CX 3 7", "H 7", "H 7", "CX 3 9", "Tdg 9", "Tdg 13", "Tdg 15", "CX 11 15", "Tdg 15", "CX 5 15", "CX 19 15", "H 1", "CX 15 12", "CX 19 11", "T 11", "H 12", "CX 3 12", "H 12", "Tdg 12", "CX 15 11", "CX 5 15", "T 15", "CX 19 12", "CX 19 15", "Tdg 11", "CX 12 11", "T 12", "CX 12 15", "CX 19 11", "Tdg 11", "CX 9 12", "CX 6 12", "H 12", "S 12", "T 12", "CX 5 12", "T 12", "CX 3 12", "Tdg 12", "CX 12 15", "CX 19 11", "CX 4 6", "CX 5 9", "CX 4 9", "T 9", "T 11", "CX 11 15", "CX 12 5", "H 12", "Tdg 12", "CX 4 12", "T 12", "CX 6 12", "T 12", "CX 4 12", "Tdg 12", "CX 0 4", "Z 5", "T 5", "H 9", "CX 5 9", "H 9", "H 9", "H 11", "CX 5 11", "H 11", "H 12", "CX 5 12", "H 12", "H 12", "Z 12", "CX 5 15", "H 19", "CX 5 19", "H 19", "H 19", "H 5", "X 13", "X 18", "X 6", "X 10", "X 15", "X 7", "X 1", "CX 1 6", "CX 6 1", "CX 1 6", "CX 2 3", "CX 3 2", "CX 2 3", "CX 3 5", "CX 5 3", "CX 3 5", "CX 4 12", "CX 12 4", "CX 4 12", "CX 5 9", "CX 9 5", "CX 5 9", "CX 6 12", "CX 12 6", "CX 6 12", "CX 7 12", "CX 12 7", "CX 7 12", "CX 8 9", "CX 9 8", "CX 8 9", "CX 9 12", "CX 12 9", "CX 9 12", "CX 11 15", "CX 15 11", "CX 11 15", "CX 12 15", "CX 15 12", "CX 12 15"]
+}

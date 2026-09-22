@@ -1,0 +1,33 @@
+{
+  "name": "tof_3_mut1",
+  "qubits": 5,
+  "relation": "u",
+  "expected": "not_equiv",
+  "split": "dev",
+  "family": "tof",
+  "rung": 3,
+  "source": {
+    "module": "CircuitEq/Benchmarks/Tof3.lean",
+    "pipeline": ""
+  },
+  "holdout": {
+    "modules": [
+      "CircuitEq.Benchmarks.Tof3"
+    ],
+    "redact": []
+  },
+  "known_leaks": [
+    "the pair is a promoted benchmark of this repository, so a model may have seen its proof; removed from the run copy: its module, README.md, benchmarks/, and the window table of scripts/certificate.py",
+    "CircuitEq/PhasePoly.lean keeps three test theorems about sub-blocks of this circuit (`tof3_merge`, `tof3_controls`, `tof3_core`); not redacted, since that would rebuild the largest module of the library on every run"
+  ],
+  "mutation": {
+    "side": "optimized",
+    "deleted_index": 8,
+    "deleted_gate": "CX 0 3",
+    "seed": 1
+  },
+  "gates": [
+    45,
+    49
+  ]
+}
