@@ -5,8 +5,8 @@
 one of those on a wire or a `CX`. The scripts that mirror, search, translate or
 simulate circuits (`certificate.py`, `circuit_sources.py`, `circuit_pairs.py`,
 `tcount_survey.py`, `peephole_pairs.py`, `check_pyzx_benchmarks.py`,
-`scale_test.py`) import their tables from here, so a change to the alphabet is
-one edit. Standard library only: numpy users build arrays from `MATRICES`.
+`scale_test.py`, `hard_pair.py`) import their tables from here, so a change to
+the alphabet is one edit. Standard library only: numpy users build arrays from `MATRICES`.
 
 `benchmarks/harness/tools/qasm.py` keeps its own copy of `TO_QASM` and `PHASES`,
 because the harness copies it into a run workspace as a standalone executable;

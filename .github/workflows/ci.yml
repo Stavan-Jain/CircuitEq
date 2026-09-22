@@ -30,8 +30,9 @@ jobs:
       # Lean sources and qasm.py's copy), the two agent harnesses (standard library
       # only, no lake, no agent) and the circuit catalogue's fetch/translate
       # and pairing scripts, whose self-tests check every translation rule
-      # numerically and so need numpy. pyzx is optional to them; without it
-      # the PyZX comparisons are skipped and say so.
+      # numerically and so need numpy, and the hard-pair generator, whose
+      # self-test checks its construction on dense unitaries. pyzx is optional
+      # to them; without it the PyZX comparisons are skipped and say so.
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -43,6 +44,7 @@ jobs:
           python3 -m pip install --quiet numpy
           python3 scripts/circuit_sources.py --self-test
           python3 scripts/circuit_pairs.py --self-test
+          python3 scripts/hard_pair.py --self-test
       # Fetches the mathlib olean cache and runs `lake build`.
       - uses: leanprover/lean-action@v1
       # Every declaration must depend on exactly [propext, Classical.choice,
