@@ -20,8 +20,10 @@ is determined by that conjugation action up to a global scalar, which is why
 the certified relation is `≡ₛ` and not `≡ᵤ`: the tableau never sees the
 scalar, and showing it is a power of `ω` is number theory in `ℤ[ω]` that this
 library does not do. Memory is `2n` strings of `2n` bits, a gate costs `O(n)`
-bit operations, and no object of size `2 ^ n` is ever built, so circuits on
-hundreds of qubits are within reach of the kernel.
+bit operations, and no object of size `2 ^ n` is ever built. In one
+declaration the kernel's cache bounds the check at a few thousand gates;
+chunked, one declaration per range of generators (the last section), circuits
+on hundreds of qubits are within reach.
 
 ## Pauli strings
 
@@ -71,11 +73,13 @@ produces `λ⁻¹`, so `λ` is a unit.
 ## What the kernel runs
 
 `tableauCheck a b` is `Bool` code over `Nat` bit operations, `Fin 4`
-addition and list recursion: `conj` folds a gate update over the circuit
-for each of the `2n` generators, and the two `Option (List Pauli)` results
-are compared by the derived `DecidableEq`. Nothing touches `Zeta8`, so
-`decide +kernel` on the check costs `O(n · gates)` machine-word operations
-and the seven-qubit benchmarks below decide in milliseconds.
+addition and list recursion: `Tableau.conj` folds a gate update over the
+circuit for each of the `2n` generators, and the two `Option (List Pauli)`
+results are compared by the derived `DecidableEq`. Nothing touches `Zeta8`,
+so `decide +kernel` on the check costs `O(n · gates)` machine-word
+operations per generator. `tableauCheckGen a b g` is the same check on
+generator `g` alone, for a proof chunked one range of generators per
+declaration (`tableau_sound_of_allBelow`).
 -/
 
 namespace Quantum.Circuit
@@ -97,6 +101,8 @@ structure Pauli where
   /-- The phase, as the exponent of `i`. -/
   phase : Fin 4
   deriving DecidableEq, Repr
+
+namespace Tableau
 
 /-- `i ^ p`, the scalar of a phase. -/
 def phaseVal (p : Fin 4) : Zeta8 := I ^ p.val
@@ -163,10 +169,6 @@ def xorMask (x : ℕ) (w : Fin (2 ^ n)) : Fin (2 ^ n) :=
 @[simp] lemma val_xorMask (x : ℕ) (w : Fin (2 ^ n)) :
     (xorMask x w).val = (w.val ^^^ x) % 2 ^ n := rfl
 
-lemma testBit_xorMask (x : ℕ) (w : Fin (2 ^ n)) (i : ℕ) :
-    (xorMask x w).val.testBit i = (decide (i < n) && (w.val.testBit i ^^ x.testBit i)) := by
-  simp [Nat.testBit_mod_two_pow, Nat.testBit_xor]
-
 @[simp] lemma xorMask_zero (w : Fin (2 ^ n)) : xorMask 0 w = w := by
   ext
   simp [Nat.mod_eq_of_lt w.isLt]
@@ -200,6 +202,10 @@ lemma xorMask_flipBit (x : ℕ) (j : Fin n) (w : Fin (2 ^ n)) :
 /-- A single wire as a mask is a bit flip. -/
 lemma xorMask_two_pow (j : Fin n) (w : Fin (2 ^ n)) : xorMask (2 ^ j.val) w = flipBit j w := by
   simpa using xorMask_xor_two_pow 0 j w
+
+end Tableau
+
+open Tableau
 
 /-- The operator a Pauli string denotes: `i ^ p · Z^z · X^x`, pointwise. -/
 def Pauli.op (P : Pauli) (ψ : Vec n) : Vec n :=
@@ -356,6 +362,8 @@ theorem Instr.conj_sound {g : Instr n} {P Q : Pauli} (h : g.conj P = some Q) (ψ
 
 /-! ### The tableau -/
 
+namespace Tableau
+
 /-- Conjugate a Pauli string by a whole circuit, gate by gate; `none` if any
 gate is outside the fragment. -/
 def conj : Circuit n → Pauli → Option Pauli
@@ -397,11 +405,15 @@ theorem conj_proper {c : Circuit n} {P Q : Pauli} (h : conj c P = some Q) :
         simp [Instr.conj, hab] at hg
       · exact ih h a b hm
 
+end Tableau
+
 /-- The generator `X_j`. -/
 def Pauli.xGen (j : Fin n) : Pauli := ⟨2 ^ j.val, 0, 0⟩
 
 /-- The generator `Z_j`. -/
 def Pauli.zGen (j : Fin n) : Pauli := ⟨0, 2 ^ j.val, 0⟩
+
+namespace Tableau
 
 /-- The `2n` generators of the Pauli group: `X_0, …, X_{n-1}, Z_0, …,
 Z_{n-1}`. -/
@@ -442,6 +454,8 @@ lemma mapOpt_eq_some {α β : Type*} {f g : α → Option β} {l : List α} {r :
     · exact ⟨_, hfa, hga⟩
     · exact ih hfl hgl a' ha'
 
+end Tableau
+
 /-- The tableau of a circuit: the images of the `2n` generators under
 conjugation by it, or `none` if the circuit leaves the Clifford fragment. -/
 def tableau (c : Circuit n) : Option (List Pauli) := mapOpt (conj c) (generators n)
@@ -461,6 +475,8 @@ theorem tableau_proper {b : Circuit n} {T : List Pauli} (hb : tableau b = some T
 
 /-! ### The commutant of the Pauli group is the scalars -/
 
+namespace Tableau
+
 /-- `Z_j` acts on `|w⟩` by the sign of bit `j`. -/
 lemma zGen_op (j : Fin n) (ψ : Vec n) (w : Fin (2 ^ n)) :
     (Pauli.zGen j).op ψ w = (if bit j w then -1 else 1) * ψ w := by
@@ -471,23 +487,9 @@ lemma xGen_op (j : Fin n) (ψ : Vec n) (w : Fin (2 ^ n)) :
     (Pauli.xGen j).op ψ w = ψ (flipBit j w) := by
   simp [Pauli.op, Pauli.xGen, xorMask_two_pow]
 
-/-- Distinct basis indices differ in some bit. -/
-lemma exists_bit_ne {w y : Fin (2 ^ n)} (h : w ≠ y) : ∃ j : Fin n, bit j w ≠ bit j y := by
-  by_contra hc
-  apply h
-  apply Fin.ext
-  apply Nat.eq_of_testBit_eq
-  intro i
-  by_cases hi : i < n
-  · by_contra hne
-    exact hc ⟨⟨i, hi⟩, hne⟩
-  · have hn : 2 ^ n ≤ 2 ^ i := Nat.pow_le_pow_right two_pos (not_lt.1 hi)
-    rw [Nat.testBit_lt_two_pow (lt_of_lt_of_le w.isLt hn),
-      Nat.testBit_lt_two_pow (lt_of_lt_of_le y.isLt hn)]
-
 /-- A function on basis indices invariant under every bit flip is constant:
 clear the set bits one at a time. -/
-lemma eq_zero_of_flipBit_invariant {α : Type*} (f : Fin (2 ^ n) → α)
+lemma eq_of_flipBit_invariant {α : Type*} (f : Fin (2 ^ n) → α)
     (hf : ∀ j y, f (flipBit j y) = f y) (y : Fin (2 ^ n)) : f y = f ⟨0, Nat.two_pow_pos n⟩ := by
   obtain ⟨v, hv⟩ := y
   induction v using Nat.strong_induction_on with
@@ -517,10 +519,6 @@ lemma zeta8_eq_zero_of_add_self {v : Zeta8} (h : v + v = 0) : v = 0 := by
     Zeta8.zero_c, Zeta8.zero_d] at h ⊢
   obtain ⟨h1, h2, h3, h4⟩ := h
   exact ⟨by linarith, by linarith, by linarith, by linarith⟩
-
-/-- A flip sends `v` to `y` iff it sends `y` to `v`. -/
-lemma flipBit_eq_iff (j : Fin n) (v y : Fin (2 ^ n)) : flipBit j v = y ↔ v = flipBit j y :=
-  ⟨fun h => by rw [← h, flipBit_flipBit_self], fun h => by rw [h, flipBit_flipBit_self]⟩
 
 /-- A linear operator commuting with every `X_j` and `Z_j` is a scalar: the
 `Z_j` make it diagonal in the computational basis, the `X_j` make the
@@ -569,12 +567,16 @@ theorem eq_smul_of_comm_generators (W : Vec n →ₗ[Zeta8] Vec n)
   have hW : W = lam ⟨0, Nat.two_pow_pos n⟩ • LinearMap.id := by
     apply LinearMap.ext_basis
     intro y
-    rw [hdiag y, eq_zero_of_flipBit_invariant lam hflip y]
+    rw [hdiag y, eq_of_flipBit_invariant lam hflip y]
     rfl
   rw [hW]
   rfl
 
+end Tableau
+
 /-! ### Soundness of the checker -/
+
+namespace Tableau
 
 /-- The two circuits send every generator to the same Pauli string. -/
 def ConjAgree (a b : Circuit n) : Prop :=
@@ -620,6 +622,8 @@ theorem equivalentUpToScalar_of_conjAgree {a b : Circuit n} (key : ConjAgree a b
     simpa [basis] using this
   exact ⟨lam, ⟨⟨lam, mu, hunit, (mul_comm mu lam).trans hunit⟩, rfl⟩, hab⟩
 
+end Tableau
+
 /-- Equal tableaux certify equivalence up to a unit scalar: the shape of
 `NormalForm.sound`, for `≡ₛ`. -/
 theorem tableau_sound {a b : Circuit n} {T : List Pauli} (ha : tableau a = some T)
@@ -643,21 +647,28 @@ def tableauChecker (n : ℕ) : ScalarChecker n :=
 /-! ### The chunked check
 
 `tableauCheck` conjugates all `2n` generators inside one declaration, and
-the kernel keeps every intermediate Pauli string until it ends: the
-40-qubit rung of the scale test was killed at 6.3 GB. `tableauCheckGen` is
-the check on one generator, numbered on `ℕ` by `genAt`; a file proves it
+the kernel keeps every intermediate Pauli string until it ends, so the
+40-qubit rung of the scale test ran out of memory
+(`benchmarks/scale/README.md`). `tableauCheckGen` is the check on one
+generator, numbered on `ℕ` by `Tableau.genAt`; a file proves it
 on ranges of generators, one declaration per range, and
 `tableau_sound_of_allBelow` assembles them (`CircuitEq.Chunk`). -/
+
+namespace Tableau
 
 /-- Generator number `g` of the `2n`, on `ℕ` so that a chunked check can
 range over it: `X_g` for `g < n`, `Z_{g − n}` from `n` on. -/
 def genAt (n g : ℕ) : Pauli := if g < n then ⟨2 ^ g, 0, 0⟩ else ⟨0, 2 ^ (g - n), 0⟩
+
+end Tableau
 
 /-- The tableau check on one generator: both images exist and agree. -/
 def tableauCheckGen (a b : Circuit n) (g : ℕ) : Bool :=
   match conj a (genAt n g), conj b (genAt n g) with
   | some P, some Q => decide (P = Q)
   | _, _ => false
+
+namespace Tableau
 
 /-- A passed generator check names the common image. -/
 lemma exists_of_tableauCheckGen {a b : Circuit n} {g : ℕ} (h : tableauCheckGen a b g = true) :
@@ -666,6 +677,8 @@ lemma exists_of_tableauCheckGen {a b : Circuit n} {g : ℕ} (h : tableauCheckGen
   split at h
   · next P Q ha hb => exact ⟨P, ha, by rw [hb, of_decide_eq_true h]⟩
   · exact absurd h Bool.false_ne_true
+
+end Tableau
 
 /-- The chunked tableau check: `tableauCheckGen` on all `2n` generators,
 proved a range at a time, gives `≡ₛ`. -/
@@ -691,107 +704,13 @@ theorem tableau_sound_of_allBelow {a b : Circuit n}
   · obtain ⟨Q, -, hQb⟩ := h0 x
     exact proper ⟨Q, hQb⟩ x t hm
 
+namespace Tableau
+
 /-- The first generator whose images under the two circuits differ, for
 diagnosing a `false`; `none` when every generator agrees. -/
 def witness (a b : Circuit n) : Option Pauli :=
   (generators n).find? fun P => decide (conj a P ≠ conj b P)
 
-/-! ### Tests
-
-Each equivalence is closed by the checker; `decide +kernel` evaluates the
-tableau comparison and the soundness theorem turns the `true` into `≡ₛ`. -/
-
-namespace Tableau.Tests
-
-open Instr
-
-/-- Conjugating a CNOT by `H ⊗ H` reverses it. -/
-theorem hh_cnot_hh : ([H 0, H 1, CX 0 1, H 0, H 1] : Circuit 2) ≡ₛ [CX 1 0] :=
-  (tableauChecker 2).sound _ _ (by decide +kernel)
-
-/-- The two three-CNOT decompositions of SWAP agree. -/
-theorem swap_swap : ([CX 0 1, CX 1 0, CX 0 1] : Circuit 2) ≡ₛ [CX 1 0, CX 0 1, CX 1 0] :=
-  (tableauChecker 2).sound _ _ (by decide +kernel)
-
-/-- CZ is symmetric in its two qubits. -/
-theorem cz_symm : ([H 1, CX 0 1, H 1] : Circuit 2) ≡ₛ [H 0, CX 1 0, H 0] :=
-  (tableauChecker 2).sound _ _ (by decide +kernel)
-
-/-- `S X S† = Y`; as a circuit, `S†` runs first. -/
-theorem Sdg_X_S_eq_Y : ([Sdg 0, X 0, S 0] : Circuit 1) ≡ₛ [Y 0] :=
-  (tableauChecker 1).sound _ _ (by decide +kernel)
-
-/-- `Z X = −X Z`: equal up to the scalar `−1`, which the tableau ignores. -/
-theorem Z_X_scalar_X_Z : ([Z 0, X 0] : Circuit 1) ≡ₛ [X 0, Z 0] :=
-  (tableauChecker 1).sound _ _ (by decide +kernel)
-
-/-- `H` and `S` are not equivalent: the check returns `false`. -/
-theorem not_H_S : tableauCheck ([H 0] : Circuit 1) [S 0] = false := by decide +kernel
-
-/-- `T` is outside the fragment: the check is `false` even for equal
-circuits. -/
-theorem not_T_T : tableauCheck ([T 0] : Circuit 1) [T 0] = false := by decide +kernel
-
-/-- The witness for `[H 0]` versus `[S 0]` is the first generator, `X_0`:
-`H` sends it to `Z_0`, `S` to `Y_0`. -/
-theorem witness_H_S : witness ([H 0] : Circuit 1) [S 0] = some ⟨1, 0, 0⟩ := by decide +kernel
-
-/-- The tableau of `H 0; CX 0 1`: `X_0 ↦ Z_0`, `X_1 ↦ X_1`, `Z_0 ↦ X_0 X_1`,
-`Z_1 ↦ Z_0 Z_1`. -/
-theorem tableau_H_CX : tableau ([H 0, CX 0 1] : Circuit 2) =
-    some [⟨0, 1, 0⟩, ⟨2, 0, 0⟩, ⟨3, 0, 0⟩, ⟨0, 3, 0⟩] := by
-  decide +kernel
-
-/-- The three-qubit phase-flip repetition encoder of
-`CircuitEq.Benchmarks.Rep3PhaseFlip` (copied here, since a checker module
-cannot import the benchmark modules). -/
-def rep3Original : Circuit 3 := [CX 0 1, CX 0 2, H 0, H 1, H 2]
-
-/-- Its PyZX output. -/
-def rep3Optimized : Circuit 3 := [CX 0 1, H 1, CX 0 2, H 2, H 0]
-
-/-- The benchmark pair, decided by the tableau. -/
-theorem rep3 : rep3Original ≡ₛ rep3Optimized :=
-  (tableauChecker 3).sound _ _ (by decide +kernel)
-
-/-- The Steane plus-state encoder of `CircuitEq.Benchmarks.SteanePlus`. -/
-def steaneOriginal : Circuit 7 :=
-  [H 0, H 1, H 3,
-    CX 0 2, CX 0 4, CX 0 6, CX 1 2, CX 1 5, CX 1 6, CX 3 4, CX 3 5, CX 3 6,
-    H 0, H 1, H 2, H 3, H 4, H 5, H 6]
-
-/-- Its PyZX output. -/
-def steaneOptimized : Circuit 7 :=
-  [H 2, CX 2 1, CX 2 0, H 4, CX 4 3, CX 4 0,
-    H 5, CX 5 3, CX 5 1, H 6, CX 6 3, CX 6 1, CX 6 0]
-
-/-- The benchmark pair, decided by the tableau on seven qubits. -/
-theorem steane : steaneOriginal ≡ₛ steaneOptimized :=
-  (tableauChecker 7).sound _ _ (by decide +kernel)
-
-/-! The same pair by the chunked check (`CircuitEq.Chunk`): the seven `X`
-generators in one declaration, the seven `Z` generators in another, and a
-constant-size term to assemble them. At this size nothing is gained; the
-40- and 80-qubit rungs of `benchmarks/scale/` need it. -/
-
-/-- The `X` generators of the Steane pair agree. -/
-theorem steane_x :
-    (List.range' 0 7).all (tableauCheckGen steaneOriginal steaneOptimized) = true := by
-  decide +kernel
-
-/-- The `Z` generators of the Steane pair agree. -/
-theorem steane_z :
-    (List.range' 7 7).all (tableauCheckGen steaneOriginal steaneOptimized) = true := by
-  decide +kernel
-
-/-- The benchmark pair again, assembled from the two chunks. -/
-theorem steane_chunked : steaneOriginal ≡ₛ steaneOptimized :=
-  tableau_sound_of_allBelow (((AllBelow.zero _).add steane_x).add steane_z)
-
-/-- A generator on which `[H 0]` and `[S 0]` differ: the chunked form of a
-rejection. -/
-theorem not_H_S_gen : tableauCheckGen ([H 0] : Circuit 1) [S 0] 0 = false := by decide +kernel
-
-end Tableau.Tests
+end Tableau
 
 end Quantum.Circuit

@@ -3,28 +3,28 @@ Copyright (c) 2026 Stavan Jain. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stavan Jain
 -/
-import CircuitEq.Certificate
+import CircuitEq.Defaults
 import Lean
 
 /-! # Circuit tactics: `circuit_simp` and `circuit_windows`
 
-Both tactics prove goals `c₁ ≡ᵤ c₂` between concrete instruction lists by
-searching, in meta code, for a certificate (`CircuitEq.Certificate`): a
-list of `Step`s whose replay turns `c₁` into `c₂`. The goal is closed by
-one application of `replay_sound` to a kernel evaluation of `replay`, so
-the proof term is constant-size and the kernel's work is one check per
-step. No state vector is ever evaluated on the full register: windows are
-decided on their own wires by the checker table `defaultCheckers`.
+Both tactics prove goals `c₁ ≡ᵤ c₂`, `c₁ ≡ₚ c₂` and `c₁ ≡ₚ[k] c₂` between
+concrete instruction lists (`circuit_simp`, whose moves are all exact,
+takes `≡ₚ[0]` rather than an arbitrary `k`) by searching, in meta code, for
+a certificate (`CircuitEq.Certificate`): a list of `Step`s whose replay
+turns `c₁` into `c₂`. An exact goal is closed by one application of
+`replay_sound` to a kernel evaluation of `replay`, so the proof term is
+constant-size and the kernel's work is one check per step. No state vector
+is ever evaluated on the full register: windows are decided on their own
+wires by the checker table `defaultCheckers` (`CircuitEq.Defaults`).
 
-Both also accept a goal up to a global phase, `c₁ ≡ₚ c₂` or, with the
-exponent named, `c₁ ≡ₚ[k] c₂`. The search and the certificate are the
-same; the trace is replayed by `replayPhase` under `defaultPhaseFinders`
-and the goal is closed by `replayUpToPhase_sound` or `replayPhase_sound`.
-Each window may then hold only up to a phase of its own (`Z X` against
-`X Z` is `ω ^ 4`): the basis evaluator names it on the window's wires, the
-kernel adds the windows' phases up, and a goal `c₁ ≡ₚ[k] c₂` checks the
-sum against `k`. Every move outside a window is still an exact commutation
-or cancellation.
+For a goal up to a global phase the search and the certificate are the same; the
+trace is replayed by `replayPhase` under `defaultPhaseFinders` and the goal is
+closed by `replayUpToPhase_sound` or `replayPhase_sound`. Each window may then
+hold only up to a phase of its own (`Z X` against `X Z` is `ω ^ 4`): the basis
+evaluator names it on the window's wires, the kernel adds the windows' phases
+up, and a goal `c₁ ≡ₚ[k] c₂` checks the sum against `k`. Every move outside a
+window is still an exact commutation or cancellation.
 
 * `circuit_simp` cancels checked inverse pairs through the gates they
   commute with, then aligns the two lists by pulling each gate of `c₂` to
@@ -37,8 +37,9 @@ or cancellation.
   roadmap: the alignment is input, the tactic checks it. A window `aᵢ ↔ bᵢ`
   is a pair of gate lists on the full register that touch a few wires. The
   tactic restricts the pair to those wires and emits a `window` step, which
-  `replay` checks with the basis evaluator at cost `2 ^ k` for `k` wires,
-  and walks `c₂` in order: at each point it pulls the next window to the
+  the replay checks with the table's first entry (the phase polynomial for
+  a CNOT-plus-diagonal window, else the basis evaluator at cost `2 ^ k` for
+  `k` wires), and walks `c₂` in order: at each point it pulls the next window to the
   front of both circuits if its gates can be moved there, otherwise the
   next gate of `c₂` is context and is pulled to the front of `c₁`. Windows
   are consumed in the listed order. A window with an empty side is a

@@ -26,7 +26,8 @@ jobs:
       # this step only names the file and line before a build is paid for.
       - name: Option guard (no debug.* options; early warning only)
         run: python3 scripts/check_debug_options.py
-      # The Python that is not Lean: the two agent harnesses (standard library
+      # The Python that is not Lean: the shared gate alphabet (against the
+      # Lean sources and qasm.py's copy), the two agent harnesses (standard library
       # only, no lake, no agent) and the circuit catalogue's fetch/translate
       # and pairing scripts, whose self-tests check every translation rule
       # numerically and so need numpy. pyzx is optional to them; without it
@@ -36,6 +37,7 @@ jobs:
           python-version: "3.12"
       - name: Python self-tests (harnesses, circuit catalogue)
         run: |
+          python3 scripts/alphabet.py --self-test
           python3 scripts/agent_harness.py selftest
           python3 scripts/optimizer_harness.py selftest
           python3 -m pip install --quiet numpy
@@ -48,7 +50,8 @@ jobs:
       # against the build lean-action just produced.
       - name: Axiom policy (standard three axioms only)
         run: lake env lean scripts/AxiomCheck.lean
-      # Every declaration of the built CircuitEq `.olean` files goes through
+      # Every declaration of the built `.olean` files of the library and of
+      # its examples and tests (`CircuitEqTest`) goes through
       # the kernel again, in a process where no option or meta code of the
       # library runs. This is what catches `debug.skipKernelTC` and any other
       # way of adding a declaration unchecked. `leanchecker` is the former
@@ -64,7 +67,7 @@ jobs:
       - name: Kernel replay (leanchecker over the CircuitEq oleans)
         env:
           LEAN_NUM_THREADS: "1"
-        run: lake env leanchecker -v CircuitEq
+        run: lake env leanchecker -v CircuitEq CircuitEqTest
       # The replay must reject `2 + 2 = 5` sealed behind `debug.skipKernelTC`
       # (`scripts/SkipKernelTCFixture.lean`, not part of any `lean_lib`), the
       # text guard must flag it, and it must still compile clean, so that a

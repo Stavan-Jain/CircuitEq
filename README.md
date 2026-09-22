@@ -103,8 +103,8 @@ not commute), and structural results for every `n` (`H²` cancels on any qubit,
 [`benchmarks/rep3_phaseflip/`](benchmarks/rep3_phaseflip/README.md) adds an
 original-versus-PyZX pair from QECUnitaryCircuits: the three-qubit
 phase-flip repetition encoder, whose five gates PyZX only reorders. The pair
-closes by `circuit_simp` in one line; `reorder` is the same fact for any
-three distinct wires of any register.
+closes by `circuit_simp` in one line, and `rename` places it on any three
+distinct wires of any register.
 
 [`benchmarks/steane_plus/`](benchmarks/steane_plus/README.md) proves a larger
 pair: PyZX reduces the seven-qubit Steane logical plus-state encoder from
@@ -125,9 +125,8 @@ and out of the window pattern's reach.
 decided by the Clifford tableau: the 15-qubit `[[15,1,3]]` Reed–Muller
 logical-zero encoder against PyZX's re-synthesised CNOT network (32 to 28
 gates, with CNOTs the original never has, so no alignment exists). The
-proof is one line, `(tableauChecker 15).sound _ _ (by decide +kernel)`,
-about 0.3 s of kernel time, and states `≡ₛ`, equality up to a unit scalar,
-which is all a tableau can see.
+proof is one line, `(tableauChecker 15).sound _ _ (by decide +kernel)`, and
+states `≡ₛ`, equality up to a unit scalar, which is all a tableau can see.
 
 [`benchmarks/barenco_tof_3/`](benchmarks/barenco_tof_3/README.md) is the
 first pair whose alignment a script found rather than a person: Barenco's
@@ -136,31 +135,28 @@ one-wire windows emitted by the survey's diff-based search and checked by
 `circuit_windows` with no refinement.
 
 [`benchmarks/scale/`](benchmarks/scale/README.md) pushes the checkers up
-ladders of random and structured circuits. The phase-polynomial checker
-certifies PyZX's phase folding of 200-, 400- and 800-gate random CNOT+T
-circuits on 20, 40 and 80 qubits in 0.2, 0.6 and 1.9 s of kernel time, and
-of a 10200-gate network of CCZ gadgets on 300 qubits in 10 s, refuting a
-gate-deleted mutant of each; the ladder's first run found the earlier
-parity-basis form incomplete, which is why the form is now the multilinear
-polynomial. The tableau, proved one range of generators per declaration
-(`CircuitEq/Chunk.lean`), certifies an 80-qubit random Clifford pair
-re-synthesised into 8261 gates in 7 minutes, a 161-qubit round of
-surface-code syndrome extraction in 39 s and two rounds on 241 qubits in
-under three minutes; in one declaration it ran out of
-memory at 40 qubits. The same chunking decides the seven-qubit Steane pair
-on its full basis in 78 s under 2 GB, where the single `decide` was killed
-at 7 GB.
+ladders of random and structured circuits, and is where every measurement of
+the library's kernel cost is recorded. The phase-polynomial checker
+certifies PyZX's phase folding of random CNOT+T circuits up to 80 qubits and
+800 gates, and of a 10200-gate network of CCZ gadgets on 300 qubits, in
+seconds, refuting a gate-deleted mutant of each; the ladder's first run found
+the earlier parity-basis form incomplete, which is why the form is now the
+multilinear polynomial. The tableau, proved one range of generators per
+declaration (`CircuitEq/Chunk.lean`), certifies an 80-qubit random Clifford
+pair re-synthesised into 8261 gates and two rounds of surface-code syndrome
+extraction on 241 qubits; in one declaration it ran out of memory at 40
+qubits. The same chunking decides the seven-qubit Steane pair on its full
+basis, where the single `decide` ran out of memory.
 
-[`benchmarks/survey/`](benchmarks/survey/README.md) is the evidence run for
-the roadmap's working hypothesis: eleven T-heavy circuits (Toffoli chains,
-Barenco's Toffoli, `mod5_4`, Cuccaro adders, seeded random circuits) against
-both PyZX pipelines, aligned by script. Phase-teleportation output aligns
-by windows on the structured circuits (seven pairs kernel-checked in 2 to
-10 s each on the dyadic evaluator, one memory-bound), re-synthesised output
-never does except as a whole-register decide, three random pairs are equal
-only up to a global phase (the window pattern has since learned `≡ₚ`, but
-these three have no alignment, so they stay whole-register decides of
-`≡ₚ`), and every wide window is CNOT-plus-diagonal
+[`benchmarks/survey/`](benchmarks/survey/README.md) is the evidence run for the
+roadmap's working hypothesis: eleven T-heavy circuits (Toffoli chains, Barenco's
+Toffoli, `mod5_4`, Cuccaro adders, seeded random circuits) against both PyZX
+pipelines, aligned by script. Phase-teleportation output aligns by windows on
+the structured circuits (seven pairs kernel-checked on the dyadic evaluator, one
+memory-bound), re-synthesised output never does except as a whole-register
+decide, three random pairs are equal only up to a global phase (the window
+pattern has since learned `≡ₚ`, but these three have no alignment, so they stay
+whole-register decides of `≡ₚ`), and every wide window is CNOT-plus-diagonal
 segments around one Hadamard, which is where the phase-polynomial checker
 applies next.
 
@@ -185,8 +181,9 @@ applies next.
   `≡ₚ` additionally ranges over the eight powers of `ω`. The instance
   evaluates with a closure evaluator over `Dyadic8` (`Dyadic.lean`), the
   gcd-free ring `ℤ[ω, 1/√2]`, proved equal to `denote`, so the kernel never
-  sees a rational and a decide is linear in depth: a three-qubit six-gate
-  window is 0.09 s where the rational list evaluator took 3 s.
+  sees a rational and a decide is linear in depth (thirty times faster than
+  the rational evaluator on a three-qubit window; the history is in
+  `benchmarks/scale/README.md`, "The basis evaluator").
 - **A global phase composes.** Optimisers preserve a circuit only up to a
   global phase (PyZX drops the scalar at extraction), and the phase shows
   up inside a window, so `≡ₚ` has everything `≡ᵤ` has: `refl`, `symm`,
@@ -216,12 +213,12 @@ applies next.
   `Equivalent.in_context` replaces an equivalent window inside any prefix and
   suffix; `Instr.CanCommute` and `Instr.CanCancel` are decidable syntactic
   checks whose `sound` lemmas produce the semantic swap or cancellation
-  (`CanCommute` knows disjoint wires, diagonal gates on one wire, a
-  diagonal gate on a CNOT control, `X` on a CNOT target, and CNOTs whose
-  controls avoid each other's targets);
-  `gate_block_comm`, `blocks_comm`, `perm_equivalent`, `pull_cons` and
-  `cancel_window` move gates and blocks. A benchmark proof never mentions
-  `denote` or an amplitude vector.
+  (`CanCommute` knows disjoint wires, diagonal gates on one wire, a diagonal
+  gate on a CNOT control, `X` on a CNOT target, and CNOTs whose controls avoid
+  each other's targets); `gate_block_comm`, `blocks_comm` and `perm_equivalent`
+  move gates and blocks, and the certificate steps (`moveLeft`, `swap`,
+  `cancel`) do the same by replay. A benchmark proof never mentions `denote` or
+  an amplitude vector.
 - **Layers and networks are first-class.** `layer_cnotNetwork_hLayer` moves
   a Hadamard layer through a whole CNOT network in one step, reversing every
   CNOT and cancelling against the seed layer, for every `n`; `hOn_symmDiff`
@@ -274,26 +271,33 @@ applies next.
 ## Layout
 
 ```
-CircuitEq.lean              umbrella
+CircuitEq.lean              umbrella of the library
+CircuitEqTest.lean          umbrella of the examples and tests (a second lean_lib)
 CircuitEq/
 ├── Zeta8.lean              ℚ(ζ₈): the computable coefficient field
 ├── Bits.lean               bit / flipBit on Fin (2 ^ n), commutation lemmas
 ├── Gates.lean              Gate1 alphabet, 2×2 matrices, applyOne / applyCNOT
 ├── Dyadic.lean             ℤ[ω, 1/√2]: the gcd-free ring the kernel computes in
 ├── Chunk.lean              chunked kernel evaluation: one declaration per index range
-├── Semantics.lean          Instr, Circuit, denote, ≡ᵤ, ≡ₚ, ≡ₚ[k], ≡ₛ, decidability
+├── Semantics.lean          the trusted core: Instr, Circuit, denote, ≡ᵤ, ≡ₚ, ≡ₚ[k], ≡ₛ
+├── Relations.lean          their algebra: refl, symm, trans, append, calc
+├── Decide.lean             basis reduction, the evaluators, decidability
 ├── Checker.lean            the checker contract: check + sound, normal forms, PhaseFinder
 ├── Structural.lean         the parametric toolkit: fusion, commutation, layers, phaseGadget
 ├── Support.lean            wire sets as Nat bitmasks
+├── Lanes.lean              bit planes: residues mod 8 on many lanes, pair and triple masks
 ├── PhasePoly.lean          phase-polynomial normal form, CNOT + diagonal
+├── PhasePoly/Complete.lean the form is canonical; the refuter
 ├── Tableau.lean            Clifford tableau checker, soundness to ≡ₛ
 ├── Rewriting.lean          rewriting in context, checked swaps and cancellations
 ├── Layers.lean             Hadamard-layer algebra, CNOT-network conjugation
-├── Certificate.lean        Step, replay, replay_sound, replayPhase, the tables
+├── Certificate.lean        Step, replay, replay_sound, replayPhase (generic in the checker table)
+├── Defaults.lean           the checker tables the tactics use
 ├── Tactic.lean             circuit_simp, circuit_windows (emit certificates; ≡ᵤ, ≡ₚ, ≡ₚ[k])
 ├── Embedding.lean          the locality theorem: circuits on selected wires
 ├── Examples.lean           worked identities: decided, refuted, structural, placed
 └── Benchmarks/             original-versus-PyZX proofs
+CircuitEqTest/              the checkers' regression tests
 benchmarks/                 QASM fixtures and provenance for each benchmark
 benchmarks/harness/         the agent harnesses: prompts, tasks, recorded runs
 benchmarks/circuits/        the circuit catalogue: 147 circuits, 390 pairs

@@ -54,12 +54,11 @@ import pyzx as zx
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import check_pyzx_benchmarks as cpb  # noqa: E402
+from alphabet import DIAG, MATRICES, TO_QASM  # noqa: E402
 
 SURVEY = ROOT / "benchmarks" / "survey"
 PIPELINES = ("teleport", "full_reduce")
-DIAG = {"Z", "S", "Sdg", "T", "Tdg"}
-QASM_NAMES = {"H": "h", "X": "x", "Y": "y", "Z": "z", "S": "s", "Sdg": "sdg", "T": "t",
-              "Tdg": "tdg", "CX": "cx"}
+QASM_NAMES = TO_QASM | {"Y": "y", "CX": "cx"}
 CANONS = ("greedy/cancommute", "asap/cancommute", "greedy/strict", "asap/strict", "raw")
 
 # Search bounds. A window's decide costs 2^k for k wires, so the search may
@@ -258,17 +257,7 @@ def generate(force: bool = False) -> None:
 # Numeric oracle (untrusted; diagnosis only)
 # --------------------------------------------------------------------------
 
-_w8 = np.exp(1j * np.pi / 4)
-MATS = {
-    "H": np.array([[1, 1], [1, -1]], dtype=complex) / np.sqrt(2),
-    "X": np.array([[0, 1], [1, 0]], dtype=complex),
-    "Y": np.array([[0, -1j], [1j, 0]], dtype=complex),
-    "Z": np.diag([1, -1]).astype(complex),
-    "S": np.diag([1, 1j]).astype(complex),
-    "Sdg": np.diag([1, -1j]).astype(complex),
-    "T": np.diag([1, _w8]).astype(complex),
-    "Tdg": np.diag([1, np.conj(_w8)]).astype(complex),
-}
+MATS = {g: np.array(m, dtype=complex) for g, m in MATRICES.items()}
 
 
 def _apply(state: np.ndarray, gate: Gate) -> np.ndarray:

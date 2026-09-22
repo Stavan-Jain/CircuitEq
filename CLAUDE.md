@@ -47,8 +47,13 @@ Rules that follow, for anyone adding to the library:
 
 ## Layout
 
-- `CircuitEq.lean` — umbrella; every module must be imported here or it is
-  never built, never linted, and its errors are invisible.
+- `CircuitEq.lean` — umbrella of the library; every library module must be
+  imported here or it is never built, never linted, and its errors are
+  invisible. `CircuitEqTest.lean` is the same for the second `lean_lib`,
+  the examples and the tests: it imports `CircuitEq.Examples` and
+  `CircuitEqTest/*.lean`. Both are default targets, so `lake build`, the
+  axiom check and the kernel replay cover both; nothing in `CircuitEq`
+  imports them.
 - `CircuitEq/Zeta8.lean` — `Quantum.Zeta8`, computable ℚ(ζ₈). Constants
   `ω`, `I`, `sqrt2`, `invSqrt2`; identities by `decide +kernel`. Exponents
   of `ω` live in `Fin 8`: `ω_pow_mod`, `ω_pow_val_add` (`ω ^ ↑(j + k) =
@@ -66,9 +71,9 @@ Rules that follow, for anyone adding to the library:
   a `√2` exponent, `add` / `mul` / `eqv` by exponent alignment, `toZeta8`
   with a `toZeta8_*` lemma per operation and `eqv_iff`. The per-gate
   actions `Gate1.applyD` (on `Fin`, proved against `applyOne g.mat`) and
-  `Gate1.applyN` / `applyCNOTN` (on `ℕ`, definitionally the same; what
-  `evalFn` composes), plus the generic `Gate1.matD` / `applyOneD` mirror of
-  `applyOne`. A computational device only: `denote` stays over `Zeta8`.
+  `Gate1.applyN` / `applyCNOTN` (on `ℕ`, the same up to unfolding
+  `VecN.at`; what `evalFn` composes). A computational device only: `denote`
+  stays over `Zeta8`.
 - `CircuitEq/Chunk.lean` — chunked kernel evaluation: `AllBelow P k`
   (`P y = true` for every `y < k`), `AllBelow.zero`, `AllBelow.add` (extend
   by a range `(List.range' lo len).all P = true`, itself one
@@ -80,37 +85,40 @@ Rules that follow, for anyone adding to the library:
   starts. Consumers: `equivalent_of_allBelow`,
   `equivalentUpToPhase_of_allBelow`, `equivalentWithPhase_of_allBelow`,
   `tableau_sound_of_allBelow`.
-- `CircuitEq/Semantics.lean` — `Instr`, `Circuit n := List (Instr n)`,
-  `denote`, `denoteₗ`, `Equivalent` (`≡ᵤ`), `EquivalentUpToPhase` (`≡ₚ`),
-  `EquivalentUpToScalar` (`≡ₛ`, up to a unit of `Zeta8`; what a tableau
-  certifies), basis reduction, the evaluators `evalList` (reference, over
-  `Zeta8`), `evalListD` (its dyadic form) and `evalFn` (dyadic closures on
-  `ℕ` indices, what the instances run), `checkEquiv` /
-  `checkEquivUpToPhase`, their per-basis-vector chunks `checkEquivAt` /
-  `checkEquivUpToPhaseAt` with `equivalent_of_allBelow` /
-  `equivalentUpToPhase_of_allBelow`, `Decidable` instances, `Trans`
-  instance for `calc`. Up to a global phase there are two relations and
-  one algebra: `EquivalentWithPhase k` (`a ≡ₚ[k] b`, `k : Fin 8`: `a` is
-  `ω ^ k` times `b`) and `≡ₚ`, which is `∃ k` of it by definition
-  (`equivalentUpToPhase_iff_exists`). `EquivalentWithPhase.refl` (phase
-  `0`), `symm` (`-k`), `trans` and `append` (`j + k`, modulo eight because
-  it is `Fin 8`), `append_left` / `append_right` / `cons` /
-  `trans_equivalent` (the phase is kept), `cast` (restate an exponent that
-  arithmetic produced), `toUpToPhase`, `toEquivalent` and
-  `equivalentWithPhase_zero_iff` (`≡ₚ[0]` is `≡ᵤ`); the `≡ₚ` lemmas
-  (`@[refl]`, `@[symm]`, `@[trans]`, `append`, `cons`) are these with the
-  exponent forgotten. `Trans` instances for every pair among `≡ᵤ`,
-  `≡ₚ[k]` and `≡ₚ`, so one `calc` mixes them: exact steps keep a named
-  phase, named phases add (a goal stated with the numeral closes by
-  unification), and one `≡ₚ` step makes the chain `≡ₚ`.
-  `checkEquivWithPhase a b k` with `checkEquivWithPhase_iff` and the
-  `Decidable` instance for `≡ₚ[k]` (one phase, so `decide +kernel` names
-  a window's phase and refutes a wrong one), the chunked
-  `equivalentWithPhase_of_allBelow`, and `findPhase` (`findPhase_sound`,
-  `findPhase_isSome_iff`), the first of the eight phases that passes. When
-  you destructure `h : a ≡ₚ b`, ascribe the component,
-  `obtain ⟨k, (hk : a ≡ₚ[k] b)⟩ := h`, or `hk` has the unfolded type and
-  dot notation fails.
+- `CircuitEq/Semantics.lean` — the trusted core, and nothing else:
+  `Instr`, `Circuit n := List (Instr n)`, the readable constructors,
+  `denote` with `denote_cons` / `_append` / `_add` / `_smul`, and the four
+  relations: `Equivalent` (`≡ᵤ`), `EquivalentWithPhase k` (`a ≡ₚ[k] b`,
+  `k : Fin 8`: `a` is `ω ^ k` times `b`), `EquivalentUpToPhase` (`≡ₚ`,
+  defined as `∃ k, a ≡ₚ[k] b`) and `EquivalentUpToScalar` (`≡ₛ`, up to a
+  unit of `Zeta8`; what a tableau certifies). A trust review reads this
+  file; keep proofs out of it.
+- `CircuitEq/Relations.lean` — the algebra of the relations. `≡ᵤ`:
+  `@[refl]`, `@[symm]`, `@[trans]`, `append`, `cons`, `toWithPhase`,
+  `toUpToPhase`, `toUpToScalar`. `EquivalentWithPhase.refl` (phase `0`),
+  `symm` (`-k`), `trans` and `append` (`j + k`, modulo eight because it is
+  `Fin 8`), `append_left` / `append_right` / `cons` / `trans_equivalent`
+  (the phase is kept), `cast` (restate an exponent that arithmetic
+  produced), `toUpToPhase`, `toEquivalent` and
+  `equivalentWithPhase_zero_iff` (`≡ₚ[0]` is `≡ᵤ`); the `≡ₚ` lemmas are
+  these with the exponent forgotten; `≡ₛ` has `refl`, `symm`, `trans`,
+  `append`. `Trans` instances for every pair among `≡ᵤ`, `≡ₚ[k]` and
+  `≡ₚ`, so one `calc` mixes them: exact steps keep a named phase, named
+  phases add (a goal stated with the numeral closes by unification), and
+  one `≡ₚ` step makes the chain `≡ₚ`.
+- `CircuitEq/Decide.lean` — deciding concrete pairs: `denoteₗ`, basis
+  reduction (`equivalent_iff_basis`, `equivalentWithPhase_iff_basis`), the
+  evaluators `evalList` (reference, over `Zeta8`), `evalListD` (its dyadic
+  form) and `evalFn` (dyadic closures on `ℕ` indices, what the instances
+  run), `checkEquiv`, `checkEquivWithPhase a b k` and `checkEquivUpToPhase`
+  (the first at each of the eight phases) with their `_iff` lemmas, the
+  per-basis-vector chunks `checkEquivAt` / `checkEquivUpToPhaseAt` with
+  `equivalent_of_allBelow`, `equivalentWithPhase_of_allBelow` and
+  `equivalentUpToPhase_of_allBelow`, `findPhase` (`findPhase_sound`,
+  `findPhase_isSome_iff`; the first of the eight phases that passes), and
+  the `Decidable` instances for `≡ᵤ`, `≡ₚ[k]` (one phase, so
+  `decide +kernel` names a window's phase and refutes a wrong one) and
+  `≡ₚ`.
 - `CircuitEq/Checker.lean` — the checker contract: `Checker n` is
   `check : Circuit n → Circuit n → Bool` plus `sound : check a b = true →
   a ≡ᵤ b` (`PhaseChecker`, `ScalarChecker` for `≡ₚ`, `≡ₛ`); `NormalForm n`
@@ -123,62 +131,69 @@ Rules that follow, for anyone adding to the library:
   basis evaluator by `findPhase`), `Checker.toFinder` (an exact checker
   finds `0` or nothing), `PhaseFinder.orElse`, `PhaseFinder.toChecker`.
   A checker module imports only
-  `Semantics`, `Structural`, `Support` and `Checker`, writes `check` as
+  `Decide`, `Structural`, `Support` and `Checker`, writes `check` as
   kernel-friendly `Bool` code, and exports exactly one checker.
-- `CircuitEq/Support.lean` — wire sets as `Nat` bitmasks, the one encoding
-  every checker and the certificate language use: `Instr.support`,
-  `support`, `masksDisjoint`, `support_testBit`,
-  `not_touches_of_disjoint`; `Rewriting.lean` adds
-  `Instr.CanCommute.of_disjoint` and `gate_block_comm_of_disjoint`. Do not
-  invent a second encoding of wire sets.
+- `CircuitEq/Support.lean` — wire sets as `Nat` bitmasks, the one encoding every
+  checker and the certificate language use: `Instr.support`, `support`,
+  `masksDisjoint`, `support_testBit`, `not_touches_of_disjoint`;
+  `Rewriting.lean` adds `gate_block_comm_of_disjoint`. Do not invent a second
+  encoding of wire sets.
+- `CircuitEq/Lanes.lean` — the bit-plane arithmetic under the phase
+  polynomial, nothing in it about circuits: `Lanes` (residues modulo 8 on
+  many lanes as three `Nat` planes; `add`, `addOn`, `addOnz`, `lane`,
+  `ext_of_lane`) and, all under `Lanes.`, the combinatorial numbering of
+  pairs and triples (`tri`, `tet`) and the masks of the pairs and triples
+  inside a parity (`pairMask`, `tripMask`, by `maskFold` over `bitFold` or
+  `sparseFold`, with `popCount`, `lowBit`, `idx`).
 - `CircuitEq/PhasePoly.lean` — the phase-polynomial canonical form for the
-  CNOT-plus-diagonal fragment (`CX` and `Z, S, Sdg, T, Tdg`): `PhasePoly`
-  is the `𝔽₂`-linear part as `rows`, one `Nat` holding `n` bitmasks of
-  `n` bits (`row n R i`), and the phase function as its multilinear
-  polynomial over `ℤ/8`, which has degree at most three and is unique:
-  `deg1`, `deg2`, `deg3 : Lanes`, three bit planes each, the coefficient
-  of `yᵢ` in lane `i`, of `yᵢ yⱼ` in lane `tri j + i` and of `yᵢ yⱼ yₗ`
-  in lane `tet l + tri j + i` (`C(j,2)`, `C(l,3)`: the planes are exactly
-  `C(n,2)` and `C(n,3)` bits). A CNOT is a shift and an xor; a phase gate
-  of phase `k` on a parity `m` adds `k`, `−2k`, `4k` on the lanes of the
-  wires, pairs and triples of `m` (`Lanes.addOn`, a ripple-carry adder on
-  planes; `pairMask`, `tripMask`, one shift-and-or per set bit by
-  `maskFold`, which visits only the set bits of a sparse parity, lowest
-  bit by `gcd`, index by a population count checked on 1024 powers of two,
-  and tests every index of a dense one; `Lanes.addOnz` skips a plane with
-  nothing to add). `nf`, `phasePolyNormalForm n`, `phasePolyChecker n`,
-  and `phasePolyRefutes n a b`, whose `true` proves `¬ a ≡ᵤ b`
-  (`PhasePoly.complete`: equal unitaries give equal forms), so within the
-  fragment `check` is a decision procedure (`phasePolyChecker_check_iff`).
-  Cost is linear in the gate count and never `2 ^ n`: the scale test's
-  random CNOT+T pairs on 20, 40 and 80 wires (200, 400, 800 gates) certify
-  in 0.2, 0.6 and 1.9 s of kernel time at 1.9, 2.0 and 2.5 GB, and CCZ
-  networks of 3400, 6800 and 10200 gates on 100, 200 and 300 wires in 2.8,
-  5.9 and 10.1 s at 2.7, 3.8 and 5.3 GB; what grows is the `C(n,3)`-bit
-  triple plane, copied by every gate that changes it (`QUEUE.md` item 8).
-  A proof is `(phasePolyChecker n).sound _ _ (by decide +kernel)`, a
-  refutation `phasePolyRefutes_sound (by decide +kernel)`; bare `decide`
-  times out at about a hundred gates. The extension with Hadamard
-  variables that certifies TZAP output across `H` gates is `QUEUE.md`
-  item 4.
+  CNOT-plus-diagonal fragment (`CX` and `Z, S, Sdg, T, Tdg`): `PhasePoly` is the
+  `𝔽₂`-linear part as `rows`, one `Nat` holding `n` bitmasks of `n` bits
+  (`row n R i`), and the phase function as its multilinear polynomial over
+  `ℤ/8`, which has degree at most three and is unique: `deg1`, `deg2`,
+  `deg3 : Lanes`, three bit planes each, the coefficient of `yᵢ` in lane `i`, of
+  `yᵢ yⱼ` in lane `tri j + i` and of `yᵢ yⱼ yₗ` in lane `tet l + tri j + i`
+  (`C(j,2)`, `C(l,3)`: the planes are exactly `C(n,2)` and `C(n,3)` bits). A
+  CNOT is a shift and an xor; a phase gate of phase `k` on a parity `m` adds
+  `k`, `−2k`, `4k` on the lanes of the wires, pairs and triples of `m`
+  (`Lanes.addOn`, a ripple-carry adder on planes; `Lanes.pairMask`,
+  `Lanes.tripMask`, one shift-and-or per set bit by `Lanes.maskFold`, which
+  visits only the set bits of a sparse parity, lowest bit by `gcd`, index by a
+  population count checked on 1024 powers of two, and tests every index of a
+  dense one; `Lanes.addOnz` skips a plane with nothing to add). `nf`,
+  `phasePolyNormalForm n`, `phasePolyChecker n`.
+  `CircuitEq/PhasePoly/Complete.lean` has `PhasePoly.complete` (equal unitaries
+  give equal forms) and so `phasePolyRefutes n a b`, whose `true` proves
+  `¬ a ≡ᵤ b`, and `phasePolyChecker_check_iff`: within the fragment `check` is a
+  decision procedure. Cost is linear in the gate count and never `2 ^ n`
+  (seconds for thousands of gates on hundreds of wires; the figures are in
+  `benchmarks/scale/README.md`); what grows is the `C(n,3)`-bit triple plane,
+  copied by every gate that changes it (`QUEUE.md` item 8). A proof is
+  `(phasePolyChecker n).sound _ _ (by decide +kernel)`, a refutation
+  `phasePolyRefutes_sound (by decide +kernel)`; bare `decide` times out at about
+  a hundred gates. The extension with Hadamard variables that certifies TZAP
+  output across `H` gates is `QUEUE.md` item 4.
 - `CircuitEq/Tableau.lean` — the Clifford tableau checker: `Pauli` strings
-  (x-mask, z-mask, phase in `Fin 4`, denoting `i^p · Z^z · X^x`), the
-  gate update rules with pointwise soundness (`conjH_sound`, …,
-  `conjCX_sound`), `conj` / `tableau` (images of the `2n` generators,
-  `none` outside the fragment or for `CX c c`), `tableauCheck`,
-  `tableau_sound` (equal tableaux give `≡ₛ`, the normal-form shape) and
-  the export `tableauChecker n : ScalarChecker n`; `witness` names the
-  first disagreeing generator. The soundness argument is stated on
-  `ConjAgree a b` (every generator has the same image), so the chunked
-  form shares it: `genAt n g` numbers the `2n` generators on `ℕ`,
-  `tableauCheckGen a b g` checks one, and `tableau_sound_of_allBelow`
-  turns `AllBelow (tableauCheckGen a b) (2 * n)` into `a ≡ₛ b`.
-  Structure-independent, `O(n)` bit operations per gate, no `Zeta8`
-  arithmetic in the kernel: the 15-qubit Reed–Muller pair decides in
-  about 0.3 s; about 0.2 ms of kernel time per generator and gate, so
-  cost is `2n · gates` and past a few thousand gates the check must be
-  chunked (`scripts/scale_test.py --chunk`). Extend `Gate1.conj` (with a
-  `sound` case) if the Clifford alphabet grows.
+  (x-mask, z-mask, phase in `Fin 4`, denoting `i^p · Z^z · X^x`), the gate
+  update rules with pointwise soundness (`conjH_sound`, …, `conjCX_sound`),
+  `Tableau.conj` / `tableau` (images of the `2n` generators, `none` outside the
+  fragment or for `CX c c`), `tableauCheck`, `tableau_sound` (equal tableaux
+  give `≡ₛ`, the normal-form shape) and the export
+  `tableauChecker n : ScalarChecker n`; `Tableau.witness` names the first
+  disagreeing generator. The soundness argument is stated on
+  `Tableau.ConjAgree a b` (every generator has the same image), so the chunked
+  form shares it: `Tableau.genAt n g` numbers the `2n` generators on `ℕ`,
+  `tableauCheckGen a b g` checks one, and `tableau_sound_of_allBelow` turns
+  `AllBelow (tableauCheckGen a b) (2 * n)` into `a ≡ₛ b`. The API (`Pauli`,
+  `tableau`, `tableauCheck`, `tableauChecker`, `tableauCheckGen` and the
+  soundness theorems) is at the top of `Quantum.Circuit`; the helpers
+  (`Tableau.phaseVal`, `sign`, `xorMask`, `generators`, `mapOpt`, the commutant
+  argument) are under `Tableau.`, as the phase polynomial's are under
+  `PhasePoly.` and `Lanes.`, so that checker internals do not crowd the
+  library's namespace. Structure-independent, `O(n)` bit operations per gate, no
+  `Zeta8` arithmetic in the kernel; the cost is `2n · gates` steps (per-step
+  figures in `benchmarks/scale/README.md`), and past a few thousand gates the
+  check must be chunked (`scripts/scale_test.py --chunk`). Extend `Gate1.conj`
+  (with a `sound` case) if the Clifford alphabet grows.
 - `CircuitEq/Structural.lean` — the parametric toolkit: fusion,
   commutation, `denote_applyOne_comm_of_not_touches`, `layer`, `hLayer`,
   and the phase gadget: `phaseGadget k i` is `k` rounds of `H S H S H S`
@@ -190,52 +205,53 @@ Rules that follow, for anyone adding to the library:
   pair that is equal only up to a phase to an exact one at no `T`-cost.
 - `CircuitEq/Rewriting.lean` — rewriting on instruction lists:
   `Equivalent.in_context` (and `EquivalentWithPhase.in_context`,
-  `EquivalentUpToPhase.in_context`: a window's phase is the phase of the
-  whole), the decidable checks `Instr.CanCommute` /
-  `Instr.CanCancel` with their `sound` lemmas, `gate_block_comm`,
-  `blocks_comm`, `perm_equivalent`, `pull_cons`, `cancel_window`.
-  `CanCommute` licenses: equal gates, disjoint wires, two diagonal gates on
-  one wire, a diagonal gate on a CNOT control, `X` on a CNOT target, CNOTs
-  whose controls avoid each other's targets. Extend it there (with a
-  `sound` case) when a benchmark needs a new local commutation; the
-  tactics pick it up automatically.
+  `EquivalentUpToPhase.in_context`: a window's phase is the phase of the whole),
+  the decidable checks `Instr.CanCommute` / `Instr.CanCancel` with their `sound`
+  lemmas, `gate_block_comm`, `blocks_comm`, `perm_equivalent`. The certificate
+  language replaced the proof-term helpers the tactics once assembled
+  (`pull_cons`, `cancel_window`); a move or a cancellation in a hand-written
+  proof is a step of `circuit_replay` or a `circuit_simp` call. `CanCommute`
+  licenses: equal gates, disjoint wires, two diagonal gates on one wire, a
+  diagonal gate on a CNOT control, `X` on a CNOT target, CNOTs whose controls
+  avoid each other's targets. Extend it there (with a `sound` case) when a
+  benchmark needs a new local commutation; the tactics pick it up automatically.
 - `CircuitEq/Layers.lean` — `cnotNetwork`, `swapEndpoints`, `hOn` (a layer
   indexed by a `Finset`), `hOn_symmDiff`, `cnotNetwork_layer`, and the
   benchmark-facing `layer_cnotNetwork_hLayer`.
-- `CircuitEq/Certificate.lean` — the certificate language: `Step n`
-  (`swap`, `moveLeft`, `moveRight`, `cancel`, `insert`, `window`), plain
-  data with positions as `ℕ`; `replay Cs steps c : Option (Circuit n)`, a
-  kernel-friendly interpreter that checks each step (`Instr.CanCommute`,
-  `masksDisjoint` on supports, `Instr.CanCancel`, or checker `k` of the
-  table `Cs : CheckerTable` on the window's own wires); `replay_sound`;
-  `defaultCheckers` (index 0: `phasePolyChecker` with `evalChecker` as
-  fallback, so a CNOT-plus-diagonal window is decided symbolically and
-  only otherwise by the basis; index 1: `syntacticChecker`);
-  the closing form `replay_sound Cs steps (by decide +kernel)` and the
-  macro `circuit_replay Cs steps`. Never imported by a checker module. A
-  new proof technique is a new step kind here with its case in
-  `replayStep_sound`; the kernel evaluates `replay` once per proof.
-  The same `Step`s replay up to a global phase: `replayPhase Fs steps c :
-  Option (Fin 8 × Circuit n)` reads a `window` against a `PhaseTable` of
-  `PhaseFinder`s (`windowPhase`), places it syntactically (`placeFront`)
-  and adds the exponent found to an accumulator; every other step is the
-  exact rewrite. `replayPhase_sound : replayPhase Fs steps c = some (k, c')
-  → c ≡ₚ[k] c'`, so the kernel computes the phase of the whole pair;
-  `replayUpToPhase` / `replayUpToPhase_sound` forget it and conclude
-  `c ≡ₚ c'`; `defaultPhaseFinders` (index 0: `phasePolyChecker` lifted,
-  then `evalPhaseFinder`; index 1: syntactic) and the macro
-  `circuit_replay_phase Fs steps`, which closes either goal. `replay`,
-  `replayStep` and `replay_sound` are unchanged; `rewriteAt_rel` is
-  `rewriteAt_sound` for any relation that `cons` preserves, and a new step
-  kind needs its case in `replayStepPhase_sound` too. Measured: the phase
-  replay costs 1.2 times the exact one on `Tof3`'s trace (62 steps, four
-  windows: 0.19 s against 0.16 s of kernel time, the same whether the
-  phase is named or not), and 128 one-wire phase windows replay in 0.7 s
-  against 0.4 s for 128 exact ones. Measure with `set_option Elab.async
-  false`: with asynchronous elaboration the kernel checks of neighbouring
-  declarations overlap and the profiler's figures grow with position in
-  the file. The scalar replay for `≡ₛ` (so that the tableau can justify a
-  window) is still open (`QUEUE.md` item 13).
+- `CircuitEq/Certificate.lean` — the certificate language: `Step n` (`swap`,
+  `moveLeft`, `moveRight`, `cancel`, `insert`, `window`), plain data with
+  positions as `ℕ`; `replay Cs steps c : Option (Circuit n)`, a kernel-friendly
+  interpreter that checks each step (`Instr.CanCommute`, `masksDisjoint` on
+  supports, `Instr.CanCancel`, or checker `k` of the table `Cs : CheckerTable`
+  on the window's own wires); `replay_sound`; the closing form
+  `replay_sound Cs steps (by decide +kernel)` and the macro
+  `circuit_replay Cs steps`. Generic in the table: it imports no checker, and no
+  checker module imports it. A new proof technique is a new step kind here: an
+  exact rewrite is a case of `exactStep` and `exactStep_sound`, which the exact
+  and the phase readings share, and a step that consults a checker needs its own
+  case in `replayStep` and `replayStepPhase`, as `window` has. The kernel
+  evaluates `replay` once per proof. The same `Step`s replay up to a global
+  phase: `replayPhase Fs steps c : Option (Fin 8 × Circuit n)` reads a `window`
+  against a `PhaseTable` of `PhaseFinder`s (`windowPhase`), places it
+  syntactically (`placeFront`) and adds the exponent found to an accumulator;
+  every other step is the exact rewrite.
+  `replayPhase_sound : replayPhase Fs steps c = some (k, c') → c ≡ₚ[k] c'`, so
+  the kernel computes the phase of the whole pair; `replayUpToPhase` /
+  `replayUpToPhase_sound` forget it and conclude `c ≡ₚ c'`; the macro
+  `circuit_replay_phase Fs steps`, which closes either goal. `rewriteAt_rel` is
+  `rewriteAt_sound` for any relation that `cons` preserves. The phase replay
+  costs about 1.2 times the exact one (`benchmarks/scale/README.md`, "Where each
+  tool stands"). Measure with `set_option Elab.async false`: with asynchronous
+  elaboration the kernel checks of neighbouring declarations overlap and the
+  profiler's figures grow with position in the file. The scalar replay for `≡ₛ`
+  (so that the tableau can justify a window) is still open (`QUEUE.md` item 13).
+- `CircuitEq/Defaults.lean` — the tables the tactics replay under, and the
+  one place a checker joins them: `defaultCheckers` (index 0:
+  `phasePolyChecker` with `evalChecker` as fallback, so a
+  CNOT-plus-diagonal window is decided symbolically and only otherwise by
+  the basis; index 1: `syntacticChecker`) and `defaultPhaseFinders` (index
+  0: `phasePolyChecker` lifted, then `evalPhaseFinder`; index 1:
+  syntactic).
 - `CircuitEq/Tactic.lean` — `circuit_simp` (cancel checked inverse pairs
   through commuting gates, then align two concrete lists gate by gate) and
   `circuit_windows [(a₁, b₁), …]` (the window pattern: each window is
@@ -265,7 +281,14 @@ Rules that follow, for anyone adding to the library:
   `rename_equivalentUpToPhase_iff`, and `EquivalentUpToScalar.rename`.
 - `CircuitEq/Examples.lean` — worked identities; add new showcase results
   here, new general lemmas to `Structural.lean`, `Rewriting.lean` or
-  `Layers.lean`.
+  `Layers.lean`. Built through `CircuitEqTest.lean`, not the umbrella; the
+  agent harness keeps it in a run's workspace, as the playbook's quickest
+  way to see each tool used.
+- `CircuitEqTest/PhasePoly.lean`, `CircuitEqTest/Tableau.lean` — the
+  checkers' regression tests (completeness cases, fragment boundaries,
+  refutations, chunked forms). Several restate parts of benchmark answers,
+  so the harness removes `CircuitEqTest/` from every run's workspace; a
+  test that shows how to use a tool belongs in `Examples.lean` instead.
 - `CircuitEq/Benchmarks/*.lean` — one module per original-versus-PyZX pair,
   with QASM fixtures and provenance under `benchmarks/<name>/`. Keep each to
   the two circuit `def`s (which `scripts/check_pyzx_benchmarks.py` parses
@@ -288,7 +311,7 @@ Rules that follow, for anyone adding to the library:
 - `PLAYBOOK.md` — the prover's guide: what exists, what it costs, and in
   which order to try it on a concrete pair. The agent harness installs it
   as the `CLAUDE.md` of every run (`benchmarks/harness/PLAYBOOK.core.md`
-  for the `core` configuration, the modules up to `Semantics.lean`), so it
+  for the `core` configuration, the modules up to `Decide.lean`), so it
   is all an agent under test knows about the library. **When a checker, a
   tactic, a certificate step or a block theorem lands, update its decision
   list in the same commit** (both playbooks if the module is in
@@ -328,6 +351,13 @@ Rules that follow, for anyone adding to the library:
   repository. `peephole_pairs.py` draws seeded random pairs equal by the
   library's own rules. CI runs the self-tests of `circuit_sources.py`,
   `circuit_pairs.py` and both harnesses.
+- `scripts/alphabet.py` — the gate alphabet once for every script: `GATES`,
+  `DIAG`, the fragments, `INVERSE`, `PHASE_OF_GATE` / `PHASES` (`diag(1,
+  ω^k)` as gates), the QASM names and the matrices. Standard library only;
+  `--self-test` (CI) checks it against `Gate1` and `Gate1.phase?` in the Lean
+  sources and against the copy `benchmarks/harness/tools/qasm.py` keeps
+  (that file is installed alone in a run workspace). A script that needs a
+  gate table imports it from here.
 - `scripts/certificate.py` — the Python mirror of the certificate language
   (`replay`, `replay_phase`, `align`, `fmt_certificate`), so a search
   outside Lean emits traces `replay` accepts; `--phase` certifies up to a
@@ -350,6 +380,17 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
 
 ## Conventions
 
+- **Measurements are recorded once.** A kernel time, a memory peak or a
+  scale limit goes, dated and with the command that reproduces it, into
+  `benchmarks/scale/README.md` (the checkers, the evaluator, replay) or the
+  benchmark's own `benchmarks/<name>/README.md`. Every other living document,
+  this file, `README.md`, the Lean docstrings, states the conclusion (linear
+  in gates, bounded by memory at seven qubits) and links there. Two
+  exceptions: `PLAYBOOK.md` and `benchmarks/harness/PLAYBOOK.core.md` are
+  all an agent under test sees, so they carry the numbers they need; when
+  the scale README changes, update them in the same commit. `QUEUE.md`
+  "Done" entries and the dated status paragraphs of `ROADMAP.md` are records
+  of their date and are not rewritten.
 - **Lemmas** `snake_case`, **definitions** `camelCase`, `theorem` for
   results, `lemma` for stepping stones. Docstrings on every declaration.
 - **`decide +kernel`, never bare `decide`, for anything touching `Zeta8`.**
@@ -362,32 +403,31 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
   `[propext, Classical.choice, Quot.sound]`. Check a result with
   `#print axioms`. `sorry` only on WIP branches, tagged
   `sorry -- TODO(<tag>): <goal shape>`.
-- **`debug.*` options are banned, and the kernel replay is the other half of
-  the trust policy.** `set_option debug.skipKernelTC true` makes Lean add a
+- **`debug.*` options are banned, and the kernel replay is the other half of the
+  trust policy.** `set_option debug.skipKernelTC true` makes Lean add a
   declaration without sending it to the kernel. `decide +kernel` leaves its
-  whole check to the kernel, so under the option a false leaf proof
-  elaborates without an error and the axiom check reports it clean: it
-  depends on no axioms at all (verified on this toolchain, 18 September
-  2026: `2 + 2 = 5`, and `[H 0] ≡ᵤ [X 0]` inside a library module, with
-  `lake build` and `AxiomCheck` both green). So CI also replays every
-  declaration of the built `.olean` files through the kernel,
-  `LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq`, in a process where
-  no option or meta code of the library runs. `leanchecker` is the former
-  lean4checker, shipped inside the toolchain since v4.28 (the separate
-  repository is deprecated and has no tag for this toolchain), so it always
-  matches `lean-toolchain`. `scripts/check_replay_fixture.sh` asserts on
-  every CI run that the replay rejects the repro kept in
-  `scripts/SkipKernelTCFixture.lean`. `scripts/check_debug_options.py` is a
-  text guard for the obvious spellings in the Lean sources and
-  `lakefile.toml`; it is an early warning and is not sound, because an
-  option can be set from meta code under a name no search recognises (a
-  variant that assembles the name from string pieces passes the guard and
-  the axiom check, and the replay rejects it). The replay is the defence.
-  It re-checks this library's modules against their imports as delivered:
-  mathlib and core are trusted as the cache provides them, and it is the
-  same kernel again, not an independent checker. Never set a `debug.*`
-  option in the library, in `scripts/` or in `lakefile.toml`; a proof that
-  needs one is not a proof.
+  whole check to the kernel, so under the option a false leaf proof elaborates
+  without an error and the axiom check reports it clean: it depends on no axioms
+  at all (verified on this toolchain, 18 September 2026: `2 + 2 = 5`, and `[H 0]
+  ≡ᵤ [X 0]` inside a library module, with `lake build` and `AxiomCheck` both
+  green). So CI also replays every declaration of the built `.olean` files
+  through the kernel, `LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq
+  CircuitEqTest`, in a process where no option or meta code of the library runs.
+  `leanchecker` is the former lean4checker, shipped inside the toolchain since
+  v4.28 (the separate repository is deprecated and has no tag for this
+  toolchain), so it always matches `lean-toolchain`.
+  `scripts/check_replay_fixture.sh` asserts on every CI run that the replay
+  rejects the repro kept in `scripts/SkipKernelTCFixture.lean`.
+  `scripts/check_debug_options.py` is a text guard for the obvious spellings in
+  the Lean sources and `lakefile.toml`; it is an early warning and is not sound,
+  because an option can be set from meta code under a name no search recognises
+  (a variant that assembles the name from string pieces passes the guard and the
+  axiom check, and the replay rejects it). The replay is the defence. It
+  re-checks this library's modules against their imports as delivered: mathlib
+  and core are trusted as the cache provides them, and it is the same kernel
+  again, not an independent checker. Never set a `debug.*` option in the
+  library, in `scripts/` or in `lakefile.toml`; a proof that needs one is not a
+  proof.
 - **No `set_option linter.* false`.** Fix the warning or leave it visible.
   The build is currently warning-free; keep it that way.
 - **Docstring prose wraps at 80 columns**, code at 100 (the `longLine`
@@ -405,17 +445,16 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
 - **Circuits are lists in time order.** `denote [g₁, g₂] ψ = U₂ (U₁ ψ)`;
   fusion lemmas therefore have the *later* gate as the left matrix factor
   (`fuse : B.mat * A.mat = C.mat → [one A i, one B i] ≡ᵤ [one C i]`).
-- **Benchmark proofs are `calc` chains on lists.** Name the block
-  decomposition (`layer`, `cnotNetwork`, `hLayer`, a `def edges`), equate
-  the circuit to it by `rfl`, apply the block theorem, and finish with
-  `circuit_simp`. Do not unfold `denote` and rewrite with `applyOne_comm`
-  gate by gate; that is what `CircuitEq/Rewriting.lean` exists to avoid.
-  `perm_equivalent` needs *every* pair in the block to commute; when only
-  the moved gates need to, use `circuit_simp` or `pull_cons`. When the
-  optimiser rewrote a few local regions, hand them to `circuit_windows` as
-  `(before, after)` pairs rather than writing `in_context`, `rename` and
-  `decide +kernel` by hand; a window's decide costs `2 ^ k` for its `k`
-  wires, not `2 ^ n`.
+- **Benchmark proofs are `calc` chains on lists.** Name the block decomposition
+  (`layer`, `cnotNetwork`, `hLayer`, a `def edges`), equate the circuit to it by
+  `rfl`, apply the block theorem, and finish with `circuit_simp`. Do not unfold
+  `denote` and rewrite with `applyOne_comm` gate by gate; that is what
+  `CircuitEq/Rewriting.lean` exists to avoid. `perm_equivalent` needs *every*
+  pair in the block to commute; when only the moved gates need to, use
+  `circuit_simp`. When the optimiser rewrote a few local regions, hand them to
+  `circuit_windows` as `(before, after)` pairs rather than writing `in_context`,
+  `rename` and `decide +kernel` by hand; a window's decide costs `2 ^ k` for its
+  `k` wires, not `2 ^ n`.
 - **A pair that is equal only up to a global phase is stated on `≡ₚ`**, and
   proved with the same tools: `circuit_windows` on the `≡ₚ` goal, `calc`
   chains that mix `≡ᵤ` and `≡ₚ` steps, `append` and `in_context` for
@@ -428,9 +467,9 @@ else (the type `Quantum.Circuit n` lives at the namespace's own name, like
 ## Build and verification
 
 ```bash
-lake build                            # whole library (~1 min warm)
+lake build                            # library, examples, tests (~1 min warm)
 lake env lean scripts/AxiomCheck.lean # axiom policy, needs a completed build
-LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq  # kernel replay, same
+LEAN_NUM_THREADS=1 lake env leanchecker CircuitEq CircuitEqTest  # kernel replay
 bash scripts/check_replay_fixture.sh  # the replay still rejects the repro
 python3 scripts/check_debug_options.py  # text guard, needs no build
 lake env lean /tmp/probe.lean         # one-off file check
@@ -490,61 +529,25 @@ Do not run `lake build` between diagnostics edits; one build at the end.
 ## Kernel-cost notes
 
 The `Decidable` instances for `≡ᵤ`, `≡ₚ` and `≡ₚ[k]` run `checkEquiv`,
-`checkEquivUpToPhase` and `checkEquivWithPhase` (`Semantics.lean`): the
-closure evaluator `evalFn` over `Dyadic8` (`Dyadic.lean`), the gcd-free
-ring `ℤ[ω, 1/√2]`, on
-`ℕ`-indexed states, proved equal to `denote` (`toZeta8_evalFn`). The kernel
-memoises `whnf` by structural term equality, so a depth-`d` decide on `k`
-qubits costs `d · 2^k` memoised gate steps, each a coordinate shuffle or,
-for `H`, four integer sums, plus `4^k` final comparisons; the kernel never
-sees a rational and never walks a list. Never `decide` through `denote`
-directly: its closures are over `Fin`, whose indices carry proof terms that
-defeat the cache, so it re-reads the input `2^d` times.
+`checkEquivUpToPhase` and `checkEquivWithPhase` (`Decide.lean`): the closure
+evaluator `evalFn` over `Dyadic8` (`Dyadic.lean`), the gcd-free ring
+`ℤ[ω, 1/√2]`, on `ℕ`-indexed states, proved equal to `denote`
+(`toZeta8_evalFn`). The kernel memoises `whnf` by structural term equality, so a
+depth-`d` decide on `k` qubits costs `d · 2^k` memoised gate steps, each a
+coordinate shuffle or, for `H`, four integer sums, plus `4^k` final comparisons;
+the kernel never sees a rational and never walks a list. Never `decide` through
+`denote` directly: its closures are over `Fin`, whose indices carry proof terms
+that defeat the cache, so it re-reads the input `2^d` times.
 
-Measured on an Apple M4 (16 GB, shared with other builds), warm oleans,
-kernel type-checking time of the `decide`, before → after: a two-qubit
-five-gate window 0.35 s → 0.02 s; the three-qubit six-gate `Tof3` window
-2.66 s → 0.09 s. Whole files, wall time: `Examples.lean` 2.6 s → 1.2 s and
-`Tof3.lean` 4.2 s → 1.3 s, both now dominated by import time. The
-seven-qubit `SteanePlus` pair decided on the full basis (`original ≡ᵤ
-optimized` by `decide +kernel`, 32 gates × 128 basis states) is not
-measured: it is memory-bound on this 16 GB machine, both before and after.
-With the `Zeta8` `evalList` it did not finish in 15 minutes (71 s of CPU
-against 248 s of system time, 15.8 GB peak footprint; the estimate for its
-compute alone is 2 × 10⁵ Hadamard amplitude updates at some 10³ `Rat`
-operations each, hours of kernel time). With the closure evaluator,
-attempts of 9 and 3 minutes were stopped swap-starved (the 9-minute one
-before reads were forced: 2:22 of CPU, 9.9 GB resident; see `Dyadic.lean`
-on forcing). The expected cost is 5 × 10⁵ memoised gate steps and a cache
-of the order of 10⁷ terms, tens of seconds and a few GB. Measured on an
-idle machine (16 September 2026): a 6 GB watchdog killed the kernel after
-20 s at 6.9 GB resident and still growing, 19 s of CPU. The cache, not the
-arithmetic, is the wall, and chunked evaluation is the lever
-(`CircuitEq/Chunk.lean`): with one basis vector per declaration the same
-pair decides in 78 s at 1.98 GB peak, 0.06 GB above the imports
-(`scripts/chunked_decide.py SteanePlus --chunk 1`, 18 September 2026).
-A basis vector costs about 0.6 s and 165 MB of retained terms here (32
-gates, 128 amplitudes: some 150 µs and 40 KB per amplitude and gate), so
-the cost of a whole-register decide is `gates · 4^n` of those steps: about
-five minutes at eight qubits, over an hour at ten. Two facts that matter
-for every chunked file: memory is returned at a declaration boundary only
-with `set_option Elab.async false` (with asynchronous elaboration on,
-sixteen 4-vector declarations peak at 3.6 GB instead of 2.6 GB, and a
-128-declaration file at 5.2 GB), and `lean -j1` does not help. The same
-retention limits certificate replay (`QUEUE.md`, item 3), where the lever
-is a compact encoding of the instruction list.
-
-Two intermediate designs were measured on the way: the same dyadic
-arithmetic through the materialised list evaluator (`evalListD`, kept as
-the reference form) with the generic per-entry product (`applyOneD`) took
-0.66 s on the three-qubit window and could not do seven qubits either,
-because reading amplitude `x` of a list costs `x` steps and the kernel
-retains every intermediate term (`O(4^k)` per gate, so memory runs out
-before time does); the per-gate shuffles and the memoised closures with
-forced reads bring it to 0.1 s. Depth is now linear: eighteen Hadamards on
-one qubit decide in 42 ms, where the unforced closures did not finish in a
-minute. Memory is the limit before time: the kernel's `whnf` cache retains
-everything evaluated during one declaration.
+A whole-register decide therefore costs `gates · 4^n` memoised amplitude
+steps, about 150 µs and 40 KB each, and the kernel retains all of them until
+the declaration ends: memory runs out before time does, a seven-qubit pair
+needs chunked evaluation (`CircuitEq/Chunk.lean`), eight qubits take minutes
+and ten over an hour. Chunked files need `set_option Elab.async false`, or
+the memory of one declaration is not returned before the next starts
+(`lean -j1` does not help). The measurements behind these figures, and the
+designs measured on the way, are in `benchmarks/scale/README.md`, "The basis
+evaluator".
 
 Kernel facts measured while scaling the fragment checkers
 (`benchmarks/scale/README.md`): a step of structural recursion with a few

@@ -171,7 +171,7 @@ def conj(instrs: list[str], pauli: tuple[int, int, int]) -> tuple[int, int, int]
 
 
 def gen_at(n: int, g: int) -> tuple[int, int, int]:
-    """`genAt n g`: `X_g` below `n`, `Z_{g-n}` from `n` on."""
+    """`Tableau.genAt n g`: `X_g` below `n`, `Z_{g-n}` from `n` on."""
     return (1 << g, 0, 0) if g < n else (0, 1 << (g - n), 0)
 
 

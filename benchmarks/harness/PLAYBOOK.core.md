@@ -16,7 +16,7 @@ build yourself, in `Solution.lean` and new modules under `Solution/`.
   `([H 0, H 0] : Circuit 1) ≡ᵤ []`.
 - `CircuitEq/Semantics.lean` defines `denote : Circuit n → Vec n → Vec n`
   over the computable field `ℚ(ζ₈)` (`CircuitEq/Zeta8.lean`) and four
-  relations: `a ≡ᵤ b` (`Equivalent`, equal on every state; it has `refl`,
+  relations, whose algebra is in `CircuitEq/Relations.lean`: `a ≡ᵤ b` (`Equivalent`, equal on every state; it has `refl`,
   `symm`, `trans`, `append`, `cons`, and `calc` works), `a ≡ₚ b` (equal up to
   a power of `ω = e^{iπ/4}`; the same algebra, and `calc` mixes it with
   `≡ᵤ`), `a ≡ₚ[k] b` (the same with the phase named, `a = ω^k · b`, `k : Fin
@@ -36,7 +36,7 @@ build yourself, in `Solution.lean` and new modules under `Solution/`.
 instruction is linear, so equivalence reduces to the `2^n` basis vectors
 (`equivalent_iff_basis`), and the instance evaluates both circuits with an
 evaluator over the gcd-free ring of `CircuitEq/Dyadic.lean` that is proved
-equal to `denote`. So `by decide +kernel` proves or refutes a small pair.
+equal to `denote` (`CircuitEq/Decide.lean`). So `by decide +kernel` proves or refutes a small pair.
 
 - Always `decide +kernel`. Bare `decide` stalls on the first rational
   addition, and `native_decide` is banned.

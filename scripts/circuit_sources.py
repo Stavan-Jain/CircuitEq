@@ -79,17 +79,10 @@ MANIFEST = CATALOGUE / "manifest.json"
 # pyzx; they are imported lazily where pyzx is present.
 sys.path.insert(0, str(ROOT / "scripts"))
 
-ALPHABET = ("H", "X", "Y", "Z", "S", "Sdg", "T", "Tdg", "CX")
-CLIFFORD = {"H", "X", "Y", "Z", "S", "Sdg", "CX"}
-CX_DIAGONAL = {"CX", "Z", "S", "Sdg", "T", "Tdg"}
-# diag(1, exp(i*k*pi/4)) as gates of the alphabet, in time order; the table of
-# `check_pyzx_benchmarks.py`.
-PHASES = {0: [], 1: ["T"], 2: ["S"], 3: ["S", "T"], 4: ["Z"], 5: ["Z", "T"], 6: ["Sdg"],
-          7: ["Tdg"]}
-INVERSE = {"H": "H", "X": "X", "Y": "Y", "Z": "Z", "S": "Sdg", "Sdg": "S", "T": "Tdg",
-           "Tdg": "T"}
-# The `k` of `diag(1, ω^k)` per diagonal gate, by its lower-case QASM name.
-PHASE_OF = {"z": 4, "s": 2, "sdg": 6, "t": 1, "tdg": 7}
+# The alphabet, its fragments, `diag(1, ω^k)` as gates in time order (`PHASES`), the
+# inverses, and the `k` of each diagonal gate by its QASM name (`PHASE_OF`).
+from alphabet import (ALPHABET, CLIFFORD, CX_DIAGONAL, INVERSE, MATRICES,  # noqa: E402, F401
+                      PHASE_OF, PHASES, TO_QASM)
 
 # Tier bounds: (qubits, gates), both inclusive; tier 4 is everything beyond.
 TIERS = ((10, 200), (30, 2000), (100, 20000))
@@ -1558,9 +1551,7 @@ def self_test() -> None:
 
     # 1. the simulator against explicit matrices (qubit 0 most significant)
     w8 = np.exp(1j * np.pi / 4)
-    mats = {"h": np.array([[1, 1], [1, -1]]) / np.sqrt(2), "x": np.array([[0, 1], [1, 0]]),
-            "y": np.array([[0, -1j], [1j, 0]]), "z": np.diag([1, -1]), "s": np.diag([1, 1j]),
-            "sdg": np.diag([1, -1j]), "t": np.diag([1, w8]), "tdg": np.diag([1, 1 / w8])}
+    mats = {(TO_QASM | {"Y": "y"})[g]: np.array(m) for g, m in MATRICES.items()}
     for name, m in mats.items():
         assert np.allclose(unitary([(name, (0,))], 1), m), name
         assert np.allclose(unitary([(name, (1,))], 2), np.kron(np.eye(2), m)), name

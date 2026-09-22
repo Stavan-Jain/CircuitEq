@@ -90,11 +90,13 @@ RELATIONS = {
 CLAIMS = ("equiv", "not_equiv")
 
 # The modules the `core` configuration keeps: the semantics and nothing else.
-CORE_MODULES = ("Zeta8", "Bits", "Gates", "Dyadic", "Chunk", "Semantics")
+CORE_MODULES = ("Zeta8", "Bits", "Gates", "Dyadic", "Chunk", "Semantics", "Relations", "Decide")
 
-# Removed from every run workspace: documents that quote benchmark proofs, and
-# fixtures that record alignments. `CLAUDE.md` is replaced by the playbook.
-GLOBAL_DELETE = ("README.md", "ROADMAP.md", "QUEUE.md", "CLAUDE.md", "benchmarks", ".github")
+# Removed from every run workspace: documents that quote benchmark proofs, fixtures
+# that record alignments, and the checkers' regression tests, which restate parts of
+# benchmark answers. `CLAUDE.md` is replaced by the playbook.
+GLOBAL_DELETE = ("README.md", "ROADMAP.md", "QUEUE.md", "CLAUDE.md", "benchmarks", ".github",
+                 "CircuitEqTest")
 # `scripts/certificate.py` lists the windows of two benchmark proofs.
 GLOBAL_REDACT = (
     {"file": "scripts/certificate.py", "pattern": r"^BENCHMARKS = \{.*?^\}",
@@ -768,6 +770,17 @@ def drop_module(ws: Path, module: str) -> None:
                 p.unlink()
 
 
+def prune_test_root(ws: Path) -> None:
+    """Keep `CircuitEqTest.lean`, the root of the examples-and-tests library, importing
+    only the modules still in the workspace, so a bare `lake build` there still works."""
+    root = ws / "CircuitEqTest.lean"
+    if not root.exists():
+        return
+    lines = [ln for ln in root.read_text().splitlines()
+             if not ln.startswith("import ") or (ws / module_path(ln.split()[1])).exists()]
+    root.write_text("\n".join(lines) + "\n")
+
+
 def apply_redactions(ws: Path, redactions, notes: list[str]) -> None:
     for r in redactions:
         path = ws / r["file"]
@@ -793,7 +806,10 @@ def strip_to_core(ws: Path) -> None:
     for d in sorted((p for p in lib.rglob("*") if p.is_dir()), reverse=True):
         if not any(d.iterdir()):
             d.rmdir()
-    (ws / "CircuitEq.lean").write_text("".join(f"import CircuitEq.{m}\n" for m in CORE_MODULES))
+    # A library commit from before `Relations` and `Decide` were split out of `Semantics`
+    # has fewer core modules; import the ones it has.
+    present = [m for m in CORE_MODULES if (lib / f"{m}.lean").exists()]
+    (ws / "CircuitEq.lean").write_text("".join(f"import CircuitEq.{m}\n" for m in present))
     shutil.rmtree(ws / "scripts", ignore_errors=True)
 
 
@@ -936,6 +952,7 @@ def setup_run(args, task: dict, customise=None) -> dict:
     else:
         apply_redactions(ws, GLOBAL_REDACT, notes)
         apply_redactions(ws, task["holdout"].get("redact", []), notes)
+    prune_test_root(ws)
 
     sym = RELATIONS[task["relation"]][1]
     (ws / "Harness").mkdir()
@@ -1448,6 +1465,14 @@ def cmd_selftest(_args) -> None:
         drop_module(ws, "CircuitEq.Benchmarks.Tof3")
         assert not olean.exists() and other.exists(), "only the held-out module's products go"
         assert "Tof3" not in (ws / "CircuitEq.lean").read_text()
+        (ws / "CircuitEq" / "Examples.lean").write_text("-- examples\n")
+        (ws / "CircuitEqTest.lean").write_text(
+            "import CircuitEq.Examples\nimport CircuitEqTest.Tableau\n\n/-! tests -/\n")
+        prune_test_root(ws)
+        assert (ws / "CircuitEqTest.lean").read_text() == \
+            "import CircuitEq.Examples\n\n/-! tests -/\n", "deleted tests leave the root"
+        (ws / "CircuitEq" / "Examples.lean").unlink()
+        (ws / "CircuitEqTest.lean").unlink()
 
         (ws / "Solution.lean").write_text("theorem equiv : True := by\n  sorry\n")
         manifest = build_manifest(ws)
@@ -1494,7 +1519,7 @@ def add_run_options(p: argparse.ArgumentParser) -> None:
     p.add_argument("task")
     p.add_argument("--commit", default="HEAD", help="library commit (must have been prepared)")
     p.add_argument("--config", choices=("full", "core"), default="full",
-                   help="`core` strips the library to the modules up to Semantics")
+                   help="`core` strips the library to the semantics and its decision procedures")
     p.add_argument("--budget-min", type=int, default=30)
     p.add_argument("--memory-gb", type=int, default=6, help="limit per Lean process")
     p.add_argument("--setup-timeout-min", type=int, default=30)
