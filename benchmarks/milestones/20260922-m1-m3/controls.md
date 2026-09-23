@@ -1,0 +1,1 @@
+All five checker configurations passed equivalent, phase-equivalent and inequivalent controls (15 isolated runs). QuiZX closed-miter decomposition also agreed with dense matrices on 12 seeded two-qubit controls.

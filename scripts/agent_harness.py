@@ -194,15 +194,44 @@ def fmt_lean_list(gates: list[str], indent: int = 4, width: int = 96) -> str:
 
 
 def read_circuit_def(path: Path, name: str) -> tuple[int, list[str]]:
-    """The width and the gate strings of `def name : Circuit n := [...]` in a Lean file."""
-    m = re.search(rf"def {name} : Circuit (\d+) :=\s*\[([^\]]*)\]", path.read_text())
-    if m is None:
-        raise HarnessError(f"{path}: no `def {name} : Circuit n := [...]`")
-    gates = [" ".join(g.split()) for g in m[2].split(",") if g.strip()]
+    """Read a gate literal or `List.flatten` of named gate literals.
+
+    This reads the harness fixture formats, not arbitrary Lean expressions.
+    Named chunks let large fixed inputs compile without one enormous literal.
+    """
+    pattern = re.compile(
+        r"\bdef\s+([A-Za-z_][A-Za-z0-9_']*)\s*:\s*Circuit\s+(\d+)\s*:=\s*"
+        r"(List\.flatten\s*)?\[([^\]]*)\]")
+    definitions: dict[str, tuple[int, bool, list[str]]] = {}
+    for m in pattern.finditer(strip_lean_comments(path.read_text())):
+        if m[1] in definitions:
+            raise HarnessError(f"{path}: ambiguous circuit definition `{m[1]}`")
+        entries = [" ".join(g.split()) for g in m[4].split(",") if g.strip()]
+        definitions[m[1]] = int(m[2]), bool(m[3]), entries
+
+    def get_def(which: str) -> tuple[int, bool, list[str]]:
+        if which not in definitions:
+            raise HarnessError(f"{path}: no supported circuit definition `{which}`")
+        return definitions[which]
+
+    n, flattened, entries = get_def(name)
+    gates = []
+    if flattened:
+        for chunk in entries:
+            width, nested, chunk_gates = get_def(chunk)
+            if width != n:
+                raise HarnessError(f"{path}: `{chunk}` has width {width}, expected {n}")
+            if nested:
+                raise HarnessError(f"{path}: `{chunk}` must be a literal gate list")
+            gates.extend(chunk_gates)
+    else:
+        gates = entries
     for g in gates:
-        if not GATE_RE.match(g):
+        if not GATE_RE.fullmatch(g):
             raise HarnessError(f"{path}: cannot read the gate `{g}`")
-    return int(m[1]), gates
+        if any(int(w) >= n for w in g.split()[1:]):
+            raise HarnessError(f"{path}: `{g}` is off a register of {n}")
+    return n, gates
 
 
 def read_benchmark_defs(module: Path) -> tuple[int, list[str], list[str]]:
@@ -1468,6 +1497,34 @@ def cmd_selftest(_args) -> None:
     assert judge_statement("u", "not_equiv").startswith("¬ Quantum.Circuit.Equivalent ")
 
     with tempfile.TemporaryDirectory() as tmp:
+        fixture = Path(tmp) / "Task.lean"
+        fixture.write_text(
+            "def first : Circuit 3 := [H 0, CX 0 1]\n"
+            "def empty : Circuit 3 := []\n"
+            "def last : Circuit 3 := [Tdg 2]\n"
+            "def original : Circuit 3 := List.flatten [last, empty, first, last]\n"
+            "def optimized : Circuit 3 := [Tdg 2, H 0, CX 0 1, Tdg 2]\n")
+        expected = (3, ["Tdg 2", "H 0", "CX 0 1", "Tdg 2"])
+        assert read_circuit_def(fixture, "original") == expected
+        assert read_circuit_def(fixture, "optimized") == expected
+        for malformed in (
+            "def original : Circuit 3 := List.flatten [missing]\n",
+            "def chunk : Circuit 2 := [H 0]\n"
+            "def original : Circuit 3 := List.flatten [chunk]\n",
+            "def chunk : Circuit 3 := [H 3]\n"
+            "def original : Circuit 3 := List.flatten [chunk]\n",
+            "def chunk : Circuit 3 := [UNKNOWN 0]\n"
+            "def original : Circuit 3 := List.flatten [chunk]\n",
+            "def original : Circuit 3 := List.flatten [original]\n",
+        ):
+            fixture.write_text(malformed)
+            try:
+                read_circuit_def(fixture, "original")
+            except HarnessError:
+                pass
+            else:
+                raise AssertionError(f"malformed circuit fixture accepted: {malformed}")
+
         ws = Path(tmp) / "ws"
         (ws / "CircuitEq" / "Benchmarks").mkdir(parents=True)
         (ws / ".lake" / "build" / "lib" / "lean" / "CircuitEq" / "Benchmarks").mkdir(parents=True)
@@ -1530,10 +1587,11 @@ def cmd_selftest(_args) -> None:
 
     for d in task_dirs():
         task = load_task(d.name)
-        body = (d / "Task.lean").read_text()
-        for which in ("original", "optimized"):
-            m = re.search(rf"def {which} : Circuit (\d+) :=\s*\[([^\]]*)\]", body)
-            assert m and int(m[1]) == task["qubits"], f"{d.name}: {which}"
+        for index, which in enumerate(("original", "optimized")):
+            width, gates = read_circuit_def(d / "Task.lean", which)
+            assert width == task["qubits"], f"{d.name}: {which} width"
+            if "gates" in task:
+                assert len(gates) == task["gates"][index], f"{d.name}: {which} gate count"
         render_prompt(task, 30, 6, False)
     print("selftest passed")
 

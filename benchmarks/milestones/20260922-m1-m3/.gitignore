@@ -1,0 +1,8 @@
+/.lock
+/batch.pid
+/batch.log
+/status.json
+/launch.json
+/milestone-*/
+/interrupted-attempts/
+/deadline-control/

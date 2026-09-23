@@ -35,6 +35,40 @@ agent has to handle, and item 4 is the tool planned for them.
 
 ## Next
 
+**Top priority: scalable circuit inputs and block-preserving verification.** The
+milestone 3 pair has 192 wires and 70,075/41,547 gates. Preparing its
+Lean input required named 256-gate chunks to bound fixture compilation;
+all 111,622 instructions were compared against the source pair. These
+mechanical boundaries supplied no proof alignment: the agent later
+found 127 different proof blocks. Evidence and fixed inputs:
+`benchmarks/milestones/`.
+Loading and traversing circuits must scale alongside the mathematics.
+
+First, make deterministic chunked fixture generation part of the harness,
+with configurable chunk size, stable instruction order, and validation
+against the exact source pair. The fixture reader already accepts named
+literal chunks; generation must no longer need manual intervention.
+
+Next, preserve named blocks through checking and certificate replay:
+block references, certified composition, and cursor traversal instead
+of repeated flattening or indexing into the full list. Coordinate with
+item 6 rather than adding a second replay architecture. Introduce a
+compact hierarchical representation only with a proved decoding or
+semantic correspondence to `Circuit n`; keep `denote` and `≡ᵤ`
+unchanged. New proof operations belong in the certificate language.
+
+Acceptance: regenerate the milestone 3 fixture without hand edits and
+verify every instruction against the saved pair; malformed references,
+width mismatches, and reordered or missing gates are rejected. Support
+this pair and a larger fixed-width input under a recorded memory limit.
+Demonstrate a composed proof that consumes block references without
+repeatedly materializing the entire circuit. Separate input-packaging
+boundaries from agent-discovered proof boundaries in the run record.
+S to M for harness generation; M to L for the
+representation and replay work. Harness work is unblocked; replay builds
+on item 3 and is coordinated with item 6. Existing benchmark runs remain
+stopped; this item authorizes no new experiment by itself.
+
 1. **Agent harness v0.** The project's bet is that this infrastructure lets an
    agent prove pairs it otherwise could not, and nothing measures it: every
    alignment so far was found by a person or by the diff script in
@@ -302,8 +336,8 @@ agent has to handle, and item 4 is the tool planned for them.
   checkout that receives only the agent's new files, isolation of the
   agent (it has a shell under the user's account), and an independent
   checker (SafeVerify, or `leanprover/comparator` on the Linux CI).
-- Hierarchical circuits (named blocks, congruence) and compact encodings
-  decoded by the kernel, before any circuit above a few thousand gates.
+- Hierarchical circuits and compact encodings: promoted to the top-priority
+  item above, with milestone 3 evidence and concrete acceptance criteria.
 - The wire-index decision (`Fin n` versus `ℕ` with well-formedness) before
   Rung 6 template work; then `cnotLadder n`, Toffoli as a macro, adders.
 - Routing as `rename` by a permutation; ancilla subspaces as a side
