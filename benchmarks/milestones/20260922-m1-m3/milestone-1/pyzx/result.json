@@ -1,0 +1,8 @@
+{
+  "milestone": 1,
+  "checker": "pyzx",
+  "verdict": "cancelled_by_user",
+  "wall_seconds": 157.327,
+  "peak_rss_gib": null,
+  "reason": "Stopped immediately after the user asked not to run any more checks. No checker verdict."
+}

@@ -56,21 +56,26 @@ Run `./submit equiv` there. Reuse already-built dependencies; do not fetch
 or rebuild mathlib. The two saved solutions use the same namespace and must
 be checked in separate harness workspaces.
 
-## External-checker comparison is in progress
+## External-checker comparison stopped
 
-`20260922-m1-m3/REPORT.md` is the current partial snapshot. The draft does
-**not** claim that either candidate defeats all other equivalence checkers.
-The sequential batch is measuring QCEC 3.10.0's default portfolio and its
-alternating DD checker, PyZX 0.9.0 `verify_equality`, QuiZX 0.3.0 `full_simp`,
-and QuiZX's stabilizer decomposition of a closed miter. Each configuration
-gets one hour and 16 GiB. Feynman is unavailable locally and must be recorded
-as **not run**, not failed.
+`20260922-m1-m3/REPORT.md` records the final partial results. On candidate 1,
+QCEC 3.10.0's default portfolio and alternating DD checker each reached the
+one-hour calendar deadline without a verdict (3,600.029 s and 3,600.215 s;
+peak sampled RSS 1.7775 GiB and 1.7766 GiB). The subsequent PyZX attempt
+was cancelled at the user's request after 157.327 s, without a verdict.
+No further checks are queued and the follow-up is paused.
+
+The remaining QuiZX checks and every candidate 3 comparison were not run.
+Feynman was unavailable locally. Neither cancellation nor unavailable tools
+count as failed equivalence checks. These partial measurements do **not**
+establish that either candidate defeats every published equivalence checker.
 
 The runner is `../../scripts/milestone_checkers.py`. It currently expects
 the two saved local harness runs under `~/.circuiteq-harness/runs/`; each
 must contain its independently accepted `meta/judge.json` and exact
 `meta/pair.json`. The committed proof records and fixtures preserve those
-inputs. Use an environment with the versions in `environment.json`:
+inputs. For a separately authorized reproduction, use an environment with the
+versions in `20260922-m1-m3/environment.json`:
 
 ```sh
 python scripts/milestone_checkers.py batch \
@@ -81,8 +86,12 @@ python scripts/milestone_checkers.py batch \
 Do not start a second batch while one is active. A file lock prevents
 concurrent batches against the same output directory; completed rows are
 skipped when resuming. Commands, QASM hashes and complete stdout/stderr are
-saved locally. Volatile runtime files are excluded from this draft; completed
-measurements and their logs will be added after the batch finishes.
+committed for the three attempted checks under
+`20260922-m1-m3/milestone-1/`, alongside the exact pair and QASM files.
+`results.jsonl` summarizes their outcomes. The recorded commands retain the
+original machine paths; adapt those paths for reproduction. Empty output
+logs mean the worker emitted no output before termination. Volatile runtime
+files and the discarded attempt remain local.
 
 Validation so far: 15 isolated positive, phase-equivalent and negative
 controls passed across all five configurations; 12 seeded two-qubit

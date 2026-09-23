@@ -1,0 +1,10 @@
+{
+  "checker": "qcec_dd",
+  "wall_seconds": 3600.215,
+  "peak_rss_gib": 1.7766,
+  "returncode": -9,
+  "time_limit_seconds": 3600.0,
+  "memory_limit_gib": 16.0,
+  "logs": "/Users/stavanjain/.codex/worktrees/queue-item-3/CircuitEq/benchmarks/milestones/20260922-m1-m3/milestone-1/qcec_dd",
+  "verdict": "timeout"
+}
