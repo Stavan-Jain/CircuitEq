@@ -1,0 +1,35 @@
+{
+  "name": "milestone_gf2_64_mult_tzap_o1",
+  "qubits": 192,
+  "relation": "p",
+  "expected": "unknown",
+  "split": "held-out",
+  "family": "feynman_gf2_mult",
+  "rung": 64,
+  "source": {
+    "input": "cached feynman_gf2_64_mult__tzap.json:original",
+    "twin_tool": {
+      "tool": "tzap -O1 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+      "tzap": "tzap 0.6.1",
+      "options": "-O1 --decompose-rz --decompose-cz",
+      "seconds": 0.27
+    },
+    "task_encoding": "Original and optimized lists are concatenations of 256-gate literal chunks to keep fixture compilation bounded."
+  },
+  "holdout": {
+    "modules": [],
+    "redact": [],
+    "delete": [
+      "docs",
+      "AGENTS.md",
+      "scripts/circuit_pairs.py",
+      "scripts/circuit_sources.py",
+      "scripts/peephole_pairs.py"
+    ]
+  },
+  "known_leaks": [],
+  "gates": [
+    70075,
+    41547
+  ]
+}

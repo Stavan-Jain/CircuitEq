@@ -1,0 +1,34 @@
+{
+  "name": "milestone_gf2_16_mult_tzap_o1",
+  "qubits": 48,
+  "relation": "p",
+  "expected": "unknown",
+  "split": "held-out",
+  "family": "feynman_gf2_mult",
+  "rung": 16,
+  "source": {
+    "input": "benchmarks/circuits/pairs/feynman_gf2_16_mult__tzap.json:original",
+    "twin_tool": {
+      "tool": "tzap -O1 --decompose-rz --decompose-cz (TZAP 0.6.1, github.com/qqq-wisc/tzap)",
+      "tzap": "tzap 0.6.1",
+      "options": "-O1 --decompose-rz --decompose-cz",
+      "seconds": 0.11
+    }
+  },
+  "holdout": {
+    "modules": [],
+    "redact": [],
+    "delete": [
+      "docs",
+      "AGENTS.md",
+      "scripts/circuit_pairs.py",
+      "scripts/circuit_sources.py",
+      "scripts/peephole_pairs.py"
+    ]
+  },
+  "known_leaks": [],
+  "gates": [
+    4459,
+    2703
+  ]
+}

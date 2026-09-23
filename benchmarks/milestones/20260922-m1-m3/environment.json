@@ -1,0 +1,23 @@
+{
+  "python": "3.12.11 (main, Jun  3 2025, 15:41:47) [Clang 17.0.0 (clang-1700.0.13.3)]",
+  "executable": "/Users/stavanjain/.circuiteq-harness/envs/qcec/bin/python",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "machine": "arm64",
+  "deadline_clock": "time.time (calendar wall time)",
+  "library_commit": "d7ddcf86dc2ca2185861c9a8c832a749a03af689",
+  "versions": {
+    "mqt.qcec": "3.10.0",
+    "mqt.core": "3.10.0",
+    "pyzx": "0.9.0",
+    "quizx": "0.3.0",
+    "numpy": "2.5.3"
+  },
+  "driver_sha256": "6560f631aa85725cef78e769fbc7c0f08b38500e6a2e0157dd62f0d459bd99d6",
+  "hard_pair_sha256": "fc624333c68715f9631798474ab706af7811729a91d3db6ccc9d1d906b163114",
+  "qcec_default_configuration": "{\n  \"application\": {\n    \"alternating\": \"proportional\",\n    \"construction\": \"proportional\",\n    \"profile\": \"cost_function\",\n    \"simulation\": \"proportional\"\n  },\n  \"execution\": {\n    \"nthreads\": 10,\n    \"parallel\": true,\n    \"run_alternating_checker\": true,\n    \"run_construction_checker\": false,\n    \"run_hsf_checker\": false,\n    \"run_simulation_checker\": true,\n    \"run_zx_checker\": true,\n    \"timeout\": 0.0,\n    \"tolerance\": 2.2737367544323206e-13\n  },\n  \"functionality\": {\n    \"approximate_checking_threshold\": 1e-08,\n    \"check_approximate_equivalence\": false,\n    \"check_partial_equivalence\": false,\n    \"trace_threshold\": 1e-08\n  },\n  \"optimizations\": {\n    \"backpropagate_output_permutation\": false,\n    \"elide_permutations\": true,\n    \"fuse_consecutive_single_qubit_gates\": true,\n    \"reconstruct_swaps\": true,\n    \"remove_diagonal_gates_before_measure\": false,\n    \"reorder_operations\": true,\n    \"transform_dynamic_circuit\": false\n  },\n  \"parameterized\": {\n    \"additional_instantiations\": 0,\n    \"tolerance\": 1e-12\n  },\n  \"simulation\": {\n    \"fidelity_threshold\": 1e-08,\n    \"max_sims\": 16,\n    \"seed\": 0,\n    \"state_type\": \"computational_basis\"\n  }\n}",
+  "qcec_dd_overrides": {
+    "run_alternating_checker": true,
+    "run_simulation_checker": false,
+    "run_zx_checker": false
+  }
+}

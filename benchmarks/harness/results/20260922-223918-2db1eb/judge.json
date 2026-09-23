@@ -1,0 +1,42 @@
+{
+  "verdict": "ACCEPT",
+  "claim": "equiv",
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "reasons": [],
+  "warnings": [
+    "Solution/Probe.lean: code run at elaboration time"
+  ],
+  "modified": [
+    "Solution.lean"
+  ],
+  "deleted": [],
+  "added": [
+    ".harness/agent-finished.json",
+    ".harness/guard.log",
+    "Solution/Data.lean",
+    "Solution/Finish.lean",
+    "Solution/Gather.lean",
+    "Solution/Normalize.lean",
+    "Solution/Probe.lean",
+    "Solution/build.log",
+    "Solution/gather.py",
+    "Solution/generate.py",
+    "Solution/probe.log",
+    "Solution/submission.log"
+  ],
+  "broke_rules": false,
+  "replayed": true,
+  "submissions": [
+    {
+      "time": "2026-09-22T22:45:00Z",
+      "elapsed_s": 295,
+      "claim": "equiv",
+      "verdict": "ACCEPT"
+    }
+  ],
+  "first_accept_s": 295
+}
